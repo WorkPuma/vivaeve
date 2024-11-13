@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:snowflake="http://www.mulesoft.org/schema/mule/snowflake"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:s3="http://www.mulesoft.org/schema/mule/s3" xmlns:cloudhub="http://www.mulesoft.org/schema/mule/cloudhub" xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/fhirr4patient-api http://www.mulesoft.org/schema/mule/fhirr4patient-api/current/mule-fhirr4patient-api.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/cloudhub http://www.mulesoft.org/schema/mule/cloudhub/current/mule-cloudhub.xsd
+http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/current/mule-s3.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/snowflake http://www.mulesoft.org/schema/mule/snowflake/current/mule-snowflake.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:request-config name="HealthGorilla_Get_Token_Request_configuration" doc:name="HTTP Request configuration" doc:id="46d1a2d0-eba1-45c4-9cb9-b78b51d56b50" basePath="/oauth">
+		<http:request-connection protocol="HTTPS" host="${healthGorillaApi.host}" port="443"/>
+	</http:request-config>
+	<http:request-config name="HealthGorilla_Api_Request_configuration" doc:name="HTTP Request configuration" doc:id="090389ec-c0ad-46a5-9e35-265f1c7ae080" basePath="/fhir/R4">
+		<http:request-connection protocol="HTTPS" host="${healthGorillaApi.host}" port="443" />
+	</http:request-config>
+	<s3:config name="Amazon_S3_Configuration" doc:name="Amazon S3 Configuration" doc:id="d3fd3ea5-5c79-4de2-95bb-4da3d8e12d52" >
+		<s3:connection accessKey="${aws.accessKeyId}" secretKey="${aws.secretKey}" />
+	</s3:config>
+	<snowflake:snowflake-config name="Snowflake_Roster_Config" doc:name="Snowflake Config" doc:id="b1a4e499-3d50-467f-aa91-30c377165cb6" >
+		<snowflake:snowflake-connection accountName="${aws.snowflake.accountName}" warehouse="HERSELF_DEFAULT_XSMALL" database="${aws.snowflake.database}" schema="${aws.snowflake.schema}" user="${secure::aws.snowflake.user}" password="${secure::aws.snowflake.password}" />
+	</snowflake:snowflake-config>
+	<db:config name="Database_Config_Sql_Interop" doc:name="Database Config" doc:id="593dec68-a1f2-4b15-9d15-2fedd0e6e4c9" >
+		<db:mssql-connection host="${aws.rds.interopDatabase.host}" user="${secure::aws.rds.interopDatabase.user}" password="${secure::aws.rds.interopDatabase.password}" databaseName="${aws.rds.interopDatabase.database}" port="${aws.rds.interopDatabase.port}"/>
+	</db:config>
+	<flow name="implementationFlow" doc:id="de3df398-a9ae-4817-96bd-4af811bb624e" maxConcurrency="1">
+		<scheduler doc:name="Scheduler" doc:id="c9a4a0da-7b67-4928-8788-b44921bbbe01">
+			<scheduling-strategy>
+				<cron expression="0 0 4 * * ?" timeZone="CST" />
+			
+</scheduling-strategy>
+		</scheduler>
+		<choice doc:name="Is env prod?" doc:id="a457c255-fd65-40f3-a7e6-51aad873b1fc" >
+			<when expression="#[%dw 2.0
+import p from Mule
+output application/json
+---
+(lower(p('env') as String)) == &quot;prod&quot;]">
+				<flow-ref doc:name="SyncRosterFromSnowflakeToInteropDatabase" doc:id="9687ae8a-cf95-4162-84cb-1e31995f2d79" name="SyncRosterFromSnowflakeToInteropDatabase" />
+			</when>
+		</choice>
+		<flow-ref doc:name="P360EnrollAndImportDocumentsFromPatientRoster" doc:id="796a136c-2eb9-4d0f-8eb6-fc7feab98f8b" name="P360EnrollAndImportDocumentsFromPatientRoster"/>
+		<error-handler ref="globalError_Handler" />
+	
+</flow>
+	<sub-flow name="SyncRosterFromSnowflakeToInteropDatabase" doc:id="4972076b-d4a3-4caf-a6f0-92349d29f6b3" >
+		<try doc:name="Try" doc:id="d4e3744a-f87b-40b4-b00e-7020377d4ce7" >
+			<logger level="INFO" doc:name="Logger" doc:id="66184da7-4adb-4ac5-b0b8-28ae2311ed2a" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+    "LogMessage" : "Starting roster sync from snowflake to interop database..."
+}]'/>
+			<db:execute-script doc:name="Truncate Temp PatientRoster" doc:id="5a976563-c4f9-459e-b725-acfab410a9f2" config-ref="Database_Config_Sql_Interop">
+			<db:sql><![CDATA[TRUNCATE TABLE PatientRoster_temp;]]></db:sql>
+		</db:execute-script>
+			<snowflake:select doc:name="Select Roster" doc:id="b88fb4c4-233c-4fd9-96e8-adc9b404f1fb" config-ref="Snowflake_Roster_Config">
+			<snowflake:sql><![CDATA[SELECT PATIENT_ID,
+	FIRST_NAME,
+	LAST_NAME,
+	DOB,
+	SEX,
+	ADDRESS_LINE1,
+	CITY,
+	STATE,
+	ZIP,
+	EMAIL,
+	CELL_PH,
+	HOME_PH,
+	NEXT_APPT_DT,
+	FIRST_VISIT_DT,
+	LAST_VISIT_DT,
+	ROI_ACCEPT_DT,
+	ROI_DECLINE_DT
+FROM HG_ROSTER]]></snowflake:sql>
+		</snowflake:select>
+			<db:bulk-insert doc:name="Insert Into Temp PatientRoster" doc:id="61ba1324-db71-47b8-b892-140d3b36d7e8" config-ref="Database_Config_Sql_Interop">
+			<db:sql><![CDATA[INSERT INTO dbo.PatientRoster_temp
+(
+	ElationPatientId,
+	FirstName,
+	LastName,
+	DateOfBirth,
+	Sex,
+	AddressLine1,
+	City,
+	[State],
+	Zip,
+	Email,
+	CellPhone,
+	HomePhone,
+	NextAppointmentDate,
+	FirstVisitDate,
+	LastVisitDate,
+	RoiAcceptDate,
+	RoiDeclineDate
+)
+VALUES
+(
+	:PATIENT_ID,
+	:FIRST_NAME,
+	:LAST_NAME,
+	:DOB,
+	:SEX,
+	:ADDRESS_LINE1,
+	:CITY,
+	:STATE,
+	:ZIP,
+	:EMAIL,
+	:CELL_PH,
+	:HOME_PH,
+	:NEXT_APPT_DT,
+	:FIRST_VISIT_DT,
+	:LAST_VISIT_DT,
+	:ROI_ACCEPT_DT,
+	:ROI_DECLINE_DT
+);]]></db:sql>
+		</db:bulk-insert>
+			<db:execute-script doc:name="Merge to PatientRoster" doc:id="9d1a68c8-d414-48ca-aad6-ab2498eca3d2" config-ref="Database_Config_Sql_Interop">
+			<db:sql><![CDATA[INSERT INTO PatientRoster
+(
+	ElationPatientId
+)
+SELECT DISTINCT ElationPatientId
+FROM PatientRoster_temp
+WHERE NOT EXISTS (SELECT 1 FROM PatientRoster WHERE PatientRoster.ElationPatientId = PatientRoster_temp.ElationPatientId)
+
+UPDATE PatientRoster
+SET PatientRoster.FirstName = PatientRoster_temp.FirstName,
+	PatientRoster.MiddleName = PatientRoster_temp.MiddleName,
+	PatientRoster.LastName = PatientRoster_temp.LastName,
+	PatientRoster.DateOfBirth = PatientRoster_temp.DateOfBirth,
+	PatientRoster.Sex = PatientRoster_temp.Sex,
+	PatientRoster.AddressLine1 = PatientRoster_temp.AddressLine1,
+	PatientRoster.AddressLine2 = PatientRoster_temp.AddressLine2,
+	PatientRoster.City = PatientRoster_temp.City,
+	PatientRoster.[State] = PatientRoster_temp.[State],
+	PatientRoster.Zip = PatientRoster_temp.Zip,
+	PatientRoster.Email = PatientRoster_temp.Email,
+	PatientRoster.CellPhone = PatientRoster_temp.CellPhone,
+	PatientRoster.HomePhone = PatientRoster_temp.HomePhone,
+	PatientRoster.NextAppointmentDate = PatientRoster_temp.NextAppointmentDate,
+	PatientRoster.FirstVisitDate = PatientRoster_temp.FirstVisitDate,
+	PatientRoster.LastVisitDate = PatientRoster_temp.LastVisitDate,
+	PatientRoster.RoiAcceptDate = PatientRoster_temp.RoiAcceptDate,
+	PatientRoster.RoiDeclineDate = PatientRoster_temp.RoiDeclineDate
+FROM PatientRoster
+	JOIN PatientRoster_temp
+		ON PatientRoster.ElationPatientId = PatientRoster_temp.ElationPatientId]]></db:sql>
+		</db:execute-script>
+			<db:execute-script doc:name="Truncate Temp PatientRoster" doc:id="5056bfea-d744-4ba0-9fe1-16c11e6a5c34" config-ref="Database_Config_Sql_Interop">
+			<db:sql><![CDATA[TRUNCATE TABLE PatientRoster_temp;]]></db:sql>
+		</db:execute-script>
+			<logger level="INFO" doc:name="Logger" doc:id="207abe0c-61f4-4e1f-8e57-0554a18c9ed8" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+    "LogMessage" : "...Finished roster sync from snowflake to interop database"
+}]'/>
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="706c643c-475e-4dda-922f-68de467dcbe2">
+					<logger level="INFO" doc:name="Logger" doc:id="ce168fb2-78ac-4c1f-aaf9-fc6c3390ff52" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+    "LogMessage" : "The sync from snowflake to interop database was not successful. An error occurred: $(error.description)"
+}]'/>
+				
+</on-error-propagate>
+			</error-handler>
+		</try>
+	</sub-flow>
+	<sub-flow name="P360EnrollAndImportDocumentsFromPatientRoster" doc:id="89d6947d-b23f-4a76-98fa-277a7da37a27" >
+		<logger level="INFO" doc:name="Logger" doc:id="1a868f98-da21-4080-b49d-5604781c556a" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+    "LogMessage" : "Starting Patient 360 document import for roster patients..."
+}]'/>
+		<set-variable value="#[%dw 2.0
+import p from Mule
+output text/plain
+
+var top =
+	if ((p('patientRosterBatchSize') default 0) as Number &gt; 0)
+		&quot;TOP $(p('patientRosterBatchSize')) &quot;
+	else
+		&quot;&quot;
+---
+&quot;SELECT $(top)
+	ElationPatientId,
+	HealthGorillaPatientId
+FROM
+	PatientRoster
+WHERE
+	HealthGorillaPatientId IS NULL
+	AND COALESCE(NextAppointmentDate, FirstVisitDate, LastVisitDate, RoiAcceptDate) IS NOT NULL&quot;]" doc:name="patientRosterQuery" doc:id="06019cfb-1d7a-4365-b2ed-f934c063cd52" variableName="patientRosterQuery"/>
+		<db:select doc:name="Select Elation Patient Ids" doc:id="080c1bc9-fbd2-43ae-8012-e58260319c19" config-ref="Database_Config_Sql_Interop" fetchSize="1000">
+					<non-repeatable-iterable />
+					<db:sql><![CDATA[#[vars.patientRosterQuery]]]></db:sql>
+				</db:select>
+		<ee:transform doc:name="Transform to JSON" doc:id="2fb2a7b8-a7a7-4111-9512-0051a51105c0">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload default [] map 
+{
+	ElationPatientId: $.ElationPatientId,
+	HealthGorillaPatientId: $.HealthGorillaPatientId
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[sizeOf(payload default [])]" doc:name="totalPatients" doc:id="adb2d2d7-d604-45b9-8ec8-838c15ec6930" variableName="totalPatients" />
+		<set-variable value="0" doc:name="successCount" doc:id="f89fda8c-dd6c-4abd-8efa-3b70f59cf9dd" variableName="successCount" />
+		<logger level="INFO" doc:name="Logger" doc:id="dc29934b-a028-4883-94bd-7fc10938781c" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+    "LogMessage" : "$(vars.totalPatients default 0) patients selected from PatientRoster"
+}]'/>
+		<foreach doc:name="For Each Patient Id" doc:id="8427a963-f6e6-422e-8128-63dbfbb67b62" collection="#[payload]">
+			<try doc:name="Try" doc:id="17151e32-af4c-40ed-a891-206643c9ffa3">
+				<set-variable value="#[payload]" doc:name="currentRosterPatient" doc:id="e63dc586-c26c-4569-97bf-6940301c05b2" variableName="currentRosterPatient" />
+				<logger level="INFO" doc:name="Logger" doc:id="5fcb6ef2-fe54-45ba-a41a-de671d5f9dae" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+	"HealthGorillaPatientId": vars.currentRosterPatient.HealthGorillaPatientId default "",
+	"ElationPatientId": vars.currentRosterPatient.ElationPatientId default "",
+    "LogMessage" : "Starting Patient 360 import $(vars.counter default 0) of $(vars.totalPatients default 0)..."
+}]'/>
+				<choice doc:name="Is missing HealthGorillaPatientId?" doc:id="1bd40cdc-9ee1-47fa-9e12-aa2501707211">
+					<when expression="#[isEmpty(vars.currentRosterPatient.HealthGorillaPatientId)]">
+						<logger level="INFO" doc:name="Logger" doc:id="c8dec61b-66a2-42c6-bd9e-563e2602c293" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+	"HealthGorillaPatientId": "",
+	"ElationPatientId": vars.currentRosterPatient.ElationPatientId default "",
+    "LogMessage" : "Attempting Patient 360 import for Elation patient $(vars.currentRosterPatient.ElationPatientId default "") in HealthGorilla..."
+}]'/>
+						<flow-ref doc:name="GetHealthGorillaPatientId" doc:id="913adc64-91bd-49f2-b98b-9953d6dcf227" name="GetHealthGorillaPatientId" />
+						<db:update doc:name="Add HealthGorillaPatientId" doc:id="04de01de-3ca0-46eb-941d-723055b954e1" config-ref="Database_Config_Sql_Interop">
+							<db:sql><![CDATA[UPDATE PatientRoster 
+	SET HealthGorillaPatientId = :HealthGorillaPatientId
+WHERE ElationPatientId = :ElationPatientId]]></db:sql>
+							<db:input-parameters><![CDATA[#[{
+	ElationPatientId: vars.currentRosterPatient.ElationPatientId,
+	HealthGorillaPatientId: vars.currentRosterPatient.HealthGorillaPatientId
+}]]]></db:input-parameters>
+						</db:update>
+					
+
+</when>
+					<otherwise >
+						<logger level="INFO" doc:name="Logger" doc:id="62dbce42-81f4-477e-829a-e0ce7ed6ac32" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+	"HealthGorillaPatientId": vars.currentRosterPatient.HealthGorillaPatientId default "",
+	"ElationPatientId": vars.currentRosterPatient.ElationPatientId default "",
+    "LogMessage" : "Attempting Patient 360 import for Elation patient $(vars.currentRosterPatient.ElationPatientId default "") in HealthGorilla with HealthGorillaPatientId $(vars.currentRosterPatient.HealthGorillaPatientId default"")..."
+}]'/>
+					
+</otherwise>
+				
+</choice>
+				<set-payload value="#[vars.currentRosterPatient.HealthGorillaPatientId]" doc:name="Set Payload to HealthGorillaPatientId" doc:id="8a764797-c908-41df-8434-1ca2d1327f4f" />
+				<logger level="INFO" doc:name="Logger" doc:id="a603cff4-de6b-41e7-ab06-e1c85170889f" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+	"HealthGorillaPatientId": vars.currentRosterPatient.HealthGorillaPatientId default "",
+	"ElationPatientId": vars.currentRosterPatient.ElationPatientId default "",
+    "LogMessage" : "Running Patient 360 import for HealthGorilla patient $(payload default "") with Elation patient id $(vars.currentRosterPatient.ElationPatientId default "")..."
+}]'/>
+				<flow-ref doc:name="HealthGorillaApiP360Import" doc:id="04492dfd-da8a-4078-88ad-8aebded27f2a" name="HealthGorillaApiP360Import" />
+				<logger level="INFO" doc:name="Logger" doc:id="4b6cc891-5ba2-49b3-b789-9d8ffbe7eac5" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+	"HealthGorillaPatientId": vars.currentRosterPatient.HealthGorillaPatientId default "",
+	"ElationPatientId": vars.currentRosterPatient.ElationPatientId default "",
+    "LogMessage" : {
+		"Message": "...Finished running Patient 360 import for HealthGorilla patient $(vars.currentRosterPatient.HealthGorillaPatientId default "") with Elation patient id $(vars.currentRosterPatient.ElationPatientId default "")",
+		"Parameters": payload.Parameters
+	}
+}]'/>
+				<try doc:name="Try" doc:id="bb925da3-4773-44eb-af7a-c030de932e77">
+						<set-variable value="#[%dw 2.0
+import p from Mule
+
+output text/plain
+---
+&quot;$(p('aws.s3.healthGorillaToHealthLake.pollingFolder') default &quot;&quot;)/$(vars.currentRosterPatient.HealthGorillaPatientId default &quot;&quot;).json&quot;]" doc:name="pollingObjectName" doc:id="5540c744-5eba-44f1-9fb7-426b9e910691" variableName="pollingObjectName" />
+						<s3:put-object doc:name="Put HealthGorilla To HealthLake Polling Object" doc:id="1ca13cf9-40ed-4cf2-8c0d-f58e6850c3d2" bucketName="${aws.s3.healthGorillaToHealthLake.bucket}" config-ref="Amazon_S3_Configuration" key="#[vars.pollingObjectName]">
+							<reconnect />
+						<s3:content><![CDATA[#[%dw 2.0
+output application/json
+---
+{}]]]></s3:content>
+						</s3:put-object>
+						<set-variable value="#[%dw 2.0
+import p from Mule
+
+output text/plain
+---
+&quot;$(p('aws.s3.healthGorillaToElation.pollingFolder') default &quot;&quot;)/$(vars.currentRosterPatient.HealthGorillaPatientId default &quot;&quot;).json&quot;]" doc:name="pollingObjectName" doc:id="07eb67bf-5fd5-42f6-9426-2eb04a267e42" variableName="pollingObjectName" />
+						<s3:put-object doc:name="Put HealthGorilla To Elation Polling Object" doc:id="5b1d0309-ce63-4d3a-a577-c1e55c139efc" config-ref="Amazon_S3_Configuration" bucketName="${aws.s3.healthGorillaToElation.bucket}" key="#[vars.pollingObjectName]">
+							<reconnect />
+						<s3:content><![CDATA[#[%dw 2.0
+output application/json
+---
+{}]]]></s3:content>
+						</s3:put-object>
+						<set-variable value="#[%dw 2.0
+import p from Mule
+
+output text/plain
+---
+&quot;$(p('aws.s3.healthGorillaHarvestDocuments.pollingFolder') default &quot;&quot;)/$(vars.currentRosterPatient.HealthGorillaPatientId default &quot;&quot;).json&quot;]" doc:name="pollingObjectName" doc:id="96e57e06-d06f-48e3-8320-470c6de0121a" variableName="pollingObjectName"/>
+					<s3:put-object doc:name="Put HealthGorillaHarvestDocuments Polling Object" doc:id="c4567b15-8293-42e6-8cca-c52ae66df4bb" config-ref="Amazon_S3_Configuration" bucketName="${aws.s3.healthGorillaHarvestDocuments.bucket}" key="#[vars.pollingObjectName]">
+						<reconnect />
+						<s3:content ><![CDATA[#[%dw 2.0
+output application/json
+---
+{}]]]></s3:content>
+					</s3:put-object>
+					<error-handler>
+							<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="9c05e86a-a59d-48ee-8012-04846de019d7" type="ANY">
+							<logger level="INFO" doc:name="Logger" doc:id="f966230d-5d0e-4434-922f-e2897b577763" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+	"HealthGorillaPatientId": vars.currentRosterPatient.HealthGorillaPatientId default "",
+	"ElationPatientId": vars.currentRosterPatient.ElationPatientId default "",
+    "LogMessage" : "An error occured while attempting to save a polling object: $(error.description)"
+}]'/>
+							
+</on-error-continue>
+						</error-handler>
+					</try>
+				<set-variable value="#[(vars.successCount default 0) + 1]" doc:name="successCount" doc:id="949afd71-7b50-4f45-809f-c64a92de781d" variableName="successCount" />
+				<logger level="INFO" doc:name="Logger" doc:id="3661efe5-a8dd-47a6-bec1-82ff77ec475d" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+	"HealthGorillaPatientId": vars.currentRosterPatient.HealthGorillaPatientId default "",
+	"ElationPatientId": vars.currentRosterPatient.ElationPatientId default "",
+    "LogMessage" : "...Finished Patient 360 import $(vars.counter default 0) of $(vars.totalPatients default 0)"
+}]'/>
+				<error-handler>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="08b28ab8-ba98-4f8f-9edb-44cf62bcb067" type="APP:HEALTHGORILLA_API_CREATE_PATIENT">
+						<logger level="INFO" doc:name="Logger" doc:id="b239dc02-ea7b-4d5f-bdc9-571bd2e81aaf" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+	"HealthGorillaPatientId": "",
+	"ElationPatientId": vars.currentRosterPatient.ElationPatientId default "",
+    "LogMessage" : error.description,
+    "ApiResponse" : error.errorMessage.payload
+}]'/>
+					
+</on-error-continue>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="d69d559f-25b1-450b-aab6-0fae714dae72" type="MULE:RETRY_EXHAUSTED">
+						<logger level="INFO" doc:name="Logger" doc:id="6453e72b-ba23-49b5-be61-7d0f14818123" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+	"HealthGorillaPatientId": vars.currentRosterPatient.HealthGorillaPatientId default "",
+	"ElationPatientId": vars.currentRosterPatient.ElationPatientId default "",
+    "LogMessage" : "The maximum number or retries has been exceeded"
+}]'/>
+					
+</on-error-continue>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="871da8e4-62d0-42f6-8023-81ef714275e4" type="ANY">
+						<logger level="INFO" doc:name="Logger" doc:id="0a292e67-419e-4990-98c0-5717b30e27ae" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+	"HealthGorillaPatientId": vars.currentRosterPatient.HealthGorillaPatientId default "",
+	"ElationPatientId": vars.currentRosterPatient.ElationPatientId default "",
+    "LogMessage" : error.description
+}]'/>
+					
+</on-error-continue>
+				
+</error-handler>
+			</try>
+		</foreach>
+		<logger level="INFO" doc:name="Logger" doc:id="1baef11d-2f26-4bd4-adb9-6ef231eb95f0" message='#[%dw 2.0
+output application/json
+---
+{
+	"AppName": app.name,
+	"FlowName" : flow.name,
+    "LogMessage" : "...Finished Patient 360 document import for $(vars.successCount default 0) of $(vars.totalPatients default 0) patients"
+}]'/>
+	</sub-flow>
+	
+	<!-- Refactored sub-flow to use PatientRoster data -->
+<sub-flow name="GetHealthGorillaPatientId" doc:id="4cb305e9-0f18-43ed-a20e-7290eab5beaf">
+    <set-payload value="#[vars.currentRosterPatient.ElationPatientId]" doc:name="Set Payload to patient id" doc:id="ca1a6339-d514-4443-a1ff-95f9805611ca" />
+    <flow-ref doc:name="HealthGorillaApiGetPatientByMrn" doc:id="ac4e8052-4c67-428c-bd69-6652b005a00c" name="HealthGorillaApiGetPatientByMrn" />
+    <choice doc:name="Is Patient In HealthGorilla?" doc:id="813dfce9-610f-43c1-b4e8-9ca341e90273">
+        <when expression="#[payload.total == 0]">
+            <logger level="INFO" doc:name="Logger" doc:id="f9bd92e2-ee1b-4133-9a10-2bfdb2baed14" message='#[%dw 2.0
+output application/json
+---
+{
+    "AppName": app.name,
+    "FlowName" : flow.name,
+    "HealthGorillaPatientId": "",
+    "ElationPatientId": vars.currentRosterPatient.ElationPatientId default "",
+    "LogMessage" : "Elation patient $(vars.currentRosterPatient.ElationPatientId default "") not found in HealthGorilla"
+}]'/>
+            <!-- Query PatientRoster instead of calling Elation -->
+            <db:select doc:name="Get Patient From PatientRoster" doc:id="get-patient-roster" config-ref="Database_Config_Sql_Interop">
+                <db:sql>
+                    SELECT 
+                        ElationPatientId,
+                        FirstName,
+                        MiddleName,
+                        LastName,
+                        DateOfBirth as DOB,
+                        Sex,
+                        AddressLine1,
+                        City,
+                        State,
+                        Zip,
+                        Email,
+                        CellPhone,
+                        HomePhone
+                    FROM PatientRoster
+                    WHERE ElationPatientId = :patientId
+                </db:sql>
+                <db:input-parameters>
+                    #[{
+                        patientId: vars.currentRosterPatient.ElationPatientId
+                    }]
+                </db:input-parameters>
+            </db:select>
+            <!-- Transform PatientRoster data to FHIR -->
+            <ee:transform doc:name="PatientRoster To FHIR" doc:id="transform-to-fhir">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+import p from Mule
+
+var phones = (
+    (if (payload[0].CellPhone != null) 
+        [{
+            "system": "phone",
+            "value": payload[0].CellPhone,
+            "use": "mobile"
+        }] else []) ++
+    (if (payload[0].HomePhone != null)
+        [{
+            "system": "phone",
+            "value": payload[0].HomePhone,
+            "use": "home"
+        }] else [])
+)
+
+var emails = if (payload[0].Email != null)
+    [{
+        "system": "email",
+        "value": payload[0].Email
+    }]
+else []
+
+---
+{
+    "resourceType": "Patient",
+    "identifier": [{
+        "type": {
+            "coding": [{
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                "code": "MR",
+                "display": "Medical record number"
+            }],
+            "text": "Medical record number"
+        },
+        "system": "https://" ++ p('elationApi.host'),
+        "value": payload[0].ElationPatientId
+    }],
+    "name": [{
+        "use": "usual",
+        "family": payload[0].LastName,
+        "given": if (payload[0].MiddleName != null)
+            [
+                payload[0].FirstName,
+                payload[0].MiddleName
+            ]
+        else
+            [payload[0].FirstName]
+    }],
+    "gender": if (payload[0].Sex != null)
+        if (upper(payload[0].Sex) == "MALE") "male"
+        else if (upper(payload[0].Sex) == "FEMALE") "female"
+        else if (upper(payload[0].Sex) == "OTHER") "other"
+        else "unknown"
+    else null,
+    "address": if (payload[0].AddressLine1 != null)
+        [{
+            "use": "home",
+            "type": "both",
+            "line": [
+                payload[0].AddressLine1
+            ],
+            "city": payload[0].City,
+            "state": payload[0].State,
+            "postalCode": payload[0].Zip
+        }]
+    else null,
+    "birthDate": payload[0].DOB,
+    "telecom": if (!isEmpty(emails) or !isEmpty(phones))
+        (emails default []) ++ (phones default [])
+    else null
+}]]></ee:set-payload>
+                </ee:message>
+            </ee:transform>
+            <flow-ref doc:name="HealthGorillaApiCreatePatient" doc:id="1d040a2e-2a2c-4353-a6fa-880deef22748" name="HealthGorillaApiCreatePatient"/>
+            <set-variable value="#[%dw 2.0
+output application/json
+---
+{
+    ElationPatientId: vars.currentRosterPatient.ElationPatientId,
+    HealthGorillaPatientId: payload
+}]" doc:name="currentRosterPatient" doc:id="d84849a2-9312-4ee0-8a84-37a6aa31d64a" variableName="currentRosterPatient"/>
+            <logger level="INFO" doc:name="Logger" doc:id="d66b373e-2c1f-4f82-8ffc-24e4c24fb59d" message='#[%dw 2.0
+output application/json
+---
+{
+    "AppName": app.name,
+    "FlowName" : flow.name,
+    "HealthGorillaPatientId": vars.currentRosterPatient.HealthGorillaPatientId default "",
+    "ElationPatientId": vars.currentRosterPatient.ElationPatientId default "",
+    "LogMessage" : "Successfully created patient $(vars.currentRosterPatient.HealthGorillaPatientId default "") in HealthGorilla using PatientRoster data for Elation patient $(vars.currentRosterPatient.ElationPatientId default "")"
+}]'/>
+        </when>
+        <when expression="#[payload.total > 1]">
+            <raise-error doc:name="Raise error" doc:id="4aceefdb-4301-4f95-88e5-878fa02f8baa" type="HEALTH_GORILLA_API:MULTIPLE_PATIENTS_FOUND" description="Multiple patients found with same identifier"/>
+        </when>
+        <otherwise>
+            <set-variable value="#[%dw 2.0
+output application/json
+---
+{
+    ElationPatientId: vars.currentRosterPatient.ElationPatientId,
+    HealthGorillaPatientId: payload.entry[0].resource.id
+}]" doc:name="currentRosterPatient" doc:id="4c38718f-563b-4d6e-a742-9eb87836917d" variableName="currentRosterPatient"/>
+            <logger level="INFO" doc:name="Logger" doc:id="858b9bb6-3e02-4cf9-8af8-8146d74d5aa5" message='#[%dw 2.0
+output application/json
+---
+{
+    "AppName": app.name,
+    "FlowName" : flow.name,
+    "HealthGorillaPatientId": vars.currentRosterPatient.HealthGorillaPatientId default "",
+    "ElationPatientId": vars.currentRosterPatient.ElationPatientId default "",
+    "LogMessage" : "Elation patient $(vars.currentRosterPatient.ElationPatientId default "") found in HealthGorilla with id $(vars.currentRosterPatient.HealthGorillaPatientId default "")"
+}]'/>
+        </otherwise>
+    </choice>
+</sub-flow>
+</mule>

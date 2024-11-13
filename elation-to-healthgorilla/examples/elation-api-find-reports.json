@@ -1,0 +1,29 @@
+{
+  "count": 164,
+  "next": "https://sandbox.elationemr.com/api/2.0/reports/?limit=100&offset=100",
+  "previous": null,
+  "results": [
+    {
+      "id": 141342982209576,
+      "patient": 140986952318977,
+      "custom_title": "COVID-19 Screening Form",
+      "report_type": "PatientForm",
+      "requisition_number": null,
+      "tags": [],
+      "reported_date": "2023-03-01T18:30:51Z",
+      "grids": [],
+      "images": [],
+      "files": [],
+      "practice": 140976522133508,
+      "physician": 140976531701762,
+      "document_date": "2023-03-01T18:30:51Z",
+      "chart_date": "2023-03-01T18:30:51Z",
+      "signed_date": null,
+      "signed_by": null,
+      "created_date": "2023-03-01T18:30:51Z",
+      "deleted_date": null,
+      "printable_view": "https://sandbox.elationemr.com/api/2.0/reports/141342982209576/printable",
+      "vendor": null,
+      "order_status": null
+    }]
+  }

@@ -1,0 +1,14 @@
+sf:
+  pwd: "![gd65N4VSVx8iW0/5biO1VQ==]"  
+  token: "![4PWABH2nXhh4mH14mhnREZ/FwaKCG9lDSnGuPRSFA00=]"
+  clientId: "![jiSlMrcY429CVL/3OiHCJxFXWlAeBbk7J8dBXZNCYFJAJNaEOcBZNlu39rVoD4Tyh3wKMG2BwrCBuudtT8+KRi058ZvEQWc/2dPmb56ItcFdSoJhZH2QPg==]"
+  clientSecret: "![ptBO/BaDzitSUPuBqUf09EaQWpcUt19osxjsq0UAmChjXhqGC3b4osp2oaUnqy8/yyNI0r6XDhgvEw8atefqjxkauvye19C5]"
+  
+aws:
+  rds:
+    interopDatabase:
+      user: "![8nvgUp+woKw=]"
+      password: "![zof6mIQDjCeKZ92SCWRCFQ==]"
+  snowflake:
+      user: "![CoSP1vbK+4KuUnT9QHAmRfJ5K4rZqoy3oBAKJCaLifc=]"  
+      password: "![6iwmhwmuvKVR6F76iqotyA==]"

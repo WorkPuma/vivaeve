@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<error-handler name="globalError_Handler" doc:id="dbfa626a-256b-4e6e-8abd-fa057b0fe749" >
+	<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="24a5f2e3-f67e-4cb6-80bb-1194c354b760" type="ANY">
+			<ee:transform doc:name="Transform Message" doc:id="3b1abab8-1cc9-468e-84e5-fe35e53851b5">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	message: error.description
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+			<logger level="INFO" doc:name="Logger" doc:id="da21fa52-ba3f-4086-bdf4-e1dd0d3e0862" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;    "LogMessage" : payload&#10;}]'/>
+			<choice doc:name="Choice" doc:id="15a6863f-ad9a-46c4-8bd8-a388b3fa052c" >
+				<when expression="#[p('sendEmails') == &quot;true&quot;]">
+					<email:send doc:name="Send" doc:id="861050a5-989f-4ade-ab48-018628273de9" config-ref="Email_SMTP" fromAddress="noreply@xbridge.io" subject="${env} - elation-to-healthgorilla application - Errorct]">
+						<email:to-addresses >
+							<email:to-address value="appteam@xbridge.io" />
+						</email:to-addresses>
+						<email:body >
+							<email:content ><![CDATA[An error has occurred in a flow. Please check the Runtime Manager logs for more details]]></email:content>
+						</email:body>
+					</email:send>
+				</when>
+				<otherwise >
+					<logger level="INFO" doc:name="Logger" doc:id="7c4de984-f1b0-4704-8c29-5d39c6aedc3b" message="#[%dw 2.0&#10;import p from Mule&#10;&#10;output application/json&#10;---&#10;{&#10;	&quot;AppName&quot;: app.name,&#10;	&quot;FlowName&quot; : flow.name,&#10;    &quot;LogMessage&quot; : &quot;Not sending error email since sendEmails is $(p('sendEmails'))&quot;&#10;}]"/>
+				
+</otherwise>
+			</choice>
+		</on-error-propagate>
+	</error-handler>
+</mule>

@@ -1,0 +1,2576 @@
+{
+    "resourceType": "Bundle",
+    "meta": {
+        "profile": [
+            "https://healthgorilla.com/fhir/StructureDefinition/hg-stateless-bundle"
+        ]
+    },
+    "type": "searchset",
+    "total": 22,
+    "link": [
+        {
+            "relation": "self",
+            "url": "https://sandbox.healthgorilla.com/fhir/R4/DocumentReference/$p360-search?patient=33238a6487e2a7fefd0b1d83"
+        }
+    ],
+    "entry": [
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-cw-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "PractitionerRole",
+                        "id": "1",
+                        "organization": {
+                            "reference": "#2",
+                            "display": "Freeman Clinic (CW)"
+                        },
+                        "specialty": [
+                            {
+                                "text": "Unknown"
+                            }
+                        ]
+                    },
+                    {
+                        "resourceType": "Organization",
+                        "id": "2",
+                        "identifier": [
+                            {
+                                "value": "1.3.6.1.4.1.52618.0.2"
+                            }
+                        ],
+                        "name": "Freeman Clinic (CW)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2019-10-13T13:46:52+00:00"
+                    }
+                ],
+                "masterIdentifier": {
+                    "system": "urn:ietf:rfc:3986",
+                    "value": "epc_826723F5DAEA3F0E10469E62D201C340"
+                },
+                "identifier": [
+                    {
+                        "use": "official",
+                        "system": "urn:ietf:rfc:3986",
+                        "value": "urn:uuid:${docRefUuid}"
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org/",
+                            "code": "34133-9",
+                            "display": "Summarization of episode note"
+                        }
+                    ]
+                },
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org/",
+                                "code": "34133-9",
+                                "display": "Summarization of episode note"
+                            }
+                        ]
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2019-10-13T13:46:52.000+00:00",
+                "author": [
+                    {
+                        "reference": "#1"
+                    }
+                ],
+                "description": "Ambulatory Summary (CW)",
+                "securityLabel": [
+                    {
+                        "text": "Normal"
+                    }
+                ],
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "language": "en-us",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/cw-a-cHN8UdWyGRxV3RtW5Hk_jtNHMc4PQdcvxI0_SHtc78gp6qSucJsYkJaDZqB_PrBK_FSW5txZVaMbv74wRbZNpnqFSBxDJ5epqPdedo1T-YQieUGV25GA9cSxUccByQcXxsvk9L7nt9Bm7Vqaph3RvwdyAjesf-qX-9-DGKzz6YgR60mtZn9CCiRa1NmXZb5p3jfVQ9qVTV-TIzYFRCdVy5x9Edv804luw-J_kut3iKhou51d6OD7ScLPX3XcFjwK0PdWXlZFo8IZ0yvtCRdgWYXL11IY_Gb99sUfG7Z3kUX_JviTgFYo5yp4RlCmQgCU0J_wXvSswsCgjdsAjk66WPuO5IWET7u3AftWWoWamfLFhzKNfmEjADyv4v_cjMlzYZOVg8ami7rS0x8kOqw4gbGliE9ePXM7QRCldTB6UIQHs7z0eijHAT6PjgKLue3KkCkWNQFfpPtNeo_SAEEA"
+                        },
+                        "format": {
+                            "code": "urn:ihe:pcc:xphr:2007"
+                        }
+                    }
+                ],
+                "context": {
+                    "event": [
+                        {
+                            "text": "Problem"
+                        },
+                        {
+                            "text": "drug allergy"
+                        },
+                        {
+                            "text": "Nausea"
+                        },
+                        {
+                            "text": "Depressive disorder"
+                        },
+                        {
+                            "text": "Hypothyroidism"
+                        },
+                        {
+                            "text": "Sinusitis"
+                        },
+                        {
+                            "text": "CT of paranasal sinuses"
+                        },
+                        {
+                            "text": "Left maxillary sinus mass"
+                        },
+                        {
+                            "text": "never a smoker"
+                        },
+                        {
+                            "text": "Vital signs"
+                        },
+                        {
+                            "text": "Neoplasm of accessory sinus"
+                        },
+                        {
+                            "text": "Finding of functional performance and activity"
+                        },
+                        {
+                            "text": "Cane"
+                        },
+                        {
+                            "text": "Cognitive function finding"
+                        },
+                        {
+                            "text": "Short term memory deficit"
+                        }
+                    ],
+                    "period": {
+                        "start": "2012-10-02T04:00:00+00:00"
+                    },
+                    "facilityType": {
+                        "coding": [
+                            {
+                                "system": "http://snomed.info/sct",
+                                "code": "83891005",
+                                "display": "Solo practice private office"
+                            }
+                        ]
+                    }
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-cw-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "PractitionerRole",
+                        "id": "1",
+                        "organization": {
+                            "reference": "#2",
+                            "display": "Freeman Clinic (CW)"
+                        },
+                        "specialty": [
+                            {
+                                "text": "Unknown"
+                            }
+                        ]
+                    },
+                    {
+                        "resourceType": "Organization",
+                        "id": "2",
+                        "identifier": [
+                            {
+                                "value": "1.3.6.1.4.1.52618.0.2"
+                            }
+                        ],
+                        "name": "Freeman Clinic (CW)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2019-02-13T13:46:52+00:00"
+                    }
+                ],
+                "masterIdentifier": {
+                    "system": "urn:ietf:rfc:3986",
+                    "value": "epc_0D25F043369D797EF2D5EF0963B65512"
+                },
+                "identifier": [
+                    {
+                        "use": "official",
+                        "system": "urn:ietf:rfc:3986",
+                        "value": "urn:uuid:${docRefUuid}"
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org/",
+                            "code": "34133-9",
+                            "display": "Summarization of episode note"
+                        }
+                    ]
+                },
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org/",
+                                "code": "34133-9",
+                                "display": "Summarization of episode note"
+                            }
+                        ]
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2019-02-13T13:46:52.000+00:00",
+                "author": [
+                    {
+                        "reference": "#1"
+                    }
+                ],
+                "description": "Clinical Summary (CW)",
+                "securityLabel": [
+                    {
+                        "text": "Normal"
+                    }
+                ],
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "application/xml",
+                            "language": "en-us",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/cw-a-cHN8UdWyGRxV3RtW5Hk_jtNHMc4PQdcvxI0_SHtc78gp6qSucJsYkJaDZqB_PrBK_FSW5txZVaMbv74wRbZNpnqFSBxDJ5epqPdedo1T-YQieUGV25GA9cSxUccByQcXxsvk9L7nt9Bm7Vqaph3TmRwFLc-GcBOdfatMzDiWqqSoh66k8gIArTgo8lokblvFu79V1lEguNTr_baBaKWBPBctTkSgPJz82FXvnsd7kuhPkXyzJ63hBt9k1bJQkMqcBPw4IzB38U-NziknE8elfKm5V1cakBXyGyMAw_GErblRDBoko2HkbNO2mqV-N7PDWakNk1t4CHArWXSNdOnycGyTlrnrYt0vY0655nZBplKCf2F3qf0vxAmpTgyJ1XojRr4-fH_vTy1J6IvmZzR7iQ0867mYvtPkV7IdcajB-lWZzejd49DRV8HmNdTr37ahPbNz8qe7PfvSethwyGYm9PR0JP0l94nuqVOJc7210"
+                        },
+                        "format": {
+                            "code": "urn:ihe:pcc:xphr:2007"
+                        }
+                    }
+                ],
+                "context": {
+                    "event": [
+                        {
+                            "text": "Problem"
+                        },
+                        {
+                            "text": "drug allergy"
+                        },
+                        {
+                            "text": "Nausea"
+                        },
+                        {
+                            "text": "Depressive disorder"
+                        },
+                        {
+                            "text": "Hypothyroidism"
+                        },
+                        {
+                            "text": "Sinusitis"
+                        },
+                        {
+                            "text": "CT of paranasal sinuses"
+                        },
+                        {
+                            "text": "Left maxillary sinus mass"
+                        },
+                        {
+                            "text": "never a smoker"
+                        },
+                        {
+                            "text": "Vital signs"
+                        },
+                        {
+                            "text": "Neoplasm of accessory sinus"
+                        },
+                        {
+                            "text": "Finding of functional performance and activity"
+                        },
+                        {
+                            "text": "Cane"
+                        },
+                        {
+                            "text": "Cognitive function finding"
+                        },
+                        {
+                            "text": "Short term memory deficit"
+                        }
+                    ],
+                    "period": {
+                        "start": "2012-10-02T04:00:00+00:00"
+                    },
+                    "facilityType": {
+                        "coding": [
+                            {
+                                "system": "http://snomed.info/sct",
+                                "code": "83891005",
+                                "display": "Solo practice private office"
+                            }
+                        ]
+                    }
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-cw-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "PractitionerRole",
+                        "id": "1",
+                        "organization": {
+                            "reference": "#2",
+                            "display": "Freeman Clinic (CW)"
+                        },
+                        "specialty": [
+                            {
+                                "text": "Unknown"
+                            }
+                        ]
+                    },
+                    {
+                        "resourceType": "Organization",
+                        "id": "2",
+                        "identifier": [
+                            {
+                                "value": "1.3.6.1.4.1.52618.0.2"
+                            }
+                        ],
+                        "name": "Freeman Clinic (CW)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2019-11-13T13:46:52+00:00"
+                    }
+                ],
+                "masterIdentifier": {
+                    "system": "urn:ietf:rfc:3986",
+                    "value": "epc_C6BDEFE5DDF5FF31042F8EDC0AAC7525"
+                },
+                "identifier": [
+                    {
+                        "use": "official",
+                        "system": "urn:ietf:rfc:3986",
+                        "value": "urn:uuid:${docRefUuid}"
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org/",
+                            "code": "34133-9",
+                            "display": "Summarization of episode note"
+                        }
+                    ]
+                },
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org/",
+                                "code": "34133-9",
+                                "display": "Summarization of episode note"
+                            }
+                        ]
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2019-11-13T13:46:52.000+00:00",
+                "author": [
+                    {
+                        "reference": "#1"
+                    }
+                ],
+                "description": "Clinical Summary (CW)",
+                "securityLabel": [
+                    {
+                        "text": "Normal"
+                    }
+                ],
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "language": "en-us",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/cw-a-cHN8UdWyGRxV3RtW5Hk_jtNHMc4PQdcvxI0_SHtc78gp6qSucJsYkJaDZqB_PrBK_FSW5txZVaMbv74wRbZNpnqFSBxDJ5epqPdedo1T-YQieUGV25GA9cSxUccByQcXxsvk9L7nt9Bm7Vqaph3Siz1hTAV4Nzw91Hsq9INEqYgR60mtZn9CCiRa1NmXZb5p3jfVQ9qVTV-TIzYFRCdbMwtmN3GJKiBi8g3J-_J5iXl1GkEGNppjCftfYD-8PbKc_5HYVWxdivd5XhYLiQ7QWYXL11IY_Gb99sUfG7Z3kUX_JviTgFYo5yp4RlCmQgCU0J_wXvSswsCgjdsAjk66WPuO5IWET7u3AftWWoWamfLFhzKNfmEjADyv4v_cjMlzYZOVg8ami7rS0x8kOqw4gbGliE9ePXM7QRCldTB6UIQHs7z0eijHAT6PjgKLue3KkCkWNQFfpPtNeo_SAEEA"
+                        },
+                        "format": {
+                            "code": "urn:ihe:pcc:xphr:2007"
+                        }
+                    }
+                ],
+                "context": {
+                    "event": [
+                        {
+                            "text": "Problem"
+                        },
+                        {
+                            "text": "drug allergy"
+                        },
+                        {
+                            "text": "Nausea"
+                        },
+                        {
+                            "text": "Depressive disorder"
+                        },
+                        {
+                            "text": "Hypothyroidism"
+                        },
+                        {
+                            "text": "Sinusitis"
+                        },
+                        {
+                            "text": "CT of paranasal sinuses"
+                        },
+                        {
+                            "text": "Left maxillary sinus mass"
+                        },
+                        {
+                            "text": "never a smoker"
+                        },
+                        {
+                            "text": "Vital signs"
+                        },
+                        {
+                            "text": "Neoplasm of accessory sinus"
+                        },
+                        {
+                            "text": "Finding of functional performance and activity"
+                        },
+                        {
+                            "text": "Cane"
+                        },
+                        {
+                            "text": "Cognitive function finding"
+                        },
+                        {
+                            "text": "Short term memory deficit"
+                        }
+                    ],
+                    "period": {
+                        "start": "2012-10-02T04:00:00+00:00"
+                    },
+                    "facilityType": {
+                        "coding": [
+                            {
+                                "system": "http://snomed.info/sct",
+                                "code": "83891005",
+                                "display": "Solo practice private office"
+                            }
+                        ]
+                    }
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-cw-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "PractitionerRole",
+                        "id": "1",
+                        "organization": {
+                            "reference": "#2",
+                            "display": "Freeman Clinic (CW)"
+                        },
+                        "specialty": [
+                            {
+                                "text": "Unknown"
+                            }
+                        ]
+                    },
+                    {
+                        "resourceType": "Organization",
+                        "id": "2",
+                        "identifier": [
+                            {
+                                "value": "1.3.6.1.4.1.52618.0.2"
+                            }
+                        ],
+                        "name": "Freeman Clinic (CW)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2019-01-13T13:46:52+00:00"
+                    }
+                ],
+                "masterIdentifier": {
+                    "system": "urn:ietf:rfc:3986",
+                    "value": "epc_4B14213CF504F019E5AC84CD4CE24A55"
+                },
+                "identifier": [
+                    {
+                        "use": "official",
+                        "system": "urn:ietf:rfc:3986",
+                        "value": "urn:uuid:${docRefUuid}"
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org/",
+                            "code": "34133-9",
+                            "display": "Summarization of episode note"
+                        }
+                    ]
+                },
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org/",
+                                "code": "34133-9",
+                                "display": "Summarization of episode note"
+                            }
+                        ]
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2019-01-13T13:46:52.000+00:00",
+                "author": [
+                    {
+                        "reference": "#1"
+                    }
+                ],
+                "description": "Clinical Summary (CW)",
+                "securityLabel": [
+                    {
+                        "text": "Normal"
+                    }
+                ],
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "application/octet-stream",
+                            "language": "en-us",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/cw-a-cHN8UdWyGRxV3RtW5Hk_jtNHMc4PQdcvxI0_SHtc78gp6qSucJsYkJaDZqB_PrBK_FSW5txZVaMbv74wRbZNpnqFSBxDJ5epqPdedo1T-YQieUGV25GA9cSxUccByQcXxsvk9L7nt9Bm7Vqaph3QrbKjmCQHHOZTJ6hjScOizp8urOdPWX46ZUlTT2F5BpOcJLTlIZrJVCQ8MMHia5rW8DvzX9SslMJ5KWICliM1Q1Ri29G4QYbQwyoUeSQMU5Tdt-Xzg-yg9oKtkV1IedR33PMkA6nV2pkdzYHxousNAFmFy9dSGPxm_fbFHxu2d5FF_yb4k4BWKOcqeEZQpkIAlNCf8F70rMLAoI3bAI5Oulj7juSFhE-7twH7VlqFmpnyxYcyjX5hIwA8r-L_3IzJc2GTlYPGpou60tMfJDqsOIGxpYhPXj1zO0EQpXUwelCEB7O89HooxwE-j44Ci7ntypApFjUBX6T7TXqP0gBBA"
+                        },
+                        "format": {
+                            "code": "urn:ihe:pcc:xphr:2007"
+                        }
+                    }
+                ],
+                "context": {
+                    "event": [
+                        {
+                            "text": "Problem"
+                        },
+                        {
+                            "text": "drug allergy"
+                        },
+                        {
+                            "text": "Nausea"
+                        },
+                        {
+                            "text": "Depressive disorder"
+                        },
+                        {
+                            "text": "Hypothyroidism"
+                        },
+                        {
+                            "text": "Sinusitis"
+                        },
+                        {
+                            "text": "CT of paranasal sinuses"
+                        },
+                        {
+                            "text": "Left maxillary sinus mass"
+                        },
+                        {
+                            "text": "never a smoker"
+                        },
+                        {
+                            "text": "Vital signs"
+                        },
+                        {
+                            "text": "Neoplasm of accessory sinus"
+                        },
+                        {
+                            "text": "Finding of functional performance and activity"
+                        },
+                        {
+                            "text": "Cane"
+                        },
+                        {
+                            "text": "Cognitive function finding"
+                        },
+                        {
+                            "text": "Short term memory deficit"
+                        }
+                    ],
+                    "period": {
+                        "start": "2012-10-02T04:00:00+00:00"
+                    },
+                    "facilityType": {
+                        "coding": [
+                            {
+                                "system": "http://snomed.info/sct",
+                                "code": "83891005",
+                                "display": "Solo practice private office"
+                            }
+                        ]
+                    }
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-cw-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "PractitionerRole",
+                        "id": "1",
+                        "organization": {
+                            "reference": "#2",
+                            "display": "Lakeside Hospital (CW)"
+                        },
+                        "specialty": [
+                            {
+                                "text": "Unknown"
+                            }
+                        ]
+                    },
+                    {
+                        "resourceType": "Organization",
+                        "id": "2",
+                        "identifier": [
+                            {
+                                "value": "1.3.6.1.4.1.52618.0.1"
+                            }
+                        ],
+                        "name": "Lakeside Hospital (CW)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2019-12-09T14:56:47+00:00"
+                    }
+                ],
+                "masterIdentifier": {
+                    "system": "urn:ietf:rfc:3986",
+                    "value": "epc_F88C98725B2FD8549A66768054F12FE9"
+                },
+                "identifier": [
+                    {
+                        "use": "official",
+                        "system": "urn:ietf:rfc:3986",
+                        "value": "urn:uuid:${docRefUuid}"
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org/",
+                            "code": "34133-9",
+                            "display": "Summarization of episode note"
+                        }
+                    ]
+                },
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org/",
+                                "code": "34133-9",
+                                "display": "Summarization of episode note"
+                            }
+                        ]
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2019-12-09T19:56:47.000+00:00",
+                "author": [
+                    {
+                        "reference": "#1"
+                    }
+                ],
+                "description": "Ambulatory Summary (CW)",
+                "securityLabel": [
+                    {
+                        "text": "Normal"
+                    }
+                ],
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "application/xml",
+                            "language": "en-us",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/cw-a-cHN8UdWyGRxV3RtW5Hk_jtNHMc4PQdcvxI0_SHtc78gp6qSucJsYkJaDZqB_PrBK_FSW5txZVaMbv74wRbZNpnqFSBxDJ5epqPdedo1T-YQieUGV25GA9cSxUccByQcXxsvk9L7nt9Bm7Vqaph3QiBFN9-HkDVzVgHaCwf9xHp8urOdPWX46ZUlTT2F5Bpk7nGArB_58OiwlVoqQDbO7pxEPJhkT4cmP_Ft6cLPdu47IdWpYL7D954vX6cVqmy8M480WhnwVg34ydc0FC-xfozxNJcAjUO0Tl0Oa3rplBnSiusUqwIWGPDgfkSwElZUDqrY1WBOXtv_pi2FcreN0PB7srLwMGwfroD6eYN1sdlulIrUM-0DQ-b1iOAi1c41hwXqS7VbXNt2zBAaU4zEtvCzrVxk5fT7DzJPZuuHYuDLB_feQLwIdh_52TsUzeJG_sL8OjGvY6AknL2AI6qP48vb0SjAiVicTLKENgyWJw"
+                        },
+                        "format": {
+                            "code": "urn:ihe:pcc:xphr:2007"
+                        }
+                    }
+                ],
+                "context": {
+                    "event": [
+                        {
+                            "text": "Problem"
+                        },
+                        {
+                            "text": "drug allergy"
+                        },
+                        {
+                            "text": "Nausea"
+                        },
+                        {
+                            "text": "Depressive disorder"
+                        },
+                        {
+                            "text": "Hypothyroidism"
+                        },
+                        {
+                            "text": "Sinusitis"
+                        },
+                        {
+                            "text": "CT of paranasal sinuses"
+                        },
+                        {
+                            "text": "Left maxillary sinus mass"
+                        },
+                        {
+                            "text": "never a smoker"
+                        },
+                        {
+                            "text": "Vital signs"
+                        },
+                        {
+                            "text": "Neoplasm of accessory sinus"
+                        },
+                        {
+                            "text": "Finding of functional performance and activity"
+                        },
+                        {
+                            "text": "Cane"
+                        },
+                        {
+                            "text": "Cognitive function finding"
+                        },
+                        {
+                            "text": "Short term memory deficit"
+                        }
+                    ],
+                    "period": {
+                        "start": "2012-10-02T04:00:00+00:00"
+                    },
+                    "facilityType": {
+                        "coding": [
+                            {
+                                "system": "http://snomed.info/sct",
+                                "code": "83891005",
+                                "display": "Solo practice private office"
+                            }
+                        ]
+                    }
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-cw-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "PractitionerRole",
+                        "id": "1",
+                        "organization": {
+                            "reference": "#2",
+                            "display": "Lakeside Hospital (CW)"
+                        },
+                        "specialty": [
+                            {
+                                "text": "Unknown"
+                            }
+                        ]
+                    },
+                    {
+                        "resourceType": "Organization",
+                        "id": "2",
+                        "identifier": [
+                            {
+                                "value": "1.3.6.1.4.1.52618.0.1"
+                            }
+                        ],
+                        "name": "Lakeside Hospital (CW)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2019-06-13T13:46:52+00:00"
+                    }
+                ],
+                "masterIdentifier": {
+                    "system": "urn:ietf:rfc:3986",
+                    "value": "epc_84CCDE2F0D0ADA3C2894F34B2901BAC7"
+                },
+                "identifier": [
+                    {
+                        "use": "official",
+                        "system": "urn:ietf:rfc:3986",
+                        "value": "urn:uuid:${docRefUuid}"
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org/",
+                            "code": "34133-9",
+                            "display": "Summarization of episode note"
+                        }
+                    ]
+                },
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org/",
+                                "code": "34133-9",
+                                "display": "Summarization of episode note"
+                            }
+                        ]
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2019-06-13T13:46:52.000+00:00",
+                "author": [
+                    {
+                        "reference": "#1"
+                    }
+                ],
+                "description": "Encounter Summary (CW)",
+                "securityLabel": [
+                    {
+                        "text": "Normal"
+                    }
+                ],
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "application/octet-stream",
+                            "language": "en-us",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/cw-a-cHN8UdWyGRxV3RtW5Hk_jtNHMc4PQdcvxI0_SHtc78gp6qSucJsYkJaDZqB_PrBK_FSW5txZVaMbv74wRbZNpnqFSBxDJ5epqPdedo1T-YQieUGV25GA9cSxUccByQcXxsvk9L7nt9Bm7Vqaph3a8aMGpT9m47qx2skUNGPszp8urOdPWX46ZUlTT2F5BpOcJLTlIZrJVCQ8MMHia5rW8DvzX9SslMJ5KWICliM1R-OPILAGfzTlIQyXMgA1Io7Z6K33-enOuzddNc5dCS1UcVdfJMwC_0446mlcV2jEwFmFy9dSGPxm_fbFHxu2d5FF_yb4k4BWKOcqeEZQpkINtUXCMvitVw-Gurum_OjV6lj7juSFhE-7twH7VlqFmpnyxYcyjX5hIwA8r-L_3IzJc2GTlYPGpou60tMfJDqsOIGxpYhPXj1zO0EQpXUwelCEB7O89HooxwE-j44Ci7ntypApFjUBX6T7TXqP0gBBA"
+                        },
+                        "format": {
+                            "code": "urn:ihe:pcc:xphr:2007"
+                        }
+                    }
+                ],
+                "context": {
+                    "event": [
+                        {
+                            "text": "Problem"
+                        },
+                        {
+                            "text": "drug allergy"
+                        },
+                        {
+                            "text": "Nausea"
+                        },
+                        {
+                            "text": "Depressive disorder"
+                        },
+                        {
+                            "text": "Hypothyroidism"
+                        },
+                        {
+                            "text": "Sinusitis"
+                        },
+                        {
+                            "text": "CT of paranasal sinuses"
+                        },
+                        {
+                            "text": "Left maxillary sinus mass"
+                        },
+                        {
+                            "text": "never a smoker"
+                        },
+                        {
+                            "text": "Vital signs"
+                        },
+                        {
+                            "text": "Neoplasm of accessory sinus"
+                        },
+                        {
+                            "text": "Finding of functional performance and activity"
+                        },
+                        {
+                            "text": "Cane"
+                        },
+                        {
+                            "text": "Cognitive function finding"
+                        },
+                        {
+                            "text": "Short term memory deficit"
+                        }
+                    ],
+                    "period": {
+                        "start": "2012-10-02T04:00:00+00:00"
+                    },
+                    "facilityType": {
+                        "coding": [
+                            {
+                                "system": "http://snomed.info/sct",
+                                "code": "83891005",
+                                "display": "Solo practice private office"
+                            }
+                        ]
+                    }
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-cw-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "PractitionerRole",
+                        "id": "1",
+                        "organization": {
+                            "reference": "#2",
+                            "display": "Freeman Clinic (CW)"
+                        },
+                        "specialty": [
+                            {
+                                "text": "Unknown"
+                            }
+                        ]
+                    },
+                    {
+                        "resourceType": "Organization",
+                        "id": "2",
+                        "identifier": [
+                            {
+                                "value": "1.3.6.1.4.1.52618.0.2"
+                            }
+                        ],
+                        "name": "Freeman Clinic (CW)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2019-12-13T13:46:52+00:00"
+                    }
+                ],
+                "masterIdentifier": {
+                    "system": "urn:ietf:rfc:3986",
+                    "value": "epc_5F4F6DF35EE8110CAFE5BDF9430E91F8"
+                },
+                "identifier": [
+                    {
+                        "use": "official",
+                        "system": "urn:ietf:rfc:3986",
+                        "value": "urn:uuid:${docRefUuid}"
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org/",
+                            "code": "34133-9",
+                            "display": "Summarization of episode note"
+                        }
+                    ]
+                },
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org/",
+                                "code": "34133-9",
+                                "display": "Summarization of episode note"
+                            }
+                        ]
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2019-12-13T13:46:52.000+00:00",
+                "author": [
+                    {
+                        "reference": "#1"
+                    }
+                ],
+                "description": "Clinical Summary (CW)",
+                "securityLabel": [
+                    {
+                        "text": "Normal"
+                    }
+                ],
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "application/octet-stream",
+                            "language": "en-us",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/cw-a-cHN8UdWyGRxV3RtW5Hk_jtNHMc4PQdcvxI0_SHtc78gp6qSucJsYkJaDZqB_PrBK_FSW5txZVaMbv74wRbZNpnqFSBxDJ5epqPdedo1T-YQieUGV25GA9cSxUccByQcXxsvk9L7nt9Bm7Vqaph3VCQf3DYXtEviLK2SumZ5uHp8urOdPWX46ZUlTT2F5BpOcJLTlIZrJVCQ8MMHia5rW8DvzX9SslMJ5KWICliM1REVmRa8F2lOEW42ROXd3U6RiZUcT8d882E_cg15pSnWRQQu5y-p5c6tDU-Bgx9Ca4FmFy9dSGPxm_fbFHxu2d5FF_yb4k4BWKOcqeEZQpkIAlNCf8F70rMLAoI3bAI5Oulj7juSFhE-7twH7VlqFmpnyxYcyjX5hIwA8r-L_3IzJc2GTlYPGpou60tMfJDqsOIGxpYhPXj1zO0EQpXUwelCEB7O89HooxwE-j44Ci7ntypApFjUBX6T7TXqP0gBBA"
+                        },
+                        "format": {
+                            "code": "urn:ihe:pcc:xphr:2007"
+                        }
+                    }
+                ],
+                "context": {
+                    "event": [
+                        {
+                            "text": "Problem"
+                        },
+                        {
+                            "text": "drug allergy"
+                        },
+                        {
+                            "text": "Nausea"
+                        },
+                        {
+                            "text": "Depressive disorder"
+                        },
+                        {
+                            "text": "Hypothyroidism"
+                        },
+                        {
+                            "text": "Sinusitis"
+                        },
+                        {
+                            "text": "CT of paranasal sinuses"
+                        },
+                        {
+                            "text": "Left maxillary sinus mass"
+                        },
+                        {
+                            "text": "never a smoker"
+                        },
+                        {
+                            "text": "Vital signs"
+                        },
+                        {
+                            "text": "Neoplasm of accessory sinus"
+                        },
+                        {
+                            "text": "Finding of functional performance and activity"
+                        },
+                        {
+                            "text": "Cane"
+                        },
+                        {
+                            "text": "Cognitive function finding"
+                        },
+                        {
+                            "text": "Short term memory deficit"
+                        }
+                    ],
+                    "period": {
+                        "start": "2012-10-02T04:00:00+00:00"
+                    },
+                    "facilityType": {
+                        "coding": [
+                            {
+                                "system": "http://snomed.info/sct",
+                                "code": "83891005",
+                                "display": "Solo practice private office"
+                            }
+                        ]
+                    }
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-cw-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "PractitionerRole",
+                        "id": "1",
+                        "organization": {
+                            "reference": "#2",
+                            "display": "Lakeside Hospital (CW)"
+                        },
+                        "specialty": [
+                            {
+                                "text": "Unknown"
+                            }
+                        ]
+                    },
+                    {
+                        "resourceType": "Organization",
+                        "id": "2",
+                        "identifier": [
+                            {
+                                "value": "1.3.6.1.4.1.52618.0.1"
+                            }
+                        ],
+                        "name": "Lakeside Hospital (CW)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2019-11-14T14:19:42+00:00"
+                    }
+                ],
+                "masterIdentifier": {
+                    "system": "urn:ietf:rfc:3986",
+                    "value": "epc_FC9FC92EA3242F11B98071DCF4ABE5C9"
+                },
+                "identifier": [
+                    {
+                        "use": "official",
+                        "system": "urn:ietf:rfc:3986",
+                        "value": "urn:uuid:${docRefUuid}"
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org/",
+                            "code": "34133-9",
+                            "display": "Summarization of episode note"
+                        }
+                    ]
+                },
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org/",
+                                "code": "34133-9",
+                                "display": "Summarization of episode note"
+                            }
+                        ]
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2019-11-14T19:19:42.000+00:00",
+                "author": [
+                    {
+                        "reference": "#1"
+                    }
+                ],
+                "description": "Clinical Summary (CW)",
+                "securityLabel": [
+                    {
+                        "text": "Normal"
+                    }
+                ],
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "application/xml",
+                            "language": "en-us",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/cw-a-cHN8UdWyGRxV3RtW5Hk_jtNHMc4PQdcvxI0_SHtc78gp6qSucJsYkJaDZqB_PrBK_FSW5txZVaMbv74wRbZNpnqFSBxDJ5epqPdedo1T-YQieUGV25GA9cSxUccByQcXxsvk9L7nt9Bm7Vqaph3Q5XBFAAlWU5eZk_BvV0MF_p8urOdPWX46ZUlTT2F5Bpk7nGArB_58OiwlVoqQDbO7pxEPJhkT4cmP_Ft6cLPdv_54FYFiyZGGFRymlcXQeQsdxQXW6x6RL6E6St4LZ6h_ozxNJcAjUO0Tl0Oa3rplBnSiusUqwIWGPDgfkSwElZUDqrY1WBOXtv_pi2FcreN0PB7srLwMGwfroD6eYN1sdlulIrUM-0DQ-b1iOAi1c41hwXqS7VbXNt2zBAaU4zEtvCzrVxk5fT7DzJPZuuHYuDLB_feQLwIdh_52TsUzeJG_sL8OjGvY6AknL2AI6qP48vb0SjAiVicTLKENgyWJw"
+                        },
+                        "format": {
+                            "code": "urn:ihe:pcc:xphr:2007"
+                        }
+                    }
+                ],
+                "context": {
+                    "event": [
+                        {
+                            "text": "Problem"
+                        },
+                        {
+                            "text": "drug allergy"
+                        },
+                        {
+                            "text": "Nausea"
+                        },
+                        {
+                            "text": "Depressive disorder"
+                        },
+                        {
+                            "text": "Hypothyroidism"
+                        },
+                        {
+                            "text": "Sinusitis"
+                        },
+                        {
+                            "text": "CT of paranasal sinuses"
+                        },
+                        {
+                            "text": "Left maxillary sinus mass"
+                        },
+                        {
+                            "text": "never a smoker"
+                        },
+                        {
+                            "text": "Vital signs"
+                        },
+                        {
+                            "text": "Neoplasm of accessory sinus"
+                        },
+                        {
+                            "text": "Finding of functional performance and activity"
+                        },
+                        {
+                            "text": "Cane"
+                        },
+                        {
+                            "text": "Cognitive function finding"
+                        },
+                        {
+                            "text": "Short term memory deficit"
+                        }
+                    ],
+                    "period": {
+                        "start": "2012-10-02T04:00:00+00:00"
+                    },
+                    "facilityType": {
+                        "coding": [
+                            {
+                                "system": "http://snomed.info/sct",
+                                "code": "83891005",
+                                "display": "Solo practice private office"
+                            }
+                        ]
+                    }
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-cw-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "PractitionerRole",
+                        "id": "1",
+                        "organization": {
+                            "reference": "#2",
+                            "display": "Lakeside Hospital (CW)"
+                        },
+                        "specialty": [
+                            {
+                                "text": "Unknown"
+                            }
+                        ]
+                    },
+                    {
+                        "resourceType": "Organization",
+                        "id": "2",
+                        "identifier": [
+                            {
+                                "value": "1.3.6.1.4.1.52618.0.1"
+                            }
+                        ],
+                        "name": "Lakeside Hospital (CW)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2019-08-13T13:46:52+00:00"
+                    }
+                ],
+                "masterIdentifier": {
+                    "system": "urn:ietf:rfc:3986",
+                    "value": "epc_0855D276D2E9EFAD2B73A893C8DFDB93"
+                },
+                "identifier": [
+                    {
+                        "use": "official",
+                        "system": "urn:ietf:rfc:3986",
+                        "value": "urn:uuid:${docRefUuid}"
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org/",
+                            "code": "34133-9",
+                            "display": "Summarization of episode note"
+                        }
+                    ]
+                },
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org/",
+                                "code": "34133-9",
+                                "display": "Summarization of episode note"
+                            }
+                        ]
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2019-08-13T13:46:52.000+00:00",
+                "author": [
+                    {
+                        "reference": "#1"
+                    }
+                ],
+                "description": "Medical Summary (CW)",
+                "securityLabel": [
+                    {
+                        "text": "Normal"
+                    }
+                ],
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "application/octet-stream",
+                            "language": "en-us",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/cw-a-cHN8UdWyGRxV3RtW5Hk_jtNHMc4PQdcvxI0_SHtc78gp6qSucJsYkJaDZqB_PrBK_FSW5txZVaMbv74wRbZNpnqFSBxDJ5epqPdedo1T-YQieUGV25GA9cSxUccByQcXxsvk9L7nt9Bm7Vqaph3So36mnM4s2_CKsnutEo11vp8urOdPWX46ZUlTT2F5BpOcJLTlIZrJVCQ8MMHia5rW8DvzX9SslMJ5KWICliM1TlzWH6_ypWT_iRZ4iLJ3P03VCRwZVRNVwKZQJ8_7H3gJ2bq6iCN9JPAZQF7KdpyxgFmFy9dSGPxm_fbFHxu2d5FF_yb4k4BWKOcqeEZQpkINtUXCMvitVw-Gurum_OjV6lj7juSFhE-7twH7VlqFmpnyxYcyjX5hIwA8r-L_3IzJc2GTlYPGpou60tMfJDqsOIGxpYhPXj1zO0EQpXUwelCEB7O89HooxwE-j44Ci7ntypApFjUBX6T7TXqP0gBBA"
+                        },
+                        "format": {
+                            "code": "urn:ihe:pcc:xphr:2007"
+                        }
+                    }
+                ],
+                "context": {
+                    "event": [
+                        {
+                            "text": "Problem"
+                        },
+                        {
+                            "text": "drug allergy"
+                        },
+                        {
+                            "text": "Nausea"
+                        },
+                        {
+                            "text": "Depressive disorder"
+                        },
+                        {
+                            "text": "Hypothyroidism"
+                        },
+                        {
+                            "text": "Sinusitis"
+                        },
+                        {
+                            "text": "CT of paranasal sinuses"
+                        },
+                        {
+                            "text": "Left maxillary sinus mass"
+                        },
+                        {
+                            "text": "never a smoker"
+                        },
+                        {
+                            "text": "Vital signs"
+                        },
+                        {
+                            "text": "Neoplasm of accessory sinus"
+                        },
+                        {
+                            "text": "Finding of functional performance and activity"
+                        },
+                        {
+                            "text": "Cane"
+                        },
+                        {
+                            "text": "Cognitive function finding"
+                        },
+                        {
+                            "text": "Short term memory deficit"
+                        }
+                    ],
+                    "period": {
+                        "start": "2012-10-02T04:00:00+00:00"
+                    },
+                    "facilityType": {
+                        "coding": [
+                            {
+                                "system": "http://snomed.info/sct",
+                                "code": "83891005",
+                                "display": "Solo practice private office"
+                            }
+                        ]
+                    }
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-cw-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "PractitionerRole",
+                        "id": "1",
+                        "organization": {
+                            "reference": "#2",
+                            "display": "Lakeside Hospital (CW)"
+                        },
+                        "specialty": [
+                            {
+                                "text": "Unknown"
+                            }
+                        ]
+                    },
+                    {
+                        "resourceType": "Organization",
+                        "id": "2",
+                        "identifier": [
+                            {
+                                "value": "1.3.6.1.4.1.52618.0.1"
+                            }
+                        ],
+                        "name": "Lakeside Hospital (CW)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2019-09-13T13:46:52+00:00"
+                    }
+                ],
+                "masterIdentifier": {
+                    "system": "urn:ietf:rfc:3986",
+                    "value": "epc_11D56B1983EFC75D48200186D5575DB0"
+                },
+                "identifier": [
+                    {
+                        "use": "official",
+                        "system": "urn:ietf:rfc:3986",
+                        "value": "urn:uuid:${docRefUuid}"
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org/",
+                            "code": "34133-9",
+                            "display": "Summarization of episode note"
+                        }
+                    ]
+                },
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org/",
+                                "code": "34133-9",
+                                "display": "Summarization of episode note"
+                            }
+                        ]
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2019-09-13T13:46:52.000+00:00",
+                "author": [
+                    {
+                        "reference": "#1"
+                    }
+                ],
+                "description": "Medical Summary (CW)",
+                "securityLabel": [
+                    {
+                        "text": "Normal"
+                    }
+                ],
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "language": "en-us",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/cw-a-cHN8UdWyGRxV3RtW5Hk_jtNHMc4PQdcvxI0_SHtc78gp6qSucJsYkJaDZqB_PrBK_FSW5txZVaMbv74wRbZNpnqFSBxDJ5epqPdedo1T-YQieUGV25GA9cSxUccByQcXxsvk9L7nt9Bm7Vqaph3dDlhrM_cBQp3AV9lCwSKi6YgR60mtZn9CCiRa1NmXZb5p3jfVQ9qVTV-TIzYFRCdTUakpFYs1AHAqMeqjNBHSU-eaoPI5MtgrWGMRmpAK0ehZXTMtTeaxY9v4mHBaVIbAWYXL11IY_Gb99sUfG7Z3kUX_JviTgFYo5yp4RlCmQg21RcIy-K1XD4a6u6b86NXqWPuO5IWET7u3AftWWoWamfLFhzKNfmEjADyv4v_cjMlzYZOVg8ami7rS0x8kOqw4gbGliE9ePXM7QRCldTB6UIQHs7z0eijHAT6PjgKLue3KkCkWNQFfpPtNeo_SAEEA"
+                        },
+                        "format": {
+                            "code": "urn:ihe:pcc:xphr:2007"
+                        }
+                    }
+                ],
+                "context": {
+                    "event": [
+                        {
+                            "text": "Problem"
+                        },
+                        {
+                            "text": "drug allergy"
+                        },
+                        {
+                            "text": "Nausea"
+                        },
+                        {
+                            "text": "Depressive disorder"
+                        },
+                        {
+                            "text": "Hypothyroidism"
+                        },
+                        {
+                            "text": "Sinusitis"
+                        },
+                        {
+                            "text": "CT of paranasal sinuses"
+                        },
+                        {
+                            "text": "Left maxillary sinus mass"
+                        },
+                        {
+                            "text": "never a smoker"
+                        },
+                        {
+                            "text": "Vital signs"
+                        },
+                        {
+                            "text": "Neoplasm of accessory sinus"
+                        },
+                        {
+                            "text": "Finding of functional performance and activity"
+                        },
+                        {
+                            "text": "Cane"
+                        },
+                        {
+                            "text": "Cognitive function finding"
+                        },
+                        {
+                            "text": "Short term memory deficit"
+                        }
+                    ],
+                    "period": {
+                        "start": "2012-10-02T04:00:00+00:00"
+                    },
+                    "facilityType": {
+                        "coding": [
+                            {
+                                "system": "http://snomed.info/sct",
+                                "code": "83891005",
+                                "display": "Solo practice private office"
+                            }
+                        ]
+                    }
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-cq-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "Organization",
+                        "id": "1",
+                        "identifier": [
+                            {
+                                "type": {
+                                    "coding": [
+                                        {
+                                            "code": "hcid",
+                                            "display": "Home Community ID"
+                                        }
+                                    ],
+                                    "text": "Home Community ID"
+                                },
+                                "value": "1.3.6.1.4.1.52618.0.11"
+                            }
+                        ],
+                        "name": "Garden Health Center (CQ)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2018-08-03T09:55:44+00:00"
+                    },
+                    {
+                        "url": "https://www.healthgorilla.com/fhir/StructureDefinition/documentreference-ondemand",
+                        "valueBoolean": true
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "34133-9",
+                            "display": "Summary of episode note"
+                        }
+                    ]
+                },
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org",
+                                "code": "11506-3",
+                                "display": "Progress Note"
+                            }
+                        ]
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2018-08-03T09:55:44.000+00:00",
+                "custodian": {
+                    "reference": "#1",
+                    "display": "Garden Health Center (CQ)"
+                },
+                "description": "Continuity of Care Document 6 (CQ)",
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/cq-6NPeUyZWgSxfJzdc0XqJJdLLwGn3sMAAxlC4D_BhEe1u_vo58MbHv6zocUnHpPC2a9kaUNYnaIO6Bqga9ZqYjtqpsqO1MB1tTjCISsG1VpkUX_JviTgFYo5yp4RlCmQgQVg9huCj7GM9ejBrg18gxxSf7qoWdPCtE0nwrE9YZm40r3j9W1TTNqpT6s6pWSg4jgT9AtPgn4Emp3WAaWr4_DF6IL7Loue8YLWakQJ-f5wxz-Y67uD2fQY2neU9E_kZaYbs3tMVXrFFlCTaaYbBIMbzy9w0u5915C17JbMq7wadpxs9xkN-mzmdFroiYFyuMNKBMbZBj2knVY_6pv6UWgx6BbVL1tvVj28X5NUDkcw"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-cq-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "Organization",
+                        "id": "1",
+                        "identifier": [
+                            {
+                                "type": {
+                                    "coding": [
+                                        {
+                                            "code": "hcid",
+                                            "display": "Home Community ID"
+                                        }
+                                    ],
+                                    "text": "Home Community ID"
+                                },
+                                "value": "1.3.6.1.4.1.52618.0.10"
+                            }
+                        ],
+                        "name": "Springfield Hospital (CQ)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "1978-03-21T14:15:11+00:00"
+                    },
+                    {
+                        "url": "https://www.healthgorilla.com/fhir/StructureDefinition/documentreference-ondemand",
+                        "valueBoolean": true
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "34133-9",
+                            "display": "Summary of episode note"
+                        }
+                    ]
+                },
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org",
+                                "code": "11506-3",
+                                "display": "Progress Note"
+                            }
+                        ]
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "1978-03-21T14:15:11.000+00:00",
+                "custodian": {
+                    "reference": "#1",
+                    "display": "Springfield Hospital (CQ)"
+                },
+                "description": "Continuity of Care Document 3 (CQ)",
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/cq-6NPeUyZWgSxfJzdc0XqJJdLLwGn3sMAAxlC4D_BhEe2TTANslC8WAdfhyIPhvzGga9kaUNYnaIO6Bqga9ZqYjtqpsqO1MB1tTjCISsG1VpkUX_JviTgFYo5yp4RlCmQgZV0Hw5lEcXMXlpBA1lIONBSf7qoWdPCtE0nwrE9YZm5StJouQx-6xCXjhCRS1qx8jgT9AtPgn4Emp3WAaWr4_DF6IL7Loue8YLWakQJ-f5wxz-Y67uD2fQY2neU9E_kZdhadBsIziCXUkxvDSK9qYMbzy9w0u5915C17JbMq7wadpxs9xkN-mzmdFroiYFyuMNKBMbZBj2knVY_6pv6UWgx6BbVL1tvVj28X5NUDkcw"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-cq-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "Organization",
+                        "id": "1",
+                        "identifier": [
+                            {
+                                "type": {
+                                    "coding": [
+                                        {
+                                            "code": "hcid",
+                                            "display": "Home Community ID"
+                                        }
+                                    ],
+                                    "text": "Home Community ID"
+                                },
+                                "value": "1.3.6.1.4.1.52618.0.11"
+                            }
+                        ],
+                        "name": "Garden Health Center (CQ)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2005-03-01T04:25:34+00:00"
+                    },
+                    {
+                        "url": "https://www.healthgorilla.com/fhir/StructureDefinition/documentreference-ondemand",
+                        "valueBoolean": true
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "34133-9",
+                            "display": "Summary of episode note"
+                        }
+                    ]
+                },
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org",
+                                "code": "11506-3",
+                                "display": "Progress Note"
+                            }
+                        ]
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2005-03-01T04:25:34.000+00:00",
+                "custodian": {
+                    "reference": "#1",
+                    "display": "Garden Health Center (CQ)"
+                },
+                "description": "Continuity of Care Document 9 (CQ)",
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/cq-6NPeUyZWgSxfJzdc0XqJJdLLwGn3sMAAxlC4D_BhEe1u_vo58MbHv6zocUnHpPC2a9kaUNYnaIO6Bqga9ZqYjtqpsqO1MB1tTjCISsG1VpkUX_JviTgFYo5yp4RlCmQgQVg9huCj7GM9ejBrg18gxxSf7qoWdPCtE0nwrE9YZm6NfKny3U_0ODdXU-oJzeyDjgT9AtPgn4Emp3WAaWr4_DF6IL7Loue8YLWakQJ-f5wxz-Y67uD2fQY2neU9E_kZaYbs3tMVXrFFlCTaaYbBIMbzy9w0u5915C17JbMq7wadpxs9xkN-mzmdFroiYFyuMNKBMbZBj2knVY_6pv6UWgx6BbVL1tvVj28X5NUDkcw"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-cq-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "Organization",
+                        "id": "1",
+                        "identifier": [
+                            {
+                                "type": {
+                                    "coding": [
+                                        {
+                                            "code": "hcid",
+                                            "display": "Home Community ID"
+                                        }
+                                    ],
+                                    "text": "Home Community ID"
+                                },
+                                "value": "1.3.6.1.4.1.52618.0.11"
+                            }
+                        ],
+                        "name": "Garden Health Center (CQ)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2016-07-15T15:15:14+00:00"
+                    },
+                    {
+                        "url": "https://www.healthgorilla.com/fhir/StructureDefinition/documentreference-ondemand",
+                        "valueBoolean": true
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "34133-9",
+                            "display": "Summary of episode note"
+                        }
+                    ]
+                },
+                "category": [
+                    {
+                        "coding": [
+                            {
+                                "system": "http://loinc.org",
+                                "code": "11506-3",
+                                "display": "Progress Note"
+                            }
+                        ]
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2016-07-15T15:15:14.000+00:00",
+                "custodian": {
+                    "reference": "#1",
+                    "display": "Garden Health Center (CQ)"
+                },
+                "description": "Continuity of Care Document 10 (CQ)",
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/cq-6NPeUyZWgSxfJzdc0XqJJdLLwGn3sMAAxlC4D_BhEe1u_vo58MbHv6zocUnHpPC2a9kaUNYnaIO6Bqga9ZqYjtqpsqO1MB1tTjCISsG1VpkUX_JviTgFYo5yp4RlCmQgQVg9huCj7GM9ejBrg18gxxSf7qoWdPCtE0nwrE9YZm5mDembNnEbkpAkOZoEQyWpGIDESQct4gvAhnsL7-Fwq4wceQBVXuUtEnJ1EC2oyO8UX_JviTgFYo5yp4RlCmQgaypcOni_tst-8Ontv2AjfkJUaF0KgtS9RUCPRqYXCTRonOMWpqtjsrNz9KqNXNfsCEB7O89HooxwE-j44Ci7ntypApFjUBX6T7TXqP0gBBA"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-ehex-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "Organization",
+                        "id": "1",
+                        "identifier": [
+                            {
+                                "type": {
+                                    "coding": [
+                                        {
+                                            "code": "hcid",
+                                            "display": "Home Community ID"
+                                        }
+                                    ],
+                                    "text": "Home Community ID"
+                                },
+                                "value": "1.3.6.1.4.1.52618.0.13"
+                            }
+                        ],
+                        "name": "Parkland Hospital (eHEX)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2018-08-03T09:55:44+00:00"
+                    },
+                    {
+                        "url": "https://www.healthgorilla.com/fhir/StructureDefinition/documentreference-ondemand",
+                        "valueBoolean": true
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "34133-9",
+                            "display": "Summary of episode note"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2018-08-03T09:55:44.000+00:00",
+                "custodian": {
+                    "reference": "#1",
+                    "display": "Parkland Hospital (eHEX)"
+                },
+                "description": "Continuity of Care Document 6 (eHEX)",
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/ehex-6NPeUyZWgSxfJzdc0XqJJdLLwGn3sMAAxlC4D_BhEe3iTuRZxovPb3ZNxbiL4sCwa9kaUNYnaIO6Bqga9ZqYjtqpsqO1MB1tTjCISsG1VpkUX_JviTgFYo5yp4RlCmQgoq3JvX9MOAjVgExmwA4kSsQ5pbfLw21haSsxk1-SWYEEhEs-rxmAtu2AUwdsYhMFiswAhbhs8-F92YVcGAuJuUxRimwrVEp24CG6IFwsMu4ROtxGXSIfj0ipMC3qrlX5Cn2CelryaIIJhy6ehRKahp6EAmJFM1swackGaJ1Xcx2gMW4P7GAfl_hyGh9qXT0m043x280Ks-GzqvXhOA7JghlD0LosECHiazPr18LqH20"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-ehex-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "Organization",
+                        "id": "1",
+                        "identifier": [
+                            {
+                                "type": {
+                                    "coding": [
+                                        {
+                                            "code": "hcid",
+                                            "display": "Home Community ID"
+                                        }
+                                    ],
+                                    "text": "Home Community ID"
+                                },
+                                "value": "1.3.6.1.4.1.52618.0.12"
+                            }
+                        ],
+                        "name": "Mountain Hospital (eHEX)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2001-11-24T09:25:04+00:00"
+                    },
+                    {
+                        "url": "https://www.healthgorilla.com/fhir/StructureDefinition/documentreference-ondemand",
+                        "valueBoolean": true
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "34133-9",
+                            "display": "Summary of episode note"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2001-11-24T09:25:04.000+00:00",
+                "custodian": {
+                    "reference": "#1",
+                    "display": "Mountain Hospital (eHEX)"
+                },
+                "description": "Continuity of Care Document 4 (eHEX)",
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/ehex-6NPeUyZWgSxfJzdc0XqJJdLLwGn3sMAAxlC4D_BhEe2jgqS9-QQ9NLWx9_N-f2Dma9kaUNYnaIO6Bqga9ZqYjtqpsqO1MB1tTjCISsG1VpkUX_JviTgFYo5yp4RlCmQgUmpPB5-gXFhbEhQrDPK58MQ5pbfLw21haSsxk1-SWYGGF8GCGF8kHoylLYgqUnMDiswAhbhs8-F92YVcGAuJuUxRimwrVEp24CG6IFwsMu4ROtxGXSIfj0ipMC3qrlX5ePVzOPjjW65JATcl6pzTZ56EAmJFM1swackGaJ1Xcx2gMW4P7GAfl_hyGh9qXT0m043x280Ks-GzqvXhOA7JghlD0LosECHiazPr18LqH20"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-ehex-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "Organization",
+                        "id": "1",
+                        "identifier": [
+                            {
+                                "type": {
+                                    "coding": [
+                                        {
+                                            "code": "hcid",
+                                            "display": "Home Community ID"
+                                        }
+                                    ],
+                                    "text": "Home Community ID"
+                                },
+                                "value": "1.3.6.1.4.1.52618.0.12"
+                            }
+                        ],
+                        "name": "Mountain Hospital (eHEX)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "1990-01-23T14:25:34+00:00"
+                    },
+                    {
+                        "url": "https://www.healthgorilla.com/fhir/StructureDefinition/documentreference-ondemand",
+                        "valueBoolean": true
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "34133-9",
+                            "display": "Summary of episode note"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "1990-01-23T14:25:34.000+00:00",
+                "custodian": {
+                    "reference": "#1",
+                    "display": "Mountain Hospital (eHEX)"
+                },
+                "description": "Continuity of Care Document 1 (eHEX)",
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/ehex-6NPeUyZWgSxfJzdc0XqJJdLLwGn3sMAAxlC4D_BhEe2jgqS9-QQ9NLWx9_N-f2Dma9kaUNYnaIO6Bqga9ZqYjtqpsqO1MB1tTjCISsG1VpkUX_JviTgFYo5yp4RlCmQgUmpPB5-gXFhbEhQrDPK58MQ5pbfLw21haSsxk1-SWYHn10hLjzO3hG8wEWEBkALliswAhbhs8-F92YVcGAuJuUxRimwrVEp24CG6IFwsMu4ROtxGXSIfj0ipMC3qrlX5ePVzOPjjW65JATcl6pzTZ56EAmJFM1swackGaJ1Xcx2gMW4P7GAfl_hyGh9qXT0m043x280Ks-GzqvXhOA7JghlD0LosECHiazPr18LqH20"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-ehex-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "Organization",
+                        "id": "1",
+                        "identifier": [
+                            {
+                                "type": {
+                                    "coding": [
+                                        {
+                                            "code": "hcid",
+                                            "display": "Home Community ID"
+                                        }
+                                    ],
+                                    "text": "Home Community ID"
+                                },
+                                "value": "1.3.6.1.4.1.52618.0.13"
+                            }
+                        ],
+                        "name": "Parkland Hospital (eHEX)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2005-03-01T04:25:34+00:00"
+                    },
+                    {
+                        "url": "https://www.healthgorilla.com/fhir/StructureDefinition/documentreference-ondemand",
+                        "valueBoolean": true
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "34133-9",
+                            "display": "Summary of episode note"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2005-03-01T04:25:34.000+00:00",
+                "custodian": {
+                    "reference": "#1",
+                    "display": "Parkland Hospital (eHEX)"
+                },
+                "description": "Continuity of Care Document 9 (eHEX)",
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/ehex-6NPeUyZWgSxfJzdc0XqJJdLLwGn3sMAAxlC4D_BhEe3iTuRZxovPb3ZNxbiL4sCwa9kaUNYnaIO6Bqga9ZqYjtqpsqO1MB1tTjCISsG1VpkUX_JviTgFYo5yp4RlCmQgoq3JvX9MOAjVgExmwA4kSsQ5pbfLw21haSsxk1-SWYG9D1vFicyiluOVqnNUDmkviswAhbhs8-F92YVcGAuJuUxRimwrVEp24CG6IFwsMu4ROtxGXSIfj0ipMC3qrlX5Cn2CelryaIIJhy6ehRKahp6EAmJFM1swackGaJ1Xcx2gMW4P7GAfl_hyGh9qXT0m043x280Ks-GzqvXhOA7JghlD0LosECHiazPr18LqH20"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-ehex-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "Organization",
+                        "id": "1",
+                        "identifier": [
+                            {
+                                "type": {
+                                    "coding": [
+                                        {
+                                            "code": "hcid",
+                                            "display": "Home Community ID"
+                                        }
+                                    ],
+                                    "text": "Home Community ID"
+                                },
+                                "value": "1.3.6.1.4.1.52618.0.13"
+                            }
+                        ],
+                        "name": "Parkland Hospital (eHEX)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2016-07-15T15:15:14+00:00"
+                    },
+                    {
+                        "url": "https://www.healthgorilla.com/fhir/StructureDefinition/documentreference-ondemand",
+                        "valueBoolean": true
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "34133-9",
+                            "display": "Summary of episode note"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2016-07-15T15:15:14.000+00:00",
+                "custodian": {
+                    "reference": "#1",
+                    "display": "Parkland Hospital (eHEX)"
+                },
+                "description": "Continuity of Care Document 10 (eHEX)",
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/ehex-6NPeUyZWgSxfJzdc0XqJJdLLwGn3sMAAxlC4D_BhEe3iTuRZxovPb3ZNxbiL4sCwa9kaUNYnaIO6Bqga9ZqYjtqpsqO1MB1tTjCISsG1VpkUX_JviTgFYo5yp4RlCmQgoq3JvX9MOAjVgExmwA4kSsQ5pbfLw21haSsxk1-SWYGfpQGd9bMzhDJqMHXVzWfX6pTa5JokwHzShQ2p47ZUDrcx9nfW1jV1xDYnKQDhdku30ndfLdjIIDHAdC_Th5Npgfvfmb8fHR7iw82ISn6DozYuxmuRDz5x-Wp6N4mbCLl-oRPXwy33iFtXiFS4Q-gMYDkSpBQYijea5YlCVV5YhyJQQIrwGCyGzVoSYHskjtM"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-ehex-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "Organization",
+                        "id": "1",
+                        "identifier": [
+                            {
+                                "type": {
+                                    "coding": [
+                                        {
+                                            "code": "hcid",
+                                            "display": "Home Community ID"
+                                        }
+                                    ],
+                                    "text": "Home Community ID"
+                                },
+                                "value": "1.3.6.1.4.1.52618.0.12"
+                            }
+                        ],
+                        "name": "Mountain Hospital (eHEX)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "1978-03-21T14:15:11+00:00"
+                    },
+                    {
+                        "url": "https://www.healthgorilla.com/fhir/StructureDefinition/documentreference-ondemand",
+                        "valueBoolean": true
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "34133-9",
+                            "display": "Summary of episode note"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "1978-03-21T14:15:11.000+00:00",
+                "custodian": {
+                    "reference": "#1",
+                    "display": "Mountain Hospital (eHEX)"
+                },
+                "description": "Continuity of Care Document 3 (eHEX)",
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/ehex-6NPeUyZWgSxfJzdc0XqJJdLLwGn3sMAAxlC4D_BhEe2jgqS9-QQ9NLWx9_N-f2Dma9kaUNYnaIO6Bqga9ZqYjtqpsqO1MB1tTjCISsG1VpkUX_JviTgFYo5yp4RlCmQgUmpPB5-gXFhbEhQrDPK58MQ5pbfLw21haSsxk1-SWYGmbrU3SA5AKatzHGXIGorfiswAhbhs8-F92YVcGAuJuUxRimwrVEp24CG6IFwsMu4ROtxGXSIfj0ipMC3qrlX5ePVzOPjjW65JATcl6pzTZ56EAmJFM1swackGaJ1Xcx2gMW4P7GAfl_hyGh9qXT0m043x280Ks-GzqvXhOA7JghlD0LosECHiazPr18LqH20"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-ehex-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "Organization",
+                        "id": "1",
+                        "identifier": [
+                            {
+                                "type": {
+                                    "coding": [
+                                        {
+                                            "code": "hcid",
+                                            "display": "Home Community ID"
+                                        }
+                                    ],
+                                    "text": "Home Community ID"
+                                },
+                                "value": "1.3.6.1.4.1.52618.0.12"
+                            }
+                        ],
+                        "name": "Mountain Hospital (eHEX)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "1995-10-23T12:11:34+00:00"
+                    },
+                    {
+                        "url": "https://www.healthgorilla.com/fhir/StructureDefinition/documentreference-ondemand",
+                        "valueBoolean": true
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "34133-9",
+                            "display": "Summary of episode note"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "1995-10-23T12:11:34.000+00:00",
+                "custodian": {
+                    "reference": "#1",
+                    "display": "Mountain Hospital (eHEX)"
+                },
+                "description": "Continuity of Care Document 2 (eHEX)",
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/ehex-6NPeUyZWgSxfJzdc0XqJJdLLwGn3sMAAxlC4D_BhEe2jgqS9-QQ9NLWx9_N-f2Dma9kaUNYnaIO6Bqga9ZqYjtqpsqO1MB1tTjCISsG1VpkUX_JviTgFYo5yp4RlCmQgUmpPB5-gXFhbEhQrDPK58MQ5pbfLw21haSsxk1-SWYHoQMqL4fbhJHGyHLSpe1iRiswAhbhs8-F92YVcGAuJuUxRimwrVEp24CG6IFwsMu4ROtxGXSIfj0ipMC3qrlX5ePVzOPjjW65JATcl6pzTZ56EAmJFM1swackGaJ1Xcx2gMW4P7GAfl_hyGh9qXT0m043x280Ks-GzqvXhOA7JghlD0LosECHiazPr18LqH20"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "DocumentReference",
+                "meta": {
+                    "profile": [
+                        "https://healthgorilla.com/fhir/StructureDefinition/hg-ehex-document"
+                    ]
+                },
+                "contained": [
+                    {
+                        "resourceType": "Organization",
+                        "id": "1",
+                        "identifier": [
+                            {
+                                "type": {
+                                    "coding": [
+                                        {
+                                            "code": "hcid",
+                                            "display": "Home Community ID"
+                                        }
+                                    ],
+                                    "text": "Home Community ID"
+                                },
+                                "value": "1.3.6.1.4.1.52618.0.13"
+                            }
+                        ],
+                        "name": "Parkland Hospital (eHEX)"
+                    }
+                ],
+                "extension": [
+                    {
+                        "url": "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created",
+                        "valueDateTime": "2012-10-01T01:15:34+00:00"
+                    },
+                    {
+                        "url": "https://www.healthgorilla.com/fhir/StructureDefinition/documentreference-ondemand",
+                        "valueBoolean": true
+                    }
+                ],
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "34133-9",
+                            "display": "Summary of episode note"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/33238a6487e2a7fefd0b1d83",
+                    "display": "Justin Time"
+                },
+                "date": "2012-10-01T01:15:34.000+00:00",
+                "custodian": {
+                    "reference": "#1",
+                    "display": "Parkland Hospital (eHEX)"
+                },
+                "description": "Continuity of Care Document 8 (eHEX)",
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/xml",
+                            "url": "https://sandbox.healthgorilla.com/fhir/Binary/ehex-6NPeUyZWgSxfJzdc0XqJJdLLwGn3sMAAxlC4D_BhEe3iTuRZxovPb3ZNxbiL4sCwa9kaUNYnaIO6Bqga9ZqYjtqpsqO1MB1tTjCISsG1VpkUX_JviTgFYo5yp4RlCmQgoq3JvX9MOAjVgExmwA4kSsQ5pbfLw21haSsxk1-SWYGpk4GQabuiHy9axzBvrgJoiswAhbhs8-F92YVcGAuJuUxRimwrVEp24CG6IFwsMu4ROtxGXSIfj0ipMC3qrlX5Cn2CelryaIIJhy6ehRKahp6EAmJFM1swackGaJ1Xcx2gMW4P7GAfl_hyGh9qXT0m043x280Ks-GzqvXhOA7JghlD0LosECHiazPr18LqH20"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        }
+    ]
+}

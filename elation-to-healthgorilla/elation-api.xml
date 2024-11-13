@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<sub-flow name="ElationApiGetToken" doc:id="18d790a6-68d7-40a5-a399-dbf505c31410">
+		<set-variable value="#[payload]" doc:name="tempPayload" doc:id="9ddfe065-9337-468d-b50c-c68abcab9aac" variableName="tempPayload"/>
+		<os:retrieve doc:name="Retrieve Elation Bearer Token" doc:id="7df20ebb-8b69-4e80-bed5-65285b023c8a" key="ElationBearerToken" target="elationBearerToken">
+			<os:default-value ><![CDATA[#[%dw 2.0
+output application/json
+---
+{}]]]></os:default-value>
+		</os:retrieve>
+		<set-variable value="#[%dw 2.0&#10;output application/java&#10;var json = vars.elationBearerToken default {}&#10;var expires_at = (json.expires_at default now()) as DateTime{format:&quot;yyyy-MM-dd'T'HH:mm:ssX&quot;}&#10;var isExpired = expires_at - |PT30M| &lt;= now()&#10;---&#10;isExpired]" doc:name="isGetNewToken" doc:id="01cb4602-419f-4430-a858-6d8f2eee74cd" variableName="isGetNewToken"/>
+		<choice doc:name="Choice" doc:id="e5967984-e7af-424a-9003-3211fb4a795e" >
+			<when expression="#[vars.isGetNewToken == true]">
+				<http:request method="POST" doc:name="ElationApiGetTokenRequest" doc:id="20071e45-ef0d-4608-8771-a83dd5ae8166" config-ref="Elation_Api_Get_Token_Request_Configuration" path="/token/">
+			<http:body><![CDATA[#[%dw 2.0
+output application/x-www-form-urlencoded
+---
+{
+grant_type:"client_credentials",
+client_id:p('secure::elationApi.clientId'),
+client_secret:p('secure::elationApi.clientSecret')
+}]]]></http:body>
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"Accept" : "application/json",
+	"Content-Type" : "application/x-www-form-urlencoded"
+}]]]></http:headers>
+			<http:response-validator>
+				<http:success-status-code-validator values="200" />
+			</http:response-validator>
+		</http:request>
+				<ee:transform doc:name="Add expires_at to payload" doc:id="c9da0c76-48df-4173-9bdc-bb81eac07f5b" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+import seconds from dw::core::Periods
+
+output application/json
+
+var expires_at = ((now()>>"UTC") + seconds(payload.expires_in)) as DateTime{format:"yyyy-MM-dd'T'HH:mm:ss'Z'"}
+---
+
+payload ++ { expires_at: expires_at }]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<os:store doc:name="Store ElationBearerToken" doc:id="0a04e0e8-ddd1-4299-bb27-6675ea090c20" key="ElationBearerToken"/>
+				<set-variable value="#[payload.access_token]" doc:name="elationApiAccessToken" doc:id="0968863d-f423-4c32-ad29-8495d9c0ac43" variableName="elationApiAccessToken"/>
+			</when>
+			<otherwise >
+				<set-variable value="#[vars.elationBearerToken.access_token]" doc:name="elationApiAccessToken" doc:id="7b2fdc3e-3e46-4c0c-a857-1cacad0a5356" variableName="elationApiAccessToken"/>
+			</otherwise>
+		</choice>
+		<set-payload value="#[vars.tempPayload]" doc:name="tempPayload" doc:id="cc4bbb57-ee90-4345-a851-299bf8451ea4" />
+		<remove-variable doc:name="tempPayload" doc:id="246ea1b0-b46d-48b7-bcfb-d125b3d96fa3" variableName="tempPayload"/>
+		<remove-variable doc:name="isGetNewToken" doc:id="727af7a4-33c6-4f97-98dc-28c911c0debc" variableName="isGetNewToken"/>
+	
+</sub-flow>
+	<sub-flow name="ElationApiGetPatient" doc:id="73f3ff17-6aba-408a-a771-8e6546f98810" >
+		<flow-ref doc:name="ElationApiGetToken" doc:id="600443e2-92c5-49fb-9920-efd53d925e18" name="ElationApiGetToken"/>
+		<http:request method="GET" doc:name="ElationApiGetPatient" doc:id="1d0e8024-4bee-4e83-a7bd-9dd7db234fab" config-ref="Elation_Api_Request_configuration" path='#["/patients/" ++ payload]' sendBodyMode="NEVER">
+						<http:headers><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Bearer " ++ vars.elationApiAccessToken
+}]]]></http:headers>
+						<http:response-validator>
+							<http:success-status-code-validator values="200" />
+						</http:response-validator>
+					</http:request>
+	</sub-flow>
+
+</mule>

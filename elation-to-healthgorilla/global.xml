@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:request-config name="Elation_Api_Get_Token_Request_Configuration" doc:name="HTTP Request configuration" doc:id="c9ed15a4-4fe3-4876-822b-f4a5e656e822" basePath="/api/2.0/oauth2" >
+		<http:request-connection host="${elationApi.host}" port="443" protocol="HTTPS"/>
+	</http:request-config>
+	<http:request-config name="Elation_Api_Request_configuration" doc:name="HTTP Request configuration" doc:id="7cadae54-454d-40bb-9596-67a857602089" basePath="/api/2.0" >
+		<http:request-connection protocol="HTTPS" host="${elationApi.host}" port="443" />
+	</http:request-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="bbffb3a3-65e9-4860-a877-d832e0b2e47c" file="configs/config-${env}.yaml" />
+	<global-property doc:name="Global Property" doc:id="059b503b-e1c7-4a1d-9ebc-126dac9c953c" name="env" value="dev" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="89194e1e-ffb0-494d-abee-f52501dc21ca" file="configs/config-secure-${env}.yaml" key="${secure.key}" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="f64cb518-b4e5-4a53-b37a-7e2ea814025d" >
+		<email:smtp-connection host="smtp-relay.sendinblue.com" port="587" user="msternig@xbridge.io" password="p3kN5JbjYr7BAfXV" />
+	</email:smtp-config>
+	<global-property doc:name="Global Property" doc:id="9239c5ea-9e48-4c52-843c-0047a0dc3459" name="sendEmails" value="false" />
+	<configuration doc:name="Configuration" doc:id="f94d97a6-3579-465e-9a5e-438edbeb9493" defaultErrorHandler-ref="globalError_Handler" />
+</mule>

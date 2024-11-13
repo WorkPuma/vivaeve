@@ -1,0 +1,16 @@
+elationApi:
+  clientId: "![njz18+2GYcJ0uRyUBc9IBAmlerS8wMRAmZWBWLz8mxMV4vuyUFAFs7ZTI5JUKQGI]"
+  clientSecret: "![dnT6OCJxMYmqYPexotSP9OA1xrtNDX9ipsOW7k9XemEPP5ycOLYaL4d+mzy0/unUlN77d5ZESlhU3GWBm6FyBhLlapXec/5u5Ek3Y/L0isEbEBW0z/o26H/NqRIOEsbHQmMrV2zal1g=]"
+
+healthGorillaApi:
+  clientId: "![FXo8b9Y8Y3O9qod/C97IkTt9g3cPbwGstJBFG1G2qjfG+4AZSlt45wY7DBSib3os]"
+  clientSecret: "![Uj/zrIEOigiKHPeg4bdmnyoU2ZVFMc5H2BlHtk/S/2ClBEka+dWUjFijZx6+Q5ar]"
+  
+aws:
+  rds:
+    interopDatabase:
+      user: "![WEWoyLRmzBU=]"
+      password: "![LJ4JBX3nsPkwaeXcExbo3g==]"
+  snowflake:
+    user: "![ykfs0QBRpTE=]"  
+    password: "![XCkiLdjfH5ABbtkV4rYygA==]"
