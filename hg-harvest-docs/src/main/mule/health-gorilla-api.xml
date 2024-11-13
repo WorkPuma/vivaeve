@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:s3="http://www.mulesoft.org/schema/mule/s3"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/current/mule-s3.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<http:request-config name="HealthGorilla_Get_Token_Request_configuration" doc:name="HTTP Request configuration" doc:id="81dd3f0e-0116-4b66-8c75-35d198757a07" basePath="/oauth">
+		<http:request-connection protocol="HTTPS" host="${healthGorillaApi.host}" port="443"/>
+	</http:request-config>
+	<http:request-config name="HealthGorilla_Api_Request_configuration" doc:name="HTTP Request configuration" doc:id="0eca8875-0199-4b8d-b595-487f8e0bd597" basePath="/fhir/R4">
+		<http:request-connection protocol="HTTPS" host="${healthGorillaApi.host}" port="443" />
+	</http:request-config>
+	<sub-flow name="HealthGorillaGetToken" doc:id="9b3cb6cd-66b8-4609-97c2-dd7663729def" >
+		<os:retrieve doc:name="Retrieve HealthGorillaBearerToken" doc:id="1f3390d1-14f6-4257-9fd6-3bdec5b361f0" key="HealthGorillaBearerToken" target="healthGorillaBearerToken">
+			<os:default-value ><![CDATA[#[%dw 2.0
+output application/json
+---
+{}]]]></os:default-value>
+		</os:retrieve>
+		<set-variable value="#[%dw 2.0&#10;output application/java&#10;var json = vars.healthGorillaBearerToken default {}&#10;var expires_at = (json.expires_at default now()) as DateTime{format:&quot;yyyy-MM-dd'T'HH:mm:ssX&quot;}&#10;var isExpired = expires_at - |PT1H| &lt;= now()&#10;---&#10;isExpired]" doc:name="isGetNewToken" doc:id="5e7352e7-7266-4587-adbe-8e556e1c2b7f" variableName="isGetNewToken"/>
+		<choice doc:name="Choice" doc:id="3adcae11-6448-4ecd-b438-5897bdbe64ed" >
+			<when expression="#[vars.isGetNewToken == true]">
+				<set-variable value="#[%dw 2.0&#10;import p from Mule&#10;&#10;&#10;output application/java&#10;&#10;import * from dw::Crypto&#10;import * from dw::core::Binaries&#10;import * from dw::core::URL&#10;&#10;var header = &quot;{\&quot;typ\&quot;: \&quot;JWT\&quot;,\&quot;alg\&quot;: \&quot;HS256\&quot;}&quot;&#10;var iat = now() as Number { unit: 'seconds' }&#10;var exp = (now() + |PT3600S|) as Number { unit: 'seconds' }&#10;&#10;var jwt_payload = &quot;{\&quot;aud\&quot;:\&quot;$(p('healthGorillaApi.aud'))\&quot;,\&quot;iss\&quot;:\&quot;https://www.herself-health.com/\&quot;,\&quot;sub\&quot;:\&quot;$(p('healthGorillaApi.sub'))\&quot;,\&quot;iat\&quot;:$(iat),\&quot;exp\&quot;:$(exp)}&quot;&#10;var secret_key = p('secure::healthGorillaApi.clientSecret')&#10; &#10;fun base64encodeURL(data) = toBase64(data) replace &quot;/&quot; with(&quot;_&quot;) replace &quot;+&quot; with(&quot;-&quot;) replace &quot;=&quot; with &quot;&quot;&#10;&#10;---&#10;&#10;do {&#10;  var header_encoded = base64encodeURL(header)&#10;  var payload_encoded = base64encodeURL(jwt_payload)&#10;  var mixed = header_encoded ++ &quot;.&quot; ++ payload_encoded&#10;  ---&#10;  mixed ++ &quot;.&quot; ++ base64encodeURL(HMACBinary(secret_key as Binary, mixed as Binary, &quot;HmacSHA256&quot;))&#10;}]" doc:name="jwt" doc:id="aed4cd7d-5d6e-4098-9ad6-7625002a1ec0" variableName="jwt" />
+				<http:request method="POST" doc:name="HealthGorillaGetTokenRequest" doc:id="9ccca15c-9789-45b5-ac4a-5bdca14aa0e6" config-ref="HealthGorilla_Get_Token_Request_configuration" path="/token">
+			<http:body><![CDATA[#[%dw 2.0
+output application/x-www-form-urlencoded
+---
+{
+	grant_type:"urn:ietf:params:oauth:grant-type:jwt-bearer",
+	client_id:p('secure::healthGorillaApi.clientId'),
+	scope: "user/*.* patient360",
+	assertion:vars.jwt
+}]]]></http:body>
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"Accept" : "application/json",
+	"Content-Type" : "application/x-www-form-urlencoded"
+}]]]></http:headers>
+			<http:response-validator>
+				<http:success-status-code-validator values="200" />
+			</http:response-validator>
+		</http:request>
+				<set-payload value="#[%dw 2.0&#10;&#10;output application/json&#10;import seconds from dw::core::Periods&#10;&#10;var json = read(payload,&quot;application/json&quot;)&#10;---&#10;&#10;json ++ { expires_at: (now() + seconds(json.expires_in)) as DateTime{format:&quot;yyyy-MM-dd'T'HH:mm:ss'Z'&quot;} }]" doc:name="Read stream into payload" doc:id="b9cd7022-f03d-425e-b345-2a5ec9a1bf89" />
+				<os:store doc:name="Store HealthGorillaBearerToken" doc:id="de2ab31e-0814-4902-873c-bebd1e89ee67" key="HealthGorillaBearerToken" />
+				<set-variable value="#[payload.access_token]" doc:name="healthGorillaApiAccessToken" doc:id="be59c91a-54f2-436f-8f24-85f6ab40521c" variableName="healthGorillaApiAccessToken" />
+				<remove-variable doc:name="jwt" doc:id="4f48c0a6-0052-430f-b9ed-b10d87cfc18e" variableName="jwt" />
+			</when>
+			<otherwise >
+				<set-variable value="#[vars.healthGorillaBearerToken.access_token]" doc:name="healthGorillaApiAccessToken" doc:id="f8c371a1-d8de-4517-a8d8-67aea1a7850c" variableName="healthGorillaApiAccessToken"/>
+			</otherwise>
+		</choice>
+		<remove-variable doc:name="isGetNewToken" doc:id="9791192f-ec70-42f6-be5c-563e83b09467" variableName="isGetNewToken"/>
+	
+</sub-flow>
+	<sub-flow name="HealthGorillaHarvestDocuments" doc:id="82a4f704-7948-4cfc-9aa9-4444d24dbb8f" >
+		<logger level="INFO" doc:name="Logger" doc:id="2e70c7f8-1ef6-4ef0-9c91-288a5095b345" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "Getting documents from HealthGorilla updated after $(vars.documentHarvestCacheInfo.lastUpdated) with offset $(vars.documentHarvestCacheInfo.offset default "") for patient $(vars.healthGorillaPatientId)..."&#10;}]'/>
+		<set-variable value="#[vars.documentHarvestCacheInfo.offset]" doc:name="offset" doc:id="796a46f3-5ed9-4ba9-93ae-6d7d34027c39" variableName="offset" />
+		<flow-ref doc:name="HealthGorillaGetDocumentReference" doc:id="5313ffed-0bd1-4cfb-9f6d-6150adf4a85e" name="HealthGorillaGetDocumentReference"/>
+		<choice doc:name="Choice" doc:id="bfc0b91b-d568-4e56-b812-aa51e5db8991" >
+			<when expression="#[payload.entry != null and !isEmpty(payload.entry)]">
+				<set-variable value="#[%dw 2.0&#10;import p from Mule&#10;&#10;var itemsRemaining = payload.total - (vars.offset default 0)&#10;&#10;output application/java&#10;---&#10;if (itemsRemaining &lt;= (p('app.batchSize') as Number))&#10;    1&#10;else &#10;	(itemsRemaining / (p('app.batchSize') as Number)) as String {format: &quot;0&quot;, roundMode:&quot;CEILING&quot;} as Number]" doc:name="pages" doc:id="d9549c2a-ead1-473a-ab39-21f125fc5d2c" variableName="pages" />
+				<foreach doc:name="For Each Page" doc:id="0cdbaac9-33ab-42d7-918a-f6a60d0df43d" collection="#[1 to (vars.pages default 1) as Number]">
+					<flow-ref doc:name="HealthGorillaGetDocumentReference" doc:id="89edb52e-2e0b-401f-90e2-4be749e7d9f5" name="HealthGorillaGetDocumentReference"/>
+					<logger level="INFO" doc:name="Logger" doc:id="1335bb00-942c-4dd4-8ae2-7d4af1fd16e1" message="#[%dw 2.0&#10;output application/json&#10;import p from Mule&#10;&#10;fun GetOffset(offset: Number) =&#10;	if ((offset default 0) &gt; 0)&#10;		offset&#10;	else&#10;		1&#10;&#10;fun GetBatchSize(offset: Number, batchSize: Number) =&#10;	if ((offset default 0) == 0)&#10;		batchSize&#10;	else&#10;		offset + batchSize&#10;&#10;var os = GetOffset(vars.offset default 0)&#10;var batchSize = GetBatchSize(vars.offset default 0, (p('app.batchSize') as Number))&#10;---&#10;{&#10;	&quot;AppName&quot;: app.name,&#10;	&quot;FlowName&quot; : flow.name,&#10;	&quot;HealthGorillaPatientId&quot;: vars.healthGorillaPatientId default &quot;&quot;,&#10;	&quot;ElationPatientId&quot;: vars.elationPatientId default &quot;&quot;,&#10;    &quot;LogMessage&quot; : &quot;processing $(os) to $(batchSize) of $(payload.total) documents for patient $(vars.healthGorillaPatientId)&quot;&#10;}]"/>
+					<flow-ref doc:name="AwsS3SaveDocumentReference" doc:id="1f1c6929-67ee-4424-b63b-dbdef07f137e" name="AwsS3SaveDocumentReference" />
+					<choice doc:name="Choice" doc:id="e8cd2fd3-328b-4b32-87e8-baa66712fee5">
+			<when expression='#[payload.link != null and !isEmpty(payload.link filter $.relation == "next")]'>
+				<set-variable value='#[%dw 2.0&#10;import * from dw::core::URL&#10;import firstWith from dw::core::Arrays&#10;output application/java&#10;fun getQueryParamValueFromUrl(u: String)=parseURI(u).query splitBy "&amp;" map ($ splitBy "=")&#10;var nextLink = (payload.link default []) firstWith((item, index) -&gt; item.relation == "next")&#10;var queryParams = getQueryParamValueFromUrl((nextLink.url default "") as String)&#10;var offsetQueryParam = queryParams firstWith((item, index) -&gt; item[0] == "_offset")&#10;---&#10;offsetQueryParam[1]]' doc:name="offset" doc:id="7bfe5331-2eb9-499b-a439-d9f727d9d32f" variableName="offset" />
+							<ee:transform doc:name="Transform Message" doc:id="1870f12d-9e40-4817-9869-6d36ee7f51f9">
+								<ee:message>
+									<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"offset": vars.offset,
+	"lastUpdated": vars.documentHarvestCacheInfo.lastUpdated
+}]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+							<s3:put-object doc:name="Put Cache Object" doc:id="f5138f55-2679-4213-9ac0-050969b5e4bb" config-ref="Amazon_S3_Configuration" bucketName="${aws.s3.bucket}" key="#[vars.cacheObjectName]" contentLength="#[sizeOf(payload.^raw)]">
+							</s3:put-object>
+							<logger level="INFO" doc:name="Logger" doc:id="27c02667-dc9c-40b8-9c15-240c33d0a04b" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "Gettting next page of documents for patient $(vars.healthGorillaPatientId)..."&#10;}]'/>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Transform Message" doc:id="45ef986a-30c2-46e9-af78-1ca45b9b6dfd">
+								<ee:message>
+									<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"offset": 0,
+	"lastUpdated": payload.entry[-1].resource.meta.lastUpdated
+}]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+							<s3:put-object doc:name="Put Cache Object" doc:id="9e972a5f-26b1-4a7c-a099-9c7139788278" config-ref="Amazon_S3_Configuration" bucketName="${aws.s3.bucket}" key="#[vars.cacheObjectName]" contentLength="#[sizeOf(payload.^raw)]"/>
+							<logger level="INFO" doc:name="Logger" doc:id="ed2e55de-c986-46de-bafb-f7fcc1739135" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "...finished getting documents from HealthGorilla for patient $(vars.healthGorillaPatientId)"&#10;}]'/>
+			</otherwise>
+		</choice>
+				</foreach>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="ccb65776-782b-40d9-8eaa-c916b24596e6" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "No documents found to process for patient $(vars.healthGorillaPatientId)"&#10;}]'/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="HealthGorillaGetDocumentReference" doc:id="1121d886-a362-400f-b139-65b68758f4b7" >
+		<flow-ref doc:name="HealthGorillaGetToken" doc:id="80f93982-bbde-49de-ae63-9658e9d3e162" name="HealthGorillaGetToken"/>
+		<http:request method="GET" doc:name="HealthGorillaGetDocumentReference" doc:id="e51eaa17-9e9f-4a93-8b1b-fb1f62d65c3d" path="/DocumentReference" sendBodyMode="NEVER" config-ref="HealthGorilla_Api_Request_configuration">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"Prefer" : "respond-async",
+	"Authorization" : "Bearer " ++ vars.healthGorillaApiAccessToken
+}]]]></http:headers>
+			<http:query-params><![CDATA[#[%dw 2.0
+import p from Mule
+output application/json
+---
+{
+	"patient": vars.healthGorillaPatientId,
+	"_lastUpdated" : "gt$(vars.documentHarvestCacheInfo.lastUpdated default "1900-01-01T00:00:00Z")",
+	"_offset" : vars.offset,
+	"_count" : p('app.batchSize')
+}]]]></http:query-params>
+			<http:response-validator >
+				<http:success-status-code-validator values="202" />
+			</http:response-validator>
+		</http:request>
+		<flow-ref doc:name="HealthGorillaApiRequestResult" doc:id="b3730a32-a862-44f7-926d-706260f3ae7c" name="HealthGorillaApiRequestResult" />
+	</sub-flow>
+	<sub-flow name="HealthGorillaApiRequestResult" doc:id="a4bfae04-5989-47de-928b-5f54dc4b90f0" >
+		<set-variable value='#[attributes.headers["Location"] default ""]' doc:name="location" doc:id="bf15367b-64d6-4190-a21d-91a44f2183ee" variableName="location"/>
+		<set-variable value="#[%dw 2.0&#10;import remove from dw::core::Strings&#10;output application/json&#10;---&#10;(vars.location default &quot;&quot;) as String remove '/fhir/R4/RequestResult/']" doc:name="requestResult" doc:id="0f239778-a9f9-4517-888e-820e1f6f376d" variableName="requestResult"/>
+		<set-variable value="60" doc:name="retryAttempts" doc:id="02bb6a67-61c5-424c-8177-ad0751d86c04" variableName="retryAttempts"/>
+		<logger level="INFO" doc:name="Logger" doc:id="5774dab5-0610-486a-8abd-e81e301343fd" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "Getting request result $(vars.location default "") from HealthGorillaApi..."&#10;}]'/>
+		<os:store doc:name="Store retry counter" doc:id="7fbb2255-1f39-49e0-a796-5ae5de8746b6" key='#[vars.requestResult]'>
+			<os:value ><![CDATA[#[0]]]></os:value>
+		</os:store>
+		<until-successful maxRetries="#[vars.retryAttempts]" doc:name="Until Successful" doc:id="ab7a0f32-f3d1-43a9-856e-28f490115801" millisBetweenRetries="30000">
+			<try doc:name="Try" doc:id="c80409f0-c4bc-44ba-9f1a-99322301f106">
+				<http:request method="GET" doc:name="HealthGorillaApiRequestResult" doc:id="1c2ecd57-8209-4d0d-a00f-947be84a2827" config-ref="HealthGorilla_Api_Request_configuration" path="/RequestResult/{id}" sendBodyMode="NEVER">
+						<http:headers><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Bearer " ++ vars.healthGorillaApiAccessToken
+}]]]></http:headers>
+						<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"id" : vars.requestResult
+}]]]></http:uri-params>
+				<http:response-validator>
+					<http:failure-status-code-validator values="202" />
+						</http:response-validator>
+					</http:request>
+				<error-handler>
+					<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="bd9e6cb0-4e44-4d84-9155-3ceba57e6edc">
+						<os:retrieve doc:name="Retrieve retry Counter" doc:id="ca85cb82-7267-48b1-b7a4-b48659ec1795" key='#[vars.requestResult]' target="retryCounter">
+							<os:default-value><![CDATA[0]]></os:default-value>
+		</os:retrieve>
+						<set-variable value="#[(vars.retryCounter default 0) + 1]" doc:name="Increment retryCounter" doc:id="a60cb846-6d13-4aab-bbb3-396c55498b12" variableName="retryCounter" />
+						<choice doc:name="Choice" doc:id="d0271f31-159d-48a9-b4f1-4c3edb6c7dbf" >
+							<when expression="#[vars.retryCounter &gt; vars.retryAttempts]">
+								<os:remove doc:name="Remove retry counter" doc:id="0675e34f-afa4-4a0d-8724-5fb13a2f3818" key="#[vars.requestResult]"/>
+							</when>
+							<otherwise >
+								<logger level="INFO" doc:name="Logger" doc:id="bf6c6207-b6fb-4f22-93ca-be4f20142886" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage": "$(error.description)...attempting retry $(vars.retryCounter default 0) of $(vars.retryAttempts)"&#10;}]'/>
+								<os:store doc:name="Store retry counter value" doc:id="16c69702-1305-4e5f-a708-84c202bdeb09" key='#["$(vars.requestResult)"]'>
+							<os:value><![CDATA[#[vars.retryCounter default 0]]]></os:value>
+						</os:store>
+							
+</otherwise>
+						</choice>
+					</on-error-propagate>
+				</error-handler>
+			</try>
+				
+</until-successful>
+		<os:remove doc:name="Remove retry counter" doc:id="cea96722-54e0-4851-83d5-7bf60fb44526" key="#[vars.requestResult]" />
+		<choice doc:name="Choice" doc:id="6c90b734-509f-499e-848d-9a905adb7295" >
+			<when expression="#[!([200,201] contains attributes.statusCode)]">
+				<logger level="INFO" doc:name="Logger" doc:id="54667fe1-991d-4756-b5f2-79407d5fceaa" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "...HealthGorillaApi responded with status code $(attributes.statusCode) while attempting to get request result with request id $(attributes.headers["X-Request-Id"] default "")"&#10;}]'/>
+				<raise-error doc:name="Raise error" doc:id="4d2473af-e630-4f3b-b3fc-fdf342d59ad4" type="HEALTH_GORILLA_API:RESULT_REQUEST_UNEXPECTED_STATUS" description="Did not receive expected success status" />
+			
+
+</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="2a5d2a25-66ad-4576-9efe-939af04e524f" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "...Successfully got request result $(vars.location default "") with request id $(attributes.headers["X-Request-Id"] default "") from HealthGorillaApi"&#10;}]'/>
+			
+</otherwise>
+		</choice>
+		<remove-variable doc:name="retryAttempts" doc:id="65110820-9154-4fa1-b855-7452af8ef520" variableName="retryAttempts"/>
+		<remove-variable doc:name="location" doc:id="14cc2ff2-d446-4bbd-87ee-21ba9d0abd62" variableName="location" />
+		<remove-variable doc:name="requestResult" doc:id="d43217fe-cca3-45f1-9c67-e2e081858d33" variableName="requestResult" />
+	</sub-flow>
+	<sub-flow name="HealthGorillaGetElationPatientId" doc:id="9d556776-a625-4956-93d6-3c20e1c8a000" >
+		<flow-ref doc:name="HealthGorillaGetToken" doc:id="f751d18c-1705-49ac-9859-7258b2557877" name="HealthGorillaGetToken"/>
+		<http:request method="GET" doc:name="RequestPatientData" doc:id="e7bcf472-cdc8-41cf-99a5-53e986f886b8" config-ref="HealthGorilla_Api_Request_configuration" path="/Patient/{healthGorillaPatientId}" sendBodyMode="NEVER">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Bearer $(vars.healthGorillaApiAccessToken default "")"
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	healthGorillaPatientId : vars.HealthGorillaPatientId
+}]]]></http:uri-params>
+			<http:response-validator >
+				<http:success-status-code-validator values="200" />
+			</http:response-validator>
+		
+</http:request>
+<set-variable value="#[%dw 2.0
+import p from Mule
+import firstWith from dw::core::Arrays
+
+output application/java
+
+var identifier = payload.identifier firstWith $.system == &quot;https://api.athenahealth.com&quot;
+---
+if (identifier != null)
+    identifier.value as Number
+else
+    null]" doc:name="elationPatientId" variableName="elationPatientId"/>		
+		
+		
+		<validation:is-not-null doc:name="Validate ElationPatientId Is not null" doc:id="03c130fe-c798-4559-8699-3c1f03c67405" value="#[vars.elationPatientId]" message="ElationEMR patient id not found for HealthGorilla patient">
+			<error-mapping sourceType="VALIDATION:NULL" targetType="HEALTH_GORILLA_API:ELATION_EMR_PATIENT_ID_NOT_FOUND" />
+		</validation:is-not-null>
+	
+</sub-flow>
+</mule>

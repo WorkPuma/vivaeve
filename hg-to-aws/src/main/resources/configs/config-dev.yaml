@@ -1,0 +1,21 @@
+commonUtilities:
+  loggingApi:
+    host: "mule-worker-internal-common-utilities-api-dev.us-e2.cloudhub.io"
+    port: "8092"
+
+healthGorillaApi:
+  host: "sandbox.healthgorilla.com"
+  aud: "https://sandbox.healthgorilla.com/oauth/token"
+  sub: "herselfhealth.api"
+  
+elationApi:
+   host: "sandbox.elationemr.com"
+   
+aws:
+  s3:
+    bucket: "hh-dev-healthgorilla-to-healthlake"
+    pollingFolder: "PatientPolling"
+    pollingFrequency: "10"
+    fhirFolder: "FHIR"
+  healthLake:
+    dataStore: "bbba73c77221075571675181fc387e47"

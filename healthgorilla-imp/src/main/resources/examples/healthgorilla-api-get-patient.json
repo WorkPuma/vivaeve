@@ -1,0 +1,119 @@
+{
+    "resourceType": "Bundle",
+    "id": "1fe3f02e-b1a4-465c-b0e1-f1e541db5f3d",
+    "meta": {
+        "lastUpdated": "2023-06-15T20:41:17.062+00:00"
+    },
+    "type": "searchset",
+    "total": 1,
+    "link": [
+        {
+            "relation": "self",
+            "url": "https://sandbox.healthgorilla.com/fhir/R4/Patient?identifier=https%3A%2F%2Fsandbox.elationemr.com%7C141576933015553"
+        }
+    ],
+    "entry": [
+        {
+            "fullUrl": "https://sandbox.healthgorilla.com/fhir/R4/Patient/33238a6487e2a7fefd0b1d83",
+            "resource": {
+                "resourceType": "Patient",
+                "id": "33238a6487e2a7fefd0b1d83",
+                "meta": {
+                    "versionId": "1686774579185",
+                    "lastUpdated": "2023-06-14T20:29:39.185+00:00",
+                    "profile": [
+                        "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient",
+                        "http://fhir.org/guides/argonaut/StructureDefinition/argo-patient"
+                    ]
+                },
+                "text": {
+                    "status": "generated",
+                    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Time Justin, 44y.o., Male, Mechanicsburg, PA, United States</div>"
+                },
+                "extension": [
+                    {
+                        "url": "https://www.healthgorilla.com/fhir/StructureDefinition/patient-enrolledForUpdates",
+                        "extension": [
+                            {
+                                "url": "enrolled",
+                                "valueBoolean": false
+                            }
+                        ]
+                    }
+                ],
+                "identifier": [
+                    {
+                        "use": "usual",
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                                    "code": "MR",
+                                    "display": "Medical record number"
+                                }
+                            ],
+                            "text": "Medical record number"
+                        },
+                        "system": "https://www.healthgorilla.com",
+                        "value": "33238a6487e2a7fefd0b1d83"
+                    },
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                                    "code": "MR",
+                                    "display": "Medical record number"
+                                }
+                            ],
+                            "text": "Medical record number"
+                        },
+                        "system": "https://sandbox.elationemr.com",
+                        "value": "141576933015553"
+                    }
+                ],
+                "active": true,
+                "name": [
+                    {
+                        "use": "usual",
+                        "text": "Time Justin",
+                        "family": "Justin",
+                        "given": [
+                            "Time"
+                        ]
+                    }
+                ],
+                "telecom": [
+                    {
+                        "system": "phone",
+                        "value": "7175551212",
+                        "use": "mobile"
+                    },
+                    {
+                        "system": "email",
+                        "value": "jtime@focushcs.com"
+                    }
+                ],
+                "gender": "male",
+                "birthDate": "1979-01-01",
+                "address": [
+                    {
+                        "use": "home",
+                        "text": "123 Fake St, Mechanicsburg, PA 17050",
+                        "line": [
+                            "123 Fake St"
+                        ],
+                        "city": "Mechanicsburg",
+                        "state": "PA",
+                        "postalCode": "17050",
+                        "country": "USA"
+                    }
+                ],
+                "managingOrganization": {
+                    "reference": "Organization/t-aee24b64256aa9f4ca4fe239",
+                    "display": "Herself Health"
+                }
+            }
+        }
+    ]
+}

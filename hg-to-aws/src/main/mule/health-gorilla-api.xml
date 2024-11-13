@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<http:request-config name="HealthGorilla_Get_Token_Request_configuration" doc:name="HTTP Request configuration" doc:id="a9e4c586-3477-4804-ab85-70b5103cbf2a" basePath="/oauth">
+		<http:request-connection protocol="HTTPS" host="${healthGorillaApi.host}" port="443"/>
+	</http:request-config>
+	<http:request-config name="HealthGorilla_Api_Request_configuration" doc:name="HTTP Request configuration" doc:id="e9f39432-38e8-4d9e-a994-c5be57138019" basePath="/fhir/R4">
+		<http:request-connection protocol="HTTPS" host="${healthGorillaApi.host}" port="443" />
+	</http:request-config>
+	<sub-flow name="HealthGorillaGetToken" doc:id="a5d2f091-15b3-4d0c-be23-91c4db50edd7" >
+		<os:retrieve doc:name="Retrieve HealthGorillaBearerToken" doc:id="d870f720-4abe-4986-9079-04172c266c88" key="HealthGorillaBearerToken" target="healthGorillaBearerToken">
+			<os:default-value><![CDATA[#[%dw 2.0
+output application/json
+---
+{}]]]></os:default-value>
+		</os:retrieve>
+		<set-variable value="#[%dw 2.0&#10;output application/java&#10;var json = vars.healthGorillaBearerToken default {}&#10;var expires_at = (json.expires_at default now()) as DateTime{format:&quot;yyyy-MM-dd'T'HH:mm:ssX&quot;}&#10;var isExpired = expires_at - |PT1H| &lt;= now()&#10;---&#10;isExpired]" doc:name="isGetNewToken" doc:id="d6be72bc-3611-4a4b-ba2c-a50d61bb0287" variableName="isGetNewToken"/>
+		<choice doc:name="Choice" doc:id="6d0b4c8b-0da7-4152-899e-cc1b976c0de2" >
+			<when expression="#[vars.isGetNewToken == true]">
+				<set-variable value="#[%dw 2.0&#10;import p from Mule&#10;&#10;output application/java&#10;&#10;import * from dw::Crypto&#10;import * from dw::core::Binaries&#10;import * from dw::core::URL&#10;&#10;var header = &quot;{\&quot;typ\&quot;: \&quot;JWT\&quot;,\&quot;alg\&quot;: \&quot;HS256\&quot;}&quot;&#10;var iat = now() as Number { unit: 'seconds' }&#10;var exp = (now() + |PT3600S|) as Number { unit: 'seconds' }&#10;&#10;var jwt_payload = &quot;{\&quot;aud\&quot;:\&quot;$(p('healthGorillaApi.aud'))\&quot;,\&quot;iss\&quot;:\&quot;https://www.herself-health.com/\&quot;,\&quot;sub\&quot;:\&quot;$(p('healthGorillaApi.sub'))\&quot;,\&quot;iat\&quot;:$(iat),\&quot;exp\&quot;:$(exp)}&quot;&#10;var secret_key = p('secure::healthGorillaApi.clientSecret')&#10; &#10;fun base64encodeURL(data) = toBase64(data) replace &quot;/&quot; with(&quot;_&quot;) replace &quot;+&quot; with(&quot;-&quot;) replace &quot;=&quot; with &quot;&quot;&#10;&#10;---&#10;&#10;do {&#10;  var header_encoded = base64encodeURL(header)&#10;  var payload_encoded = base64encodeURL(jwt_payload)&#10;  var mixed = header_encoded ++ &quot;.&quot; ++ payload_encoded&#10;  ---&#10;  mixed ++ &quot;.&quot; ++ base64encodeURL(HMACBinary(secret_key as Binary, mixed as Binary, &quot;HmacSHA256&quot;))&#10;}]" doc:name="jwt" doc:id="660c67ba-a63f-4beb-a4d7-a6a85678e1d5" variableName="jwt" />
+				<http:request method="POST" doc:name="HealthGorillaGetTokenRequest" doc:id="06b912dd-d940-491f-9271-ad999cfef7ef" config-ref="HealthGorilla_Get_Token_Request_configuration" path="/token">
+			<http:body><![CDATA[#[%dw 2.0
+output application/x-www-form-urlencoded
+---
+{
+	grant_type:"urn:ietf:params:oauth:grant-type:jwt-bearer",
+	client_id:p('secure::healthGorillaApi.clientId'),
+	scope: "user/*.* patient360",
+	assertion:vars.jwt
+}]]]></http:body>
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"Accept" : "application/json",
+	"Content-Type" : "application/x-www-form-urlencoded"
+}]]]></http:headers>
+			<http:response-validator>
+				<http:success-status-code-validator values="200" />
+			</http:response-validator>
+		</http:request>
+				<set-payload value="#[%dw 2.0&#10;&#10;output application/json&#10;import seconds from dw::core::Periods&#10;&#10;var json = read(payload,&quot;application/json&quot;)&#10;---&#10;&#10;json ++ { expires_at: (now() + seconds(json.expires_in)) as DateTime{format:&quot;yyyy-MM-dd'T'HH:mm:ss'Z'&quot;} }]" doc:name="Read stream into payload" doc:id="b152f771-5ae9-453a-92cd-9631a7c48761" />
+				<os:store doc:name="Store HealthGorillaBearerToken" doc:id="59cdbe3f-07f7-4212-a411-df933ab1ab57" key="HealthGorillaBearerToken"/>
+				<set-variable value='#[payload.access_token]' doc:name="healthGorillaApiAccessToken" doc:id="887e0ede-bd61-4aeb-b9c5-c5b32d3a11cd" variableName="healthGorillaApiAccessToken" />
+				<remove-variable doc:name="jwt" doc:id="34167a12-b379-44e3-95e9-eff30666dba8" variableName="jwt" />
+			</when>
+			<otherwise >
+				<set-variable value="#[vars.healthGorillaBearerToken.access_token]" doc:name="healthGorillaApiAccessToken" doc:id="825d08ab-f4cd-43f2-ace6-4c6168655ebb" variableName="healthGorillaApiAccessToken"/>
+			</otherwise>
+		</choice>
+		<remove-variable doc:name="isGetNewToken" doc:id="b333d8ae-4f77-4b5d-a8a5-9253c5d2f08c" variableName="isGetNewToken"/>
+	
+</sub-flow>
+	<sub-flow name="HealthGorillaGetEverythingForPatient" doc:id="11420915-f555-4c47-adf6-fd91422da977">
+		<flow-ref doc:name="HealthGorillaGetToken" doc:id="4479cb35-17f6-4906-9b18-eef0a4f4dd7b" name="HealthGorillaGetToken"/>
+		<http:request method="GET" doc:name="HealthGorillaApiGetPatientEverything" doc:id="5e5274a9-cb41-4288-af3a-0347701de674" config-ref="HealthGorilla_Api_Request_configuration" path="/Patient/{healthGorillaPatientId}/$everything" sendBodyMode="NEVER" responseTimeout="120000">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Bearer " ++ vars.healthGorillaApiAccessToken
+}]]]></http:headers>
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"healthGorillaPatientId" : vars.healthGorillaPatientId
+}]]]></http:uri-params>
+			<http:query-params><![CDATA[#[output application/java
+---
+{
+	"_since" : vars.lastHarvestDateTime,
+	"_offset" : vars.offset,
+	"_count" : "200",
+	"_format" : "json"
+}]]]></http:query-params>
+			<http:response-validator>
+				<http:success-status-code-validator values="200" />
+			</http:response-validator>
+		
+</http:request>
+	</sub-flow>
+	<sub-flow name="HealthGorillaGetElationPatientId" doc:id="9d556776-a625-4956-93d6-3c20e1c8a000" >
+		<flow-ref doc:name="HealthGorillaGetToken" doc:id="f751d18c-1705-49ac-9859-7258b2557877" name="HealthGorillaGetToken"/>
+		<http:request method="GET" doc:name="RequestPatientData" doc:id="e7bcf472-cdc8-41cf-99a5-53e986f886b8" config-ref="HealthGorilla_Api_Request_configuration" path="/Patient/{healthGorillaPatientId}" sendBodyMode="NEVER">
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Bearer $(vars.healthGorillaApiAccessToken default "")"
+}]]]></http:headers>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	healthGorillaPatientId : vars.HealthGorillaPatientId
+}]]]></http:uri-params>
+			<http:response-validator >
+				<http:success-status-code-validator values="200" />
+			</http:response-validator>
+		
+</http:request>
+		<set-variable value="#[%dw 2.0&#10;import p from Mule&#10;import firstWith from dw::core::Arrays&#10;&#10;output application/java&#10;&#10;var identifier = payload.identifier firstWith $.system == &quot;https://api.athenahealth.com&quot;&#10;---&#10;if (identifier != null)&#10;	identifier.value as Number&#10;else&#10;	null]" doc:name="elationPatientId" doc:id="2c13b424-430f-4641-94c1-ef963e085db5" variableName="elationPatientId"/>
+		<validation:is-not-null doc:name="Validate ElationPatientId Is not null" doc:id="03c130fe-c798-4559-8699-3c1f03c67405" value="#[vars.elationPatientId]" message="ElationEMR patient id not found for HealthGorilla patient">
+			<error-mapping sourceType="VALIDATION:NULL" targetType="HEALTH_GORILLA_API:ELATION_EMR_PATIENT_ID_NOT_FOUND" />
+		</validation:is-not-null>
+	
+</sub-flow>
+</mule>

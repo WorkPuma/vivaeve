@@ -1,0 +1,14 @@
+minnesotaAdt:
+  sftp:
+    username: "![7AZFFAaGblt8uyFuMsnmKQ==]"
+    password: "![Ez4LYAFxveQfSiBIxEhuoA==]"
+
+bambooHealth:
+  sftp:
+    username: "![FXo8b9Y8Y3O9qod/C97IkTt9g3cPbwGstJBFG1G2qjfG+4AZSlt45wY7DBSib3os]"
+    password: "![FXo8b9Y8Y3O9qod/C97IkTt9g3cPbwGstJBFG1G2qjfG+4AZSlt45wY7DBSib3os]"
+    
+aws:
+  snowflake:
+    user: "![ykfs0QBRpTE=]"  
+    password: "![XCkiLdjfH5ABbtkV4rYygA==]"

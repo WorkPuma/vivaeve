@@ -1,0 +1,25 @@
+commonUtilities:
+  loggingApi:
+    host: "mule-worker-internal-common-utilities-api-dev.us-e2.cloudhub.io"
+    port: "8092"
+
+minnesotaAdt:
+  sftp:
+    host: "sftp.ainq.com"
+    port: "22"
+    workingDirectory: "/HERHLTH_P - Herself Health MN/Patient Panel/Test"
+    
+bambooHealth:
+  sftp:
+    host: "13.86.125.254"
+    port: "22"
+    workingDirectory: ""
+    
+aws:
+  s3:
+    minnesotaAdtBucket: "hh-dev-elation-to-minnesotaadt"
+    bambooHealthBucket: "hh-dev-elation-to-bamboohealth"
+  snowflake:
+    accountName: "ab16868.us-east-2.aws"
+    database: "DEV_HERSELF"
+    schema: "ROSTER"

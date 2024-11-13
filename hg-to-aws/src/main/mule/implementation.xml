@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:s3="http://www.mulesoft.org/schema/mule/s3" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/current/mule-s3.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<s3:config name="Amazon_S3_Configuration" doc:name="Amazon S3 Configuration" doc:id="df167671-176c-47da-8acc-71ca853d102e" >
+		<s3:connection accessKey="${aws.accessKeyId}" secretKey="${aws.secretKey}" />
+	</s3:config>
+	<flow name="MainFlow" doc:id="df1668b5-400f-4e32-832c-372efb190ea1" maxConcurrency="4">
+		<s3:new-object-listener doc:name="On Object created in PatientPolling" doc:id="c4af7311-c970-4cc4-ad8b-8a0cbfd23a7f" config-ref="Amazon_S3_Configuration" folder="${aws.s3.pollingFolder}" bucketName="${aws.s3.bucket}" queueName="${aws.s3.bucket}-${aws.s3.pollingFolder}">
+			<scheduling-strategy>
+				<fixed-frequency frequency="${aws.s3.pollingFrequency}" timeUnit="SECONDS" />
+			</scheduling-strategy>
+		</s3:new-object-listener>
+		<set-variable value="#[%dw 2.0&#10;output application/json&#10;---&#10;(now() &gt;&gt; &quot;UTC&quot; as TimeZone) as String {format: &quot;yyyy-MM-dd'T'HH:mm:ss'Z'&quot;}]" doc:name="startDateTime" doc:id="82bc2bbe-1788-4da9-8881-fc017c027eae" variableName="startDateTime" />
+		<set-variable value='#[(payload.key default "") as String]' doc:name="objectKey from payload" doc:id="768fdee1-ed98-43a2-87aa-8b06da160e4e" variableName="objectKey" />
+		<set-variable value="#[%dw 2.0&#10;import p from Mule&#10;import remove from dw::core::Strings&#10;&#10;output application/json&#10;---&#10;vars.objectKey remove (p('aws.s3.pollingFolder') ++ '/') remove &quot;.json&quot;]" doc:name="healthGorillaPatientId from objectKey" doc:id="cadfb66d-3d6e-4352-a675-e243bc777b95" variableName="healthGorillaPatientId" />
+		<set-variable value='#[%dw 2.0&#10;output text/plain&#10;---&#10;"HealthGorillaCache/Patient/$(vars.healthGorillaPatientId default "").json"]' doc:name="cacheObjectName" doc:id="9bc164a4-3f1b-44e2-af58-9ff8c5cc8ee8" variableName="cacheObjectName" />
+		<try doc:name="Try" doc:id="30e01ab5-0d8b-4fb1-90bc-55dd01fd13a1">
+			<flow-ref doc:name="HealthGorillaGetElationPatientId" doc:id="85a716d7-3fcc-4b3f-893b-4eec07eb57e1" name="HealthGorillaGetElationPatientId" />
+			<error-handler>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="eed3d291-0721-496f-8d2d-dac3c449db27">
+					<logger level="INFO" doc:name="Logger" doc:id="7b396211-687f-4855-88de-22d78f7e03f2" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": "",&#10;    "LogMessage" : error.description&#10;}]'/>
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<logger level="INFO" doc:name="Logger" doc:id="b6a114b7-cf73-4906-abba-692fcfe598ef" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "Starting sync of HealthGorilla patient: $(vars.healthGorillaPatientId default "") to AWS HealthLake..."&#10;}]'/>
+		<set-variable value="1900-01-01" doc:name="lastHarvestDateTime" doc:id="14170d3c-0c07-4b06-a762-a3cee91614b5" variableName="lastHarvestDateTime" />
+		<try doc:name="Try" doc:id="6a2ec2bb-507c-412c-a700-62bbe7e5c1bd">
+			<s3:get-object doc:name="Get Patient Cache Object" doc:id="47973e10-1c11-4626-8dc8-07912a85aab0" config-ref="Amazon_S3_Configuration" bucketName="${aws.s3.bucket}" key="#[vars.cacheObjectName]" outputMimeType="application/json" />
+			<set-variable value="#[payload.LastHarvestDateTime]" doc:name="lastHarvestDateTime" doc:id="b0ecc207-6cf0-4c9c-879a-1b1751a0a400" variableName="lastHarvestDateTime" />
+			<error-handler>
+				<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="b8867dd5-4881-40ba-8fd4-427fb168f433" type="S3:NO_SUCH_KEY">
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<set-payload value="#[%dw 2.0&#10;output application/json&#10;---&#10;{}]" doc:name="JSON payload" doc:id="1b8a6ba1-0fef-4a50-9947-dcf0dae3184f" />
+		<flow-ref doc:name="HarvestEverythingForPatient" doc:id="8029de25-2c99-4cd7-8822-1f3bd8faebcb" name="HarvestEverythingForPatient" />
+		<set-payload value="#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	LastHarvestDateTime: vars.startDateTime&#10;}]" doc:name="Set Payload" doc:id="01b86163-c1a5-4186-a9db-7518fe65649f" />
+		<s3:put-object doc:name="Put Cache Object" doc:id="5268546d-f1e9-4b3f-b407-3e66034ec1d3" config-ref="Amazon_S3_Configuration" bucketName="${aws.s3.bucket}" key="#[vars.cacheObjectName]" contentLength="#[sizeOf(payload.^raw)]">
+		</s3:put-object>
+		<s3:delete-object doc:name="Delete Object from PatientPolling" doc:id="f5e98720-5ba3-4470-aa4b-b447ca12e264" config-ref="Amazon_S3_Configuration" bucketName="${aws.s3.bucket}" key="#[vars.objectKey]" />
+		<logger level="INFO" doc:name="Logger" doc:id="e5cbbc43-76d2-44f4-898f-159e62d7f772" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "...Finished sync of HealthGorilla patient: $(vars.healthGorillaPatientId default "") to AWS HealthLake"&#10;}]'/>
+		<error-handler ref="globalError_Handler" />
+	</flow>
+	<sub-flow name="HarvestEverythingForPatient" doc:id="4051ca2c-25d5-4f08-b560-c2b576940639" >
+		<logger level="INFO" doc:name="Logger" doc:id="e99772fa-7532-49b2-b95b-10c0e414cb48" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "Getting everything results for patient $(vars.healthGorillaPatientId default "")..."&#10;}]'/>
+		<set-variable value="0" doc:name="offset" doc:id="15bb2036-9a6f-4aa4-bbab-150cb12f3358" variableName="offset" />
+		<flow-ref doc:name="HealthGorillaGetEverythingForPatient" doc:id="c676683d-d308-4876-940e-963521fcfbbd" name="HealthGorillaGetEverythingForPatient"/>
+		<choice doc:name="Are there any results?" doc:id="a6ec4a47-8a00-4af7-9f58-83fdb8627627" >
+			<when expression="#[payload.entry != null and !isEmpty(payload.entry)]">
+				<set-variable value='#[%dw 2.0&#10;output application/java&#10;---&#10;(payload.total / 200) as String {format: "0", roundMode:"CEILING"} as Number]' doc:name="pages" doc:id="e3a1821b-757a-4e63-822d-77fb6dde0f40" variableName="pages" />
+				<foreach doc:name="For Each Page" doc:id="84205bb0-d111-4119-b5e4-94a393d15d53" collection="#[1 to (vars.pages default 1) as Number]">
+					<flow-ref doc:name="HealthGorillaGetEverythingForPatient" doc:id="34fefcd5-06da-4ef8-b995-72d834d36aac" name="HealthGorillaGetEverythingForPatient"/>
+					<set-variable value="#[payload.link default []]" doc:name="link" doc:id="9d8cf1d3-8b3f-439e-8419-e57915b48a79" variableName="link"/>
+					<foreach doc:name="For Each Entry in FHIR Bundle" doc:id="b7d59280-daac-4b41-a18a-a76618de00cd" collection="#[payload.entry default []]">
+				<try doc:name="Try" doc:id="b112950c-a112-445b-a735-cbd1d7e217b5">
+					<set-variable value="#[payload.resource.resourceType]" doc:name="resourceType" doc:id="d998cf3b-58bf-4f49-8454-274d49825263" variableName="resourceType" />
+					<flow-ref doc:name="UpsertFhirResource" doc:id="95a2747c-637a-459a-9f62-3597d9425fb2" name="UpsertFhirResource" />
+								<error-handler>
+						<on-error-continue enableNotifications="true" logException="false" doc:name="On Error Continue" doc:id="d7fd4dd0-c267-443c-99df-62bf405d6a1a" type="ANY">
+							<ee:transform doc:name="error to JSON" doc:id="7939d793-56df-43fc-82c2-f9b321143057">
+								<ee:message>
+									<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	description: error.description default "",
+	message: error.errorMessage.payload default ""
+}]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+							<set-variable value='#[%dw 2.0&#10;output text/plain&#10;var today = now() &gt;&gt; "GMT" &#10;var strToday = today as String {format: "yyyyMMddHHmmss"}&#10;---&#10;"Logs/$(vars.healthGorillaPatientId default "")_$(vars.resourceType default "")_$(strToday).json"]' doc:name="filename" doc:id="fac5f420-68b5-4f4d-9f74-8fbae996ce94" variableName="filename" />
+							<logger level="INFO" doc:name="Logger" doc:id="6f023193-ec13-4da5-8612-dd02dabed36d" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : payload&#10;}]'/>
+							<s3:put-object doc:name="Put Object" doc:id="09627e02-6560-488d-ae5a-71167f0cce34" config-ref="Amazon_S3_Configuration" bucketName="${aws.s3.bucket}" key="#[vars.filename]" contentLength="#[sizeOf(payload.^raw)]" />
+						</on-error-continue>
+					</error-handler>
+				</try>
+			</foreach>
+					<choice doc:name="Choice" doc:id="c0f213b4-7170-4a45-bc79-7d5becf5c476">
+									<when expression='#[!isEmpty(vars.link filter $.relation == "next")]'>
+										<set-variable value='#[%dw 2.0&#10;import * from dw::core::URL&#10;import firstWith from dw::core::Arrays&#10;output application/java&#10;fun getQueryParamValueFromUrl(u: String)=parseURI(u).query splitBy "&amp;" map ($ splitBy "=")&#10;var nextLink = (payload.link default []) firstWith((item, index) -&gt; item.relation == "next")&#10;var queryParams = getQueryParamValueFromUrl((nextLink.url default "") as String)&#10;var offsetQueryParam = queryParams firstWith((item, index) -&gt; item[0] == "_offset")&#10;---&#10;offsetQueryParam[1]]' doc:name="offset" doc:id="47212041-2e13-4154-afd4-d835fa423fc5" variableName="offset" />
+							<logger level="INFO" doc:name="Logger" doc:id="169f1e4b-e932-430a-8619-372c3861d308" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "Getting next page of everything results for $(vars.healthGorillaPatientId default "")..."&#10;}]'/>
+									</when>
+								</choice>
+				</foreach>
+				<remove-variable doc:name="pages" doc:id="bc936dcf-6890-4adc-902d-989f968bf197" variableName="pages"/>
+				<remove-variable doc:name="link" doc:id="43902685-f5f8-409e-8cd5-3403bc6fc384" variableName="link"/>
+				<logger level="INFO" doc:name="Logger" doc:id="669089e8-7d2e-41e0-b9e0-008b91f105df" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "...Finished getting everything results for patient $(vars.healthGorillaPatientId default "")"&#10;}]'/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="a058c544-6c21-41a7-9cae-5e0cdf0d8f58" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "No results found to process for patient $(vars.healthGorillaPatientId)"&#10;}]'/>
+			</otherwise>
+		</choice>
+		<remove-variable doc:name="offset" doc:id="5729e952-56f9-4530-bbb4-efd92198af28" variableName="offset" />
+	</sub-flow>
+	<sub-flow name="UpsertFhirResource" doc:id="95400a65-2930-42e1-8601-aa2d40b3f706" >
+		<set-payload value="#[%dw 2.0&#10;output application/json&#10;---&#10;payload.resource]" doc:name="Set Payload to resource" doc:id="dbce92ef-b520-44c4-9fa5-416388d3fa6d" />
+		<logger level="INFO" doc:name="Logger" doc:id="5e767c1f-0b17-43cf-9bd7-f4610fb4a87b" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "Upserting resource $(vars.resourceType default "") for patient: $(vars.healthGorillaPatientId default "")..."&#10;}]'/>
+		<choice doc:name="Handle resourceType" doc:id="de642618-ec67-4ae0-81ca-e597e8b2815f" >
+			<when expression='#[vars.resourceType == "Patient"]'>
+				<ee:transform doc:name="Transform Patient" doc:id="75380c87-5f35-418c-99fd-e5bf0bd812b5" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+import parseURI from dw::core::URL
+
+output application/json
+
+var absoluteIdentifiers = payload.identifier default [] filter parseURI($.system).isAbsolute
+
+---
+payload mapObject ((value, key, index) ->
+	(if (key as String == "identifier") (key): absoluteIdentifiers else (key):value)
+)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[vars.resourceType == "MedicationStatement"]'>
+				<ee:transform doc:name="Transform Medication Statement" doc:id="2ce174b5-6009-4e8f-a221-368395e1f418" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+
+output application/json
+
+var otherResources = payload.contained default [] filter $.resourceType != "MedicationDispense"
+var medicationDispenseResources = payload.contained default [] filter $.resourceType == "MedicationDispense" map ((item, index) -> item ++ status: "unknown")
+
+---
+payload mapObject ((value, key, index) -> 
+	(if (key as String == "contained") (key): otherResources ++ medicationDispenseResources else (key):value))]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[vars.resourceType == "Observation"]'>
+				<ee:transform doc:name="Transform Observation" doc:id="10e33a68-8811-4bdc-800e-7c598a1c4965" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+
+output application/json skipNullOn="everywhere"
+
+var validExtensions = payload.extension default [] filter $.url != "http://hl7.org/fhir/StructureDefinition/event-partOf"
+
+---
+payload mapObject ((value, key, index) ->
+	(if (key as String == "extension") (key): if (sizeOf(validExtensions) == 0) null else validExtensions else (key):value)
+)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[vars.resourceType == "DiagnosticReport"]'>
+				<ee:transform doc:name="Transform DiagnosticReport" doc:id="9af60b84-cc8a-44d6-9558-ce936d6d946f" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+
+output application/json skipNullOn="everywhere"
+
+---
+payload mapObject ((value, key, index) ->
+	(if (key as String == "issued") (key): null else (key):value)
+)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+		</choice>
+		<flow-ref doc:name="AwsS3SaveFhirResource" doc:id="79b6b500-619d-49ea-85fd-48c94513b003" name="AwsS3SaveFhirResource" />
+		<logger level="INFO" doc:name="Logger" doc:id="0ea870b9-d378-4a86-ad16-6486900f97dd" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "...Finished upserting resource $(vars.resourceType default "") for patient: $(vars.healthGorillaPatientId default "")"&#10;}]'/>
+	</sub-flow>
+	<sub-flow name="AwsS3SaveFhirResource" doc:id="8dad2b27-106f-4cff-a74b-93bdae43487e" >
+		<set-variable value="#[%dw 2.0&#10;output text/plain&#10;import p from Mule&#10;---&#10;&quot;$(p('aws.s3.fhirFolder'))/$(vars.healthGorillaPatientId default &quot;unknown&quot;)/$(vars.resourceType default &quot;&quot;)_$(payload.id).json&quot;]" doc:name="s3Path" doc:id="a5c450ad-d243-4911-b86e-1391a939a4f4" variableName="s3Path" />
+		<s3:put-object doc:name="Put FHIR Object" doc:id="e9a9d53d-4461-498f-98af-e3c8f7ddad94" config-ref="Amazon_S3_Configuration" bucketName="${aws.s3.bucket}" key="#[vars.s3Path]" contentLength="#[sizeOf(payload.^raw)]" />
+		<remove-variable doc:name="s3Path" doc:id="3236ebd1-dcd0-4fb2-82ff-5cabfe9629c1" variableName="s3Path" />
+	
+</sub-flow>
+</mule>

@@ -1,0 +1,36 @@
+{
+  "minMuleVersion": "4.4.0",
+  "javaSpecificationVersions": [
+    "17"
+  ],
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [
+        "org.apache.logging.log4j.core",
+        "org.apache.logging.log4j.core.appender",
+        "org.apache.logging.log4j.core.appender.db.jdbc",
+        "org.apache.logging.log4j.core.layout"
+      ],
+      "exportedResources": [
+        "log4j2.xml"
+      ]
+    }
+  },
+  "configs": [
+    "implementation.xml"
+  ],
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  },
+  "redeploymentEnabled": true,
+  "name": "healthgorilla-imp",
+  "secureProperties": [
+    "secure.key",
+    "aws.accessKeyId",
+    "aws.secretKey"
+  ],
+  "requiredProduct": "MULE_EE",
+  "type": "mule-application"
+}

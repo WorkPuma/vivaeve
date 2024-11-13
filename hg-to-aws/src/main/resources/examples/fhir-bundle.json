@@ -1,0 +1,36 @@
+{
+	"resourceType": "Bundle",
+	"meta": {
+		"profile": [
+			"https://healthgorilla.com/fhir/StructureDefinition/hg-stateless-bundle"
+		]
+	},
+	"type": "searchset",
+	"total": 1398,
+	"link": [
+		{
+			"relation": "self",
+			"url": "https://sandbox.healthgorilla.com/fhir/R4/Patient/33238a6487e2a7fefd0b1d83/$everything?_format=json&_since=2018-01-01&_count=200"
+		},
+		{
+			"relation": "first",
+			"url": "https://sandbox.healthgorilla.com/fhir/R4/Patient/33238a6487e2a7fefd0b1d83/$everything?_format=json&_since=2018-01-01&_offset=0&_count=200"
+		},
+		{
+			"relation": "last",
+			"url": "https://sandbox.healthgorilla.com/fhir/R4/Patient/33238a6487e2a7fefd0b1d83/$everything?_format=json&_since=2018-01-01&_offset=1200&_count=200"
+		},
+		{
+			"relation": "next",
+			"url": "https://sandbox.healthgorilla.com/fhir/R4/Patient/33238a6487e2a7fefd0b1d83/$everything?_format=json&_since=2018-01-01&_offset=200&_count=200"
+		}
+	],
+	"entry": [
+		{
+			"fullUrl": "https://sandbox.healthgorilla.com/fhir/R4/Patient/33238a6487e2a7fefd0b1d83",
+			"resource": {
+				"resourceType": "Patient"
+			}
+		}
+	]
+}

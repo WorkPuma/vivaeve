@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:s3="http://www.mulesoft.org/schema/mule/s3" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/current/mule-s3.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<sub-flow name="AwsS3SaveDocumentReference" doc:id="92df8dea-3f69-4a06-b8a8-7decb338d284" >
+		<foreach doc:name="For Each Entry" doc:id="3c3ae3ad-750d-4d82-8307-a39509053354" collection="#[payload.entry default []]">
+			<set-variable value="#[payload.resource]" doc:name="resource" doc:id="3076b004-36e1-4051-b22e-f0bec1c89e62" variableName="resource"/>
+			<set-variable value="#[payload.resource.id]" doc:name="documentReferenceId" doc:id="48d74c75-e9a0-4692-84f7-40d66e6d5216" variableName="documentReferenceId" />
+			<foreach doc:name="For Each Content" doc:id="e2d55cc3-8f07-4e6c-a1e0-af17514cc8cc" collection="#[payload.resource.content default []]">
+				<try doc:name="Try" doc:id="0ca15f11-3d18-4195-bf6e-7447846f382f">
+					<set-variable value="#[%dw 2.0&#10;import p from Mule&#10;&#10;output text/plain&#10;var title = payload.attachment.title default &quot;&quot;&#10;---&#10;&quot;$(p('aws.s3.documentsFolder'))/$(vars.healthGorillaPatientId default &quot;&quot;)/$(vars.documentReferenceId default &quot;&quot;)_$(title)&quot;]" doc:name="filename" doc:id="f9f2f75a-862f-40fb-92ec-2850bdc8aad3" variableName="filename" />
+					<logger level="INFO" doc:name="Logger" doc:id="564d15e9-8784-4e0a-952f-c8f6827ffd79" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "Creating $(vars.filename default "") in s3..."&#10;}]'/>
+					<set-variable value="#[payload.attachment.size default 0]" doc:name="contentLength" doc:id="1a57bbeb-6564-46f7-9a9c-4b6f895dcbd3" variableName="contentLength" />
+					<set-variable value='#[%dw 2.0&#10;import firstWith from dw::core::Arrays&#10;import substring from dw::core::Strings&#10;&#10;output application/java&#10;&#10;var documentCreatedExtension = vars.resource.extension default [] firstWith((item, index) -&gt; item.url == "http://hl7.org/fhir/3.0/StructureDefinition/extension-DocumentReference.created")&#10;var documentCreatedDate =  (substring(documentCreatedExtension.valueDateTime default "1900-01-01", 0, 10)) as Date{format:"yyyy-MM-dd"}&#10;---&#10;(substring(payload.attachment.creation default documentCreatedDate as Date{format:"yyyy-MM-dd"}, 0,10)) as Date{format:"yyyy-MM-dd"}]' doc:name="createdDate" doc:id="33c30648-4231-4415-8d5e-843fa5416661" variableName="createdDate" />
+					<until-successful maxRetries="${app.maxRetries}" doc:name="Until Successful" doc:id="e1299605-7627-4999-82c8-9f5f890ac7c5" millisBetweenRetries="${app.retryDelayMs}">
+						<http:request method="GET" doc:name="Get Document From URL" doc:id="1c7ef37c-ed3b-4f61-947e-a4b37dbd9126" url='#[payload.attachment.url default ""]' sendBodyMode="NEVER">
+						<http:headers><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "Bearer " ++ vars.healthGorillaApiAccessToken
+}]]]></http:headers>
+						<http:response-validator>
+							<http:success-status-code-validator values="200" />
+						</http:response-validator>
+					</http:request>
+					</until-successful>
+				<s3:put-object doc:name="Put Document Object" doc:id="fb54e173-3afd-4957-b54c-f01c069b60fa" config-ref="Amazon_S3_Configuration" bucketName="${aws.s3.bucket}" key='#[vars.filename default ""]' contentLength="#[vars.contentLength]">
+							<reconnect frequency="${app.retryDelayMs}" count="${app.maxRetries}"/>
+						</s3:put-object>
+					<logger level="INFO" doc:name="Logger" doc:id="c7c0157b-e226-4680-a5db-88682f4ad0a3" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : "...Created $(vars.filename default "") in s3"&#10;}]'/>
+					<ee:transform doc:name="resource to metadata JSON" doc:id="4d4cd417-5e0f-4de6-b1d9-b363cc3c7ea8" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+            
+---
+{
+	Id: vars.resource.id default "",
+	Description: vars.resource.description default "",
+	CreatedDate: vars.resource.date default "",
+	PatientId: vars.healthGorillaPatientId,
+	Category: if (vars.resource.category != null and vars.resource.category[0].coding != null and !isEmpty(vars.resource.category[0].coding))
+             	payload.resource.category[0].coding[0].display default ""
+			  else ""
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<s3:put-object doc:name="Put metadata Object" doc:id="744b7fc4-5d9c-4524-92bb-56ca90947d5e" config-ref="Amazon_S3_Configuration" bucketName="${aws.s3.bucket}" key='#["$(vars.filename default "").metadata.json"]' contentLength="#[sizeOf(payload.^raw)]">
+						<reconnect frequency="${app.retryDelayMs}" count="${app.maxRetries}" />
+					</s3:put-object>
+					<error-handler>
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c7c8c5a0-cf5c-4b71-bc2e-ea21f09cf45b" type="ANY">
+						<ee:transform doc:name="error to JSON" doc:id="f0cbb34f-5368-4049-8317-815e9d659ab4">
+								<ee:message>
+									<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	documentReferenceId: vars.documentReferenceId default "",
+	size: vars.contentLength default 0,
+	description: error.description default "",
+	message: error.errorMessage.payload default ""
+}]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+							<logger level="INFO" doc:name="Logger" doc:id="9d5f5436-540d-4699-b482-4f48c7409b3f" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"HealthGorillaPatientId": vars.healthGorillaPatientId default "",&#10;	"ElationPatientId": vars.elationPatientId default "",&#10;    "LogMessage" : payload&#10;}]'/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+				<remove-variable doc:name="filename" doc:id="9b7d4abc-c290-42c8-9fd0-3abce655844e" variableName="filename" />
+				<remove-variable doc:name="contentLength" doc:id="b8e82fcd-0fb5-41d6-9b0e-dd4c0099b1d1" variableName="contentLength" />
+				<remove-variable doc:name="createdDate" doc:id="89212876-8810-4047-a297-9d66f7c895e6" variableName="createdDate"/>
+			</foreach>
+			<remove-variable doc:name="resource" doc:id="11f26fc7-e86a-4477-a529-de8cac2eb365" variableName="resource"/>
+			<remove-variable doc:name="documentReferenceId" doc:id="5397585b-e7c3-4d70-a707-267aa24f294e" variableName="documentReferenceId" />
+		</foreach>
+	</sub-flow>
+</mule>

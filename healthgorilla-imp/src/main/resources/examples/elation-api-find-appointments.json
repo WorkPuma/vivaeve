@@ -1,0 +1,49 @@
+{
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 141473603453018,
+            "scheduled_date": "2023-05-15T20:00:00Z",
+            "duration": 80,
+            "billing_details": null,
+            "payment": null,
+            "time_slot_type": "appointment",
+            "time_slot_status": null,
+            "reason": "Transition of Care",
+            "mode": "IN_PERSON",
+            "description": "",
+            "status": {
+                "status": "Scheduled",
+                "room": null,
+                "status_date": "2023-05-15T19:30:38Z"
+            },
+            "patient": 141167219638273,
+            "patient_forms": {
+                "patient_can_receive_forms": false,
+                "anonymous_url": "https://sandbox.elationemr.com/appointments/141473603453018/patient-forms/?key=3b700d6b3a265616355539149f215a3613cfdf978b9645e14abe37e52001512e",
+                "overrides": [],
+                "short_code": "I06PXPQ2",
+                "statuses": [
+                    {
+                        "id": 57,
+                        "name": "COVID-19 Screening Form",
+                        "status": "incomplete"
+                    }
+                ],
+                "hours_prior": 48
+            },
+            "physician": 141350789840898,
+            "practice": 140976522133508,
+            "instructions": "",
+            "recurring_event_schedule": null,
+            "metadata": null,
+            "created_date": "2023-05-15T19:30:38Z",
+            "last_modified_date": "2023-05-15T19:30:38Z",
+            "deleted_date": null,
+            "service_location": null,
+            "telehealth_details": null
+        }
+    ]
+}
