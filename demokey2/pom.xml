@@ -4,10 +4,10 @@
 
 	<groupId>com.mycompany</groupId>
 	<artifactId>demokey2</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>mule-application</packaging>
 
-	<name>demokey2-1.0.0-snapshot-mule-application</name>
+	<name>demokey2</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
