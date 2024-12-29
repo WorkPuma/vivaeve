@@ -1,36 +1,30 @@
 {
-  "minMuleVersion": "4.4.0",
-  "javaSpecificationVersions": [
-    "17"
-  ],
-  "classLoaderModelLoaderDescriptor": {
-    "id": "mule",
-    "attributes": {
-      "exportedPackages": [
-        "org.apache.logging.log4j.core",
-        "org.apache.logging.log4j.core.appender",
-        "org.apache.logging.log4j.core.appender.db.jdbc",
-        "org.apache.logging.log4j.core.layout"
-      ],
-      "exportedResources": [
-        "log4j2.xml"
-      ]
-    }
-  },
-  "configs": [
-    "demokey2.xml"
-  ],
-  "bundleDescriptorLoader": {
-    "id": "mule",
-    "attributes": {}
-  },
-  "redeploymentEnabled": true,
-  "name": "demokey2",
-  "secureProperties": [
-    "secure.key",
-    "aws.accessKeyId",
-    "aws.secretKey"
-  ],
-  "requiredProduct": "MULE_EE",
-  "type": "mule-application"
+    "configs": ["demokey2.xml"],
+    "redeploymentEnabled": true,
+    "classLoaderModelLoaderDescriptor": {
+        "attributes": {
+            "exportedPackages": [
+                "org.apache.logging.log4j.core",
+                "org.apache.logging.log4j.core.appender",
+                "org.apache.logging.log4j.core.appender.db.jdbc",
+                "org.apache.logging.log4j.core.layout"
+            ],
+            "exportedResources": ["log4j2.xml"]
+        },
+        "id": "mule"
+    },
+    "name": "demokey2",
+    "requiredProduct": "MULE_EE",
+    "minMuleVersion": "4.8.0",
+    "bundleDescriptorLoader": {
+        "attributes": {},
+        "id": "mule"
+    },
+    "javaSpecificationVersions": ["17"],
+    "type": "mule-application",
+    "secureProperties": [
+        "secure.key",
+        "aws.accessKeyId",
+        "aws.secretKey"
+    ]
 }
