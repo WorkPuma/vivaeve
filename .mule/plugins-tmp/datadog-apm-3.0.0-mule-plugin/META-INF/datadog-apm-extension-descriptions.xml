@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension-documentation>
+    <configs>
+        <config name="config">
+            <description><![CDATA[Default configuration]]></description>
+            <parameters>
+                <parameter name="expirationPolicy">
+                    <description><![CDATA[Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.]]></description>
+                </parameter>
+            </parameters>
+        </config>
+    </configs>
+    <connections>
+        <connection name="connection">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="host">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="port">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="poolingProfile">
+                    <description><![CDATA[Characteristics of the connection pool]]></description>
+                </parameter>
+                <parameter name="service">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="environment">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="version">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+    </connections>
+    <extension name="Datadog APM">
+        <description><![CDATA[A Mule(R) extension that provides application performance monitoring (APM) with Datadog APM. Allows you to create traces in a flow and correlate such traces with the logs sent to Datadog.]]></description>
+        <parameters/>
+    </extension>
+    <operations>
+        <operation name="activateSpan">
+            <description><![CDATA[The Activate Span operation ensures to set the Active span in the context with the one the user passes]]></description>
+            <parameters>
+                <parameter name="spanName">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="createSpan">
+            <description><![CDATA[The Create Span operation ensures the creation of a new span in the current context, as well as validates the span names to avoid duplicate errors]]></description>
+            <parameters>
+                <parameter name="spanName">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="parent">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="autofinish">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="injection">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="tag">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="baggageItems">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="method">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="path">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="finishAll">
+            <description><![CDATA[The Finish Span operation ensures the finalization of the existing spans in the current context]]></description>
+            <parameters/>
+        </operation>
+        <operation name="finishSpan">
+            <description><![CDATA[The Finish Span operation ensures the finalization of the existing spans in the current context]]></description>
+            <parameters>
+                <parameter name="spanName">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="error">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="statusCode">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="log">
+            <description><![CDATA[Logs the passed message with the passed level and category. If the given spanName can be found in the spans registry in the configuration, then the IConstants.DD_TRACE_ID and IConstants.DD_SPAN_ID is injected in the SLF4J's MDC context. If there's no span with the given name, then it just logs.]]></description>
+            <parameters>
+                <parameter name="spanName">
+                    <description><![CDATA[to retrieve the trace id to which this log will be associated in Datadog.]]></description>
+                </parameter>
+                <parameter name="message">
+                    <description><![CDATA[the message to log.]]></description>
+                </parameter>
+                <parameter name="level">
+                    <description><![CDATA[the desired level of the log.]]></description>
+                </parameter>
+                <parameter name="category">
+                    <description><![CDATA[used to log.]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="updateSpan">
+            <description><![CDATA[The Create Span operation ensures the creation of a new span in the current context, as well as validates the span names to avoid duplicate errors]]></description>
+            <parameters>
+                <parameter name="spanName">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="tag">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="baggageItems">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+    </operations>
+    <sources/>
+    <types>
+        <type name="com.ioconnectservices.mule.internal.parameters.InjectionType">
+            <description><![CDATA[]]></description>
+            <parameters/>
+        </type>
+        <type name="com.ioconnectservices.mule.internal.parameters.OpenTracingInjection">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="traceId">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="parentId">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="samplingPriority">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="baggageItems">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+    </types>
+</extension-documentation>
