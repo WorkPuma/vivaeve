@@ -1,0 +1,22 @@
+sf:
+  name: "mulesoftdeployment@herself-health.com"
+  host: "herself.my.salesforce.com"
+  url: "https://herself.my.salesforce.com/services/Soap/u/55.0"
+  frequency: "60000"
+  count: "3"
+  clinicalEncounter:
+    defaultRecordTypeId: "0128b000001KDh2AAG"
+  
+aws:
+  s3:
+    frequency: "60000"
+    count: "3"
+  rds:
+    interopDatabase:
+      host: "hh-sql-database-prod.cvvqp5ertig9.us-east-1.rds.amazonaws.com"
+      port: "1433"
+      database: "hh_interop_prod"
+  snowflake:
+    accountName: "ab16868.us-east-2.aws"
+    database: "HERSELF"
+    schema: "HH_DMART"

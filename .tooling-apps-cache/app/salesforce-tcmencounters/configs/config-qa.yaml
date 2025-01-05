@@ -1,0 +1,19 @@
+sf:
+  name: "doradla.v.deepchand@apisero.com"
+  url: "https://herself--partialcpy.sandbox.my.salesforce.com/services/Soap/u/55.0"
+  frequency: "60000"
+  count: "3"
+  
+aws:
+  s3:
+    frequency: "60000"
+    count: "3"
+  rds:
+    interopDatabase:
+      host: "hh-sql-database-dev.ckgj59svd8dx.us-east-1.rds.amazonaws.com"
+      port: "1433"
+      database: "tuva_dev"
+  snowflake:
+    accountName: "ab16868.us-east-2.aws"
+    database: "TUVA"
+    schema: "CORE"
