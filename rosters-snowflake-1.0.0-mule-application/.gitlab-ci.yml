@@ -1,0 +1,21 @@
+image: maven:3.8.2-jdk-8
+
+stages:
+  - build-deploy
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  ENV: "dev"
+  ENVIRONMENT: "Development"
+  APPLICATION_NAME: "build-rosters-from-snowflake-dev"
+
+cache:
+  paths:
+    - .m2/repository
+
+build-deploy:
+  stage: build-deploy
+  script:
+    - mvn clean deploy -DmuleDeploy
+  only:
+    - dev
