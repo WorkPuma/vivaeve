@@ -1,0 +1,51 @@
+api:
+  autodiscoveryId: "123456"  
+
+http:
+  host: "0.0.0.0"
+  port: "8081"
+  
+request:
+  host: "0.0.0.0"
+  port: "8083"
+  path: "/api/invokenextgen"  
+  
+https:
+  host: "0.0.0.0"
+  port: "8082"
+
+
+sf:
+  username: "integrations@vivaeve.com"
+
+smtp:
+  host: "smtp.gmail.com"
+  port: "587"
+  user: "viva.eve.notify@gmail.com"
+  toaddress: "mrudhula.eerisetti@prowesssoft.com"
+  fromaddress: "viva.eve.notify@gmail.com"
+
+mshsegment:
+  PT-01 : "P"
+  MSH-12: "2.3"
+  MSH-03: "VIVAEVE"
+  MSH-04: "1266378"
+  MSH-05: "NEXTGEN OFFICE"
+  MSH-06-HD-01: "1266378"
+  MSH-06-HD-02: "foresthms"
+  MSH-09-MSG-01: "SIU"
+  MSH-09-MSG-02-s12: "S12"
+  MSH-09-MSG-02-s13: "S13"
+  MSH-09-MSG-02-s14: "S14"
+  MSH-09-MSG-02-s15: "S15"
+  MSH-09-MSG-01-ADT: "ADT"
+  MSH-09-MSG-02-A04: "A04"
+  MSH-09-MSG-02-A08: "A08"
+
+hl7:
+  A04schema: "/hl7/v2_3/ADT_A04.esl"
+  A08schema: "/hl7/v2_3/ADT_A08.esl"
+  S12schema: "/hl7/v2_3/SIU_S12.esl"
+  S13schema: "/hl7/v2_3/SIU_S13.esl"
+  S14schema: "/hl7/v2_3/SIU_S14.esl"
+  S15schema: "/hl7/v2_3/SIU_S15.esl"

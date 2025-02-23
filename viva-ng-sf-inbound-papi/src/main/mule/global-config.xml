@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:salesforce-composite="http://www.mulesoft.org/schema/mule/salesforce-composite"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:cofww-logger="http://www.mulesoft.org/schema/mule/cofww-logger"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/cofww-logger http://www.mulesoft.org/schema/mule/cofww-logger/current/mule-cofww-logger.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org/schema/mule/salesforce-composite/current/mule-salesforce-composite.xsd">
+
+	<!-- This configuration uses default algorithm (AES) and mode (CBC) -->
+	
+	<secure-properties:config
+		name="Secure_Properties_Config"
+		doc:name="Environment-specific Secure Properties Config"
+		doc:id="b64daa35-1683-43f6-84c9-21776df3753a"
+		file="config/config-secured-${mule.env}.yaml"
+		key="${mule.key}" />
+
+	<configuration-properties
+		doc:name="Application Configuration properties"
+		doc:id="4e9071c0-5800-46f3-8031-b1ae639c2256"
+		file="config/config-${mule.env}.yaml" />
+
+	<configuration-properties
+		doc:name="Common Configuration properties"
+		doc:id="8f0a30ee-8023-4aa2-91a3-c8ab1f805c27"
+		file="config/config-common.yaml" />
+
+	<global-property doc:name="default mule.env"
+		doc:id="fe3c60da-e4a7-4f63-b47b-6f30a7b8bc93" name="mule.env"
+		value="qa" />
+
+	<global-property doc:name="default mule.encryption.key"
+		doc:id="562465a7-8482-41fb-ad41-be913eca44c9"
+		name="mule.key" value="mulevivaeve09876" />
+
+	<!-- <api-gateway:autodiscovery apiId="${api.autodiscoveryId}"
+		doc:name="API Autodiscovery"
+		doc:id="99fac178-73f2-484b-8821-be13d2c2201a" flowRef="template-main"
+		ignoreBasePath="true" /> -->
+
+	<http:listener-config name="http-listener-config">
+        <http:listener-connection host="${http.host}" port="${http.port}"/>
+    </http:listener-config>
+	<import doc:name="Import" doc:id="f8896585-9ae1-4382-898e-8356262db634" file="common-global.xml" />
+	<import doc:name="Import" doc:id="3d8474c3-0482-4ac2-9f51-d667b741a39b" file="mule-common-logging.xml" />
+	<hl7:config name="HL7_EDI_Config_A04" doc:name="HL7 EDI Config" doc:id="a2809071-aa66-4361-b1d2-840550fccfc1" >
+		<hl7:schemas >
+			<hl7:schema value="/hl7/v2_3/ADT_A04.esl" />
+		</hl7:schemas>
+	</hl7:config>
+	<hl7:config name="HL7_EDI_Config_A08" doc:name="HL7 EDI Config" doc:id="94afc8c7-57a8-4550-a17b-9e7bb3e9bfb8" >
+		<hl7:schemas >
+			<hl7:schema value="/hl7/v2_3/ADT_A08.esl" />
+		</hl7:schemas>
+	</hl7:config>
+	<hl7:config name="HL7_EDI_Config_S12" doc:name="HL7 EDI Config" doc:id="9a64e9a8-d061-48d8-abc9-4a69cedd5138">
+		<hl7:schemas >
+			<hl7:schema value="/hl7/v2_3/SIU_S12.esl" />
+		</hl7:schemas>
+	</hl7:config>
+	<hl7:config name="HL7_EDI_Config_S13" doc:name="HL7 EDI Config" doc:id="72602241-5f26-449e-b74c-2edea9d2a0fc" >
+		<hl7:schemas >
+			<hl7:schema value="/hl7/v2_3/SIU_S13.esl" />
+		</hl7:schemas>
+	</hl7:config>
+	<hl7:config name="HL7_EDI_Config_S14" doc:name="HL7 EDI Config" doc:id="2ff63d7f-40a4-4d1b-886d-d3214eee1f06" >
+		<hl7:schemas >
+			<hl7:schema value="/hl7/v2_3/SIU_S14.esl" />
+		</hl7:schemas>
+	</hl7:config>
+	<hl7:config name="HL7_EDI_Config_S15" doc:name="HL7 EDI Config" doc:id="348844f5-7710-4833-9797-0e7f5bdc784f" >
+		<hl7:schemas >
+			<hl7:schema value="/hl7/v2_3/SIU_S15.esl" />
+		</hl7:schemas>
+	</hl7:config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="3d290ecf-b658-400b-971d-7fc96bf282d5" >
+		<http:request-connection host="${request.host}" port="${request.port}" />
+	</http:request-config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="47ad693c-9965-4d34-8011-728dc204663a" >
+		<salesforce:basic-connection username="${sf.username}" password="${secure::sf.password}" >
+			<reconnection >
+				<reconnect frequency="${sf.retryfrequency}" count="${sf.retryattempts}" />
+			</reconnection>
+		</salesforce:basic-connection>
+	</salesforce:sfdc-config>
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="96bdf21a-6169-4fe2-aa98-f1f0c56fc76d" >
+		<email:smtp-connection host="${email.host}" port="${email.port}" user="${email.username}" password="${secure::email.password}" >
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+
+
+</mule>
