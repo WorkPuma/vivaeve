@@ -1,9 +1,0 @@
-{
-    "minMuleVersion": "4.4.0",
-    "javaSpecificationVersions": ["17"],
-    "secureProperties": [
-        "key",
-        "aws.accessKeyId",
-        "aws.secretKey"
-    ]
-}
