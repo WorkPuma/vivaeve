@@ -1,0 +1,43 @@
+api:
+  autodiscoveryId: "123456"  
+
+http:
+  host: "0.0.0.0"
+  port: "8083"
+  
+https:
+  host: "0.0.0.0"
+  port: "8082"
+  
+request:
+  host: "0.0.0.0"
+  port: "8083"
+  method: "POST"
+  path: "/api/nextgenemr"  
+
+sf:
+  retryattempts: "2"
+  retryfrequency : "30000"
+  username: "integrations@vivaeve.com"
+ 
+  consumerkey: "3MVG9Km_cBLhsuPzyxmKKmOQ19ECH4_3VjLkA_ehz_v9Qf0Osb6FHrw9aKydUd7jmj3TqJksoylyNlx3dI5dP"
+  consumersecret: "ED06F07FAAFC670030364C26AA88FADC7193F1293168768B99337919382FB3BE"
+email:
+  from: "viva.eve.notify@gmail.com"
+  to: "chandra.nekkala@prowesssoft.com"
+  madison:
+   to: "chandra.nekkala@prowesssoft.com"
+  forest:
+   to: "chandra.nekkala@prowesssoft.com"
+  
+  host: "smtp.gmail.com"
+  port: "587"
+  username: "viva.eve.notify@gmail.com"
+  
+
+  
+
+
+ 
+  
+ 

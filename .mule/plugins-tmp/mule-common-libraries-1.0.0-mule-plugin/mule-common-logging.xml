@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+<!-- 	<sub-flow name="sf-response-logger" doc:id="670839e9-df96-432c-a832-6c6cbae87a14" >
+		<logger level="DEBUG" doc:name="SF Response Logger" doc:id="9579d1a7-f942-4ac1-a196-e65b10579f90" message="#[%dw 2.0&#10;output application/json&#10;&#10;-&#45;&#45;&#10;vars.sfResponse]" category="${logger.category.payload}" />
+	</sub-flow> -->
+	<sub-flow name="failure-log" doc:id="66aaaebe-774c-405d-af1e-934f15094aac" >
+		<logger level="INFO" doc:name="Log the failure milestone" doc:id="4efad5f4-9ffa-4c65-99dd-2646e3d4916e" message="#[vars.logPayload]" category="${logger.category.milestones}" />
+	</sub-flow>
+	<sub-flow name="milestone-log" doc:id="d91f000f-380a-442e-ade5-4f9264e3da84" >
+		<ee:transform doc:name="prepare the milestone payload" doc:id="b2a78f13-bc2c-4599-90ee-d0d365ccbf24">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable resource="loggerDw/logger-commonMilestonePayload.dwl" variableName="logPayload" />
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Log the milestone" doc:id="653a6195-9cdf-492d-a694-5a44aed13cd6" message="#[vars.logPayload]" category="${logger.category.milestones}" />
+	</sub-flow>
+	<sub-flow name="failure-milestone-log" doc:id="e563df46-08b7-419c-b3e7-5e4a45998277">
+		<ee:transform doc:name="prepare the failure payload" doc:id="3d2047f1-f64d-4f45-90a9-794a1d25eb40">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable resource="loggerDw/logger-failureResponseReceived.dwl" variableName="logPayload" />
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="failure-log" doc:id="e66a7ba4-86fd-4ab6-ba40-ddb08c5bf026" name="failure-log" />
+	</sub-flow>
+	<sub-flow name="mile-log:request-received" doc:id="678d822b-ca8a-43c0-832a-13949db99ddb" >
+		<set-variable value="#['RequestReceived']" doc:name="set the milestone status to RequestReceived" doc:id="6ab7c864-042d-4d06-9f47-02e2a7fc0fb3" variableName="milestoneStatus"/>
+		<flow-ref doc:name="milestone-log" doc:id="cbe0cdcb-5969-4243-8ae8-3f77926c7402" name="milestone-log" />
+	</sub-flow>
+	<sub-flow name="mile-log:failure-response-received" doc:id="c061862f-2785-44b2-83db-e3dcbbc076a6">
+		<set-variable value="#['FailureResponseReceived']" doc:name="set the milestone status to FailureResponseReceived" doc:id="9bb249a6-c4f2-4b79-8953-72f014d322de" variableName="milestoneStatus" />
+		<flow-ref doc:name="failure-milestone-log" doc:id="b8473cec-8e8a-4355-ba0e-98bd9a25dda9" name="failure-milestone-log" />
+	</sub-flow>
+	<sub-flow name="mile-log:filter-criteria-failed" doc:id="96556001-9f01-4729-b686-a89b93858140" >
+		<ee:transform doc:name="prepare the payload" doc:id="7acd4c48-1c96-4cf5-803d-4781401d42d1" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable resource="loggerDw/logger-filterCriteriaFailed.dwl" variableName="logPayload" />
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="failure-log" doc:id="95dc0be7-6619-41db-b8d0-26e34298a86a" name="failure-log" />
+	</sub-flow>
+	<sub-flow name="mile-log:request-sent" doc:id="41f29f2c-39fd-4a90-87a6-475852369b79" >
+		<set-variable value="#['RequestSent']" doc:name="set the milestone status to RequestSent" doc:id="6ed3a453-60e3-407e-82b5-5453e53144e6" variableName="milestoneStatus" />
+		<flow-ref doc:name="milestone-log" doc:id="e663f293-7bea-4e00-953a-471650ad29d6" name="milestone-log" />
+	</sub-flow>
+	<sub-flow name="mile-log:success-response-received" doc:id="13c0d089-acb9-4d61-9494-a0055ba7ddc9" >
+		<set-variable value="#['SuccessResponseReceived']" doc:name="set the milestone status to SuccessResponseReceived" doc:id="4a24e2ac-322a-4461-b275-7c08fc2e1431" variableName="milestoneStatus" />
+		<flow-ref doc:name="milestone-log" doc:id="6d40e102-592c-4f0e-9d56-f305ac91dc18" name="milestone-log" />
+	</sub-flow>
+	<sub-flow name="mile-log:success-response-sent" doc:id="400cd740-202a-451f-9997-7380862778a0" >
+		<set-variable value="#['SuccessResponseSent']" doc:name="set the milestone status to SuccessResponseSent" doc:id="48dda75f-ce44-4c2d-b635-50f1379e3433" variableName="milestoneStatus" />
+		<flow-ref doc:name="milestone-log" doc:id="44c090d8-3063-4eaf-a947-0e5f426f9a65" name="milestone-log" />
+	</sub-flow>
+	<sub-flow name="mile-log:failure-response-sent" doc:id="f407dd75-a2d3-4a06-adfe-0b8601bfde3f" >
+		<set-variable value="#['FailureResponseSent']" doc:name="set the milestone status to FailureResponseSent" doc:id="c1c355e7-a802-4974-9707-a56a46355ef6" variableName="milestoneStatus" />
+		<flow-ref doc:name="failure-milestone-log" doc:id="686b00fc-410d-43a2-9327-40df944dd88b" name="failure-milestone-log" />
+	</sub-flow>
+	<sub-flow name="mile-log:data-enrinchment-failure" doc:id="950deee8-2e50-4348-8319-85acca1e1dce" >
+		<set-variable value="#['DataEnrinchmentFailure']" doc:name="set the milestone status to DataEnrinchmentFailure" doc:id="2dcb4eee-8824-44ae-ba80-f551ea0b1a3b" variableName="milestoneStatus" />
+		<flow-ref doc:name="failure-milestone-log" doc:id="45b10d76-7cd3-47d2-ada0-b231599fa8f0" name="failure-milestone-log" />
+	</sub-flow>
+	<sub-flow name="mile-log:payload-logger" doc:id="a30cb53a-0162-452a-96ac-1bcf4e52a673" >
+		<logger level="DEBUG" doc:name="Log the payload" doc:id="7e8866ba-53ef-4580-b465-687925e51e7b" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" category="${logger.category.payload}" />
+	</sub-flow>
+
+</mule>

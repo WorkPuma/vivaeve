@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="viva-sf-ng-outbound-sapi-test-suite.xml" />
+	<munit:test name="viva-sf-ng-outbound-sapi-mainTest" doc:id="d7c57ee3-cfa5-4c43-a007-5bb276cd7d93" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="8541e38b-5126-4ba5-b247-17e331c111fc" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="viva-sf-ng-outbound-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to viva-sf-ng-outbound-sapi-main" doc:id="0a8832b5-ab12-4a5f-8883-668667626ce9" name="viva-sf-ng-outbound-sapi-main"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="f92930c4-ba8d-41d7-902f-53eaa6990f81" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="viva-sf-ng-outbound-sapi-consoleTest" doc:id="ef900be4-592f-4484-be3e-52b6a97fb292" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="3da934b5-8550-4a47-974b-64912c9e6bc8" processor="apikit:console">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="viva-sf-ng-outbound-sapi-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to viva-sf-ng-outbound-sapi-console" doc:id="6c985c94-5abf-4066-8ffc-64c239daef97" name="viva-sf-ng-outbound-sapi-console"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="6f8d5391-da68-4b1d-b603-cbde04954046" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="viva-sf-ng-outbound-sapi-configTest" doc:id="eaaef726-f77b-44b6-b0ed-3f962935b2bc" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="9e04820d-aed6-4999-a07e-2f8006083211" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="4890e393-6b3b-421e-b18f-43495376a6a0" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="ba6c3a9e-23b0-4f72-b275-47f1d94f6df7" >
+				<munit:payload value="#[readUrl('classpath://mUnitFiles/request.txt')]" mediaType="text/plain" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to post:\invokenextgen:text\plain:viva-sf-ng-outbound-sapi-config" doc:id="4a209364-c526-4421-b9bb-8e4d3d391484" name="post:\invokenextgen:text\plain:viva-sf-ng-outbound-sapi-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="d84daa51-316d-4cf4-9596-981a0c6eb3ee" expression="#[payload]" is="#[MunitTools::notNullValue()]" />
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

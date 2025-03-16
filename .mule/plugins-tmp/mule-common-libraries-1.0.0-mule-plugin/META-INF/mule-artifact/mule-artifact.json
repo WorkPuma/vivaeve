@@ -1,0 +1,61 @@
+{
+  "configs": [
+    "error-handler.xml",
+    "mule-common-logging.xml",
+    "common-global.xml"
+  ],
+  "secureProperties": [],
+  "redeploymentEnabled": true,
+  "name": "cf005554-e454-4573-9ab6-6dbb3d2ea557:mule-common-libraries:1.0.0",
+  "minMuleVersion": "4.4.0",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "common-global.xml",
+        "config/common-libraries.yaml",
+        "error-handler.xml",
+        "log4j2.xml",
+        "loggerDw/logger-commonFailureMilestonePayload.dwl",
+        "loggerDw/logger-commonMilestonePayload.dwl",
+        "loggerDw/logger-failureResponseReceived.dwl",
+        "loggerDw/logger-failureResponseSent.dwl",
+        "loggerDw/logger-filterCriteriaFailed.dwl",
+        "loggerDw/logger-requestReceived.dwl",
+        "loggerDw/logger-requestSent.dwl",
+        "loggerDw/logger-successResponseReceived.dwl",
+        "loggerDw/logger-successResponseSent.dwl",
+        "modules/CommonUtils.dwl",
+        "modules/StringifyUtils.dwl",
+        "mule-common-logging.xml",
+        "transformations/buildErrorOutput.dwl",
+        "transformations/callbackOutput.dwl",
+        "transformations/critical-error.dwl",
+        "transformations/error-handler/bad-request.dwl",
+        "transformations/error-handler/callback.dwl",
+        "transformations/error-handler/internal-error.dwl",
+        "transformations/error-handler/not-acceptable.dwl",
+        "transformations/error-handler/not-allowed.dwl",
+        "transformations/error-handler/not-found.dwl",
+        "transformations/error-handler/not-implemented.dwl",
+        "transformations/error-handler/unsupported-media.dwl",
+        "transformations/error.dwl",
+        "transformations/error400.dwl",
+        "transformations/error401.dwl",
+        "transformations/error403.dwl",
+        "transformations/error404.dwl",
+        "transformations/error405.dwl",
+        "transformations/error406.dwl",
+        "transformations/error415.dwl",
+        "transformations/error500.dwl",
+        "transformations/error501.dwl"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

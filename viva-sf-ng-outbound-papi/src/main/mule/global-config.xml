@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:cofww-logger="http://www.mulesoft.org/schema/mule/cofww-logger"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/cofww-logger http://www.mulesoft.org/schema/mule/cofww-logger/current/mule-cofww-logger.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+
+	<!-- This configuration uses default algorithm (AES) and mode (CBC) -->
+	
+	<secure-properties:config
+		name="Secure_Properties_Config"
+		doc:name="Environment-specific Secure Properties Config"
+		doc:id="b64daa35-1683-43f6-84c9-21776df3753a"
+		file="config/config-secured-${mule.env}.yaml"
+		key="${mule.key}" />
+
+	<configuration-properties
+		doc:name="Application Configuration properties"
+		doc:id="4e9071c0-5800-46f3-8031-b1ae639c2256"
+		file="config/config-${mule.env}.yaml" />
+
+	<configuration-properties
+		doc:name="Common Configuration properties"
+		doc:id="8f0a30ee-8023-4aa2-91a3-c8ab1f805c27"
+		file="config/config-common.yaml" />
+
+	<global-property doc:name="default mule.env"
+		doc:id="fe3c60da-e4a7-4f63-b47b-6f30a7b8bc93" name="mule.env"
+		value="qa" />
+
+	<global-property doc:name="default mule.encryption.key"
+		doc:id="562465a7-8482-41fb-ad41-be913eca44c9"
+		name="mule.key" value="mule$oftviva0987" />
+
+	<!-- <api-gateway:autodiscovery apiId="${api.autodiscoveryId}"
+		doc:name="API Autodiscovery"
+		doc:id="99fac178-73f2-484b-8821-be13d2c2201a" flowRef="template-main"
+		ignoreBasePath="true" /> -->
+
+<!-- 	<tls:context name="tls-viva" doc:name="TLS Context" doc:id="5dd20cd8-d02e-4879-af6b-5737ad42b3e6" >
+	
+	<tls:key-store type="jks" path="${tls.path}" alias="${tls.alias}" keyPassword="${tls.keypassword}" password="${tls.password}" />
+	
+	</tls:context> -->
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="8f1cc1ec-0d0d-4961-a51b-93dc97031ba0" >
+		<salesforce:basic-connection username="${sf.username}" password="${secure::sf.password}" />
+	</salesforce:sfdc-config>
+	<hl7:config name="HL7_EDI_Config_A04" doc:name="HL7 EDI Config" doc:id="b775032e-115f-42d0-afbb-a8ad857ff3b4" subcompSeparator="&amp;">
+		<hl7:schemas >
+			<hl7:schema value="${hl7.A04schema}" />
+		</hl7:schemas>
+	</hl7:config>
+	 <hl7:config name="HL7_EDI_Config_A08" doc:name="HL7 EDI Config" doc:id="271d4ea6-93c8-4fc8-88ac-174fe4c1b2e3" subcompSeparator="&amp;">
+		<hl7:schemas >
+			<hl7:schema value="${hl7.A08schema}" />
+		</hl7:schemas>
+	</hl7:config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="7ddb2b72-6834-470a-b17a-f6ede5f12bd6" >
+		<http:request-connection host="${request.host}" port="${request.port}" connectionIdleTimeout="60000"/>
+	</http:request-config>
+	<hl7:config name="HL7_EDI_Config_S12" doc:name="HL7 EDI Config" doc:id="5dc665d5-73f4-4e3c-b6da-172515ac46f5" subcompSeparator="&amp;">
+		<hl7:schemas >
+			<hl7:schema value="${hl7.S12schema}" />
+		</hl7:schemas>
+	</hl7:config>
+	<hl7:config name="HL7_EDI_Config_S13" doc:name="HL7 EDI Config" doc:id="f8104af7-9aa2-471c-8891-f775fa9c5f95" subcompSeparator="&amp;">
+		<hl7:schemas >
+			<hl7:schema value="${hl7.S13schema}" />
+		</hl7:schemas>
+	</hl7:config>
+	<hl7:config name="HL7_EDI_Config_S14" doc:name="HL7 EDI Config" doc:id="a9b76f41-c856-4bc8-baaf-e668fa0473df" subcompSeparator="&amp;">
+		<hl7:schemas >
+			<hl7:schema value="${hl7.S14schema}" />
+		</hl7:schemas>
+	</hl7:config>
+	<hl7:config name="HL7_EDI_Config_S15" doc:name="HL7 EDI Config" doc:id="21877d06-5545-446b-9613-480c7bb4d90c" subcompSeparator="&amp;">
+		<hl7:schemas >
+			<hl7:schema value="${hl7.S15schema}" />
+		</hl7:schemas>
+	</hl7:config>
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="296062c4-e1bf-4bda-b48f-fe34dd649624" >
+		<email:smtp-connection host="${smtp.host}" port="${smtp.port}" user="${smtp.user}" password="${secure::smtp.password}" >
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+	<vm:config name="VM_Config" doc:name="VM Config" doc:id="ed0dad11-0abf-4f9c-8fd8-2638fd9a124e" sendCorrelationId="ALWAYS" >
+		<vm:queues >
+			<vm:queue queueName="sfqueue" queueType="PERSISTENT" />
+		</vm:queues>
+	</vm:config>
+
+
+</mule>

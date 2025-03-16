@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d [%t] %-5p %c - %m%n"/>
+        </Console>
+
+
+
+        <Http name="Datadog"
+            url="https://http-intake.logs.us3.datadoghq.com/api/v2/logs?host=${sys:hostName}&amp;ddsource=Mulesoft&amp;service=${sys:application.name}">
+            <Property name="Content-Type" value="application/json"/>
+            <Property name="DD-API-KEY" value="${datadog.apiKey}"/>
+            <PatternLayout pattern="{&quot;message&quot;:&quot;%d [%t] %-5p %c - %m&quot;}"/>
+        </Http>
+    </Appenders>
+
+    <Loggers>
+        <AsyncRoot level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="Datadog" level="ERROR"/>
+        </AsyncRoot>
+    </Loggers>
+</Configuration>

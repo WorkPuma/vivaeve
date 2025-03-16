@@ -1,0 +1,16 @@
+# Logger
+logger:
+  category:
+    payload: "com.prowess.integration.logging.payload"
+    milestones: "com.prowess.integration.logging.milestones"
+
+milestone:
+  cateogry: "LOG"
+  requetReceived: "RequestReceived"
+  requetSent: "RequetSent"
+  successResponseReceived: "SuccessResponseReceived"
+  failureResponseReceived: "FailureResponseReceived"
+  successResponseSent: "SuccessResponseSent"
+  failureResponseSent: "FailureResponseSent"
+  filterCriteriaFailed: "FilterCriteriaFailed"
+  dataEnrinchmentFailure: "DataEnrinchmentFailure"

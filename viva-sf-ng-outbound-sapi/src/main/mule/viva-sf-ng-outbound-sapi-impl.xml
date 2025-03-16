@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="implementationFlow" doc:id="6db5c269-f30b-4a98-bf24-71865b4c1720" >
+		<logger level="WARN" doc:name="inputLogger" doc:id="aacde260-bcaa-4a5e-a1dc-216006e1140f" message="#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	correlationId : vars.correlationId,&#10;	eventTimestamp : now(),&#10;	applicationName: Mule::p('application.name'),&#10;	flowName: flow.name default &quot;implementation-flow&quot;,&#10;	environment: upper(Mule::p('mule.env')),&#10;	source: Mule::p('source'),&#10;	target: Mule::p('target'),&#10;	message: &quot;request received from papi&quot;&#10;}]"/>
+		<until-successful maxRetries="${untilsuccessful.maxretries}" doc:name="Until Successful" doc:id="bed93482-42f3-4139-b04c-2b322f674c73" millisBetweenRetries="${untilsuccessful.retryfrequency}">
+			<http:request method="POST" doc:name="nextgenAPI" doc:id="4890e393-6b3b-421e-b18f-43495376a6a0" url="${nextgen.url}" responseTimeout="60000">
+			<reconnect count="3" />
+				<http:headers><![CDATA[#[output application/java
+---
+{
+	"x-process" : p('nextgen.x-process'),
+	"Priority" : p('nextgen.Priority'),
+	"eventtype": attributes.headers.eventtype,
+	"content-type": p('nextgen.content-type'),
+	"Node":  p('nextgen.Node'),
+	"accountnumber": p('nextgen.accountnumber'),
+	"x-api-key": p('nextgen.x-api-key'),
+	"username": p('nextgen.username')
+}]]]></http:headers>
+		</http:request>
+		</until-successful>
+		<logger level="INFO" doc:name="outputLogger" doc:id="dca0240c-d665-46a0-a615-23ae7d2e35c2" message="#[%dw 2.0&#10;output application/json&#10;&#10;---&#10;{&#10;	correlationId : vars.correlationId,&#10;	eventTimestamp : now(),&#10;	applicationName: Mule::p('app.name'),&#10;	flowName: flow.name default &quot;implementation-flows&quot;,&#10;	environment: upper(Mule::p('mule.env')),&#10;	source: Mule::p('source'),&#10;	target:  Mule::p('target'),&#10;	message: &quot;response sent to nextgen API&quot;&#10;}]"/>
+	</sub-flow>
+</mule>

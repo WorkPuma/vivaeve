@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<sub-flow name="commonRequestFlow" doc:id="51fb3c62-0787-4c96-959f-506b8432d17f" >
+		<try doc:name="Try" doc:id="60d50a3d-f06f-47a3-ba08-f2385dfc1fc0" >
+			<ee:transform doc:name="transformedPayload" doc:id="7ece1d42-70e6-4391-84e2-e7d3bfcb6836">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output text/plain
+---
+payload replace "\r" with ""]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			<ee:transform doc:name="HL7Message" doc:id="823441a1-59b5-43cf-8384-157c70bd26e3">
+			<ee:message>
+			</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="hl7Payload" ><![CDATA[%dw 2.0
+output text/plain
+---
+payload
+    replace "SCH|" with ",SCH|"
+    replace "PID|" with ",PID|"
+    replace "AIL|" with ",AIL|"
+    replace "AIP|" with ",AIP|" replace   "," with "\n"]]></ee:set-variable>
+				</ee:variables>
+		</ee:transform>
+			<http:request method="POST" doc:name="callToSapi" doc:id="87ffaa36-32c0-4024-955f-6e4b0ab4097f" config-ref="HTTP_Request_configuration" path="${request.path}" outputMimeType="text/plain" sendBodyMode="ALWAYS" responseTimeout="60000">
+			<http:body><![CDATA[#[output text/plain
+---
+vars.hl7Payload]]]></http:body>
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"eventtype" : vars.eventType
+}]]]></http:headers>
+		</http:request>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="2b510989-6581-4b8b-bd6b-aab47ce67cd4" type="HTTP:CONNECTIVITY,HTTP:GATEWAY_TIMEOUT">
+					<logger level="INFO" doc:name="Logger" doc:id="e509bf28-5c40-4248-a413-9a2af8a68de3" message="message sending to queue"/>
+					<ee:transform doc:name="HL7Message" doc:id="4c0dc3c1-a03d-4e1f-a654-4501e935abe4" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output text/plain
+---
+vars.hl7Payload]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<try doc:name="Try" doc:id="cc307be9-d148-43cd-89b1-5cc512e6d268" >
+						<vm:publish doc:name="publishingtoQueue" doc:id="ec3f73e5-a613-4709-8335-5c89e428994f" config-ref="VM_Config" sendCorrelationId="ALWAYS" queueName="sfqueue" />
+						<error-handler >
+							<on-error-continue enableNotifications="false" logException="true" doc:name="On Error Continue" doc:id="e4ace3ca-bda1-4598-84c4-5903acfda2f7" type="VM:QUEUE_TIMEOUT"/>
+						</error-handler>
+					</try>
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</sub-flow>
+	<flow name="reprocessingFlow" doc:id="e9de60db-fbde-4b95-8d39-1ec1099bf0e4" >
+		<scheduler doc:name="Scheduler" doc:id="7afd4158-9039-4b73-abd3-c7981aae23be" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="5" timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</scheduler>
+		<try doc:name="Try" doc:id="f5c6002a-a400-47fd-8994-bca2ac23f2b4" >
+			<vm:consume doc:name="Consume" doc:id="a4f837cb-dbb8-4661-823a-5f80fce9034b" config-ref="VM_Config" queueName="sfqueue" timeout="1" timeoutUnit="HOURS"/>
+			<error-handler>
+				<on-error-continue enableNotifications="false" logException="true" doc:name="On Error Continue" doc:id="97cc4485-ac3b-40ea-8ef5-19c251cfc7b9" type="VM:EMPTY_QUEUE"/>
+			</error-handler>
+		</try>
+		<choice doc:name="Choice" doc:id="16bb2cfd-8709-4c17-be17-3a66aeb81597" >
+			<when expression="#[!isEmpty(payload)]">
+				<ee:transform doc:name="HL7Message" doc:id="b8dac1cf-f68e-4aef-b6d9-9bd50bc0afc0" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output text/plain
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<flow-ref doc:name="reprocessingtoSapiFlow" doc:id="7d5fef19-7817-4d1a-b9f3-1c63f7434fb6" name="commonRequestFlow"/>
+			</when>
+		</choice>
+	</flow>
+</mule>

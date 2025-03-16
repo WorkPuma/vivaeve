@@ -1,0 +1,40 @@
+{
+  "configs": [
+    "implementation.xml",
+    "global.xml",
+    "global-error-handler.xml"
+  ],
+  "secureProperties": [
+    "key",
+    "aws.accessKeyId",
+    "aws.secretKey"
+  ],
+  "supportedJavaVersions": [],
+  "redeploymentEnabled": true,
+  "name": "74df867a-7493-423b-81f2-5fa9fde4a52b:herself-salesforce-sys-delta-api:1.0.0-SNAPSHOT",
+  "minMuleVersion": "4.4.0",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedPackages": [],
+      "exportedResources": [
+        "application-types.xml",
+        "dwl/mappings.dwl",
+        "dwl/var-fetching-all-fields-from-object.dwl",
+        "dwl/var-fetching-object-list.dwl",
+        "dwl/var-filtering-exception-list-from-payload.dwl",
+        "dwl/var-object-data-to-json.dwl",
+        "global-error-handler.xml",
+        "global.xml",
+        "implementation.xml",
+        "log4j2.xml",
+        "tmp/sample.txt"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

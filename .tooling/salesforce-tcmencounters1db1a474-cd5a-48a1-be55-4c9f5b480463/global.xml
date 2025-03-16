@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:snowflake="http://www.mulesoft.org/schema/mule/snowflake"
+    xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+    http://www.mulesoft.org/schema/mule/snowflake http://www.mulesoft.org/schema/mule/snowflake/current/mule-snowflake.xsd">
+
+    <salesforce:sfdc-config name="Salesforce_Config_client" doc:name="Salesforce Config" doc:id="676f8c77-b0d5-4f1b-a0df-239deea39c32">
+        <salesforce:oauth-user-pass-connection
+            username="${sf.name}"
+            password="${sf.pwd}"
+            securityToken="${sf.token}"
+            consumerKey="${sf.consumer.key}"
+            consumerSecret="${sf.consumer.secret}">
+            <reconnection>
+                <reconnect frequency="${sf.frequency}" count="${sf.count}"/>
+            </reconnection>
+        </salesforce:oauth-user-pass-connection>
+    </salesforce:sfdc-config>
+
+    <snowflake:snowflake-config name="Herself_Health_Snowflake_Config" doc:name="Snowflake Config" doc:id="3bdab0a5-0066-42de-a637-5ea693f89691">
+        <snowflake:snowflake-connection
+            accountName="ab16868.us-east-2.aws"            
+            warehouse="HERSELF_DEFAULT_XSMALL"
+            database="HERSELF"
+            schema="HH_DMART"
+            user="${aws.snowflake.user}"
+            password="${aws.snowflake.password}"
+            role="accountadmin">
+            <reconnection>
+                <reconnect count="5"/>
+            </reconnection>
+			<reconnection >
+				<reconnect count="5" />
+			</reconnection>
+        
+</snowflake:snowflake-connection>
+    </snowflake:snowflake-config>
+
+    <configuration doc:name="Configuration" doc:id="b1f80ae6-5952-439f-bd08-b3160be16f69" defaultErrorHandler-ref="global-error-handlerError_Handler"/>
+</mule>

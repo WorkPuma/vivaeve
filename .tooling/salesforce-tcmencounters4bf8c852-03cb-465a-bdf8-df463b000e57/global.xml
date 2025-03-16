@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:snowflake="http://www.mulesoft.org/schema/mule/snowflake"
+    xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+    http://www.mulesoft.org/schema/mule/snowflake http://www.mulesoft.org/schema/mule/snowflake/current/mule-snowflake.xsd">
+    
+    <salesforce:sfdc-config name="Salesforce_Config_client" doc:name="Salesforce Config" doc:id="bcacef56-3f1c-400e-a8bb-c19b82026d06">
+        <salesforce:basic-connection username="${sf.name}" password="${sf.pwd}" securityToken="${sf.token}" url="${sf.url}">
+            <reconnection>
+                <reconnect frequency="${sf.frequency}" count="${sf.count}"/>
+            </reconnection>
+        </salesforce:basic-connection>
+    </salesforce:sfdc-config>
+
+    <snowflake:snowflake-config name="Herself_Health_Snowflake_Config" doc:name="Snowflake Config" doc:id="cc3bf5c6-7f02-4a8c-a6fe-061682b3bf62">
+        <snowflake:snowflake-connection 
+            accountName="${aws.snowflake.accountName}" 
+            warehouse="HERSELF_DEFAULT_XSMALL" 
+            database="${aws.snowflake.database}" 
+            schema="${aws.snowflake.schema}" 
+            user="${aws.snowflake.user}" 
+            password="${aws.snowflake.password}" role="accountadmin"/>
+    </snowflake:snowflake-config>
+
+    <configuration doc:name="Configuration" doc:id="8c32e354-15c4-4809-b837-a07f6d7225fe" defaultErrorHandler-ref="global-error-handlerError_Handler"/>
+</mule>

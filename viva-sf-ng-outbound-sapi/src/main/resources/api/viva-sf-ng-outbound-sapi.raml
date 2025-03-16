@@ -1,0 +1,30 @@
+#%RAML 1.0
+title: viva-sf-ng-outbound-sapi
+description: Nextgen System API
+version: 1.0.0
+protocols: [HTTP,HTTPS]
+mediaType: [text/plain]
+
+securitySchemes:
+  securityScheme: !include /security-scheme/securityScheme.raml
+securedBy:
+  - securityScheme
+
+/invokenextgen:
+  post:
+    description: To send the viva details to Nextgen API
+    body:
+      text/plain:
+        example: !include /examples/request.txt
+    responses:
+      200:
+        body:
+          text/plain:
+            example: !include /examples/response.txt
+              
+          
+
+            
+
+      
+    

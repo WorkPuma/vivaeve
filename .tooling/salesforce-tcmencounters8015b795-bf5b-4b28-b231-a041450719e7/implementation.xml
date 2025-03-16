@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" 
+    xmlns:snowflake="http://www.mulesoft.org/schema/mule/snowflake"
+    xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" 
+    xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" 
+    xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+    xmlns="http://www.mulesoft.org/schema/mule/core" 
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+    http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+    http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+    http://www.mulesoft.org/schema/mule/snowflake http://www.mulesoft.org/schema/mule/snowflake/current/mule-snowflake.xsd
+    http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+    
+    <flow name="create-clinical-encounters" doc:id="a8c6f5bb-0786-4656-83ee-5f68b315b289" maxConcurrency="1">
+        <scheduler doc:name="Trigger Create Clinical Encounters Flow Every Hour" doc:id="7f67d18b-3922-44cc-a742-60585de7364e">
+            <scheduling-strategy>
+                <fixed-frequency frequency="1" timeUnit="HOURS"/>
+            </scheduling-strategy>
+        </scheduler>
+        
+        <set-variable value="#[%dw 2.0&#10;import p from Mule&#10;output application/java&#10;---&#10;(p('encounterBatchSize') default 200) as Number]" 
+            doc:name="encounterBatchSize" 
+            doc:id="fe2e3d13-cf84-4973-8e75-4d27e74c7858" 
+            variableName="encounterBatchSize"/>
+        
+    <snowflake:select doc:name="Select encounters" doc:id="76800772-fa27-43ef-9d2f-26838cb70553" config-ref="Herself_Health_Snowflake_Config">
+    <snowflake:sql><![CDATA[
+        SELECT 
+            ENCOUNTER_ID as SourceSystemIdentifier,
+            PATIENT_ID,
+            ENCOUNTER_TYPE,
+            TO_CHAR(ENCOUNTER_START_DATE) AS ENCOUNTER_START_DATE,
+            TO_CHAR(ENCOUNTER_END_DATE) AS ENCOUNTER_END_DATE,
+            ENCOUNTER_STATUS,
+            LENGTH_OF_STAY,
+            ADMIT_SOURCE_CODE,
+            ADMIT_SOURCE_DESCRIPTION,
+            DISCHARGE_DISPOSITION_CODE,
+            DISCHARGE_DISPOSITION_DESCRIPTION,
+            ATTENDING_PROVIDER_NPI,
+            FACILITY_NPI,
+            FACILITY_NAME,
+            PRIMARY_DIAGNOSIS_CODE_TYPE,
+            PRIMARY_DIAGNOSIS_CODE,
+            PRIMARY_DIAGNOSIS_DESCRIPTION,
+            PATIENT_TIER,
+            BAMBOO_MOBILE_PHONE,
+            BAMBOO_HOME_PHONE,
+            BAMBOO_PATIENT_PHONE,
+            MNEAS_PATIENT_PHONE,
+            MNEAS_HOME_PHONE,
+            MNEAS_CELL_PHONE,
+            MNEAS_WORK_PHONE,
+            READMISSION_FLAG,
+            INDEX_ADMISSION,
+            DATA_SOURCE
+        FROM TCM_TRANSITION
+        ORDER BY ENCOUNTER_END_DATE ASC
+        LIMIT 200
+    ]]></snowflake:sql>
+</snowflake:select>
+
+        <choice doc:name="Are there any encounters?" doc:id="51d1ac0e-6d5f-44c1-b2a7-c2f2fd09dfed">
+            <when expression="#[sizeOf(payload) == 0]">
+                <logger level="INFO" doc:name="Log no encounters found" doc:id="a37f152f-b48f-4bb9-b28e-181c2564c326" 
+                    message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;    "LogMessage" : "No encounters found to process"&#10;}]'/>
+            </when>
+            <otherwise>
+                <logger level="INFO" doc:name="Log number of encounters found" doc:id="f22136c6-29cc-47fe-b969-77c07a5ab656" 
+                    message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;    "LogMessage" : "$(sizeOf(payload)) encounters selected for processing"&#10;}]'/>
+                
+                <parallel-foreach doc:name="Process Each Encounter" doc:id="4912794a-4cab-4050-8cb0-372af200f930" maxConcurrency="50">
+                    <try doc:name="Try" doc:id="1360fc27-82d9-453f-ae29-ce9a613f4005">
+                        <validation:is-true doc:name="Validate encounter has PATIENT_ID" doc:id="2b8e066c-15ec-4ce2-93bd-dccfa53d9213" 
+                            expression="#[!isEmpty(payload.PATIENT_ID)]" 
+                            message="PATIENT_ID not found"/>
+                            
+                        <salesforce:query doc:name="Lookup Account by MRN" doc:id="e277a750-496f-47e9-9d65-f8c2cb2f06f2" config-ref="Salesforce_Config_client">
+                            <salesforce:salesforce-query><![CDATA[
+                                SELECT Id 
+                                FROM Account 
+                                WHERE SourceSystemIdentifier = ':PATIENT_ID' 
+                                AND IsPersonAccount = TRUE
+                            ]]></salesforce:salesforce-query>
+                            <salesforce:parameters><![CDATA[#[output application/java
+                                ---
+                                {
+                                    "PATIENT_ID" : payload.PATIENT_ID
+                                }]]]></salesforce:parameters>
+                        </salesforce:query>
+
+                        <ee:transform doc:name="Transform to Clinical Encounter" doc:id="bd0360c0-ec52-4724-87b0-0ad160101a8b">
+                            <ee:message>
+                                <ee:set-payload><![CDATA[%dw 2.0
+                                output application/java
+                                ---
+                                {
+                                    SourceSystemIdentifier__c: payload.SourceSystemIdentifier,
+                                    AccountId: vars.accountId,
+                                    Type__c: payload.ENCOUNTER_TYPE,
+                                    StartDate__c: payload.ENCOUNTER_START_DATE,
+                                    EndDate__c: payload.ENCOUNTER_END_DATE,
+                                    Status__c: payload.ENCOUNTER_STATUS,
+                                    LengthOfStay__c: payload.LENGTH_OF_STAY,
+                                    AdmitSourceCode__c: payload.ADMIT_SOURCE_CODE,
+                                    AdmitSourceDescription__c: payload.ADMIT_SOURCE_DESCRIPTION,
+                                    DischargeDispositionCode__c: payload.DISCHARGE_DISPOSITION_CODE,
+                                    DischargeDispositionDescription__c: payload.DISCHARGE_DISPOSITION_DESCRIPTION,
+                                    AttendingProviderNPI__c: payload.ATTENDING_PROVIDER_NPI,
+                                    FacilityNPI__c: payload.FACILITY_NPI,
+                                    FacilityName__c: payload.FACILITY_NAME,
+                                    PrimaryDiagnosisCodeType__c: payload.PRIMARY_DIAGNOSIS_CODE_TYPE,
+                                    PrimaryDiagnosisCode__c: payload.PRIMARY_DIAGNOSIS_CODE,
+                                    PrimaryDiagnosisDescription__c: payload.PRIMARY_DIAGNOSIS_DESCRIPTION,
+                                    RecordTypeId: p('sf.clinicalEncounter.defaultRecordTypeId')
+                                }]]></ee:set-payload>
+                            </ee:message>
+                        </ee:transform>
+
+                        <salesforce:upsert doc:name="Upsert Clinical Encounter" doc:id="843c6b6b-480e-4be1-bb8e-ba26c0bf38f5" 
+                            config-ref="Salesforce_Config_client" 
+                            externalIdFieldName="SourceSystemIdentifier" 
+                            objectType="ClinicalEncounter"/>
+
+                        <logger level="INFO" doc:name="Log successful processing" doc:id="f7602ba1-0174-489b-81a5-2cbe3d2eec2c" 
+                            message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"SourceSystemIdentifier": payload.SourceSystemIdentifier,&#10;	"PatientId": payload.PATIENT_ID,&#10;    "LogMessage" : "Successfully processed encounter"&#10;}]'/>
+
+                        <error-handler>
+                            <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="3848c14f-0e55-48cd-b9be-5d074f26ac0d">
+                                <logger level="ERROR" doc:name="Log error details" doc:id="2c6cb525-dbaa-4d3b-bfd9-b1fcea21c1b5" 
+                                    message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"AppName": app.name,&#10;	"FlowName" : flow.name,&#10;	"SourceSystemIdentifier": payload.SourceSystemIdentifier,&#10;	"PatientId": payload.PATIENT_ID,&#10;    "ErrorMessage": error.description&#10;}]'/>
+                            </on-error-continue>
+                        </error-handler>
+                    </try>
+                </parallel-foreach>
+            </otherwise>
+        </choice>
+        <error-handler ref="global-error-handlerError_Handler"/>
+    </flow>
+</mule>

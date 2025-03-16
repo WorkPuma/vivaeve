@@ -1,0 +1,2007 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:salesforce-composite="http://www.mulesoft.org/schema/mule/salesforce-composite"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module" xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd
+http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org/schema/mule/salesforce-composite/current/mule-salesforce-composite.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+	<vm:config name="VM_Config" doc:name="VM Config" doc:id="b6409a26-714b-4b33-9d70-f193150bc31a">
+		<vm:connection >
+			<reconnection >
+				<reconnect />
+			</reconnection>
+		</vm:connection>
+		<vm:queues >
+			<vm:queue queueName="nextgenqueue" queueType="PERSISTENT" />
+		</vm:queues>
+	</vm:config>
+	<sub-flow name="nextgen-sf-papi-impl" doc:id="1f415dc2-5e93-4135-ac8e-8ca300986eec" >
+		<logger level="INFO" doc:name="startLogger" doc:id="371c977c-15a0-4445-bfcb-6cb7e2631264" message="#[%dw 2.0&#10;output application/json &#10;&#10;---&#10;{&#10;	correlationId : vars.correlationId,&#10;	eventTimestamp : now(),&#10;	applicationName: p('application.name'),&#10;	flowName: flow.name default &quot;implementation-flow&quot;,&#10;	environment: upper(p('mule.env')),&#10;	source: p('source'),&#10;	target: p('target'),&#10;	message: &quot;request received from eapi&quot;&#10;}]"/>
+		<ee:transform doc:name="inputPayload" doc:id="46bb389b-cad0-4352-9e25-5ca00a2bd244" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="inputPayload" ><![CDATA[%dw 2.0
+output text/plain
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="printInputPayload" doc:id="9c52693e-16c2-4917-be4b-1aa864ff14a3" message="#[vars.inputPayload]"/>
+		<ee:transform doc:name="conditionCheck" doc:id="54f08ddf-6d3d-401e-948a-5f53584fe176" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="checkConditionA04" ><![CDATA[%dw 2.0
+output application/json
+fun checkADT(payload) = 
+    if (payload contains "ADT^A04")  true 
+    else false
+
+---
+{
+    result: checkADT(payload)
+}]]></ee:set-variable>
+				<ee:set-variable variableName="checkConditionA08" ><![CDATA[%dw 2.0
+output application/json
+fun checkADT(payload) = 
+    if (payload contains "ADT^A08")  true 
+    else false
+
+---
+{
+    result: checkADT(payload)
+}]]></ee:set-variable>
+				<ee:set-variable variableName="checkConditionS12" ><![CDATA[%dw 2.0
+output application/json
+fun checkADT(payload) = 
+    if (payload contains "SIU^S12")  true 
+    else false
+
+---
+{
+    result: checkADT(payload)
+}]]></ee:set-variable>
+				<ee:set-variable variableName="checkConditionS13" ><![CDATA[%dw 2.0
+output application/json
+fun checkADT(payload) = 
+    if (payload contains "SIU^S13")  true 
+    else false
+
+---
+{
+    result: checkADT(payload)
+}]]></ee:set-variable>
+				<ee:set-variable variableName="checkConditionS14" ><![CDATA[%dw 2.0
+output application/json
+fun checkADT(payload) = 
+    if (payload contains "SIU^S14")  true 
+    else false
+
+---
+{
+    result: checkADT(payload)
+}]]></ee:set-variable>
+				<ee:set-variable variableName="checkConditionS15" ><![CDATA[%dw 2.0
+output application/json
+fun checkADT(payload) = 
+    if (payload contains "SIU^S15")  true 
+    else false
+
+---
+{
+    result: checkADT(payload)
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="077ac664-8f0a-43ca-a1e3-ee50446e9eed">
+			<when expression="#[vars.checkConditionA04.result]">
+				<hl7:read doc:name="A04" doc:id="21a5dfd8-a398-4712-a4ab-07a662601707" config-ref="HL7_EDI_Config_A04">
+					<hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+				</hl7:read>
+				<ee:transform doc:name="jsonPayload" doc:id="25edede3-1db2-4a08-b63a-ea5b5cf86a19">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<ee:transform doc:name="language_field" doc:id="a67400c1-e40f-4f32-82e5-f142ddf9ba0b">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
+output application/json
+var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
+---
+(language filter ($.primarylanguage == payload.Data.ADT_A04.PID."PID-15"."CE_0296-01"))[0].Language_Preferred__c]]></ee:set-variable>
+							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
+output application/java
+---
+payload.Data.ADT_A04.PV1."PV1-03"."PL-09"]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="sfMappings" doc:id="34c96d5e-daad-4b1c-ac52-819005526808">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="accountCreate"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	 
+      "Name":flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-02"[0] ++ " " ++ flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-01"[0],
+    "Date_of_Birth__c":(payload.Data.ADT_A04.PID."PID-07"."TS-01") as Number as DateTime as Date { format:"MM-dd-yyyy"},
+    "Email_DO_NOT_USE__c":payload.Data.ADT_A04.PID."PID-13"."XTN-04"[0] default null,
+       
+     
+
+       
+    }]]]></ee:set-variable>
+						<ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	
+      "FirstName":flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-02"[0],
+      "LastName":flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-01"[0],
+      "MiddleName": payload.Data.ADT_A04.PID."PID-05"."XPN-03"[0],
+//      "HF_Chart_Number__c":flatten(payload.Data.ADT_A04.PID."PID-04")."CX-01"[0],
+    //   "Language_Preferred__c":vars.patientLanguage,
+//      "HF_Chart_Number__c":payload.Data.ADT_A04.PID."PID-03"."CX-01"[0],
+      "Email":payload.Data.ADT_A04.PID."PID-13"."XTN-04"[0],
+      "Phone": payload.Data.ADT_A04.PID."PID-13"."XTN-01"[0],
+//       "MailingCountry":payload.Data.ADT_A04.PID."PID-11",
+      "MailingState":payload.Data.ADT_A04.PID."PID-11"."XAD-04"[0],
+      "MailingPostalCode":payload.Data.ADT_A04.PID."PID-11"."XAD-05"[0],
+      "MailingCity":payload.Data.ADT_A04.PID."PID-11"."XAD-03"[0],
+      "MailingStreet":payload.Data.ADT_A04.PID."PID-11"."XAD-01"[0],
+      "Patient_Ethnicity__c":payload.Data.ADT_A04.PID."PID-22",
+      "Patient_Race__c":payload.Data.ADT_A04.PID."PID-10",
+      "Patient_Gender_2__c":if(payload.Data.ADT_A04.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A04.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A04.PID."PID-08"),
+       "Date_of_Birth__c":(payload.Data.ADT_A04.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}),
+       "HealthFusion_Patient_Record_ID__c":payload.Data.ADT_A04.PID."PID-04"."CX-01"[0]
+//       ("Insurance_Plan_Id_Identifier__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0] !=
+//null)),
+//         ("Insurance_Member_ID__c" :payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0] !=
+//null))
+//          ("Insurance_Company_Picklist__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0] !=
+//null)),
+//      
+//          "Effective_Date__c":(payload.Data.ADT_A04.INSURANCE.IN1."IN1-12"[0]) as Date as Date { format:"MM-dd-yyyy"},
+//          
+//          ("FirstName":payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0] !=
+//null)),
+//          ("LastName":payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0] !=
+//null)),
+//          ("MailingState":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0] !=
+//null)),
+//          ("MailingPostalCode":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0] !=
+//null)),
+//          ("MailingCity":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0] !=
+//null)),
+//          ("MailingStreet":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0] !=
+//null)),
+//          ("Insureds_Relationship__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0] !=
+//null)),
+//          ("Insurance_Plan_ID_Text__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0] !=
+//null)),
+          
+// ("Insurance_Company_ID__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0]) if
+//((payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0]?)
+//and
+//(payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0] !=
+//null
+//))
+       
+    }]]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="callToGetContactId" doc:id="6a0baf35-6bb1-407b-bf6f-d40e06d90649" name="salesforce_queryaccoun_Sub_Flow" />
+				<choice doc:name="Choice" doc:id="bee1c93c-0b2b-419b-be66-1a5855fb5961">
+					<when expression="#[sizeOf(vars.queryRes.AccountId[0]) == null]">
+						<flow-ref doc:name="flow reference to createAccount" doc:id="d2de6ba2-1ae9-4393-be3e-1daa71b3b145" name="createAccount" />
+						<ee:transform doc:name="transformedSfData" doc:id="20db954f-9947-45ef-8a3d-8b054e7abcb2">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+								<ee:set-variable variableName="sfContactData" ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	 "AccountId" : vars.accountResponse.items.id[0],
+      "FirstName":vars.sfContactData.FirstName[0],
+      "LastName":vars.sfContactData.LastName[0],
+//      "HF_Chart_Number__c":flatten(payload.Data.ADT_A04.PID."PID-04")."CX-01"[0],
+    //   "Language_Preferred__c":vars.patientLanguage,
+//      "HF_Chart_Number__c":payload.Data.ADT_A04.PID."PID-03"."CX-01"[0],
+      "Email":vars.sfContactData.Email[0],
+      "Phone": vars.sfContactData.Phone[0],
+//       "MailingCountry":payload.Data.ADT_A04.PID."PID-11",
+      "MailingState":vars.sfContactData.MailingState[0],
+      "MailingPostalCode":vars.sfContactData.MailingPostalCode[0],
+      "MailingCity":vars.sfContactData.MailingCity[0],
+      "MailingStreet":vars.sfContactData.MailingStreet[0],
+      "Patient_Ethnicity__c":vars.sfContactData.Patient_Ethnicity__c[0],
+      "Patient_Race__c":vars.sfContactData.Patient_Race__c[0],
+      "Patient_Gender_2__c":vars.sfContactData.Patient_Gender_2__c[0],
+       "Date_of_Birth__c":vars.sfContactData.Date_of_Birth__c[0],
+       "HealthFusion_Patient_Record_ID__c":vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
+//       ("Insurance_Plan_Id_Identifier__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0] !=
+//null)),
+//         ("Insurance_Member_ID__c" :payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0] !=
+//null))
+//          ("Insurance_Company_Picklist__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0] !=
+//null)),
+//      
+//          "Effective_Date__c":(payload.Data.ADT_A04.INSURANCE.IN1."IN1-12"[0]) as Date as Date { format:"MM-dd-yyyy"},
+//          
+//          ("FirstName":payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0] !=
+//null)),
+//          ("LastName":payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0] !=
+//null)),
+//          ("MailingState":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0] !=
+//null)),
+//          ("MailingPostalCode":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0] !=
+//null)),
+//          ("MailingCity":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0] !=
+//null)),
+//          ("MailingStreet":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0] !=
+//null)),
+//          ("Insureds_Relationship__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0] !=
+//null)),
+//          ("Insurance_Plan_ID_Text__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0] !=
+//null)),
+          
+// ("Insurance_Company_ID__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0]) if
+//((payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0]?)
+//and
+//(payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0] !=
+//null
+//))
+       
+    }]]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+						<logger level="INFO" doc:name="Logger" doc:id="c31016f6-f15f-48e2-bf52-c8523f6a4eb5" message="CREATING THE CONTACT" />
+					</when>
+					<otherwise>
+						<logger level="INFO" doc:name="Logger" doc:id="c6b1ac2e-2bc1-47fc-b668-f3d26e105440" message="CONTACT ID EXISTS" />
+						<ee:transform doc:name="requiredSfMappings" doc:id="d9d1dd02-9fef-4b90-a67e-a09f087aac96">
+					<ee:message>
+					</ee:message>
+							<ee:variables >
+								<ee:set-variable variableName="sfContactData" ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	 "AccountId" : vars.queryRes.AccountId[0],
+     "FirstName":vars.sfContactData.FirstName[0],
+      "LastName":vars.sfContactData.LastName[0],
+//      "HF_Chart_Number__c":flatten(payload.Data.ADT_A04.PID."PID-04")."CX-01"[0],
+    //   "Language_Preferred__c":vars.patientLanguage,
+//      "HF_Chart_Number__c":payload.Data.ADT_A04.PID."PID-03"."CX-01"[0],
+      "Email":vars.sfContactData.Email[0],
+      "Phone": vars.sfContactData.Phone[0],
+//       "MailingCountry":payload.Data.ADT_A04.PID."PID-11",
+      "MailingState":vars.sfContactData.MailingState[0],
+      "MailingPostalCode":vars.sfContactData.MailingPostalCode[0],
+      "MailingCity":vars.sfContactData.MailingCity[0],
+      "MailingStreet":vars.sfContactData.MailingStreet[0],
+      "Patient_Ethnicity__c":vars.sfContactData.Patient_Ethnicity__c[0],
+      "Patient_Race__c":vars.sfContactData.Patient_Race__c[0],
+      "Patient_Gender_2__c":vars.sfContactData.Patient_Gender_2__c[0],
+       "Date_of_Birth__c":vars.sfContactData.Date_of_Birth__c[0],
+       "HealthFusion_Patient_Record_ID__c":vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
+//       ("Insurance_Plan_Id_Identifier__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0] !=
+//null)),
+//         ("Insurance_Member_ID__c" :payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0] !=
+//null))
+//          ("Insurance_Company_Picklist__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0] !=
+//null)),
+//      
+//          "Effective_Date__c":(payload.Data.ADT_A04.INSURANCE.IN1."IN1-12"[0]) as Date as Date { format:"MM-dd-yyyy"},
+//          
+//          ("FirstName":payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0] !=
+//null)),
+//          ("LastName":payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0] !=
+//null)),
+//          ("MailingState":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0] !=
+//null)),
+//          ("MailingPostalCode":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0] !=
+//null)),
+//          ("MailingCity":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0] !=
+//null)),
+//          ("MailingStreet":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0] !=
+//null)),
+//          ("Insureds_Relationship__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0] !=
+//null)),
+//          ("Insurance_Plan_ID_Text__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0] !=
+//null)),
+          
+// ("Insurance_Company_ID__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0]) if
+//((payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0]?)
+//and
+//(payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0] !=
+//null
+//))
+       
+    }] ]]></ee:set-variable>
+							</ee:variables>
+				</ee:transform>
+						<logger level="INFO" doc:name="Logger" doc:id="1d775cfe-39a2-499d-af48-4d08f879ed71" message="CREATING THE CONTACT" />
+					</otherwise>
+				</choice>
+				<flow-ref doc:name="callToUpsertFlow" doc:id="aa78b47f-1ff7-4beb-8162-cbfeb7d1db6b" name="common-sf-upsert-flow" />
+			</when>
+			<when expression="#[vars.checkConditionA08.result]">
+				<hl7:read doc:name="A08" doc:id="8eadcafe-d192-4e09-8148-5181ecbf9d17" config-ref="HL7_EDI_Config_A08">
+					<hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+				</hl7:read>
+				<ee:transform doc:name="jsonPayload" doc:id="769feed6-88ba-40bb-a504-a89e7b16b3dc">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<ee:transform doc:name="language_field" doc:id="edc477ab-6e52-471d-8ad4-34c5872fec96">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
+output application/json
+var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
+---
+(language filter ($.primarylanguage == payload.Data.ADT_A08.PID."PID-15"."CE_0296-01"))[0].Language_Preferred__c]]></ee:set-variable>
+							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
+output application/java
+---
+payload.Data.ADT_A08.PV1."PV1-03"."PL-09"]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="sfMappings" doc:id="890eab0b-d850-465e-956a-1a68f81e1ef1">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	 "Id":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
+     
+      "FirstName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
+      "LastName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
+      "MiddleName": payload.Data.ADT_A08.PID."PID-05"."XPN-03"[0],
+//      "HF_Chart_Number__c":flatten(payload.Data.ADT_A08.PID."PID-04")."CX-01"[0],
+    //   "Language_Preferred__c":vars.patientLanguage,
+//      "HF_Chart_Number__c":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
+      "Email":payload.Data.ADT_A08.PID."PID-13"."XTN-04"[0],
+      "Phone": payload.Data.ADT_A08.PID."PID-13"."XTN-01"[0],
+//       "MailingCountry":payload.Data.ADT_A08.PID."PID-11",
+      "MailingState":payload.Data.ADT_A08.PID."PID-11"."XAD-04"[0],
+      "MailingPostalCode":payload.Data.ADT_A08.PID."PID-11"."XAD-05"[0],
+      "MailingCity":payload.Data.ADT_A08.PID."PID-11"."XAD-03"[0],
+      "MailingStreet":payload.Data.ADT_A08.PID."PID-11"."XAD-01"[0],
+      "Patient_Ethnicity__c":payload.Data.ADT_A08.PID."PID-22",
+      "Patient_Race__c":payload.Data.ADT_A08.PID."PID-10",
+      "Patient_Gender_2__c":if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
+//       "Date_of_Birth__c":(payload.Data.ADT_A08.PID."PID-07"."TS-01") as Number as DateTime as Date { format:"MM-dd-yyyy"},
+//      "Date_of_Birth__c" : (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) as String {format: "MM-dd-yyyy"},
+     "Date_of_Birth__c" :  (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}),
+       "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A08.PID."PID-04"."CX-01"[0]
+       
+//         ("Insurance_Member_ID__c" :payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0] !=
+//null)),
+//          ("Insurance_Plan_Id_Identifier__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0] !=
+//null))
+//          ("Insurance_Company_Picklist__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0] !=
+//null)),
+//      
+//          "Effective_Date__c":(payload.Data.ADT_A08.INSURANCE.IN1."IN1-12"[0]) as Date as Date { format:"MM-dd-yyyy"},
+//          
+//          ("FirstName":payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0] !=
+//null)),
+//          ("LastName":payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0] !=
+//null)),
+//          ("MailingState":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0] !=
+//null)),
+//          ("MailingPostalCode":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0] !=
+//null)),
+//          ("MailingCity":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0] !=
+//null)),
+//          ("MailingStreet":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0] !=
+//null)),
+//          ("Insureds_Relationship__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0] !=
+//null)),
+//          ("Insurance_Plan_ID_Text__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0] !=
+//null)),
+//          
+// ("Insurance_Company_ID__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0]) if
+//((payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0]?)
+//and
+//(payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0] !=
+//null
+//))
+       
+    }]]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<choice doc:name="Choice" doc:id="1a524317-3779-43e7-850e-af9de241b2ac">
+					<when expression="#[sizeOf(vars.sfContactData.Id[0]) == 18]">
+						<ee:transform doc:name="settingContactId" doc:id="331ecbf0-e23b-4f47-bc1b-5dfbd99c048f">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	 "Contact_Id__c":(payload.Data.ADT_A08.PID."PID-03"."CX-01"[0])[0 to 14],
+     
+      "FirstName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
+      "LastName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
+      "MiddleName": payload.Data.ADT_A08.PID."PID-05"."XPN-03"[0],
+//      "HF_Chart_Number__c":flatten(payload.Data.ADT_A08.PID."PID-04")."CX-01"[0],
+    //   "Language_Preferred__c":vars.patientLanguage,
+//      "HF_Chart_Number__c":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
+      "Email":payload.Data.ADT_A08.PID."PID-13"."XTN-04"[0],
+      "Phone": payload.Data.ADT_A08.PID."PID-13"."XTN-01"[0],
+//       "MailingCountry":payload.Data.ADT_A08.PID."PID-11",
+      "MailingState":payload.Data.ADT_A08.PID."PID-11"."XAD-04"[0],
+      "MailingPostalCode":payload.Data.ADT_A08.PID."PID-11"."XAD-05"[0],
+      "MailingCity":payload.Data.ADT_A08.PID."PID-11"."XAD-03"[0],
+      "MailingStreet":payload.Data.ADT_A08.PID."PID-11"."XAD-01"[0],
+      "Patient_Ethnicity__c":payload.Data.ADT_A08.PID."PID-22",
+      "Patient_Race__c":payload.Data.ADT_A08.PID."PID-10",
+      "Patient_Gender_2__c":if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
+//       "Date_of_Birth__c":(payload.Data.ADT_A08.PID."PID-07"."TS-01") as Number as DateTime as Date { format:"MM-dd-yyyy"},
+//      "Date_of_Birth__c" : (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) as String {format: "MM-dd-yyyy"},
+     "Date_of_Birth__c" :  (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}),
+       "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A08.PID."PID-04"."CX-01"[0]
+       
+//         ("Insurance_Member_ID__c" :payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0] !=
+//null)),
+//          ("Insurance_Plan_Id_Identifier__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0] !=
+//null))
+//          ("Insurance_Company_Picklist__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0] !=
+//null)),
+//      
+//          "Effective_Date__c":(payload.Data.ADT_A08.INSURANCE.IN1."IN1-12"[0]) as Date as Date { format:"MM-dd-yyyy"},
+//          
+//          ("FirstName":payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0] !=
+//null)),
+//          ("LastName":payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0] !=
+//null)),
+//          ("MailingState":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0] !=
+//null)),
+//          ("MailingPostalCode":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0] !=
+//null)),
+//          ("MailingCity":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0] !=
+//null)),
+//          ("MailingStreet":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0] !=
+//null)),
+//          ("Insureds_Relationship__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0] !=
+//null)),
+//          ("Insurance_Plan_ID_Text__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0] !=
+//null)),
+//          
+// ("Insurance_Company_ID__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0]) if
+//((payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0]?)
+//and
+//(payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0] !=
+//null
+//))
+       
+    }]]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+						<flow-ref doc:name="callToGetTheContactId" doc:id="cae59cc6-5701-41b3-bcde-9aedaced18aa" name="salesforce_querycontact_Sub_Flow" />
+						<ee:transform doc:name="sfMappings" doc:id="d64a8eaf-3393-4f5a-aadc-a66f5458657b">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[
+  {
+    "Id": vars.contactResponse.Id[0],
+    "FirstName": payload.FirstName[0],
+    "LastName": payload.LastName[0],
+    "MiddleName": payload.MiddleName[0],
+    "Email": payload.Email[0],
+    "Phone": payload.Email[0],
+    "MailingState": payload.MailingState[0],
+    "MailingPostalCode": payload.MailingPostalCode[0],
+    "MailingCity": payload.MailingCity[0],
+    "MailingStreet": payload.MailingStreet[0],
+    "Patient_Ethnicity__c": payload.Patient_Ethnicity__c[0],
+    "Patient_Race__c": payload.Patient_Race__c[0],
+    "Patient_Gender_2__c": payload.Patient_Gender_2__c[0],
+    "Date_of_Birth__c": payload.Date_of_Birth__c[0],
+    "HealthFusion_Patient_Record_ID__c": payload.HealthFusion_Patient_Record_ID__c[0]
+  }
+]]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+						<flow-ref doc:name="callToUpsertFlow" doc:id="4a1619db-9b78-4407-8e92-6cece935b9a9" name="common-sf-update-flow" />
+					</when>
+					<otherwise>
+						<ee:transform doc:name="requiredPayloadForSalesforceUpdate" doc:id="51ad16f4-6435-4e5d-87b5-fa7227e57ae1">
+					<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	 "Id":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
+     
+      "FirstName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
+      "LastName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
+      "MiddleName": payload.Data.ADT_A08.PID."PID-05"."XPN-03"[0],
+//      "HF_Chart_Number__c":flatten(payload.Data.ADT_A08.PID."PID-04")."CX-01"[0],
+    //   "Language_Preferred__c":vars.patientLanguage,
+//      "HF_Chart_Number__c":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
+      "Email":payload.Data.ADT_A08.PID."PID-13"."XTN-04"[0],
+      "Phone": payload.Data.ADT_A08.PID."PID-13"."XTN-01"[0],
+//       "MailingCountry":payload.Data.ADT_A08.PID."PID-11",
+      "MailingState":payload.Data.ADT_A08.PID."PID-11"."XAD-04"[0],
+      "MailingPostalCode":payload.Data.ADT_A08.PID."PID-11"."XAD-05"[0],
+      "MailingCity":payload.Data.ADT_A08.PID."PID-11"."XAD-03"[0],
+      "MailingStreet":payload.Data.ADT_A08.PID."PID-11"."XAD-01"[0],
+      "Patient_Ethnicity__c":payload.Data.ADT_A08.PID."PID-22",
+      "Patient_Race__c":payload.Data.ADT_A08.PID."PID-10",
+      "Patient_Gender_2__c":if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
+//       "Date_of_Birth__c":(payload.Data.ADT_A08.PID."PID-07"."TS-01") as Number as DateTime as Date { format:"MM-dd-yyyy"},
+//      "Date_of_Birth__c" : (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) as String {format: "MM-dd-yyyy"},
+     "Date_of_Birth__c" :  (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}),
+       "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A08.PID."PID-04"."CX-01"[0]
+       
+//         ("Insurance_Member_ID__c" :payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0] !=
+//null)),
+//          ("Insurance_Plan_Id_Identifier__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0] !=
+//null))
+//          ("Insurance_Company_Picklist__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0] !=
+//null)),
+//      
+//          "Effective_Date__c":(payload.Data.ADT_A08.INSURANCE.IN1."IN1-12"[0]) as Date as Date { format:"MM-dd-yyyy"},
+//          
+//          ("FirstName":payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0] !=
+//null)),
+//          ("LastName":payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0] !=
+//null)),
+//          ("MailingState":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0] !=
+//null)),
+//          ("MailingPostalCode":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0] !=
+//null)),
+//          ("MailingCity":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0] !=
+//null)),
+//          ("MailingStreet":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0] !=
+//null)),
+//          ("Insureds_Relationship__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0] !=
+//null)),
+//          ("Insurance_Plan_ID_Text__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0] !=
+//null)),
+//          
+// ("Insurance_Company_ID__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0]) if
+//((payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0]?)
+//and
+//(payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0] !=
+//null
+//))
+       
+    }]]]></ee:set-payload>
+							</ee:message>
+					<ee:variables>
+					</ee:variables>
+				</ee:transform>
+						<flow-ref doc:name="callToUpdateUsingHfChart" doc:id="f953e9df-d119-42c1-aa89-ca8f1f249ad7" name="contact-update-hfchartnumber-subflow" />
+					</otherwise>
+				</choice>
+			</when>
+			<when expression="#[vars.checkConditionS12.result]">
+				<hl7:read doc:name="S12" doc:id="6db61ca5-597e-4e34-9a93-1f33ba7040ff" config-ref="HL7_EDI_Config_S12">
+					<hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+				</hl7:read>
+				<ee:transform doc:name="jsonPayload" doc:id="1eff1e28-0b9f-42e9-b992-b48bbdace7cf">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<ee:transform doc:name="input_mappings" doc:id="55940ab9-334b-45e1-b517-42620322917a">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
+output application/json
+var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
+---
+(language filter ($.primarylanguage == payload.Data.SIU_S12.PATIENT.PID."PID-15"[0]."CE_0296-01" ))[0].Language_Preferred__c]]></ee:set-variable>
+						<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].AdditionalInformation]]></ee:set-variable>
+						<ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
+output application/json
+var provider =  readUrl("classpath://appointmentProviderExtract.json","application/json")
+---
+(provider filter ($.Last_Name == flatten(payload.Data.SIU_S12.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
+						<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
+output application/json
+var location =  readUrl("classpath://LocationId.json","application/json")
+---
+(location filter ($.LOCATION == payload.Data.SIU_S12.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
+						<ee:set-variable variableName="duration"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].duration]]></ee:set-variable>
+						<ee:set-variable variableName="apType"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].AppointmentType]]></ee:set-variable>
+						<ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].WorkTypeId]]></ee:set-variable>
+						<ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
+						<ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
+						<ee:set-variable variableName="serviceId"><![CDATA[%dw 2.0
+output application/json
+var provider =  readUrl("classpath://appointmentProviderExtract.json","application/json")
+---
+(provider filter ($.Last_Name == flatten(payload.Data.SIU_S12.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].providerId]]></ee:set-variable>
+							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
+output application/java
+---
+payload.Data.SIU_S12.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="call To Salesforce For ContactId" doc:id="1297e7df-bb2f-4af1-a28a-a2362bcbeaa4" name="salesforce_query_Sub_Flow" />
+				<ee:transform doc:name="sfMappings" doc:id="8b7202d6-b048-47cf-bc42-e678741df985">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+output application/java
+---
+
+[{
+  //  "LastModifiedDate" : payload.LastModifiedDate[0],   
+    "ActualStartTime": (payload.Data.SIU_S12.SCH."SCH-11"."TQ-04"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+    "SchedStartTime" : (payload.Data.SIU_S12.SCH."SCH-11"."TQ-04"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+   "ActualEndTime" : (payload.Data.SIU_S12.SCH."SCH-11"."TQ-05"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+//     "Name": payload.Data.SIU_S12.SCH."SCH-06"."CE-01",
+     "SchedEndTime": (payload.Data.SIU_S12.SCH."SCH-11"."TQ-05"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "NextGen_ID__c": payload.Data.SIU_S12.SCH."SCH-02"."EI-01",
+     
+     "ParentRecordId": vars.queryResponse.AccountId[0],
+     "DurationType": if(payload.Data.SIU_S12.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S12.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S12.SCH."SCH-10"."CE-01"),
+     
+     "ContactId": vars.queryResponse.Id[0],
+     "AppointmentType": vars.apType,
+     "WorkTypeId" : vars.workTypeId,
+//     "Work_Type_Group_Id": vars.workGroupId,
+     "Work_Type_Group__c": vars.workGroupId,
+     
+//     "AppointmentNumber":payload.Data.SIU_S12.SCH."SCH-02"."EI-01",
+     "ActualDuration" : vars.duration,
+     "Duration": vars.duration,
+	 "DurationType":if(payload.Data.SIU_S12.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S12.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S12.SCH."SCH-10"."CE-01"),
+    
+    
+
+     "Status": if(payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01" == "Booked") ("Scheduled") else if (payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01" == "NEW") ("Scheduled") else (payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01"),
+     "AdditionalInformation": vars.appointmentType,
+       "ServiceTerritoryId": vars.locationId,
+        "Service_Resource__c": vars.providerExtract,
+//        "HealthFusion_Patient_Record_ID__c":flatten(payload.Data.SIU_S12.PATIENT.PID."PID-04")."CX-01"[0]
+       
+//        "Opportunity__c": vars.opportunity_c.Opportunity__c
+    }]
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="6ff9f6b3-51d8-4012-b838-8c4fec0d04d2" message="CREATING THE SERVICE APPOINTMENT" />
+				<flow-ref doc:name="callToSFupsertSubFlow" doc:id="000db286-c26b-4202-adcb-a5e79ba47785" name="common-sf-appointment-upsert-flow" />
+				<ee:transform doc:name="fetchingAppointmentId" doc:id="7b7235de-350c-4837-82e6-087104c7f7e3">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="appointmentId"><![CDATA[%dw 2.0
+output application/json
+---
+vars.appRes.items.id[0]]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="requiredPayloadForUpdation" doc:id="8d0051af-65f7-4021-a868-a2f4348b9941">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	"ServiceAppointmentId" : vars.appointmentId ,
+	"ServiceResourceId": vars.serviceId
+}]]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="a73dd9a3-9fbe-412a-8928-5156660a1461" message="UPDATING THE RESOURCEID TO THE ASSIGNED RESOURCE" />
+				<flow-ref doc:name="flow Call To Update the Appointment" doc:id="d2f37945-137b-4712-9231-a6aeaf70144e" name="appointment-update-Sub_Flow" />
+			</when>
+			<when expression="#[vars.checkConditionS13.result]">
+				<hl7:read doc:name="S13" doc:id="793ca39d-eaf3-44eb-8b49-c1178c7bdf2f" config-ref="HL7_EDI_Config_S13">
+					<hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+				</hl7:read>
+				<ee:transform doc:name="jsonPayload" doc:id="2f35e056-5286-433e-b47f-b936d9426e4f">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<ee:transform doc:name="input_mappings" doc:id="96672973-b174-4eea-a0d6-8e830a399bd3">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
+output application/json
+var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
+---
+(language filter ($.primarylanguage == payload.Data.SIU_S13.PATIENT.PID."PID-15"[0]."CE_0296-01" ))[0].Language_Preferred__c]]></ee:set-variable>
+						<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].AdditionalInformation]]></ee:set-variable>
+						<ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
+output application/json
+var provider =  readUrl("classpath://appointmentProviderExtract.json","application/json")
+---
+(provider filter ($.Last_Name == flatten(payload.Data.SIU_S13.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
+						<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
+output application/json
+var location =  readUrl("classpath://LocationId.json","application/json")
+---
+(location filter ($.LOCATION == payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
+						<ee:set-variable variableName="duration"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].duration]]></ee:set-variable>
+						<ee:set-variable variableName="apType"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].AppointmentType]]></ee:set-variable>
+						<ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.AdditionalInformation == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].WorkTypeId]]></ee:set-variable>
+						<ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
+						<ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
+							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
+output application/java
+---
+payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="sfMappings" doc:id="eba57166-7bf8-4edb-997e-a88748d68850">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+  //  "LastModifiedDate" : payload.LastModifiedDate[0],
+     "ActualStartTime":(payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedEndTime": (payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedStartTime": (payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0]   ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+      "ActualEndTime" : (payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "NextGen_ID__c":payload.Data.SIU_S13.SCH."SCH-02"."EI-01",
+    "Status": if(payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01" == "Rescheduled") ("Rescheduled by Provider") else (payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01"),
+    "AdditionalInformation": vars.appointmentType,
+    "DurationType":  if(payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S13.SCH."SCH-10"."CE-01"),
+	
+//  "ServiceTerritoryId":  flatten(payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
+      "Service_Resource__c": vars.providerExtract,
+      "ServiceTerritoryId": vars.locationId,
+       "ActualDuration" : vars.duration,
+       "AppointmentType ": vars.apType,
+     "WorkTypeId" : vars.workTypeId,
+//     "Work_Type_Group_Id": vars.workGroupId,
+     "Work_Type_Group__c":vars.workGroupId,
+     "Duration": vars.duration,
+       
+//        "Opportunity__c": vars.opportunity_c.opportunity__c
+        
+    }]
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<choice doc:name="Choice" doc:id="066c1905-fc96-422d-848d-9c10adfd0944">
+					<when expression="#[sizeOf(vars.appointmentFields.NextGen_ID__c[0]) == 18]">
+						<ee:transform doc:name="sfMappings" doc:id="ecfb6114-a9d0-441c-8f0f-6e585049609f">
+							<ee:message />
+							<ee:variables>
+								<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+  //  "LastModifiedDate" : payload.LastModifiedDate[0],
+     "ActualStartTime":(payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedEndTime": (payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedStartTime": (payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0]   ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+      "ActualEndTime" : (payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "NextGen_ID__c":payload.Data.SIU_S13.SCH."SCH-02"."EI-01"[0 to 14],
+    "Status": if(payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01" == "Rescheduled") ("Rescheduled by Provider") else (payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01"),
+    "AdditionalInformation": vars.appointmentType,
+    "DurationType":  if(payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S13.SCH."SCH-10"."CE-01"),
+	
+//  "ServiceTerritoryId":  flatten(payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
+      "Service_Resource__c": vars.providerExtract,
+      "ServiceTerritoryId": vars.locationId,
+       "ActualDuration" : vars.duration,
+       "AppointmentType ": vars.apType,
+     "WorkTypeId" : vars.workTypeId,
+//     "Work_Type_Group_Id": vars.workGroupId,
+     "Work_Type_Group__c":vars.workGroupId,
+     "Duration": vars.duration,
+       
+//        "Opportunity__c": vars.opportunity_c.opportunity__c
+        
+    }]
+]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+						<flow-ref doc:name="callToQueryAppointmnetId" doc:id="de2d662d-cb42-4066-8ff2-297be62a75d0" name="salesforce-appointmnet-querySub_Flow" />
+						<ee:transform doc:name="sfMappings" doc:id="06e1b8ca-c182-46d9-ab89-52a45551b28c">
+							<ee:message />
+							<ee:variables>
+								<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+  //  "LastModifiedDate" : payload.LastModifiedDate[0],
+     "ActualStartTime":(payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedEndTime": (payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedStartTime": (payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0]   ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+      "ActualEndTime" : (payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "Id": vars.accResponse.Id[0],
+    "Status": if(payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01" == "Rescheduled") ("Rescheduled by Provider") else (payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01"),
+    "AdditionalInformation": vars.appointmentType,
+    "DurationType":  if(payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S13.SCH."SCH-10"."CE-01"),
+	
+//  "ServiceTerritoryId":  flatten(payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
+      "Service_Resource__c": vars.providerExtract,
+      "ServiceTerritoryId": vars.locationId,
+       "ActualDuration" : vars.duration,
+       "AppointmentType ": vars.apType,
+     "WorkTypeId" : vars.workTypeId,
+//     "Work_Type_Group_Id": vars.workGroupId,
+     "Work_Type_Group__c":vars.workGroupId,
+     "Duration": vars.duration,
+       
+//        "Opportunity__c": vars.opportunity_c.opportunity__c
+        
+    }]
+]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+						<flow-ref doc:name="callToUpdateAppointment" doc:id="2e11a6f1-c9fe-4552-afd3-23fdcd5b4956" name="sf-appointment-update-flow" />
+					</when>
+					<otherwise>
+						<logger level="INFO" doc:name="Logger" doc:id="d86f63be-9347-48ec-b06d-c28ffbd4b599" message="NEXTGEN ID EXISTS" />
+						<flow-ref doc:name="callToUpdateAppointment" doc:id="cb2ec7af-4e1f-4667-b28c-edd570d5fbae" name="common-sf-appointment-upsert-flow" />
+					</otherwise>
+				</choice>
+			</when>
+			<when expression="#[vars.checkConditionS14.result]">
+				<hl7:read doc:name="S14" doc:id="cb6962d4-b365-42e3-91d1-cbf53d98bede" config-ref="HL7_EDI_Config_S14" />
+				<ee:transform doc:name="jsonPayload" doc:id="e4b7393b-d244-40df-a616-1a52429da731">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<ee:transform doc:name="input_mappings" doc:id="86d36d5a-3127-4dee-b7c8-13ab490a546b">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
+output application/json
+var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
+---
+(language filter ($.primarylanguage == payload.Data.SIU_S14.PATIENT.PID."PID-15"."CE_0296-01"[0]))[0].Language_Preferred__c]]></ee:set-variable>
+						<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].AdditionalInformation]]></ee:set-variable>
+						<ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
+output application/json
+var provider =  readUrl("classpath://appointmentProviderExtract.json","application/json")
+---
+(provider filter ($.Last_Name == flatten(payload.Data.SIU_S14.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
+						<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
+output application/json
+var location =  readUrl("classpath://LocationId.json","application/json")
+---
+(location filter ($.LOCATION == payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
+						<ee:set-variable variableName="duration"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].duration]]></ee:set-variable>
+						<ee:set-variable variableName="apType"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].AppointmentType]]></ee:set-variable>
+						<ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].WorkTypeId]]></ee:set-variable>
+						<ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
+						<ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
+							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
+output application/java
+---
+payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="sfMappings" doc:id="73aca6e7-bc6b-4797-81c4-9fb06ccbb6ac">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+//	"Name": payload.Data.SIU_S14.SCH."SCH-06"."CE-01",
+	"ActualStartTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedEndTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedStartTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+      "ActualEndTime" : (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+    "NextGen_ID__c":payload.Data.SIU_S14.SCH."SCH-02"."EI-01",
+	"Status": if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01" == "CHECKED IN")("Checked In")  else if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"=="CHECKED OUT")("Checked Out") else (payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"),
+    "AdditionalInformation": vars.appointmentType,
+    "DurationType": if(payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S14.SCH."SCH-10"."CE-01"),
+	
+//    "ServiceTerritoryId": flatten(payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
+        "Service_Resource__c": vars.providerExtract,
+        "ServiceTerritoryId": vars.locationId,
+        "ActualDuration" : vars.duration,
+         "AppointmentType": vars.apType,
+     "WorkTypeId" : vars.workTypeId,
+//     "Work_Type_Group_Id": vars.workGroupId,
+     "Work_Type_Group__c": vars.workGroupId,
+     "Duration": vars.duration,
+         
+//        "Opportunity__c": vars.opportunity_c.opportunity__c
+}]]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<choice doc:name="Choice" doc:id="5096628a-62e5-44ec-8daa-c3a7b7e01dfe">
+					<when expression="#[sizeOf(vars.appointmentFields.NextGen_ID__c[0]) == 18]">
+						<ee:transform doc:name="Transform Message" doc:id="e0e8b152-c5c1-4f5a-8b67-dc07bb26e2f5">
+							<ee:message>
+							</ee:message>
+							<ee:variables>
+								<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+//	"Name": payload.Data.SIU_S14.SCH."SCH-06"."CE-01",
+	"ActualStartTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedEndTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedStartTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+      "ActualEndTime" : (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+    "NextGen_ID__c":payload.Data.SIU_S14.SCH."SCH-02"."EI-01"[0 to 14],
+	"Status": if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01" == "CHECKED IN")("Checked In")  else if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"=="CHECKED OUT")("Checked Out") else (payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"),
+    "AdditionalInformation": vars.appointmentType,
+    "DurationType": if(payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S14.SCH."SCH-10"."CE-01"),
+	
+//    "ServiceTerritoryId": flatten(payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
+        "Service_Resource__c": vars.providerExtract,
+        "ServiceTerritoryId": vars.locationId,
+        "ActualDuration" : vars.duration,
+         "AppointmentType": vars.apType,
+     "WorkTypeId" : vars.workTypeId,
+//     "Work_Type_Group_Id": vars.workGroupId,
+     "Work_Type_Group__c": vars.workGroupId,
+     "Duration": vars.duration,
+         
+//        "Opportunity__c": vars.opportunity_c.opportunity__c
+}]]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+						<flow-ref doc:name="callToQueryAppointmnetId" doc:id="1c0201ed-087f-4cfc-8d44-999347dab8db" name="salesforce-appointmnet-querySub_Flow" />
+						<ee:transform doc:name="Transform Message" doc:id="5783ecd6-3838-46e9-a4bb-f79f33802a6f">
+							<ee:message>
+							</ee:message>
+							<ee:variables>
+								<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+//	"Name": payload.Data.SIU_S14.SCH."SCH-06"."CE-01",
+	"ActualStartTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedEndTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedStartTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+      "ActualEndTime" : (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+    "Id": vars.accResponse.Id[0],
+	"Status": if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01" == "CHECKED IN")("Checked In")  else if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"=="CHECKED OUT")("Checked Out") else (payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"),
+    "AdditionalInformation": vars.appointmentType,
+    "DurationType": if(payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S14.SCH."SCH-10"."CE-01"),
+	
+//    "ServiceTerritoryId": flatten(payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
+        "Service_Resource__c": vars.providerExtract,
+        "ServiceTerritoryId": vars.locationId,
+        "ActualDuration" : vars.duration,
+         "AppointmentType": vars.apType,
+     "WorkTypeId" : vars.workTypeId,
+//     "Work_Type_Group_Id": vars.workGroupId,
+     "Work_Type_Group__c": vars.workGroupId,
+     "Duration": vars.duration,
+         
+//        "Opportunity__c": vars.opportunity_c.opportunity__c
+}]]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+						<flow-ref doc:name="callToUpdateAppointment" doc:id="59dcd5bc-864b-4b0d-acb5-dcb40602c4d8" name="sf-appointment-update-flow" />
+					</when>
+					<otherwise>
+						<logger level="INFO" doc:name="Logger" doc:id="303e6940-e806-45ec-ad09-ed3e2300dc6e" message="NEXTGEN ID EXISTS" />
+						<flow-ref doc:name="callToUpdateAppointment" doc:id="1b0bade9-ea9a-464a-985f-16fb3904a110" name="common-sf-appointment-upsert-flow" />
+					</otherwise>
+				</choice>
+			</when>
+			<when expression="#[vars.checkConditionS15.result]">
+				<hl7:read doc:name="S15" doc:id="94e68d2a-f0e9-47fb-91ce-cf14e18dfad5" config-ref="HL7_EDI_Config_S15">
+					<hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+				</hl7:read>
+				<ee:transform doc:name="jsonPayload" doc:id="b59de35f-b2d3-43c3-ac16-073931e72408">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<ee:transform doc:name="input_mappings" doc:id="3c81f004-80f7-443d-b6e4-e6edc683fac1">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
+output application/json
+var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
+---
+(language filter ($.primarylanguage == payload.Data.SIU_S15.PATIENT.PID."PID-15"."CE_0296-01"[0]))[0].Language_Preferred__c]]></ee:set-variable>
+						<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].AdditionalInformation]]></ee:set-variable>
+						<ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
+output application/json
+var provider =  readUrl("classpath://appointmentProviderExtract.json","application/json")
+---
+(provider filter ($.Last_Name == flatten(payload.Data.SIU_S15.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
+						<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
+output application/json
+var location =  readUrl("classpath://LocationId.json","application/json")
+---
+(location filter ($.LOCATION == payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
+						<ee:set-variable variableName="duration"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].duration]]></ee:set-variable>
+						<ee:set-variable variableName="apType"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].AppointmentType]]></ee:set-variable>
+						<ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].WorkTypeId]]></ee:set-variable>
+						<ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
+						<ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
+output application/json
+var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+---
+(appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
+							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
+output application/java
+---
+payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="sfMappings" doc:id="be9bfc69-7113-4cac-990b-83d28ec1d4a4">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+//	"Name": payload.Data.SIU_S15.SCH."SCH-06"."CE-01",
+	"ActualStartTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedEndTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedStartTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+      "ActualEndTime" : (payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+    "NextGen_ID__c":payload.Data.SIU_S15.SCH."SCH-02"."EI-01",
+    "DurationType": payload.Data.SIU_S15.SCH."SCH-10"."CE-01",
+	"Status": if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "CANCELLED") ("Cancelled by Provider") else if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "NO SHOW") ("No Show") else  (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01") ,
+    "AdditionalInformation": vars.appointmentType,
+//	"ServiceTerritoryId": flatten(payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],  
+        "Service_Resource__c": vars.providerExtract,
+        "ServiceTerritoryId": vars.locationId,
+         "AppointmentType": vars.apType,
+     "WorkTypeId" : vars.workTypeId,
+//     "Work_Type_Group_Id": vars.workGroupId,
+     "Work_Type_Group__c": vars.workGroupId,
+     "ActualDuration" : vars.duration,
+     "Duration": vars.duration,
+     "DurationType": if(payload.Data.SIU_S15.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S15.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S15.SCH."SCH-10"."CE-01"),
+        
+         
+//        "Opportunity__c": vars.opportunity_c.opportunity__c
+}]]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<choice doc:name="Choice" doc:id="34db6f3d-0710-4b55-9ee9-f5eb93387cf3">
+					<when expression="#[sizeOf(vars.appointmentFields.NextGen_ID__c[0]) == 18]">
+						<ee:transform doc:name="sfMappings" doc:id="17e14a06-162a-42af-93a7-c3ab578d07a3">
+							<ee:message />
+							<ee:variables>
+								<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+//	"Name": payload.Data.SIU_S15.SCH."SCH-06"."CE-01",
+	"ActualStartTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedEndTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedStartTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+      "ActualEndTime" : (payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+    "NextGen_ID__c":payload.Data.SIU_S15.SCH."SCH-02"."EI-01"[0 to 14],
+    "DurationType": payload.Data.SIU_S15.SCH."SCH-10"."CE-01",
+	"Status": if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "CANCELLED") ("Cancelled by Provider") else if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "NO SHOW") ("No Show") else  (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01") ,
+    "AdditionalInformation": vars.appointmentType,
+//	"ServiceTerritoryId": flatten(payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],  
+        "Service_Resource__c": vars.providerExtract,
+        "ServiceTerritoryId": vars.locationId,
+         "AppointmentType": vars.apType,
+     "WorkTypeId" : vars.workTypeId,
+//     "Work_Type_Group_Id": vars.workGroupId,
+     "Work_Type_Group__c": vars.workGroupId,
+     "ActualDuration" : vars.duration,
+     "Duration": vars.duration,
+     "DurationType": if(payload.Data.SIU_S15.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S15.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S15.SCH."SCH-10"."CE-01"),
+        
+         
+//        "Opportunity__c": vars.opportunity_c.opportunity__c
+}]]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+						<flow-ref doc:name="callToQueryAppointmnetId" doc:id="33f82b82-63f2-4d81-85a7-c7201695db7d" name="salesforce-appointmnet-querySub_Flow" />
+						<ee:transform doc:name="sfMappings" doc:id="42a35919-a218-46a0-b770-a444612bee3c">
+							<ee:message />
+							<ee:variables>
+								<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+//	"Name": payload.Data.SIU_S15.SCH."SCH-06"."CE-01",
+	"ActualStartTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedEndTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedStartTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+      "ActualEndTime" : (payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+    "Id": vars.accResponse.Id[0],
+    "DurationType": payload.Data.SIU_S15.SCH."SCH-10"."CE-01",
+	"Status": if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "CANCELLED") ("Cancelled by Provider") else if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "NO SHOW") ("No Show") else  (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01") ,
+    "AdditionalInformation": vars.appointmentType,
+//	"ServiceTerritoryId": flatten(payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],  
+        "Service_Resource__c": vars.providerExtract,
+        "ServiceTerritoryId": vars.locationId,
+         "AppointmentType": vars.apType,
+     "WorkTypeId" : vars.workTypeId,
+//     "Work_Type_Group_Id": vars.workGroupId,
+     "Work_Type_Group__c": vars.workGroupId,
+     "ActualDuration" : vars.duration,
+     "Duration": vars.duration,
+     "DurationType": if(payload.Data.SIU_S15.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S15.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S15.SCH."SCH-10"."CE-01"),
+        
+         
+//        "Opportunity__c": vars.opportunity_c.opportunity__c
+}]]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+						<flow-ref doc:name="callToUpdateAppointment" doc:id="756954b4-903e-4bcd-9854-fd029ac47a31" name="sf-appointment-update-flow" />
+					</when>
+					<otherwise>
+						<logger level="INFO" doc:name="Logger" doc:id="b2eb6aff-9bf9-443b-8d55-5d5993a59e37" message="NEXTGEN ID EXISTS" />
+						<flow-ref doc:name="callToUpdateAppointment" doc:id="ec436fcc-483f-4f49-b45d-3fc7fc17b6c2" name="common-sf-appointment-upsert-flow" />
+					</otherwise>
+				</choice>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="defaultCase" doc:id="80ba2033-525b-43a3-8f26-1f9129ffa5dc">
+					<ee:message>
+						<ee:set-payload><![CDATA["Invalid Message"]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="endLogger" doc:id="51b54071-0562-4e22-b164-caa1e133c555" message="#[%dw 2.0&#10;output application/json&#10;&#10;---&#10;{&#10;	correlationId : vars.correlationId,&#10;	eventTimestamp : now(),&#10;	applicationName: Mule::p('app.name'),&#10;	&#10;	flowName: flow.name default &quot;implementation-flows&quot;,&#10;	environment: upper(Mule::p('mule.env')),&#10;	source: Mule::p('source'),&#10;	target:  Mule::p('target'),&#10;	message: &quot;response sent to Salesforce&quot;&#10;}]"/>
+	</sub-flow>
+	<sub-flow name="common-sf-upsert-flow" doc:id="a3165efe-c015-4ea4-8362-e80a2c53f0e5" >
+		<logger level="INFO" doc:name="beforeInsert" doc:id="c6068ee8-7f91-4af8-9c64-22698bd02017" message="##########Before Salesforce Upsert###################" />
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="72724815-f270-4e95-aa10-797bd2c725eb" millisBetweenRetries="${sf.retryfrequency}">
+			<salesforce:upsert objectType="Contact" doc:name="Update/Insert" doc:id="cc6b33ae-b7c0-49a9-91b9-de3c0b965548" config-ref="Salesforce_Config" externalIdFieldName="HealthFusion_Patient_Record_ID__c">
+				<salesforce:records ><![CDATA[#[vars.sfContactData]]]></salesforce:records>
+			</salesforce:upsert>
+			</until-successful>
+		<logger level="INFO" doc:name="afterInsert" doc:id="a1f1d650-f779-4656-8dc6-9c1a13ae89ae" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
+		<choice doc:name="Choice" doc:id="7505838e-21e8-46cb-9455-89e3ceb6327c" >
+			<when expression="#[payload.successful== false]">
+				<ee:transform doc:name="errorDetails" doc:id="96fcf9a0-bbbe-4916-9348-c75ab1232a7a" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+status: "ERROR",
+errorMessage: payload.items.message[0],
+statusMessage : payload.items.statusCode[0]
+} ]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="errorMessage" ><![CDATA[%dw 2.0
+output application/json
+---
+{   
+    "message": "Hello Team This email is to notify you that an error occurred while attempting to Create a Contact in Salesforce",
+    "Contact Details": {
+        "contactId": payload.items.id[0],
+        "Date of Birth": vars.sfContactData.Date_of_Birth__c[0],
+        "Email": vars.sfContactData.Email[0],
+        "Phone": vars.sfContactData.Phone[0],
+        "Location": vars.mailLocation,
+        "Contact Full Name": vars.sfContactData.FirstName[0] ++ " " ++  vars.sfContactData.MiddleName[0] ++ " " ++  vars.sfContactData.LastName[0]
+    },  
+    "Error Details": {
+        "statusCode": payload.items.statusCode[0],
+        "errorMessage": payload.items.message[0],
+        "error Type": error.errorType
+    }
+}
+]]></ee:set-variable>
+						<ee:set-variable variableName="subject" ><![CDATA[%dw 2.0
+output application/json
+---
+"Contact Creation Error" ++ " " ++ vars.sfContactData.FirstName[0]++ " " ++ vars.sfContactData.MiddleName[0] ++ " " ++ vars.sfContactData.LastName[0] default " "]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Transform Message" doc:id="c491aadb-b298-422e-99c7-1cc22683656d">
+					<ee:message>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="errorMesg" ><![CDATA[%dw 2.0
+output text/plain
+---
+"Hello Team,\n\n" ++
+"This email is to notify you that an error occurred while attempting to Create a Contact in Salesforce.\n\n" ++
+"Contact Details:\n" ++
+"Contact ID: " ++ (if (vars.errorMessage["Contact Details"]["contactId"] != null) (vars.errorMessage["Contact Details"]["contactId"] as String) else "N/A") ++ "\n" ++
+"Date of Birth: " ++ (if (vars.errorMessage["Contact Details"]["Date of Birth"] != null) (vars.errorMessage["Contact Details"]["Date of Birth"] as String) else "N/A") ++ "\n" ++
+"Email: " ++ (if (vars.errorMessage["Contact Details"]["Email"] != null) (vars.errorMessage["Contact Details"]["Email"] as String) else "N/A") ++ "\n" ++
+"Phone: " ++ (if (vars.errorMessage["Contact Details"]["Phone"] != null) (vars.errorMessage["Contact Details"]["Phone"] as String) else "N/A") ++ "\n" ++
+"Contact Full Name: " ++ (if (vars.errorMessage["Contact Details"]["Contact Full Name"] != null) (vars.errorMessage["Contact Details"]["Contact Full Name"] as String) else "N/A") ++ "\n\n" ++
+"Error Details:\n" ++
+"Status Code: " ++ (if (vars.errorMessage["Error Details"]["statusCode"] != null) (vars.errorMessage["Error Details"]["statusCode"] as String) else "N/A") ++ "\n" ++
+"Error Message: " ++ (if (vars.errorMessage["Error Details"]["errorMessage"] != null) (vars.errorMessage["Error Details"]["errorMessage"] as String) else "N/A") ++ "\n" ++
+"Error Type: " ++ (if (vars.errorMessage["Error Details"]["error Type"] != null) (vars.errorMessage["Error Details"]["error Type"] as String) else "N/A")]]></ee:set-variable>
+						<ee:set-variable variableName="locationAddress" ><![CDATA[%dw 2.0
+output application/json
+---
+if (vars.errorMessage."Contact Details".Location == "FOREST HILLS") p('email.forest.to') else if (vars.errorMessage."Contact Details".Location == "MADISON") p('email.madison.to') else p('email.to') ]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<email:send doc:name="sendEmail" doc:id="ca263577-6b61-493a-9137-8a17ee6319b5" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
+					<email:to-addresses >
+						<email:to-address value="#[vars.locationAddress]" />
+					</email:to-addresses>
+					<email:body contentType="text/plain" >
+						<email:content ><![CDATA[#[vars.errorMesg]]]></email:content>
+					</email:body>
+				</email:send>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="defaultMessage" doc:id="cca23b44-30d0-4ecd-8648-f99b62c40c56" message="###########No errors##############"/>
+				<ee:transform doc:name="successMessage" doc:id="af0fee7a-5432-43c8-a845-82dbc5615e7a" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : "Contact Created Successfully" ,
+	"status" : "SUCCESS"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<!-- [STUDIO:"common-sf-composite-flow"]<sub-flow name="common-sf-composite-flow" doc:id="63ddb02e-bf30-4c54-be62-5d38594a6304" >
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="005c8b3c-066c-4806-8503-593d20520ae5" millisBetweenRetries="${sf.retryfrequency}">
+			<salesforce-composite:execute-composite-batch doc:name="Execute composite batch" doc:id="2a10d4f8-8758-4635-a98d-8d7679d5afe4" config-ref="Salesforce_Composite_Config">
+			<salesforce-composite:sub-requests><![CDATA[#[payload.batchRequests&#93;&#93;&#93;></salesforce-composite:sub-requests>
+		</salesforce-composite:execute-composite-batch>
+			<logger level="INFO" doc:name="afterUpsert" doc:id="b86d6d03-104c-4819-a75a-e7302daf9eda" message="#[%dw 2.0&#10;output application/json&#10;&#45;&#45;-&#10;payload&#93;"/>
+		</until-successful>
+		<choice doc:name="Choice" doc:id="7092f860-150f-4598-a8e4-f12c90ed72c4">
+				<when expression="#[payload.hasErrors == true&#93;">
+					<ee:transform doc:name="errorDetails" doc:id="fd15beb3-56c2-46c1-9752-cc806e1a8c62">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="ErrorDetails"><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+    
+    "Appointment Status":
+
+    "Status Code": payload.results.statusCode[0&#93; default "",
+    "createdId":payload.results.result.id[0&#93; default " ",
+    "ErrorMessage":payload.results.result[0&#93;.message[0&#93; default "",
+    "ErrorCode":payload.results.result[0&#93;.errorCode[0&#93; default "",
+
+
+    "Contact Status":
+
+    "Satus Code":payload.results.statusCode[1&#93;,
+    "ErrorMessage":payload.results.result[1&#93;.message[0&#93; default "",
+    "ErrorCode":payload.results.result[1&#93;.errorCode[0&#93; default "",
+    "PatientName": vars.contactFields.FirstName[0&#93; ++ " " ++ vars.contactFields.LastName[0&#93; default "",
+    "Id": vars.contactFields.HealthFusion_Patient_Record_ID__c[0&#93; default ""
+
+    
+}&#93;&#93;></ee:set-variable>
+							<ee:set-variable variableName="subject"><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+"Error Occured while creating/updating the Appointment/Contact"
+
+&#93;&#93;></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<email:send doc:name="sendEmail" doc:id="375aee39-48fa-4526-b3cf-4a67d723aff7" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java &#45;&#45;- vars.subject&#93;">
+						<email:to-addresses>
+							<email:to-address value="${email.to}" />
+						</email:to-addresses>
+						<email:body contentType="text/plain">
+							<email:content><![CDATA[#[vars.ErrorDetails&#93;&#93;&#93;></email:content>
+						</email:body>
+					</email:send>
+				</when>
+				<otherwise>
+					<logger level="INFO" doc:name="defaultMessage" doc:id="d9b86098-37ae-4f89-8306-ae756706d619" message="##########No errors############" />
+				</otherwise>
+			</choice>
+	</sub-flow> [STUDIO] -->
+	<sub-flow name="createAccount" doc:id="60d190e9-8df8-4eb2-bd22-653bc4e06474" >
+		<logger level="INFO" doc:name="Logger" doc:id="8a1f5b07-ff63-40c1-8505-bdc1a088ab9e" message="BEFORE CREATING THE ACCOUNT"/>
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="8ba3d67c-5386-480d-9b4d-37a0b99fbb58" millisBetweenRetries="${sf.retryfrequency}">
+			<salesforce:create doc:name="Create" doc:id="8d31ecf0-7a3b-4334-8f40-d8b6cf230c94" config-ref="Salesforce_Config" type="Account" target="accountResponse">
+				<reconnect />
+				<salesforce:records ><![CDATA[#[vars.accountCreate]]]></salesforce:records>
+			</salesforce:create>
+		</until-successful>
+		<logger level="INFO" doc:name="Logger" doc:id="0068d380-10a6-4f32-bd9f-6e21c9d2a57e" message="#[%dw 2.0&#10;output application/json&#10;---&#10;vars.accountResponse]"/>
+		<choice doc:name="Choice" doc:id="b72ce448-699d-4197-883f-ba2eefc3b87e" >
+			<when expression="#[vars.accountResponse.successful== false]" >
+				<ee:transform doc:name="errorDetails" doc:id="c0096cc0-a7ba-492e-8f05-c09c884de3a2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+status: "ERROR",
+errorMessage: vars.accountResponse.items.message[0],
+statusMessage : vars.accountResponse.items.statusCode[0]
+}  ]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="errorMessage" ><![CDATA[%dw 2.0
+output application/json
+---
+{   
+    "message": "Hello Team This email is to notify you that an error occurred while attempting to create Account in Salesforce",
+    "Contact Details": {
+        "contactId": payload.items.id[0],
+        "Date of Birth": vars.sfContactData.Date_of_Birth__c[0],
+        "Email": vars.sfContactData.Email[0],
+        "Phone": vars.sfContactData.Phone[0],
+        "Location": vars.mailLocation,
+        "Contact Full Name": if(vars.sfContactData.FirstName[0] == null) " " else (vars.sfContactData.FirstName[0]) ++ " " ++  if(vars.sfContactData.LastName[0] == null) " " else (vars.sfContactData.LastName[0]) ++ " " ++  if(vars.sfContactData.MiddleName[0] == null) "" else (vars.sfContactData.MiddleName[0])
+    },  
+    "Error Details": {
+        "statusCode": vars.accountResponse.items.statusCode[0],
+        "errorMessage":vars.accountResponse.items.message[0],
+        "error Type": error.errorType
+    }
+}
+]]></ee:set-variable>
+						<ee:set-variable variableName="subject" ><![CDATA[%dw 2.0
+output application/json
+---
+"Account Creation Error" ++ " " ++ vars.sfContactData.FirstName[0]++ " " ++ vars.sfContactData.MiddleName[0] ++ " " ++ vars.sfContactData.LastName[0] default " "]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="emailDetails" doc:id="248260e9-9c46-4972-8856-d8ed275efae5">
+					<ee:message>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="locationAddress" ><![CDATA[%dw 2.0
+output application/json
+---
+if (vars.errorMessage."Contact Details".Location == "FOREST HILLS") p('email.forest.to') else if (vars.errorMessage."Contact Details".Location == "MADISON") p('email.madison.to') else p('email.to') ]]></ee:set-variable>
+						<ee:set-variable variableName="errorMesg" ><![CDATA[%dw 2.0
+output text/plain
+---
+"Hello Team,\n\nThis email is to notify you that an error occurred while attempting to create Account in Salesforce.\n\nContact Details:\n" ++
+"Contact ID: " ++ (payload.items.id[0] default "N/A") ++ "\n" ++
+"Date of Birth: " ++ (vars.sfContactData.Date_of_Birth__c[0] default "N/A") ++ "\n" ++
+"Email: " ++ (vars.sfContactData.Email[0] default "N/A") ++ "\n" ++
+"Phone: " ++ (vars.sfContactData.Phone[0] default "N/A") ++ "\n" ++
+"Location: " ++ (vars.mailLocation default "N/A") ++ "\n" ++
+"Contact Full Name: " ++ 
+    (vars.sfContactData.FirstName[0] default "") ++ " " ++ 
+    (vars.sfContactData.MiddleName[0] default "") ++ " " ++ 
+    (vars.sfContactData.LastName[0] default "") ++ "\n\n" ++
+"Error Details:\n" ++
+"Status Code: " ++ (vars.accountResponse.items.statusCode[0] default "N/A") ++ "\n" ++
+"Error Message: " ++ (vars.accountResponse.items.message[0] default "N/A") ++ "\n" ++
+"Error Type: " ++ (error.errorType default "N/A")
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<email:send doc:name="sendEmail" doc:id="e4630cfd-976e-4350-b63e-6c3c58c3415e" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]">
+					<email:to-addresses>
+						<email:to-address value="#[vars.locationAddress]" />
+					</email:to-addresses>
+					<email:body contentType="text/plain">
+						<email:content><![CDATA[#[vars.errorMesg]]]></email:content>
+					</email:body>
+				</email:send>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="defaultMessage" doc:id="c5b16947-0f27-41c1-80a4-2f7f42ad76a6" message="###########No errors##############" />
+				<ee:transform doc:name="successMessage" doc:id="4d2701db-f5cb-4e7b-b468-dda66f011449">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : "Account Created Successfully" ,
+	"status" : "Success"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="a16ad3e1-64b6-4381-9679-8e97f9dc29ce" message="ACCOUNT CREATED SUCCUESSFULLY " />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<!-- [STUDIO:"createAppointment"]<sub-flow name="createAppointment" doc:id="646ac962-16d8-4e70-8934-4eb30da537fe" >
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="71c88c1d-6bfe-4b35-b134-5aedc0330fe4" millisBetweenRetries="${sf.retryfrequency}" >
+			<salesforce:upsert doc:name="Upsert" doc:id="203ee995-0e33-442b-8984-2a00d0023855" config-ref="Salesforce_Config" objectType="ServiceAppointment" externalIdFieldName="NextGen_ID__c">
+				<salesforce:records ><![CDATA[#[vars.appointmentFields&#93;&#93;&#93;></salesforce:records>
+			</salesforce:upsert>
+		</until-successful>
+		<logger level="INFO" doc:name="Logger" doc:id="b558f2e6-0f4d-4d02-b742-8c6de91425bf" message="#[%dw 2.0&#10;output application/json&#10;&#45;&#45;-&#10;payload&#93;" />
+	</sub-flow> [STUDIO] -->
+	<sub-flow name="salesforce_query_Sub_Flow" doc:id="1b38a52c-5379-4009-b444-31a047fe1cba" >
+		<salesforce:query doc:name="Query" doc:id="d14fb987-b245-42f2-9e2f-2ef3a953b3fb" config-ref="Salesforce_Config" target="queryResponse">
+			<reconnect frequency="${sf.retryfrequency}" count="${sf.retryattempts}" />
+			<salesforce:salesforce-query ><![CDATA[select Id, AccountId, Firstname ,LastName ,MiddleName, Date_of_Birth__c from Contact where HealthFusion_Patient_Record_ID__c =':HealthFusion_Patient_Record_ID__c']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	"HealthFusion_Patient_Record_ID__c" : flatten(payload.Data.SIU_S12.PATIENT.PID."PID-04")."CX-01"[0]
+}]]]></salesforce:parameters>
+		</salesforce:query>
+	</sub-flow>
+	<sub-flow name="common-sf-appointment-upsert-flow" doc:id="d40ad214-3b64-4179-bc92-972093d4590b" >
+		<logger level="INFO" doc:name="beforeInsert" doc:id="80766d10-021d-48b0-973f-17ff82af9158" message="##########Before Salesforce Upsert###################" />
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="27c377fe-9966-4a17-9aea-3bc533a9f043" millisBetweenRetries="${sf.retryfrequency}">
+			<salesforce:upsert objectType="ServiceAppointment" externalIdFieldName="NextGen_ID__c" doc:name="Update/Insert" doc:id="935217ec-464f-41b5-ade9-e8105b9a90a2" config-ref="Salesforce_Config" target="appRes">
+				<salesforce:records><![CDATA[#[vars.appointmentFields]]]></salesforce:records>
+			</salesforce:upsert>
+		</until-successful>
+		<logger level="INFO" doc:name="afterInsert" doc:id="337acc10-59aa-4860-bf6c-2f2224d8d776" message="#[%dw 2.0&#10;output application/json&#10;---&#10;vars.appRes]" />
+		<choice doc:name="Choice" doc:id="1d2150a1-3780-4273-9857-e7b03c45cf1f" >
+			<when expression="#[payload.successful== false]" >
+				<ee:transform doc:name="errorDetails" doc:id="b0beca54-c3a5-453a-9a2b-3f736b7a0521" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+status: "ERROR",
+errorMessage: vars.appRes.items.message[0],
+statusMessage : vars.appRes.items.statusCode[0]
+} ]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="errorMessage" ><![CDATA[%dw 2.0
+output application/json
+---
+{   
+    "message": "Hello Team This email is to notify you that an error occurred while attempting to Create a ServiceAppointment in Salesforce",
+     
+   "Error Details": {
+        "AppointmentId":vars.Res.items.id[0],
+		"Date of Birth": vars.queryResponse.Date_of_Birth__c[0],
+		"Appointment Status": vars.appointmentFields.Status[0],
+		"Provider": vars.appointmentFields.Service_Resource__c[0],
+		"Location": vars.mailLocation,
+		"patientName": vars.queryResponse.FirstName[0] ++ " " ++  vars.queryResponse.MiddleName[0] ++ " " ++ vars.queryResponse.LastName[0] default " ",
+        "statusCode": vars.appRes.items.statusCode[0],
+        "errorMessage": vars.appres.items.message[0],
+        "error Type": error.errorType
+    }
+}]]></ee:set-variable>
+						<ee:set-variable variableName="subject" ><![CDATA[%dw 2.0
+output application/json
+---
+"Appointment Creation Error"  ++ vars.queryResponse.FirstName[0] ++ " " ++ vars.queryResponse.MiddleName[0] ++ " " ++ vars.queryResponse.LastName[0] default " "]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="emailAddress" doc:id="3f9dda99-e566-44e2-8624-792cef151cbc">
+					<ee:message>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="errorMesg" ><![CDATA[%dw 2.0
+output text/plain
+---
+"Hello Team,\n\n" ++
+"This email is to notify you that an error occurred while attempting to Create a ServiceAppointment in Salesforce.\n\n" ++
+"Error Details:\n" ++
+"Appointment ID: " ++ (if (vars.errorMessage["Error Details"]["AppointmentId"] != null) (vars.errorMessage["Error Details"]["AppointmentId"] as String) else "N/A") ++ "\n" ++
+"Date of Birth: " ++ (if (vars.errorMessage["Error Details"]["Date of Birth"] != null) (vars.errorMessage["Error Details"]["Date of Birth"] as String) else "N/A") ++ "\n" ++
+"Appointment Status: " ++ (if (vars.errorMessage["Error Details"]["Appointment Status"] != null) (vars.errorMessage["Error Details"]["Appointment Status"] as String) else "N/A") ++ "\n" ++
+"Provider: " ++ (if (vars.errorMessage["Error Details"]["Provider"] != null) (vars.errorMessage["Error Details"]["Provider"] as String) else "N/A") ++ "\n" ++
+"Patient Name: " ++ (if (vars.errorMessage["Error Details"]["patientName"] != null) (vars.errorMessage["Error Details"]["patientName"] as String) else "N/A") ++ "\n" ++
+"Status Code: " ++ (if (vars.errorMessage["Error Details"]["statusCode"] != null) (vars.errorMessage["Error Details"]["statusCode"] as String) else "N/A") ++ "\n" ++
+"Error Message: " ++ (if (vars.errorMessage["Error Details"]["errorMessage"] != null) (vars.errorMessage["Error Details"]["errorMessage"] as String) else "N/A") ++ "\n" ++
+"Error Type: " ++ (if (vars.errorMessage["Error Details"]["error Type"] != null) (vars.errorMessage["Error Details"]["error Type"] as String) else "N/A")
+]]></ee:set-variable>
+						<ee:set-variable variableName="locationAddress" ><![CDATA[%dw 2.0
+output application/json
+---
+if (vars.errorMessage."Error Details".Location == "FOREST HILLS") p('email.forest.to') else if (vars.errorMessage."Error Details".Location == "MADISON") p('email.madison.to') else p('email.to')
+ ]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<email:send doc:name="sendEmail" doc:id="e579e2a0-c8de-40be-8e22-06254400d2cb" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
+					<email:to-addresses >
+						<email:to-address value="#[vars.locationAddress]" />
+					</email:to-addresses>
+					<email:body contentType="text/plain" >
+						<email:content ><![CDATA[#[vars.errorMesg]]]></email:content>
+					</email:body>
+				</email:send>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="defaultMessage" doc:id="7b2ffda3-e21c-43d7-aa7b-6c64c2d10659" message="###########No errors##############" />
+				<ee:transform doc:name="successMessage" doc:id="19f5fe45-feca-411a-a68f-7a52ba8e919b" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : if(vars.appRes.items.payload.created == true) "Appointment Created Successfully" else "Appointment Updated Successfully" ,
+	"status" : "SUCCESS"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="appointment-update-Sub_Flow" doc:id="1cc2041a-9c89-4daa-a660-a632e0140c9f" >
+		<logger level="INFO" doc:name="Logger" doc:id="2e9ce68c-9917-451d-b458-ee884d65f24e" message="########before Appointment Update##########"/>
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="f20694ad-330d-4f84-a002-1519f83b8007" millisBetweenRetries="${sf.retryfrequency}">
+			<salesforce:upsert objectType="AssignedResource" externalIdFieldName="Id" doc:name="Upsert" doc:id="87668568-a73c-40c6-aeaf-1f6a3c714554" config-ref="Salesforce_Config" />
+			</until-successful>
+		<logger level="INFO" doc:name="Logger" doc:id="6186b073-7328-4ec0-bbba-8496916021ef" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]"/>
+	</sub-flow>
+	<sub-flow name="common-sf-update-flow" doc:id="08be6d1b-ea8e-4db3-b71f-79715529f8ea" >
+		<logger level="INFO" doc:name="beforeInsert" doc:id="5c91fe57-3089-41ee-81d7-4034beb1a24d" message="##########Before Salesforce Upsert###################" />
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="f07c278a-85a0-4f26-b102-0c96a2527549" millisBetweenRetries="${sf.retryfrequency}" >
+			<salesforce:upsert objectType="Contact" externalIdFieldName="Id" doc:name="Update/Insert" doc:id="a062c804-57c3-434c-80d7-bc99aa9e745c" config-ref="Salesforce_Config">
+			</salesforce:upsert>
+		</until-successful>
+		<logger level="INFO" doc:name="afterInsert" doc:id="dc749685-628b-4288-93d8-ac0705719e1a" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
+		<choice doc:name="Choice" doc:id="8ad0cafb-36e1-4666-bf46-30ef6fad64a5" >
+			<when expression="#[payload.successful== false]" >
+				<ee:transform doc:name="errorDetails" doc:id="bf436781-3fb1-44d0-bebc-b036038e6d08" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+status: "ERROR",
+errorMessage: payload.items.message[0],
+statusMessage : payload.items.statusCode[0]
+} ]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="errorMessage" ><![CDATA[%dw 2.0
+output application/json
+---
+{   
+    "message": "Hello Team This email is to notify you that an error occurred while attempting to Update a Contact in Salesforce",
+    "Contact Details": {
+        "contactId": payload.items.id[0],
+        "Date of Birth": vars.sfContactData.Date_of_Birth__c[0],
+        "Email": vars.sfContactData.Email[0],
+        "Location": vars.mailLocation,
+        "Phone": vars.sfContactData.Phone[0],
+        "Contact Full Name": if(vars.sfContactData.FirstName[0] == null) " " else (vars.sfContactData.FirstName[0]) ++ " " ++  if(vars.sfContactData.LastName[0] == null) " " else (vars.sfContactData.LastName[0]) ++ " " ++  if(vars.sfContactData.MiddleName[0] == null) "" else (vars.sfContactData.MiddleName[0])
+    },  
+    "Error Details": {
+        "statusCode": payload.items.statusCode[0],
+        "errorMessage": payload.items.message[0],
+        "error Type": error.errorType
+    }
+}
+]]></ee:set-variable>
+						<ee:set-variable variableName="subject" ><![CDATA[%dw 2.0
+output application/json
+---
+"Contact Updation Error" ++ " " ++ vars.sfContactData.FirstName[0]++ " " ++ vars.sfContactData.MiddleName[0] ++ " " ++ vars.sfContactData.LastName[0] default " "]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Transform Message" doc:id="d3649944-a249-41e4-beb0-78c2acf99cda">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="errorMesg"><![CDATA[%dw 2.0
+output text/plain
+---
+"Hello Team,\n\n" ++
+"This email is to notify you that an error occurred while attempting to Update a Contact in Salesforce.\n\n" ++
+"Contact Details:\n" ++
+"Contact ID: " ++ (if (vars.errorMessage["Contact Details"]["contactId"] != null) (vars.errorMessage["Contact Details"]["contactId"] as String) else "N/A") ++ "\n" ++
+"Date of Birth: " ++ (if (vars.errorMessage["Contact Details"]["Date of Birth"] != null) (vars.errorMessage["Contact Details"]["Date of Birth"] as String) else "N/A") ++ "\n" ++
+"Email: " ++ (if (vars.errorMessage["Contact Details"]["Email"] != null) (vars.errorMessage["Contact Details"]["Email"] as String) else "N/A") ++ "\n" ++
+"Phone: " ++ (if (vars.errorMessage["Contact Details"]["Phone"] != null) (vars.errorMessage["Contact Details"]["Phone"] as String) else "N/A") ++ "\n" ++
+"Contact Full Name: " ++ (if (vars.errorMessage["Contact Details"]["Contact Full Name"] != null) (vars.errorMessage["Contact Details"]["Contact Full Name"] as String) else "N/A") ++ "\n\n" ++
+"Error Details:\n" ++
+"Status Code: " ++ (if (vars.errorMessage["Error Details"]["statusCode"] != null) (vars.errorMessage["Error Details"]["statusCode"] as String) else "N/A") ++ "\n" ++
+"Error Message: " ++ (if (vars.errorMessage["Error Details"]["errorMessage"] != null) (vars.errorMessage["Error Details"]["errorMessage"] as String) else "N/A") ++ "\n" ++
+"Error Type: " ++ (if (vars.errorMessage["Error Details"]["error Type"] != null) (vars.errorMessage["Error Details"]["error Type"] as String) else "N/A")]]></ee:set-variable>
+						<ee:set-variable variableName="locationAddress" ><![CDATA[%dw 2.0
+output application/json
+---
+if (vars.errorMessage."Contact Details".Location == "FOREST HILLS") p('email.forest.to') else if (vars.errorMessage."Contact Details".Location == "MADISON") p('email.madison.to') else p('email.to') ]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<email:send doc:name="sendEmail" doc:id="934e08d6-d25b-4f8b-8dbf-49b06eff79da" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
+					<email:to-addresses >
+						<email:to-address value="#[vars.locationAddress]" />
+					</email:to-addresses>
+					<email:body contentType="text/plain" >
+						<email:content ><![CDATA[#[vars.errorMesg]]]></email:content>
+					</email:body>
+				</email:send>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="defaultMessage" doc:id="1b3b0d83-8060-42d7-bcfc-68ac9c1529c0" message="###########No errors##############" />
+				<ee:transform doc:name="successMessage" doc:id="47002191-98ea-4305-8ce6-736d2e17b973" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : "Contact Updated Successfully" ,
+	"status" : "SUCCESS"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="salesforce_querycontact_Sub_Flow" doc:id="d935e78e-0bc1-4572-a85a-e98e10b27dcf" >
+		<salesforce:query doc:name="Query" doc:id="79adbc28-8388-4fc5-b183-b176a2dcea09" config-ref="Salesforce_Config" target="contactResponse" >
+			<salesforce:salesforce-query ><![CDATA[select Id from Contact where Contact_Id__c = ':Contact_Id__c']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	"Contact_Id__c" : payload.Contact_Id__c[0]
+}]]]></salesforce:parameters>
+		</salesforce:query>
+	</sub-flow>
+	<sub-flow name="salesforce_queryaccoun_Sub_Flow" doc:id="39aab4c8-aa95-4190-9357-a29214d3cd51" >
+		<salesforce:query doc:name="Query" doc:id="8035e9d6-75d1-44dc-96ef-aee71449b2f3" config-ref="Salesforce_Config" target="queryRes" >
+			<salesforce:salesforce-query ><![CDATA[select  AccountId from Contact where LastName = ':LastName'  and FirstName=':FirstName']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	"LastName" : vars.sfContactData.LastName[0],
+	"FirstName" : vars.sfContactData.FirstName[0]
+}]]]></salesforce:parameters>
+		</salesforce:query>
+	</sub-flow>
+	<sub-flow name="salesforce-appointmnet-querySub_Flow" doc:id="8d4aee44-43a6-46be-b1a9-cae1a4cb9990" >
+		<salesforce:query doc:name="Query" doc:id="cd2d1d00-ec8a-4833-842e-d3e61926d7bf" config-ref="Salesforce_Config" target="accResponse">
+			<salesforce:salesforce-query ><![CDATA[select Id from ServiceAppointment where NextGen_ID__c = ':NextGen_ID__c']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	"NextGen_ID__c" : vars.appointmentFields.NextGen_ID__c[0]
+}]]]></salesforce:parameters>
+		</salesforce:query>
+	</sub-flow>
+	<sub-flow name="sf-appointment-update-flow" doc:id="7c77a221-aa07-4264-8ef0-a8fa37b7ba61" >
+		<logger level="INFO" doc:name="beforeInsert" doc:id="a040c226-4edd-429e-b90e-9f5b8fed1432" message="##########Before Salesforce Upsert###################" />
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="09118984-4cd1-4771-bc27-06f9e72fa25e" millisBetweenRetries="${sf.retryfrequency}" >
+			<salesforce:upsert objectType="ServiceAppointment" externalIdFieldName="Id" doc:name="Update/Insert" doc:id="005689f3-1b60-43ea-9783-43f8435b5a9a" config-ref="Salesforce_Config">
+				<salesforce:records><![CDATA[#[vars.appointmentFields]]]></salesforce:records>
+			</salesforce:upsert>
+		</until-successful>
+		<logger level="INFO" doc:name="afterInsert" doc:id="b07eb6c0-8b79-45ec-a2ef-b7cb0d6cdbb1" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
+		<choice doc:name="Choice" doc:id="03b70ed9-89d9-4bf6-a493-5489f2012ff9" >
+			<when expression="#[payload.successful== false]" >
+				<ee:transform doc:name="errorDetails" doc:id="d41f21a7-9ffa-4655-ac38-cff2973f772c" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+status: "ERROR",
+errorMessage: payload.items.message[0],
+statusMessage : payload.items.statusCode[0]
+} ]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="errorMessage" ><![CDATA[%dw 2.0
+output application/json
+---
+{   
+    "message": "Hello Team This email is to notify you that an error occurred while attempting to Update a ServiceAppointment in Salesforce",
+     
+   "Error Details": {
+        "AppointmentId":payload.items.id[0],
+		"Date of Birth": vars.queryResponse.Date_of_Birth__c[0],
+		"Appointment Status": vars.appointmentFields.Status[0],
+		"Provider": vars.appointmentFields.Service_Resource__c[0],
+		"Location": vars.mailLocation,
+		"patientName": vars.queryResponse.FirstName[0] ++ " " ++  vars.queryResponse.MiddleName[0] ++ " " ++ vars.queryResponse.LastName[0] default " ",
+        "statusCode": payload.items.statusCode[0],
+        "errorMessage": payload.items.message[0],
+        "error Type": error.errorType
+    }
+}]]></ee:set-variable>
+						<ee:set-variable variableName="subject" ><![CDATA[%dw 2.0
+output application/json
+---
+"Appointment Updation Error"  ++ vars.queryResponse.FirstName[0] ++ " " ++ vars.queryResponse.MiddleName[0] ++ " " ++ vars.queryResponse.LastName[0] default " "]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="emailAddress" doc:id="367c0fee-2909-414b-a3af-a36a027e5ddc">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="errorMesg"><![CDATA[%dw 2.0
+output text/plain
+---
+"Hello Team,\n\n" ++
+"This email is to notify you that an error occurred while attempting to Update a ServiceAppointment in Salesforce.\n\n" ++
+"Error Details:\n" ++
+"Appointment ID: " ++ (if (vars.errorMessage["Error Details"]["AppointmentId"] != null) (vars.errorMessage["Error Details"]["AppointmentId"] as String) else "N/A") ++ "\n" ++
+"Date of Birth: " ++ (if (vars.errorMessage["Error Details"]["Date of Birth"] != null) (vars.errorMessage["Error Details"]["Date of Birth"] as String) else "N/A") ++ "\n" ++
+"Appointment Status: " ++ (if (vars.errorMessage["Error Details"]["Appointment Status"] != null) (vars.errorMessage["Error Details"]["Appointment Status"] as String) else "N/A") ++ "\n" ++
+"Provider: " ++ (if (vars.errorMessage["Error Details"]["Provider"] != null) (vars.errorMessage["Error Details"]["Provider"] as String) else "N/A") ++ "\n" ++
+"Patient Name: " ++ (if (vars.errorMessage["Error Details"]["patientName"] != null) (vars.errorMessage["Error Details"]["patientName"] as String) else "N/A") ++ "\n" ++
+"Status Code: " ++ (if (vars.errorMessage["Error Details"]["statusCode"] != null) (vars.errorMessage["Error Details"]["statusCode"] as String) else "N/A") ++ "\n" ++
+"Error Message: " ++ (if (vars.errorMessage["Error Details"]["errorMessage"] != null) (vars.errorMessage["Error Details"]["errorMessage"] as String) else "N/A") ++ "\n" ++
+"Error Type: " ++ (if (vars.errorMessage["Error Details"]["error Type"] != null) (vars.errorMessage["Error Details"]["error Type"] as String) else "N/A")
+]]></ee:set-variable>
+						<ee:set-variable variableName="locationAddress" ><![CDATA[%dw 2.0
+output application/json
+---
+if (vars.errorMessage."Error Details".Location == "FOREST HILLS") p('email.forest.to') else if (vars.errorMessage."Error Details".Location == "MADISON") p('email.madison.to') else p('email.to')
+ ]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<email:send doc:name="sendEmail" doc:id="69bfef1e-7057-40a1-8c92-688423cecbf3" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
+					<email:to-addresses >
+						<email:to-address value="#[vars.locationAddress]" />
+					</email:to-addresses>
+					<email:body contentType="text/plain" >
+						<email:content ><![CDATA[#[vars.errorMesg]]]></email:content>
+					</email:body>
+				</email:send>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="defaultMessage" doc:id="9e085750-10ea-404e-ac08-79acf0f8e2d7" message="###########No errors##############" />
+				<ee:transform doc:name="successMessage" doc:id="eb271003-71c6-4f66-8836-8c30730beb24" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : "Service Appointment Updated Successfully" ,
+	"status" : "SUCCESS"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="contact-update-hfchartnumber-subflow" doc:id="3cb980f1-d099-4117-bbca-177a7fb25c35" >
+		<logger level="INFO" doc:name="beforeInsert" doc:id="1a4ace4d-4e40-4016-9649-ae41c674b19a" message="##########Before Salesforce Upsert###################" />
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="10862969-1686-4114-822a-2468c3b7dc37" millisBetweenRetries="${sf.retryfrequency}" >
+			<salesforce:upsert objectType="Contact" externalIdFieldName="HealthFusion_Patient_Record_ID__c" doc:name="Update/Insert" doc:id="128c6a30-dc35-4a6f-8459-4018addb34d1" config-ref="Salesforce_Config" />
+		</until-successful>
+		<logger level="INFO" doc:name="afterInsert" doc:id="b8a66897-fee3-4975-947e-de16146c4b5d" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
+		<choice doc:name="Choice" doc:id="7bdd1603-36a1-4caf-8c68-3e71ad041a3f" >
+			<when expression="#[payload.successful== false]" >
+				<ee:transform doc:name="errorDetails" doc:id="0fbf032f-5861-410e-b0d3-5d3a097990d2" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+status: "ERROR",
+errorMessage: payload.items.message[0],
+statusMessage : payload.items.statusCode[0]
+} ]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="errorMessage" ><![CDATA[%dw 2.0
+output application/json
+---
+{   
+    "message": "Hello Team This email is to notify you that an error occurred while attempting to Update a Contact in Salesforce",
+    "Contact Details": {
+        "contactId": payload.items.id[0],
+        "Date of Birth": vars.sfContactData.Date_of_Birth__c[0],
+        "Email": vars.sfContactData.Email[0],
+        "Phone": vars.sfContactData.Phone[0],
+        "Location": vars.mailLocation,
+        "Contact Full Name": if(vars.sfContactData.FirstName[0] == null) " " else (vars.sfContactData.FirstName[0]) ++ " " ++  if(vars.sfContactData.LastName[0] == null) " " else (vars.sfContactData.LastName[0]) ++ " " ++  if(vars.sfContactData.MiddleName[0] == null) "" else (vars.sfContactData.MiddleName[0])
+    },  
+    "Error Details": {
+        "statusCode": payload.items.statusCode[0],
+        "errorMessage": payload.items.message[0],
+        "error Type": error.errorType
+    }
+}
+]]></ee:set-variable>
+						<ee:set-variable variableName="subject" ><![CDATA[%dw 2.0
+output application/json
+---
+"Contact Updation Error" ++ " " ++ vars.sfContactData.FirstName[0]++ " " ++ vars.sfContactData.MiddleName[0] ++ " " ++ vars.sfContactData.LastName[0] default " "]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Transform Message" doc:id="5aceb901-f0c3-4a3b-a5d6-779ce1b12971">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="errorMesg"><![CDATA[%dw 2.0
+output text/plain
+---
+"Hello Team,\n\n" ++
+"This email is to notify you that an error occurred while attempting to Update a Contact in Salesforce.\n\n" ++
+"Contact Details:\n" ++
+"Contact ID: " ++ (if (vars.errorMessage["Contact Details"]["contactId"] != null) (vars.errorMessage["Contact Details"]["contactId"] as String) else "N/A") ++ "\n" ++
+"Date of Birth: " ++ (if (vars.errorMessage["Contact Details"]["Date of Birth"] != null) (vars.errorMessage["Contact Details"]["Date of Birth"] as String) else "N/A") ++ "\n" ++
+"Email: " ++ (if (vars.errorMessage["Contact Details"]["Email"] != null) (vars.errorMessage["Contact Details"]["Email"] as String) else "N/A") ++ "\n" ++
+"Phone: " ++ (if (vars.errorMessage["Contact Details"]["Phone"] != null) (vars.errorMessage["Contact Details"]["Phone"] as String) else "N/A") ++ "\n" ++
+"Contact Full Name: " ++ (if (vars.errorMessage["Contact Details"]["Contact Full Name"] != null) (vars.errorMessage["Contact Details"]["Contact Full Name"] as String) else "N/A") ++ "\n\n" ++
+"Error Details:\n" ++
+"Status Code: " ++ (if (vars.errorMessage["Error Details"]["statusCode"] != null) (vars.errorMessage["Error Details"]["statusCode"] as String) else "N/A") ++ "\n" ++
+"Error Message: " ++ (if (vars.errorMessage["Error Details"]["errorMessage"] != null) (vars.errorMessage["Error Details"]["errorMessage"] as String) else "N/A") ++ "\n" ++
+"Error Type: " ++ (if (vars.errorMessage["Error Details"]["error Type"] != null) (vars.errorMessage["Error Details"]["error Type"] as String) else "N/A")]]></ee:set-variable>
+						<ee:set-variable variableName="locationAddress" ><![CDATA[%dw 2.0
+output application/json
+---
+if (vars.errorMessage."Contact Details".Location == "FOREST HILLS") p('email.forest.to') else if (vars.errorMessage."Contact Details".Location == "MADISON") p('email.madison.to') else p('email.to') ]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<email:send doc:name="sendEmail" doc:id="2927a551-7913-4f45-8f8f-2ede951ec8ae" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
+					<email:to-addresses >
+						<email:to-address value="#[vars.locationAddress]" />
+					</email:to-addresses>
+					<email:body contentType="text/plain" >
+						<email:content ><![CDATA[#[vars.errorMesg]]]></email:content>
+					</email:body>
+				</email:send>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="defaultMessage" doc:id="5887c3c6-4ce7-48a5-bbc7-328bdffe85d5" message="###########No errors##############" />
+				<ee:transform doc:name="successMessage" doc:id="c28fdbf2-bda2-451d-9fce-da200c6d8df5" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : "Contact Updated Successfully" ,
+	"status" : "SUCCESS"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<!-- [STUDIO:"viva-ng-sf-inbound-papi-reprocessing-flow"]<flow name="viva-ng-sf-inbound-papi-reprocessing-flow" doc:id="8851d4b9-9a0d-41d4-843e-31463849bd9c" >
+		<scheduler doc:name="scheduler runs every 5 mins" doc:id="4b3b9ccd-456f-44b1-9213-e6d51f97125b" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="5" timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</scheduler>
+		<vm:listener queueName="nextgenqueue" doc:name="Listener" doc:id="0fc1b13e-3d62-4cae-939d-57bc1013606f" config-ref="VM_Config" numberOfConsumers="1" timeout="60"/>
+		<try doc:name="Try" doc:id="4490a2a2-415c-4dcf-aee6-5213ddf9a122" >
+			<vm:consume doc:name="Consume" doc:id="5622407a-6bc6-47a5-b2d2-1e07a97229eb" config-ref="VM_Config" queueName="nextgenqueue" timeoutUnit="MINUTES"/>
+			<error-handler >
+				<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="6157103b-17fc-47e6-982e-54d15179a56a" type="VM:EMPTY_QUEUE">
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<choice doc:name="Choice" doc:id="0d24dc04-0df4-4b59-98d3-d0b29ea870b2">
+			<when expression="#[!isEmpty(payload)&#93;">
+				<ee:transform doc:name="Transform Message" doc:id="d3287a03-a597-4e88-9038-5013c7d75651">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output text/plain
+&#45;&#45;-
+payload&#93;&#93;></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<flow-ref doc:name="Flow Reference" doc:id="97f19f98-e1d1-49cc-beea-b28409a3c3bf" name="nextgen-sf-papi-impl" />
+			</when>
+		</choice>
+		<error-handler ref="error-handler" />
+	</flow> [STUDIO] -->
+</mule>

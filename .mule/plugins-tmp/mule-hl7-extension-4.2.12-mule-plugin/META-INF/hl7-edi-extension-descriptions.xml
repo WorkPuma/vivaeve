@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension-documentation>
+    <configs>
+        <config name="config">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="expirationPolicy">
+                    <description><![CDATA[Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.]]></description>
+                </parameter>
+                <parameter name="appNamespaceIdSelf">
+                    <description><![CDATA[Application Namespace ID for Mule in message header (MSH segment). If this value is set, it effects both send and receive message handling. On the receive side, the MSH Receiving Application identification Namespace ID must match this value. On the send side, this value is used as the MSH Sending Application identification Namespace ID unless overridden in either the send configuration or the message parameters.]]></description>
+                </parameter>
+                <parameter name="appUniversalIdSelf">
+                    <description><![CDATA[Application Universal ID for Mule in message header (MSH segment). If this value is set, it effects both send and receive message handling. On the receive side, the MSH Receiving Application identification Universal ID must match this value. On the send side, this value is used as the MSH Sending Application identification Universal ID unless overridden in either the send configuration or the message parameters.]]></description>
+                </parameter>
+                <parameter name="appUniversalIdTypeSelf">
+                    <description><![CDATA[Application Universal ID Type for Mule in message header (MSH segment). If this value is set, it effects both send and receive message handling. On the receive side, the MSH Receiving Application identification Universal ID Type must match this value. On the send side, this value is used as the MSH Sending Application identification Universal ID Type unless overridden in either the send configuration or the message parameters.]]></description>
+                </parameter>
+                <parameter name="appNamespaceIdPartner">
+                    <description><![CDATA[Application Namespace ID for Partner in message header (MSH segment). If this value is set, it effects both send and receive message handling. On the receive side, the MSH Sending Application identification Namespace ID must match this value. On the send side, this value is used as the MSH Receiving Application identification Namespace ID unless overridden in either the send configuration or the message parameters.]]></description>
+                </parameter>
+                <parameter name="appUniversalIdPartner">
+                    <description><![CDATA[Application Universal ID for Partner in message header (MSH segment). If this value is set, it effects both send and receive message handling. On the receive side, the MSH Sending Application identification Universal ID must match this value. On the send side, this value is used as the MSH Receiving Application identification Universal ID unless overridden in either the send configuration or the message parameters.]]></description>
+                </parameter>
+                <parameter name="appUniversalIdTypePartner">
+                    <description><![CDATA[Application Universal ID Type for Partner in message header (MSH segment). If this value is set, it effects both send and receive message handling. On the receive side, the MSH Sending Application identification Universal ID Type must match this value. On the send side, this value is used as the MSH Receiving Application identification Universal ID Type unless overridden in either the send configuration or the message parameters.]]></description>
+                </parameter>
+                <parameter name="schemas">
+                    <description><![CDATA[List of paths for schemas to be used by module. The paths may be either for file system or classpath.]]></description>
+                </parameter>
+                <parameter name="eventMessageMap">
+                    <description><![CDATA[Path to a YAML file defining the mapping from event code to message code to message structure identifier. If working with multiple message structures this mapping definition supports using MSH-9-1 and MSH-9-2 to determine the message structure when MSH-9-3 is not present in a message. If only a single message structure is present in the schema(s) that message structure is used for parsing all messages, and if MSH-9-3 is present in a message the MSH-9-1 and MSH-9-2 values are ignored.]]></description>
+                </parameter>
+                <parameter name="characterEncoding">
+                    <description><![CDATA[Character encoding for HL7 messages. This is used as the default for receive messages, when MSH-18 is not present. It is also used as the default for send messages, when MSH-18 is not present in the send message data.]]></description>
+                </parameter>
+                <parameter name="identKeys">
+                    <description><![CDATA[Use segment and group identifiers directly as keys in data, rather than prefixing with position values.]]></description>
+                </parameter>
+                <parameter name="processingId">
+                    <description><![CDATA[Value to match for MSH-11-1 processing ID. If set, only messages with the specified processing ID will be accepted for processing; messages with other processing ID values, or with no processing ID specified, will be rejected with an exception.]]></description>
+                </parameter>
+                <parameter name="genericExtensionPattern">
+                    <description><![CDATA[Java regular pattern for segment names to be treated as generic extension segments. If specified, segment names matching this pattern are allowed anywhere in the message and are converted to maps of string values for elements and composites.]]></description>
+                </parameter>
+                <parameter name="missingRequiredValueFail">
+                    <description><![CDATA[Fail when a required value is missing flag. If true, a message with this error is rejected; if false, the value is ignored and the message is not rejected. In either case the error is logged and reported in an ERR segment.]]></description>
+                </parameter>
+                <parameter name="valueLengthErrorFail">
+                    <description><![CDATA[Fail when receive value length outside allowed range flag. If true, a message with this error is rejected; if false, the value is used anyway and the message is not rejected. In either case the error is logged and reported in an ERR segment.]]></description>
+                </parameter>
+                <parameter name="invalidCharacterInValueFail">
+                    <description><![CDATA[Fail when receive value contains invalid characters flag. If true, a message with this error is rejected; if false, the character is either passed through or substituted and the message is not rejected. In either case the error is reported in an ERR segment.]]></description>
+                </parameter>
+                <parameter name="wrongValuesRepeatsFail">
+                    <description><![CDATA[Fail when receive value is repeated too many times. If true, a message with this error is rejected; if false, the value is accepted and the message is not rejected. In either case the error is reported in an ERR segment.]]></description>
+                </parameter>
+                <parameter name="unknownSegmentFail">
+                    <description><![CDATA[Fail when an unknown segment is present in a message. If true, a message with this error is rejected; if false, the segment is ignored and the message is not rejected. In either case the error is reported in an ERR segment.]]></description>
+                </parameter>
+                <parameter name="segmentOutOfOrderFail">
+                    <description><![CDATA[Fail when a segment is out of order in a message. If true, a message with this error is rejected; if false and the segment can be reordered the message is not rejected. In either case the error is reported in an ERR segment.]]></description>
+                </parameter>
+                <parameter name="unusedSegmentPresentFail">
+                    <description><![CDATA[Fail when a segment marked as Unused is included in a message. If true, a message with this error is rejected; if false, the message is not rejected and the unused segment is ignored. In either case the error is reported in an ERR segment.]]></description>
+                </parameter>
+                <parameter name="wrongSegmentsRepeatsFail">
+                    <description><![CDATA[Fail when a segment occurs too many times in a message. If true, a message with this error is rejected; if false, the message is not rejected. In either case the error is reported in an ERR segment.]]></description>
+                </parameter>
+                <parameter name="parserSegmentTerminator">
+                    <description><![CDATA[Segment terminator for HL7 messages. This is used to recognize when a segment ends]]></description>
+                </parameter>
+                <parameter name="fieldSeparator">
+                    <description><![CDATA[Optional data element separator character. The configured value is used by default for all output messages, but can be overridden at the message level.]]></description>
+                </parameter>
+                <parameter name="componentSeparator">
+                    <description><![CDATA[Optional component separator character. The configured value is used by default for all output messages, but can be overridden at the message level.]]></description>
+                </parameter>
+                <parameter name="subcompSeparator">
+                    <description><![CDATA[Optional sub component separator character. The configured value is used by default for all output messages, but can be overridden at the message level.]]></description>
+                </parameter>
+                <parameter name="repetitionSeparator">
+                    <description><![CDATA[Optional repetition separator character. The configured value is used by default for all output messages, but can be overridden at the message level.]]></description>
+                </parameter>
+                <parameter name="escapeCharacter">
+                    <description><![CDATA[Optional escape character. The configured value is used by default for all output messages, but can be overridden at the message level.]]></description>
+                </parameter>
+                <parameter name="writerSegmentTerminator">
+                    <description><![CDATA[Segment terminator for HL7 messages. This is used to recognize when a segment ends]]></description>
+                </parameter>
+            </parameters>
+        </config>
+    </configs>
+    <connections>
+        <connection name="connection">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+    </connections>
+    <extension name="HL7 EDI">
+        <description><![CDATA[]]></description>
+        <parameters/>
+    </extension>
+    <operations>
+        <operation name="read">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="readContent">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="write">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="writeContent">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+    </operations>
+    <sources/>
+    <types/>
+</extension-documentation>

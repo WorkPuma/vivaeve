@@ -1,0 +1,21 @@
+api:
+  autodiscoveryId: "123456"  
+
+http:
+  host: "0.0.0.0"
+  port: "8083"
+  
+https:
+  host: "0.0.0.0"
+  port: "8082"
+    
+nextgen:
+  url: "https://prod-ehr.prod.ngo.nextgenaws.net/messaging/mcservice"  
+  auth: "Basic aW50ZXJncmF0aW9uc2RlbW86TkdPX1BldGVyUGFu"
+  x-process: "MULESOFT,HUB"
+  content-type : "text/plain"
+  Priority: "M"
+  Node: "MC1"
+  accountnumber: "foresthms"
+  x-api-key: "7Bp8toQzQhzKvcsd6K7o"
+  username: "MulesoftHUB_NGO"

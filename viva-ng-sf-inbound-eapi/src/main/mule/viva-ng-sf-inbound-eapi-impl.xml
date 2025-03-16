@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="ImplementationFlow" doc:id="5cdbccd0-e657-49b2-9a9a-cc0f8ad09345" >
+		<ee:transform doc:name="inputPayloadVar" doc:id="dadca9b2-0159-47b0-9ee9-7ed71812e583">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="inputPayload"><![CDATA[%dw 2.0
+output application/json 
+
+---
+{
+	correlationId : vars.correlationId,
+	eventTimestamp : now(),
+	applicationName: p('application.name'),
+	category: p('logger.category'),
+	flowName: flow.name default "implementation-flow",
+	environment: upper(p('mule.env')),
+	source: p('source'),
+	target: p('target'),
+	httpMethod: vars.httpMethod default "n/a",
+	milestoneStatus: p('milestone.requetReceived'),
+	message: "request received from nextgen api"
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="logRequestReceived" doc:id="fc54b6f4-efcf-4cc7-8dcb-5f9d26154feb" name="mile-log:request-received" />
+		<http:request method="${request.method}" doc:name="callToPapi" doc:id="9aa18296-aa1c-4695-ab91-d48c2e2b0568" config-ref="HTTP_Request_configuration" path="${request.path}" outputMimeType="text/plain" sendBodyMode="ALWAYS" responseTimeout="60000">
+			<http:body ><![CDATA[#[output text/plain
+---
+payload]]]></http:body>
+		</http:request>
+		<ee:transform doc:name="inputPayloadVar" doc:id="282c010d-c713-4a49-a79f-6f67a3bc4b15" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="inputPayload" ><![CDATA[%dw 2.0
+output application/json
+
+---
+{
+	correlationId : vars.correlationId,
+	eventTimestamp : now(),
+	applicationName: Mule::p('app.name'),
+	category: "LOG",
+	flowName: flow.name default "implementation-flows",
+	environment: upper(Mule::p('mule.env')),
+	source: Mule::p('source'),
+	target:  Mule::p('target'),
+	httpMethod: vars.httpMethod default "n/a",
+	milestoneStatus: "SuccessResponseSent",
+	message: "response sent to process api"
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="logSuccessResponseSent" doc:id="ee8e30c2-ebf2-45b7-a73a-ce395094fd37" name="mile-log:success-response-sent" />
+	</sub-flow>
+
+</mule>

@@ -1,0 +1,19 @@
+#%RAML 1.0 SecurityScheme
+type: Pass Through
+describedBy:
+ headers:
+   client_id:
+     displayName: Client ID
+     description: client_id of the application
+     type: string
+     required: true
+     example: "8d513a551fe44f66b79fbb46b2498582"
+   client_secret:
+     displayName: Client Secret
+     description: client_secret of application
+     type: string
+     required: true
+     example: "2A82628E8C564dE591D85A3233996Ae5"
+ responses:
+   401:
+     description: Unauthorized or invalid client application credentials

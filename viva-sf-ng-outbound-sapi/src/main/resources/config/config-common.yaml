@@ -1,0 +1,24 @@
+# Common File to be use in All env
+application:
+  name: "viva-sf-ng-outbound-sapi"
+  
+source: "viva-sf-ng-outbound-papi"
+target: "nextgen API"
+ 
+# Logger
+logger:
+  category:
+    payload: "com.prowess.integration.logging.payload"
+    milestones: "com.prowess.integration.logging.milestones"
+
+milestone:
+  cateogry: "LOG"
+  requetReceived: "RequestReceived"
+  requetSent: "RequetSent"
+  successResponseReceived: "SuccessResponseReceived"
+  successResponseSent: "SuccessResponseSent"
+
+  
+untilsuccessful:
+  maxretries: "3"
+  retryfrequency: "30000"

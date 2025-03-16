@@ -1,0 +1,35 @@
+{
+  "configs": [
+    "implementation.xml",
+    "global.xml",
+    "global-error-handler.xml"
+  ],
+  "secureProperties": [
+    "secure.key",
+    "aws.accessKeyId",
+    "aws.secretKey"
+  ],
+  "supportedJavaVersions": [],
+  "redeploymentEnabled": true,
+  "name": "rosters-snowflake",
+  "minMuleVersion": "4.4.0",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "exportedResources": [
+        "log4j2.xml"
+      ],
+      "exportedPackages": [
+        "org.apache.logging.log4j.core",
+        "org.apache.logging.log4j.core.appender",
+        "org.apache.logging.log4j.core.appender.db.jdbc",
+        "org.apache.logging.log4j.core.layout"
+      ]
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  }
+}

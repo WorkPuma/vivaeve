@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:snowflake="http://www.mulesoft.org/schema/mule/snowflake"
+    xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+    http://www.mulesoft.org/schema/mule/snowflake http://www.mulesoft.org/schema/mule/snowflake/current/mule-snowflake.xsd">
+
+    <salesforce:sfdc-config name="Salesforce_Config_client" doc:name="Salesforce Config" doc:id="46ad9fd1-29c3-495f-97be-3eb7119d119b">
+        <salesforce:oauth-user-pass-connection
+            username="${sf.name}"
+            password="${sf.pwd}"
+            securityToken="${sf.token}"
+            consumerKey="${sf.consumer.key}"
+            consumerSecret="${sf.consumer.secret}">
+            <reconnection>
+                <reconnect frequency="5000" count="3"/>
+            </reconnection>
+        </salesforce:oauth-user-pass-connection>
+    </salesforce:sfdc-config>
+
+    <snowflake:snowflake-config name="Herself_Health_Snowflake_Config" doc:name="Snowflake Config" doc:id="ebbf51fa-bf8e-4d2c-9f86-5f3ee1bbc05d">
+        <snowflake:snowflake-connection
+            accountName="ab16868.us-east-2.aws"  
+            warehouse="${aws.snowflake.warehouse}"
+            database="${aws.snowflake.database}"
+            schema="${aws.snowflake.schema}"
+            user="${aws.snowflake.user}"
+            password="${aws.snowflake.password}"
+            role="${aws.snowflake.role}">
+            <reconnection>
+                <reconnect count="5"/>
+            </reconnection>
+        </snowflake:snowflake-connection>
+    </snowflake:snowflake-config>
+
+    <configuration doc:name="Configuration" doc:id="2f44524b-acc8-43f0-98c3-31566073c921" defaultErrorHandler-ref="global-error-handlerError_Handler"/>
+</mule>

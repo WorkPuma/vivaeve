@@ -1,0 +1,17 @@
+api:
+  autodiscoveryId: "123456"  
+
+http:
+  host: "0.0.0.0"
+  port: "8083"
+  
+https:
+  host: "0.0.0.0"
+  port: "8082"
+  
+  
+nextgen:
+  url: "https://stage-ehr.staging.ngo.nextgenaws.net/messaging/mcservice"  
+  auth: "Basic aW50ZXJncmF0aW9uc2RlbW86TkdPX1BldGVyUGFu"
+ 
+  

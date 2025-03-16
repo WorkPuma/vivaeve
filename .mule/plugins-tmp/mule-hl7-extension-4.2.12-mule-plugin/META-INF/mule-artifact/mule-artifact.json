@@ -1,0 +1,32 @@
+{
+  "extensionModelLoaderDescriptor": {
+    "id": "java",
+    "attributes": {
+      "type": "com.mulesoft.connectors.hl7.extension.internal.extension.ConnectorExtension",
+      "version": "4.2.12"
+    }
+  },
+  "license": {
+    "requiredEntitlement": "hl7",
+    "provider": "Mulesoft",
+    "allowsEvaluation": true
+  },
+  "name": "HL7 EDI",
+  "requiredProduct": "MULE_EE",
+  "classLoaderModelLoaderDescriptor": {
+    "id": "mule",
+    "attributes": {
+      "privilegedExportedPackages": [],
+      "privilegedArtifactIds": [],
+      "exportedPackages": [
+        "com.mulesoft.connectors.hl7.extension.api.config"
+      ],
+      "exportedResources": []
+    }
+  },
+  "bundleDescriptorLoader": {
+    "id": "mule",
+    "attributes": {}
+  },
+  "minMuleVersion": "4.1.1"
+}
