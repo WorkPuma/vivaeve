@@ -95,7 +95,7 @@ http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org
         consumerKey="${sf.consumer.key}" 
         keyStore="${sf.keystore.path}" 
         storePassword="${sf.keystore.password}" 
-        principal="${sf.username}" tokenEndpoint="https://test.salesforce.com/services/oauth2/token">
+        principal="${sf.username}" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" certificateAlias="${sf.key.alias}">
         <reconnection>
             <reconnect frequency="${sf.retryfrequency}" count="${sf.retryattempts}" />
         </reconnection>
