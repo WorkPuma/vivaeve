@@ -90,12 +90,14 @@ http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org
 	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="3d290ecf-b658-400b-971d-7fc96bf282d5" >
 		<http:request-connection host="${request.host}" port="${request.port}" />
 	</http:request-config>
-<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="4683da56-aada-4cb0-872b-f62ba3c0130d">
+<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="f007de18-2e66-435b-b2de-a39723ea7ec9">
     <salesforce:jwt-connection 
         consumerKey="${sf.consumer.key}" 
         keyStore="${sf.keystore.path}" 
         storePassword="${sf.keystore.password}" 
-        principal="${sf.username}" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" certificateAlias="${sf.key.alias}">
+        principal="${sf.username}" 
+        tokenEndpoint="https://test.salesforce.com/services/oauth2/token" 
+        certificateAlias="${sf.key.alias}">
         <reconnection>
             <reconnect frequency="${sf.retryfrequency}" count="${sf.retryattempts}" />
         </reconnection>
