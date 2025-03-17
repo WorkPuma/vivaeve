@@ -1,0 +1,37 @@
+api:
+  autodiscoveryId: "123456"  
+
+http:
+  host: "0.0.0.0"
+  port: "8083"
+
+request:
+  host: "0.0.0.0"
+  port: "8085"
+  method: "POST"
+  path: "/api/nextgenemr"
+    
+https:
+  host: "0.0.0.0"
+  port: "8082"
+  
+tls:
+  type: "JKS"
+  path: "iewc-SSL-Keystore.jks"
+  alias: "*.esb.internal.iewc.com"
+  keypassword: test123
+  password: test123
+sf:
+  retryattempts: "1"
+  retryfrequency : "30000"
+  username: "swathi.jaini@prowesssoft.com"
+  password: "Vivaevetest123"
+  consumerkey: "3MVG9Km_cBLhsuPzyxmKKmOQ19ECH4_3VjLkA_ehz_v9Qf0Osb6FHrw9aKydUd7jmj3TqJksoylyNlx3dI5dP"
+  consumersecret: "ED06F07FAAFC670030364C26AA88FADC7193F1293168768B99337919382FB3BE"
+email:
+  from: "viva.eve.notify@gmail.com"
+  to: "tahmed@vivaeve.com"
+  host: "smtp.gmail.com"
+  port: "587"
+  username: "viva.eve.notify@gmail.com"
+  password: "yxhzagnfsabtryml"

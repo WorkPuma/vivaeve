@@ -1,0 +1,12 @@
+%dw 2.0
+
+type auto_ea3e6f41_2bf1_40a8_9d8c_44c98028eb0c_Input_Payload = {|
+  messages: String | Null, 
+  errorOrigin: String, 
+  status: String, 
+  code: Null, 
+  description: String | Null, 
+  correlationId: String, 
+  timestamp: DateTime
+|}
+

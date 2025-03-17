@@ -1,0 +1,775 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension-documentation>
+    <configs>
+        <config name="composite-config">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="expirationPolicy">
+                    <description><![CDATA[Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.]]></description>
+                </parameter>
+            </parameters>
+        </config>
+    </configs>
+    <connections>
+        <connection name="config-with-oauth">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at least the keystore in the tls:context child element of this listener-config.]]></description>
+                </parameter>
+                <parameter name="proxyHost">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyPort">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyUsername">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyPassword">
+                    <description><![CDATA[Password used to authenticate against the proxy.]]></description>
+                </parameter>
+                <parameter name="responseTimeout">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="responseTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[The socket connection timeout value. This attribute works in tandem with #connectionTimeoutUnit.]]></description>
+                </parameter>
+                <parameter name="connectionTimeoutUnit">
+                    <description><![CDATA[A TimeUnit which qualifies the #connectionTimeout]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="consumerKey">
+                    <description><![CDATA[The OAuth consumerKey as registered with the service provider]]></description>
+                </parameter>
+                <parameter name="consumerSecret">
+                    <description><![CDATA[The OAuth consumerSecret as registered with the service provider]]></description>
+                </parameter>
+                <parameter name="authorizationUrl">
+                    <description><![CDATA[The service provider's authorization endpoint URL]]></description>
+                </parameter>
+                <parameter name="accessTokenUrl">
+                    <description><![CDATA[The service provider's accessToken endpoint URL]]></description>
+                </parameter>
+                <parameter name="scopes">
+                    <description><![CDATA[The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation]]></description>
+                </parameter>
+                <parameter name="resourceOwnerId">
+                    <description><![CDATA[The resourceOwnerId which each component should use if it doesn't reference otherwise.]]></description>
+                </parameter>
+                <parameter name="before">
+                    <description><![CDATA[The name of a flow to be executed right before starting the OAuth dance]]></description>
+                </parameter>
+                <parameter name="after">
+                    <description><![CDATA[The name of a flow to be executed right after an accessToken has been received]]></description>
+                </parameter>
+                <parameter name="listenerConfig">
+                    <description><![CDATA[A reference to a <http:listener-config /> to be used in order to create the listener that will catch the access token callback endpoint.]]></description>
+                </parameter>
+                <parameter name="callbackPath">
+                    <description><![CDATA[The path of the access token callback endpoint]]></description>
+                </parameter>
+                <parameter name="authorizePath">
+                    <description><![CDATA[The path of the local http endpoint which triggers the OAuth dance]]></description>
+                </parameter>
+                <parameter name="externalCallbackUrl">
+                    <description><![CDATA[If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback]]></description>
+                </parameter>
+                <parameter name="objectStore">
+                    <description><![CDATA[A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="oauth-jwt">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at least the keystore in the tls:context child element of this listener-config.]]></description>
+                </parameter>
+                <parameter name="proxyHost">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyPort">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyUsername">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyPassword">
+                    <description><![CDATA[Password used to authenticate against the proxy.]]></description>
+                </parameter>
+                <parameter name="responseTimeout">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="responseTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[The socket connection timeout value. This attribute works in tandem with #connectionTimeoutUnit.]]></description>
+                </parameter>
+                <parameter name="connectionTimeoutUnit">
+                    <description><![CDATA[A TimeUnit which qualifies the #connectionTimeout]]></description>
+                </parameter>
+                <parameter name="consumerKey">
+                    <description><![CDATA[Consumer key for Salesforce connected app]]></description>
+                </parameter>
+                <parameter name="keyStore">
+                    <description><![CDATA[Path to key store used to sign data during authentication]]></description>
+                </parameter>
+                <parameter name="storePassword">
+                    <description><![CDATA[Password of key store]]></description>
+                </parameter>
+                <parameter name="certificateAlias">
+                    <description><![CDATA[Alias of the certificate]]></description>
+                </parameter>
+                <parameter name="principal">
+                    <description><![CDATA[Username of desired Salesforce user to take action on behalf of.]]></description>
+                </parameter>
+                <parameter name="tokenEndpoint">
+                    <description><![CDATA[URL pointing to the server responsible for providing the authentication token. According to Salesforce it should be https://login.salesforce.com/services/oauth2/token, or, if implementing for a community, https://acme.force.com/customers/services/oauth2/token (where acme.force.com/customers is your community URL).]]></description>
+                </parameter>
+                <parameter name="audienceUrl">
+                    <description><![CDATA[The audience identifies the authorization server as an intended audience. The authorization server must verify that it is an intended audience for the token. <p> Use the authorization server's URL for the audience value: https://login.salesforce.com, https://test.salesforce.com, or https://community.force.com/customers if implementing for a community.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="oauth-saml">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at least the keystore in the tls:context child element of this listener-config.]]></description>
+                </parameter>
+                <parameter name="proxyHost">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyPort">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyUsername">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyPassword">
+                    <description><![CDATA[Password used to authenticate against the proxy.]]></description>
+                </parameter>
+                <parameter name="responseTimeout">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="responseTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[The socket connection timeout value. This attribute works in tandem with #connectionTimeoutUnit.]]></description>
+                </parameter>
+                <parameter name="connectionTimeoutUnit">
+                    <description><![CDATA[A TimeUnit which qualifies the #connectionTimeout]]></description>
+                </parameter>
+                <parameter name="consumerKey">
+                    <description><![CDATA[Consumer key for Salesforce connected app]]></description>
+                </parameter>
+                <parameter name="keyStore">
+                    <description><![CDATA[Path to key store used to sign data during authentication]]></description>
+                </parameter>
+                <parameter name="storePassword">
+                    <description><![CDATA[Password of key store]]></description>
+                </parameter>
+                <parameter name="certificateAlias">
+                    <description><![CDATA[Alias of the certificate]]></description>
+                </parameter>
+                <parameter name="principal">
+                    <description><![CDATA[Username of desired Salesforce user to take action on behalf of.]]></description>
+                </parameter>
+                <parameter name="tokenEndpoint">
+                    <description><![CDATA[URL pointing to the server responsible for providing the authentication token. According to Salesforce it should be https://login.salesforce.com/services/oauth2/token, or, if implementing for a community, https://acme.force.com/customers/services/oauth2/token (where acme.force.com/customers is your community URL).]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="oauth-user-pass">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at least the keystore in the tls:context child element of this listener-config.]]></description>
+                </parameter>
+                <parameter name="proxyHost">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyPort">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyUsername">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyPassword">
+                    <description><![CDATA[Password used to authenticate against the proxy.]]></description>
+                </parameter>
+                <parameter name="responseTimeout">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="responseTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[The socket connection timeout value. This attribute works in tandem with #connectionTimeoutUnit.]]></description>
+                </parameter>
+                <parameter name="connectionTimeoutUnit">
+                    <description><![CDATA[A TimeUnit which qualifies the #connectionTimeout]]></description>
+                </parameter>
+                <parameter name="consumerKey">
+                    <description><![CDATA[Consumer key for Salesforce connected app]]></description>
+                </parameter>
+                <parameter name="consumerSecret">
+                    <description><![CDATA[Your application's client secret (consumer secret in Remote Access Detail).]]></description>
+                </parameter>
+                <parameter name="username">
+                    <description><![CDATA[Username used to initialize the session]]></description>
+                </parameter>
+                <parameter name="password">
+                    <description><![CDATA[Password used to authenticate the user]]></description>
+                </parameter>
+                <parameter name="securityToken">
+                    <description><![CDATA[User's security token. It can be omitted if your IP has been added to the allow list on Salesforce.]]></description>
+                </parameter>
+                <parameter name="tokenEndpoint">
+                    <description><![CDATA[URL pointing to the server responsible for providing the authentication token. According to Salesforce it should be https://login.salesforce.com/services/oauth2/token, or, if implementing for a community, https://acme.force.com/customers/services/oauth2/token (where acme.force.com/customers is your community URL).]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="token-connection">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at least the keystore in the tls:context child element of this listener-config.]]></description>
+                </parameter>
+                <parameter name="sessionId">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="instanceUrl">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyHost">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyPort">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyUsername">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyPassword">
+                    <description><![CDATA[Password used to authenticate against the proxy.]]></description>
+                </parameter>
+                <parameter name="responseTimeout">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="responseTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[The socket connection timeout value. This attribute works in tandem with #connectionTimeoutUnit.]]></description>
+                </parameter>
+                <parameter name="connectionTimeoutUnit">
+                    <description><![CDATA[A TimeUnit which qualifies the #connectionTimeout]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+    </connections>
+    <extension name="Salesforce Composite">
+        <description><![CDATA[]]></description>
+        <parameters/>
+    </extension>
+    <operations>
+        <operation name="createSobjectCollections">
+            <description><![CDATA[<p> The purpose of this method is to add up to 200 records, returning a list of SaveResult objects. You can choose whether to roll back the entire request when an error occurs. </p>]]></description>
+            <parameters>
+                <parameter name="requestBody">
+                    <description><![CDATA[the request body]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="createSobjectTree">
+            <description><![CDATA[<p> Sends a list of SObject trees to Salesforce to be created. </p>]]></description>
+            <parameters>
+                <parameter name="type">
+                    <description><![CDATA[the sObject type of the root of the trees]]></description>
+                </parameter>
+                <parameter name="sObjects">
+                    <description><![CDATA[a list of maps containing representing the list of trees that need to be created]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="deleteSobjectCollections">
+            <description><![CDATA[The purpose of this method is to delete up to 200 records, returning a list of DeleteResult objects. You can choose to roll back the entire request when an error occurs.]]></description>
+            <parameters>
+                <parameter name="ids">
+                    <description><![CDATA[the ids of the entities to be deleted]]></description>
+                </parameter>
+                <parameter name="allOrNone">
+                    <description><![CDATA[indicates whether to roll back the entire request when the deletion of any object fails]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="executeCompositeBatch">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="subRequests">
+                    <description><![CDATA[the list of subRequests to be executed]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="executeCompositeGraph">
+            <description><![CDATA[<p> The purpose of this method is to provide an enhanced way to perform composite requests, which execute a series of REST API requests in a single call. </p>]]></description>
+            <parameters>
+                <parameter name="graphs">
+                    <description><![CDATA[the list of graphs to be executed]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="executeCompositeRequest">
+            <description><![CDATA[<p> The purpose of this method is to Executes a series of REST API requests in a single call. You can use the output of one request as the input to a subsequent request. The response bodies and HTTP statuses of the requests are returned in a single response body. The entire request counts as a single call toward your API limits. </p>]]></description>
+            <parameters>
+                <parameter name="requestBody">
+                    <description><![CDATA[the request body]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="getSobjectCollections">
+            <description><![CDATA[<p> The purpose of this method is to retrieve one or more records of the same object type. </p>]]></description>
+            <parameters>
+                <parameter name="type">
+                    <description><![CDATA[the sObject type of the root of the trees]]></description>
+                </parameter>
+                <parameter name="ids">
+                    <description><![CDATA[A list of one or more IDs of the objects to return. All IDs must belong to the same object type.]]></description>
+                </parameter>
+                <parameter name="fields">
+                    <description><![CDATA[A list of fields to include in the response.]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="postCreate">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for the result of create. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to create sub-request generated by preCreate(String, java.util.Map). </p>]]></description>
+            <parameters>
+                <parameter name="createResult">
+                    <description><![CDATA[the result of create sub-request]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="postDelete">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for the result of delete. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to delete sub-request generated by preDelete(String, java.util.Map). </p>]]></description>
+            <parameters>
+                <parameter name="deleteResult">
+                    <description><![CDATA[the result of delete sub-request]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="postGetLimits">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for the result of getLimits. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to getLimits sub-request generated by preGetLimits(). </p>]]></description>
+            <parameters>
+                <parameter name="getLimitsResult">
+                    <description><![CDATA[the result of create sub-request]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="postQuery">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for the result of query. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to query sub-request generated by preQuery(String, java.util.Map). </p>]]></description>
+            <parameters>
+                <parameter name="query">
+                    <description><![CDATA[the query that was used in the preQuery operation - needed for metadata]]></description>
+                </parameter>
+                <parameter name="queryResult">
+                    <description><![CDATA[the result of query sub-request]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="postQueryAll">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for the result of query. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to query sub-request generated by preQueryAll(String, java.util.Map). </p>]]></description>
+            <parameters>
+                <parameter name="queryResult">
+                    <description><![CDATA[the result of create sub-request]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="postRetrieve">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for the result of retrieve. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to retrieve sub-request generated by preRetrieve(String, java.util.Map). </p>]]></description>
+            <parameters>
+                <parameter name="type">
+                    <description><![CDATA[the type of the retrieved object - used for metadata]]></description>
+                </parameter>
+                <parameter name="retrieveData">
+                    <description><![CDATA[the result of retrieve sub-request]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="postSearch">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for the result of search. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to search sub-request generated by preSearch(String, java.util.Map). </p>]]></description>
+            <parameters>
+                <parameter name="searchResult">
+                    <description><![CDATA[the result of search sub-request]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="postUpdate">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for the result of update. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to update sub-request generated by preUpdate(String, java.util.Map). </p>]]></description>
+            <parameters>
+                <parameter name="updateResult">
+                    <description><![CDATA[the result of update sub-request]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="preCreate">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for create based on object that is going to be created and generates a sub-request to be given for execution to executeCompositeBatch(String, java.util.List). </p>]]></description>
+            <parameters>
+                <parameter name="type">
+                    <description><![CDATA[type of object that is going to be created]]></description>
+                </parameter>
+                <parameter name="sObject">
+                    <description><![CDATA[object that is going to be created as a map that sticks to metadata for selected type]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="preDelete">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for delete based on object that is going to be deleted and generates a sub-request to be given for execution to executeCompositeBatch(String, java.util.List). </p>]]></description>
+            <parameters>
+                <parameter name="type">
+                    <description><![CDATA[type of object that is going to be deleted]]></description>
+                </parameter>
+                <parameter name="id">
+                    <description><![CDATA[the id of the object that is going to be deleted]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="preGetLimits">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for getLimits and generates a sub-request to be given for execution to executeCompositeBatch(String, java.util.List). </p>]]></description>
+            <parameters>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="preQuery">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for query based on object that is going to be queried and generates a sub-request to be given for execution to executeCompositeBatch(String, java.util.List). </p>]]></description>
+            <parameters>
+                <parameter name="query">
+                    <description><![CDATA[the query that is going to be ran in executeCompositeBatch]]></description>
+                </parameter>
+                <parameter name="parameters">
+                    <description><![CDATA[the parameters to be used in a parametrized query]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="preQueryAll">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for query based on object that is going to be queried and generates a sub-request to be given for execution to executeCompositeBatch(String, java.util.List). </p>]]></description>
+            <parameters>
+                <parameter name="query">
+                    <description><![CDATA[the query that is going to be ran in executeCompositeBatch]]></description>
+                </parameter>
+                <parameter name="parameters">
+                    <description><![CDATA[the parameters to be used in a parametrized query]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="preRetrieve">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for retrieve based on object that is going to be retrieved and generates a sub-request to be given for execution to executeCompositeBatch(String, java.util.List). </p>]]></description>
+            <parameters>
+                <parameter name="retrieveData">
+                    <description><![CDATA[object that is going to be retrieved as a map that sticks to metadata for selected type]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="preSearch">
+            <description><![CDATA[<p> The purpose of this method is to provide the user a way to input a SOSL String and generates a sub-request to be given for execution to executeCompositeBatch(java.util.List). </p>]]></description>
+            <parameters>
+                <parameter name="search">
+                    <description><![CDATA[the SOSL string that is going to be ran in executeCompositeBatch]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="preUpdate">
+            <description><![CDATA[<p> The purpose of this method is to provide metadata for create based on object that is going to be created and generates a sub-request to be given for execution to executeCompositeBatch(String, java.util.List). </p>]]></description>
+            <parameters>
+                <parameter name="type">
+                    <description><![CDATA[type of object that is going to be created]]></description>
+                </parameter>
+                <parameter name="sObject">
+                    <description><![CDATA[object that is going to be created as a map that sticks to metadata for selected type]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="unauthorize">
+            <description><![CDATA[Deletes all the access token information of a given resource owner id so that it's impossible to execute any operation for that user without doing the authorization dance again]]></description>
+            <parameters>
+                <parameter name="resourceOwnerId">
+                    <description><![CDATA[The id of the resource owner which access should be invalidated]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="updateSobjectCollections">
+            <description><![CDATA[<p> The purpose of this method is to update up to 200 records, returning a list of SaveResult objects. You can choose whether to roll back the entire request when an error occurs. </p>]]></description>
+            <parameters>
+                <parameter name="requestBody">
+                    <description><![CDATA[the request body]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="upsertSobjectCollections">
+            <description><![CDATA[<p> The purpose of this method is to upsert up to 200 records of same type, returning a list of SaveResult objects. You can choose whether to roll back the entire request when an error occurs. </p>]]></description>
+            <parameters>
+                <parameter name="type">
+                    <description><![CDATA[the sobject type]]></description>
+                </parameter>
+                <parameter name="externalFieldName">
+                    <description><![CDATA[the name of the external field for this sobject type]]></description>
+                </parameter>
+                <parameter name="requestBody">
+                    <description><![CDATA[the request body]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+    </operations>
+    <sources/>
+    <types/>
+</extension-documentation>

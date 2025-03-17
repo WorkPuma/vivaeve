@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_d40ad214_3b64_4179_bc92_972093d4590b_Output_Variables_appointmentFields = Array<{|  NextGen_ID__c: Null,   ParentRecordId: Null,   ContactId: Null,   Status: Null,   AdditionalInformation: Any,   Service_Resource__c: Any|}>
+

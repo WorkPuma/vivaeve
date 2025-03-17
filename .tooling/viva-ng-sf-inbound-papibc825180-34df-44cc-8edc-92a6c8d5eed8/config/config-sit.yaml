@@ -1,0 +1,17 @@
+api:
+  autodiscoveryId: "123456"  
+
+http:
+  host: "0.0.0.0"
+  port: "8081"
+  
+https:
+  host: "0.0.0.0"
+  port: "8082"
+  
+tls:
+  type: "JKS"
+  path: "iewc-SSL-Keystore.jks"
+  alias: "*.esb.internal.iewc.com"
+  keypassword: test123
+  password: test123

@@ -649,10 +649,10 @@
           "notifications": [],
           "errors": [
             "XML-MODULE:TRANSFORMATION",
-            "XML-MODULE:SCHEMA_INPUT_ERROR",
-            "XML-MODULE:INVALID_SCHEMA",
-            "XML-MODULE:SCHEMA_NOT_HONOURED",
             "XML-MODULE:INVALID_INPUT_XML",
+            "XML-MODULE:SCHEMA_INPUT_ERROR",
+            "XML-MODULE:SCHEMA_NOT_HONOURED",
+            "XML-MODULE:INVALID_SCHEMA",
             "XML-MODULE:SCHEMA_NOT_FOUND"
           ]
         },
@@ -1300,9 +1300,9 @@
           "transactional": false,
           "notifications": [],
           "errors": [
+            "XML-MODULE:INVALID_INPUT_XML",
             "XML-MODULE:TRANSFORMATION",
             "XML-MODULE:INVALID_XPATH_EXPRESSION",
-            "XML-MODULE:INVALID_INPUT_XML",
             "XML-MODULE:NULL_CONTEXT_PROPERTY"
           ]
         },
@@ -1876,8 +1876,8 @@
           "transactional": false,
           "notifications": [],
           "errors": [
-            "XML-MODULE:TRANSFORMATION",
             "XML-MODULE:INVALID_INPUT_XML",
+            "XML-MODULE:TRANSFORMATION",
             "XML-MODULE:NULL_CONTEXT_PROPERTY"
           ]
         },
@@ -2411,8 +2411,8 @@
           "transactional": false,
           "notifications": [],
           "errors": [
-            "XML-MODULE:TRANSFORMATION",
             "XML-MODULE:INVALID_INPUT_XML",
+            "XML-MODULE:TRANSFORMATION",
             "XML-MODULE:NULL_CONTEXT_PROPERTY"
           ]
         }

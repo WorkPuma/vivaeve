@@ -1,0 +1,1368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/salesforce-composite" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/tls" schemaLocation="http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd"></xs:import>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="composite-config">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractExtensionType">
+          <xs:sequence minOccurs="1" maxOccurs="1">
+            <xs:element minOccurs="1" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="config-with-oauth-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
+            <xs:element minOccurs="1" maxOccurs="1" name="oauth-authorization-code">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence></xs:sequence>
+                    <xs:attribute type="xs:string" use="required" name="consumerKey">
+                      <xs:annotation>
+                        <xs:documentation>The OAuth consumerKey as registered with the service provider</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="consumerSecret">
+                      <xs:annotation>
+                        <xs:documentation>The OAuth consumerSecret as registered with the service provider</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" default="https://login.salesforce.com/services/oauth2/authorize" name="authorizationUrl">
+                      <xs:annotation>
+                        <xs:documentation>The service provider's authorization endpoint URL</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" default="https://login.salesforce.com/services/oauth2/token" name="accessTokenUrl">
+                      <xs:annotation>
+                        <xs:documentation>The service provider's accessToken endpoint URL</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="scopes">
+                      <xs:annotation>
+                        <xs:documentation>The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="mule:expressionString" use="optional" name="resourceOwnerId">
+                      <xs:annotation>
+                        <xs:documentation>The resourceOwnerId which each component should use if it doesn't reference otherwise.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="before">
+                      <xs:annotation>
+                        <xs:documentation>The name of a flow to be executed right before starting the OAuth dance</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="after">
+                      <xs:annotation>
+                        <xs:documentation>The name of a flow to be executed right after an accessToken has been received</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="1" maxOccurs="1" name="oauth-callback-config">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence></xs:sequence>
+                    <xs:attribute type="xs:string" use="required" name="listenerConfig">
+                      <xs:annotation>
+                        <xs:documentation>A reference to a &lt;http:listener-config /&gt; to be used in order to create the listener that will catch the access token callback endpoint.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="callbackPath">
+                      <xs:annotation>
+                        <xs:documentation>The path of the access token callback endpoint</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="required" name="authorizePath">
+                      <xs:annotation>
+                        <xs:documentation>The path of the local http endpoint which triggers the OAuth dance</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                    <xs:attribute type="xs:string" use="optional" name="externalCallbackUrl">
+                      <xs:annotation>
+                        <xs:documentation>If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="oauth-store-config">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="mule:abstractExtensionType">
+                    <xs:sequence></xs:sequence>
+                    <xs:attribute type="xs:string" use="optional" name="objectStore">
+                      <xs:annotation>
+                        <xs:documentation>A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.</xs:documentation>
+                      </xs:annotation>
+                    </xs:attribute>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyHost"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="proxyPort"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyUsername"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyPassword">
+            <xs:annotation>
+              <xs:documentation>Password used to authenticate against the proxy.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" default="5" name="responseTimeout"></xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" type="java.util.concurrent.TimeUnitEnumType" use="optional" default="SECONDS" name="responseTimeoutUnit"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="connectionTimeout">
+            <xs:annotation>
+              <xs:documentation>The socket connection timeout value. This attribute works in tandem with #connectionTimeoutUnit.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" type="java.util.concurrent.TimeUnitEnumType" use="optional" default="SECONDS" name="connectionTimeoutUnit">
+            <xs:annotation>
+              <xs:documentation>A TimeUnit which qualifies the #connectionTimeout</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="oauth-jwt-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyHost"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="proxyPort"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyUsername"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyPassword">
+            <xs:annotation>
+              <xs:documentation>Password used to authenticate against the proxy.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" default="5" name="responseTimeout"></xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" type="java.util.concurrent.TimeUnitEnumType" use="optional" default="SECONDS" name="responseTimeoutUnit"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="connectionTimeout">
+            <xs:annotation>
+              <xs:documentation>The socket connection timeout value. This attribute works in tandem with #connectionTimeoutUnit.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" type="java.util.concurrent.TimeUnitEnumType" use="optional" default="SECONDS" name="connectionTimeoutUnit">
+            <xs:annotation>
+              <xs:documentation>A TimeUnit which qualifies the #connectionTimeout</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="consumerKey">
+            <xs:annotation>
+              <xs:documentation>Consumer key for Salesforce connected app</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="keyStore">
+            <xs:annotation>
+              <xs:documentation>Path to key store used to sign data during authentication</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="storePassword">
+            <xs:annotation>
+              <xs:documentation>Password of key store</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="certificateAlias">
+            <xs:annotation>
+              <xs:documentation>Alias of the certificate</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="principal">
+            <xs:annotation>
+              <xs:documentation>Username of desired Salesforce user to take action on behalf of.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" default="https://login.salesforce.com/services/oauth2/token" name="tokenEndpoint">
+            <xs:annotation>
+              <xs:documentation>URL pointing to the server responsible for providing the authentication token. According to Salesforce it should be https://login.salesforce.com/services/oauth2/token, or, if implementing for a community, https://acme.force.com/customers/services/oauth2/token (where acme.force.com/customers is your community URL).</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="audienceUrl">
+            <xs:annotation>
+              <xs:documentation>The audience identifies the authorization server as an intended audience. The authorization server must verify that it is an intended audience for the token. &lt;p&gt; Use the authorization server's URL for the audience value: https://login.salesforce.com, https://test.salesforce.com, or https://community.force.com/customers if implementing for a community.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="oauth-saml-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyHost"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="proxyPort"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyUsername"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyPassword">
+            <xs:annotation>
+              <xs:documentation>Password used to authenticate against the proxy.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" default="5" name="responseTimeout"></xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" type="java.util.concurrent.TimeUnitEnumType" use="optional" default="SECONDS" name="responseTimeoutUnit"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="connectionTimeout">
+            <xs:annotation>
+              <xs:documentation>The socket connection timeout value. This attribute works in tandem with #connectionTimeoutUnit.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" type="java.util.concurrent.TimeUnitEnumType" use="optional" default="SECONDS" name="connectionTimeoutUnit">
+            <xs:annotation>
+              <xs:documentation>A TimeUnit which qualifies the #connectionTimeout</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="consumerKey">
+            <xs:annotation>
+              <xs:documentation>Consumer key for Salesforce connected app</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="keyStore">
+            <xs:annotation>
+              <xs:documentation>Path to key store used to sign data during authentication</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="storePassword">
+            <xs:annotation>
+              <xs:documentation>Password of key store</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="certificateAlias">
+            <xs:annotation>
+              <xs:documentation>Alias of the certificate</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="principal">
+            <xs:annotation>
+              <xs:documentation>Username of desired Salesforce user to take action on behalf of.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" default="https://login.salesforce.com/services/oauth2/token" name="tokenEndpoint">
+            <xs:annotation>
+              <xs:documentation>URL pointing to the server responsible for providing the authentication token. According to Salesforce it should be https://login.salesforce.com/services/oauth2/token, or, if implementing for a community, https://acme.force.com/customers/services/oauth2/token (where acme.force.com/customers is your community URL).</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="oauth-user-pass-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyHost"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="proxyPort"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyUsername"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyPassword">
+            <xs:annotation>
+              <xs:documentation>Password used to authenticate against the proxy.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" default="5" name="responseTimeout"></xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" type="java.util.concurrent.TimeUnitEnumType" use="optional" default="SECONDS" name="responseTimeoutUnit"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="connectionTimeout">
+            <xs:annotation>
+              <xs:documentation>The socket connection timeout value. This attribute works in tandem with #connectionTimeoutUnit.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" type="java.util.concurrent.TimeUnitEnumType" use="optional" default="SECONDS" name="connectionTimeoutUnit">
+            <xs:annotation>
+              <xs:documentation>A TimeUnit which qualifies the #connectionTimeout</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="consumerKey">
+            <xs:annotation>
+              <xs:documentation>Consumer key for Salesforce connected app</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="consumerSecret">
+            <xs:annotation>
+              <xs:documentation>Your application's client secret (consumer secret in Remote Access Detail).</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="username">
+            <xs:annotation>
+              <xs:documentation>Username used to initialize the session</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="password">
+            <xs:annotation>
+              <xs:documentation>Password used to authenticate the user</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="securityToken">
+            <xs:annotation>
+              <xs:documentation>User's security token. It can be omitted if your IP has been added to the allow list on Salesforce.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" default="https://login.salesforce.com/services/oauth2/token" name="tokenEndpoint">
+            <xs:annotation>
+              <xs:documentation>URL pointing to the server responsible for providing the authentication token. According to Salesforce it should be https://login.salesforce.com/services/oauth2/token, or, if implementing for a community, https://acme.force.com/customers/services/oauth2/token (where acme.force.com/customers is your community URL).</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="token-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element xmlns:tls="http://www.mulesoft.org/schema/mule/tls" minOccurs="0" maxOccurs="1" ref="tls:context"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="optional" name="tlsContext"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="sessionId"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="instanceUrl"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyHost"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="proxyPort"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyUsername"></xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="proxyPassword">
+            <xs:annotation>
+              <xs:documentation>Password used to authenticate against the proxy.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" default="5" name="responseTimeout"></xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" type="java.util.concurrent.TimeUnitEnumType" use="optional" default="SECONDS" name="responseTimeoutUnit"></xs:attribute>
+          <xs:attribute type="mule:expressionInt" use="optional" name="connectionTimeout">
+            <xs:annotation>
+              <xs:documentation>The socket connection timeout value. This attribute works in tandem with #connectionTimeoutUnit.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" type="java.util.concurrent.TimeUnitEnumType" use="optional" default="SECONDS" name="connectionTimeoutUnit">
+            <xs:annotation>
+              <xs:documentation>A TimeUnit which qualifies the #connectionTimeout</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="CreateSobjectCollectionsType" substitutionGroup="mule:abstract-operator" name="create-sobject-collections">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to add up to 200 records, returning a list of SaveResult objects. You can choose whether to roll back the entire request when an error occurs. &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="CreateSobjectCollectionsType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="request-body">
+            <xs:annotation>
+              <xs:documentation>the request body</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="CreateSobjectTreeType" substitutionGroup="mule:abstract-operator" name="create-sobject-tree">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; Sends a list of SObject trees to Salesforce to be created. &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="CreateSobjectTreeType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="s-objects">
+            <xs:annotation>
+              <xs:documentation>a list of maps containing representing the list of trees that need to be created</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="type">
+          <xs:annotation>
+            <xs:documentation>the sObject type of the root of the trees</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="DeleteSobjectCollectionsType" substitutionGroup="mule:abstract-operator" name="delete-sobject-collections">
+    <xs:annotation>
+      <xs:documentation>The purpose of this method is to delete up to 200 records, returning a list of DeleteResult objects. You can choose to roll back the entire request when an error occurs.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="DeleteSobjectCollectionsType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="ids">
+            <xs:annotation>
+              <xs:documentation>the ids of the entities to be deleted</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="id">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionList" use="optional" name="ids">
+          <xs:annotation>
+            <xs:documentation>the ids of the entities to be deleted</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="allOrNone">
+          <xs:annotation>
+            <xs:documentation>indicates whether to roll back the entire request when the deletion of any object fails</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ExecuteCompositeBatchType" substitutionGroup="mule:abstract-operator" name="execute-composite-batch"></xs:element>
+  <xs:complexType name="ExecuteCompositeBatchType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="sub-requests">
+            <xs:annotation>
+              <xs:documentation>the list of subRequests to be executed</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ExecuteCompositeGraphType" substitutionGroup="mule:abstract-operator" name="execute-composite-graph">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide an enhanced way to perform composite requests, which execute a series of REST API requests in a single call. &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="ExecuteCompositeGraphType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="graphs">
+            <xs:annotation>
+              <xs:documentation>the list of graphs to be executed</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ExecuteCompositeRequestType" substitutionGroup="mule:abstract-operator" name="execute-composite-request">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to Executes a series of REST API requests in a single call. You can use the output of one request as the input to a subsequent request. The response bodies and HTTP statuses of the requests are returned in a single response body. The entire request counts as a single call toward your API limits. &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="ExecuteCompositeRequestType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="request-body">
+            <xs:annotation>
+              <xs:documentation>the request body</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetSobjectCollectionsType" substitutionGroup="mule:abstract-operator" name="get-sobject-collections">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to retrieve one or more records of the same object type. &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="GetSobjectCollectionsType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="ids">
+            <xs:annotation>
+              <xs:documentation>A list of one or more IDs of the objects to return. All IDs must belong to the same object type.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="id">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="fields">
+            <xs:annotation>
+              <xs:documentation>A list of fields to include in the response.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="field">
+                  <xs:complexType>
+                    <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="type">
+          <xs:annotation>
+            <xs:documentation>the sObject type of the root of the trees</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionList" use="optional" name="ids">
+          <xs:annotation>
+            <xs:documentation>A list of one or more IDs of the objects to return. All IDs must belong to the same object type.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionList" use="optional" name="fields">
+          <xs:annotation>
+            <xs:documentation>A list of fields to include in the response.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PostCreateType" substitutionGroup="mule:abstract-operator" name="post-create">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for the result of create. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to create sub-request generated by preCreate(String, java.util.Map). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PostCreateType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="create-result">
+            <xs:annotation>
+              <xs:documentation>the result of create sub-request</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PostDeleteType" substitutionGroup="mule:abstract-operator" name="post-delete">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for the result of delete. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to delete sub-request generated by preDelete(String, java.util.Map). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PostDeleteType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="delete-result">
+            <xs:annotation>
+              <xs:documentation>the result of delete sub-request</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PostGetLimitsType" substitutionGroup="mule:abstract-operator" name="post-get-limits">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for the result of getLimits. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to getLimits sub-request generated by preGetLimits(). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PostGetLimitsType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="get-limits-result">
+            <xs:annotation>
+              <xs:documentation>the result of create sub-request</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PostQueryType" substitutionGroup="mule:abstract-operator" name="post-query">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for the result of query. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to query sub-request generated by preQuery(String, java.util.Map). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PostQueryType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="query">
+            <xs:annotation>
+              <xs:documentation>the query that was used in the preQuery operation - needed for metadata</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="query-result">
+            <xs:annotation>
+              <xs:documentation>the result of query sub-request</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PostQueryAllType" substitutionGroup="mule:abstract-operator" name="post-query-all">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for the result of query. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to query sub-request generated by preQueryAll(String, java.util.Map). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PostQueryAllType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-object-streaming-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="query-result">
+            <xs:annotation>
+              <xs:documentation>the result of create sub-request</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PostRetrieveType" substitutionGroup="mule:abstract-operator" name="post-retrieve">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for the result of retrieve. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to retrieve sub-request generated by preRetrieve(String, java.util.Map). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PostRetrieveType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="retrieve-data">
+            <xs:annotation>
+              <xs:documentation>the result of retrieve sub-request</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="type">
+          <xs:annotation>
+            <xs:documentation>the type of the retrieved object - used for metadata</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PostSearchType" substitutionGroup="mule:abstract-operator" name="post-search">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for the result of search. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to search sub-request generated by preSearch(String, java.util.Map). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PostSearchType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="search-result">
+            <xs:annotation>
+              <xs:documentation>the result of search sub-request</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PostUpdateType" substitutionGroup="mule:abstract-operator" name="post-update">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for the result of update. It takes as input one record from the result returned by executeCompositeBatch(String, java.util.List) which belongs to update sub-request generated by preUpdate(String, java.util.Map). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PostUpdateType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="update-result">
+            <xs:annotation>
+              <xs:documentation>the result of update sub-request</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PreCreateType" substitutionGroup="mule:abstract-operator" name="pre-create">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for create based on object that is going to be created and generates a sub-request to be given for execution to executeCompositeBatch(String, java.util.List). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PreCreateType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="s-object">
+            <xs:annotation>
+              <xs:documentation>object that is going to be created as a map that sticks to metadata for selected type</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="type">
+          <xs:annotation>
+            <xs:documentation>type of object that is going to be created</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PreDeleteType" substitutionGroup="mule:abstract-operator" name="pre-delete">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for delete based on object that is going to be deleted and generates a sub-request to be given for execution to executeCompositeBatch(String, java.util.List). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PreDeleteType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="type">
+          <xs:annotation>
+            <xs:documentation>type of object that is going to be deleted</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="id">
+          <xs:annotation>
+            <xs:documentation>the id of the object that is going to be deleted</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PreGetLimitsType" substitutionGroup="mule:abstract-operator" name="pre-get-limits">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for getLimits and generates a sub-request to be given for execution to executeCompositeBatch(String, java.util.List). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PreGetLimitsType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PreQueryType" substitutionGroup="mule:abstract-operator" name="pre-query">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for query based on object that is going to be queried and generates a sub-request to be given for execution to executeCompositeBatch(String, java.util.List). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PreQueryType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="query">
+            <xs:annotation>
+              <xs:documentation>the query that is going to be ran in executeCompositeBatch</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="parameters">
+            <xs:annotation>
+              <xs:documentation>the parameters to be used in a parametrized query</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PreQueryAllType" substitutionGroup="mule:abstract-operator" name="pre-query-all">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for query based on object that is going to be queried and generates a sub-request to be given for execution to executeCompositeBatch(String, java.util.List). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PreQueryAllType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="query">
+            <xs:annotation>
+              <xs:documentation>the query that is going to be ran in executeCompositeBatch</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="parameters">
+            <xs:annotation>
+              <xs:documentation>the parameters to be used in a parametrized query</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PreRetrieveType" substitutionGroup="mule:abstract-operator" name="pre-retrieve">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for retrieve based on object that is going to be retrieved and generates a sub-request to be given for execution to executeCompositeBatch(String, java.util.List). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PreRetrieveType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="retrieve-data">
+            <xs:annotation>
+              <xs:documentation>object that is going to be retrieved as a map that sticks to metadata for selected type</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PreSearchType" substitutionGroup="mule:abstract-operator" name="pre-search">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide the user a way to input a SOSL String and generates a sub-request to be given for execution to executeCompositeBatch(java.util.List). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PreSearchType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="search">
+            <xs:annotation>
+              <xs:documentation>the SOSL string that is going to be ran in executeCompositeBatch</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="PreUpdateType" substitutionGroup="mule:abstract-operator" name="pre-update">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to provide metadata for create based on object that is going to be created and generates a sub-request to be given for execution to executeCompositeBatch(String, java.util.List). &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="PreUpdateType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="s-object">
+            <xs:annotation>
+              <xs:documentation>object that is going to be created as a map that sticks to metadata for selected type</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="type">
+          <xs:annotation>
+            <xs:documentation>type of object that is going to be created</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="UnauthorizeType" substitutionGroup="mule:abstract-operator" name="unauthorize">
+    <xs:annotation>
+      <xs:documentation>Deletes all the access token information of a given resource owner id so that it's impossible to execute any operation for that user without doing the authorization dance again</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="UnauthorizeType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1"></xs:sequence>
+        <xs:attribute type="mule:expressionString" use="optional" name="resourceOwnerId">
+          <xs:annotation>
+            <xs:documentation>The id of the resource owner which access should be invalidated</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="UpdateSobjectCollectionsType" substitutionGroup="mule:abstract-operator" name="update-sobject-collections">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to update up to 200 records, returning a list of SaveResult objects. You can choose whether to roll back the entire request when an error occurs. &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="UpdateSobjectCollectionsType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="request-body">
+            <xs:annotation>
+              <xs:documentation>the request body</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/salesforce-composite" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="UpsertSobjectCollectionsType" substitutionGroup="mule:abstract-operator" name="upsert-sobject-collections">
+    <xs:annotation>
+      <xs:documentation>&lt;p&gt; The purpose of this method is to upsert up to 200 records of same type, returning a list of SaveResult objects. You can choose whether to roll back the entire request when an error occurs. &lt;/p&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="UpsertSobjectCollectionsType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="request-body">
+            <xs:annotation>
+              <xs:documentation>the request body</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="type">
+          <xs:annotation>
+            <xs:documentation>the sobject type</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="externalFieldName">
+          <xs:annotation>
+            <xs:documentation>the name of the external field for this sobject type</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="java.util.concurrent.TimeUnitEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="NANOSECONDS"></xs:enumeration>
+          <xs:enumeration value="MICROSECONDS"></xs:enumeration>
+          <xs:enumeration value="MILLISECONDS"></xs:enumeration>
+          <xs:enumeration value="SECONDS"></xs:enumeration>
+          <xs:enumeration value="MINUTES"></xs:enumeration>
+          <xs:enumeration value="HOURS"></xs:enumeration>
+          <xs:enumeration value="DAYS"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+</xs:schema>
