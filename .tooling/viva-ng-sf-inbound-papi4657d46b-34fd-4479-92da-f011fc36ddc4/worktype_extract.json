@@ -1,0 +1,1882 @@
+[
+        {
+            "WorkTypeId": "08qRj0000000mCjIAI",
+            "AdditionalInformation": "DIETITIAN CONSULT 15 MINUTES - VIRTUAL ONLY",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000008GvOAI",
+            "Work_Type_Group__c": "Dietitian",
+            "AppointmentType": "Telehealth"
+        },
+        {
+            "WorkTypeId": "08qRj0000000mELIAY",
+            "AdditionalInformation": "DIETITIAN CONSULT 30 MINUTES",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008GvOAI",
+            "Work_Type_Group__c": "Dietitian",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000mFxIAI",
+            "AdditionalInformation": "DIETITIAN CONSULT 60 MINUTES",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000008GvOAI",
+            "Work_Type_Group__c": "Dietitian",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000mHZIAY",
+            "AdditionalInformation": "OB DIETITIAN IN PERSON - 30MIN",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008GvOAI",
+            "Work_Type_Group__c": "Dietitian",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000mJBIAY",
+            "AdditionalInformation": "OB DIETITIAN VIRTUAL CALL - 30MIN",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008GvOAI",
+            "Work_Type_Group__c": "Dietitian",
+            "AppointmentType": "Telehealth"
+        },
+        {
+            "WorkTypeId": "08qRj0000000mKnIAI",
+            "AdditionalInformation": "1986 DR. AXELROD BLOODWORK 60",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rQvIAI",
+            "AdditionalInformation": "ZOCDOC GYN 60",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfRIAQ",
+            "AdditionalInformation": "1986 DR AXELROD BLOODWORK",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfSIAQ",
+            "AdditionalInformation": "1986 DR LEVIN BLOODWORK",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfTIAQ",
+            "AdditionalInformation": "1986 DR LIEN BLOODWORK",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfUIAQ",
+            "AdditionalInformation": "9909 BLOODWORK",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfVIAQ",
+            "AdditionalInformation": "AES BOTOX AND FILLER COMBO TX",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfWIAQ",
+            "AdditionalInformation": "AES BOTOX TX",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfXIAQ",
+            "AdditionalInformation": "AES CHEMICAL PEEL",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfYIAQ",
+            "AdditionalInformation": "AES COMPLIMENTARY CONSULTATION",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfZIAQ",
+            "AdditionalInformation": "AES DERM CONSULT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfaIAA",
+            "AdditionalInformation": "AES DERM VISIT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfbIAA",
+            "AdditionalInformation": "AES FILLER TX",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfcIAA",
+            "AdditionalInformation": "AES FOLLOW UP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfdIAA",
+            "AdditionalInformation": "AES FOLLOW UP VIRTUAL",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "Telehealth"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfeIAA",
+            "AdditionalInformation": "AES INJ TREATMENT 30 MINUTES",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rffIAA",
+            "AdditionalInformation": "AES INJ TREATMENT 60 MINUTES",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfgIAA",
+            "AdditionalInformation": "AES MICRONEEDLING PRP",
+            "duration": "90",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfhIAA",
+            "AdditionalInformation": "AES NPV BOTOX",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfiIAA",
+            "AdditionalInformation": "AES NPV COMPLIMENTARY CONSULT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfjIAA",
+            "AdditionalInformation": "AES NPV CONSULT",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfkIAA",
+            "AdditionalInformation": "AES NPV FILLER",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rflIAA",
+            "AdditionalInformation": "AES NPV MICRONEEDLING",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfmIAA",
+            "AdditionalInformation": "AES NPV SKIN CONSULT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfnIAA",
+            "AdditionalInformation": "AES NPV VIRTUAL CONSULT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "Telehealth"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfoIAA",
+            "AdditionalInformation": "AES NUMBING",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfpIAA",
+            "AdditionalInformation": "AES SECRETPRO",
+            "duration": "90",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfqIAA",
+            "AdditionalInformation": "AES SECRETPRO CO2",
+            "duration": "90",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfrIAA",
+            "AdditionalInformation": "AES SECRETPRO WITH PRP",
+            "duration": "90",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfsIAA",
+            "AdditionalInformation": "AES SKIN CARE CONSULT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rftIAA",
+            "AdditionalInformation": "AES STAFF FOLLOW UP",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfuIAA",
+            "AdditionalInformation": "AES STAFF POST TX",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfvIAA",
+            "AdditionalInformation": "AES STAFF TX",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfwIAA",
+            "AdditionalInformation": "ANESTHESIA CONSULT",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfxIAA",
+            "AdditionalInformation": "BLOCK 150 MINUTES",
+            "duration": "150",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfyIAA",
+            "AdditionalInformation": "BLOCK 210 MINUTES",
+            "duration": "210",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rfzIAA",
+            "AdditionalInformation": "BLOCK ALL HANDS MEETING",
+            "duration": "240",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rg0IAA",
+            "AdditionalInformation": "BLOCK LUNCH",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rg1IAA",
+            "AdditionalInformation": "BLOCK PROVIDER PTO",
+            "duration": "960",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rg2IAA",
+            "AdditionalInformation": "BLOCK STAFF MEETING",
+            "duration": "240",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rg3IAA",
+            "AdditionalInformation": "BLOODWORK",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rg4IAA",
+            "AdditionalInformation": "BRCA TESTING",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rg5IAA",
+            "AdditionalInformation": "C SECTION",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rg6IAA",
+            "AdditionalInformation": "C SECTION GARDEN",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rg7IAA",
+            "AdditionalInformation": "CALENDLY UFE NEW PATIENT",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rg8IAA",
+            "AdditionalInformation": "CERVICAL DILATION HYS D AND C",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rg9IAA",
+            "AdditionalInformation": "CIRCUMCISION",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgAIAQ",
+            "AdditionalInformation": "COLPO",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgBIAQ",
+            "AdditionalInformation": "COLPO ANESTHESIA",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgCIAQ",
+            "AdditionalInformation": "COMP NPV",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgDIAQ",
+            "AdditionalInformation": "CONTRACEPTIVE",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgEIAQ",
+            "AdditionalInformation": "COSMETIC GYNECOLOGY CONSULT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgFIAQ",
+            "AdditionalInformation": "COVID-19 TESTING",
+            "duration": "20",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgGIAQ",
+            "AdditionalInformation": "COVID-19 VACCINATION",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgHIAQ",
+            "AdditionalInformation": "CRYO ABLATION",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgIIAQ",
+            "AdditionalInformation": "CRYO SURGERY",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgJIAQ",
+            "AdditionalInformation": "D AND C",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgKIAQ",
+            "AdditionalInformation": "DEPO SHOT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgLIAQ",
+            "AdditionalInformation": "DIETICIAN CONSULT 30 MINUTES",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008GvOAI",
+            "Work_Type_Group__c": "Dietitian",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgMIAQ",
+            "AdditionalInformation": "DIETICIAN CONSULT 60 MINUTES",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000008GvOAI",
+            "Work_Type_Group__c": "Dietitian",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgNIAQ",
+            "AdditionalInformation": "DIETICIAN OB CONSULT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008GvOAI",
+            "Work_Type_Group__c": "Dietitian",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgOIAQ",
+            "AdditionalInformation": "DIETICIAN OB VIRTUAL CALL",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008GvOAI",
+            "Work_Type_Group__c": "Dietitian",
+            "AppointmentType": "Telehealth"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgPIAQ",
+            "AdditionalInformation": "DIETICIAN VIRTUAL CALL 30",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008GvOAI",
+            "Work_Type_Group__c": "Dietitian",
+            "AppointmentType": "Telehealth"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgQIAQ",
+            "AdditionalInformation": "DIETICIAN VIRTUAL CALL 60",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000008GvOAI",
+            "Work_Type_Group__c": "Dietitian",
+            "AppointmentType": "Telehealth"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgRIAQ",
+            "AdditionalInformation": "DIETICIAN VIRTUAL CONS 15 MIN",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000008GvOAI",
+            "Work_Type_Group__c": "Dietitian",
+            "AppointmentType": "Telehealth"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgSIAQ",
+            "AdditionalInformation": "DRUG REP MEETING 30 MIN",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgTIAQ",
+            "AdditionalInformation": "ELABORATE LAB FOLLOW UP",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgUIAQ",
+            "AdditionalInformation": "ENDOMETRIAL BX",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgVIAQ",
+            "AdditionalInformation": "EXISTING PT SLOT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgWIAQ",
+            "AdditionalInformation": "FEMVIEW HSG",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgXIAQ",
+            "AdditionalInformation": "FERTILITY MONITORING",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgYIAQ",
+            "AdditionalInformation": "FH BLOODWORK",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgZIAQ",
+            "AdditionalInformation": "FIBROID 1 NEW PATIENT",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgaIAA",
+            "AdditionalInformation": "FIBROID 10 POST OP FOLLOW UP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgbIAA",
+            "AdditionalInformation": "FIBROID 11 POST OP MRI REVIEW",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgcIAA",
+            "AdditionalInformation": "FIBROID 12 IR SWAP PHONE CALL",
+            "duration": "10",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "Telehealth"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgdIAA",
+            "AdditionalInformation": "FIBROID 2 MRI IMAGING",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgeIAA",
+            "AdditionalInformation": "FIBROID 3 MRI REVIEW",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgfIAA",
+            "AdditionalInformation": "FIBROID 360 POST OP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rggIAA",
+            "AdditionalInformation": "FIBROID 4 HYSTEROSCOPIC DAND C",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rghIAA",
+            "AdditionalInformation": "FIBROID 5 SAMPLING POST OP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgiIAA",
+            "AdditionalInformation": "FIBROID 6 IR CONSULT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgjIAA",
+            "AdditionalInformation": "FIBROID 7 UFE FOLLOW UP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgkIAA",
+            "AdditionalInformation": "FIBROID 8 UFE PROCEDURE",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rglIAA",
+            "AdditionalInformation": "FIBROID 9 2 WEEK POST OP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgmIAA",
+            "AdditionalInformation": "FLU SHOT",
+            "duration": "10",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgnIAA",
+            "AdditionalInformation": "GLUCOSE 1 HOUR",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgoIAA",
+            "AdditionalInformation": "GLUCOSE TEST 2 HOUR",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgpIAA",
+            "AdditionalInformation": "GLUCOSE TEST 3 HOURS",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgqIAA",
+            "AdditionalInformation": "GYN FOLLOW UP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgrIAA",
+            "AdditionalInformation": "GYN NEW PATIENT",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgsIAA",
+            "AdditionalInformation": "HOLD",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgtIAA",
+            "AdditionalInformation": "HOSPITAL PREOP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rguIAA",
+            "AdditionalInformation": "HSC LYSIS ADHESION POLYPECTOMY",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgvIAA",
+            "AdditionalInformation": "HSG",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgwIAA",
+            "AdditionalInformation": "HYMENECTOMY CONSULT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgxIAA",
+            "AdditionalInformation": "HYMENECTOMY FOLLOW UP",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgyIAA",
+            "AdditionalInformation": "HYMENECTOMY POST-OP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rgzIAA",
+            "AdditionalInformation": "HYMENECTOMY PRE-OP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rh0IAA",
+            "AdditionalInformation": "HYMENECTOMY PROCEDURE",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rh1IAA",
+            "AdditionalInformation": "HYMENOPLASTY CONSULT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rh2IAA",
+            "AdditionalInformation": "HYMENOPLASTY FOLLOW UP",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rh3IAA",
+            "AdditionalInformation": "HYMENOPLASTY POST-OP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rh4IAA",
+            "AdditionalInformation": "HYMENOPLASTY PRE-OP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rh5IAA",
+            "AdditionalInformation": "HYMENOPLASTY PROCEDURE",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rh6IAA",
+            "AdditionalInformation": "HYSTEROSCOPIC D AND C",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rh7IAA",
+            "AdditionalInformation": "HYSTEROSCOPIC MYOMECTOMY",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rh8IAA",
+            "AdditionalInformation": "HYSTEROSCOPY",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rh9IAA",
+            "AdditionalInformation": "INCISION CHECKS",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhAIAQ",
+            "AdditionalInformation": "IOL",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhBIAQ",
+            "AdditionalInformation": "IRON INFUSION",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhCIAQ",
+            "AdditionalInformation": "IUD INSERTION",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhDIAQ",
+            "AdditionalInformation": "IUD INSERTION ANESTHESIA",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhEIAQ",
+            "AdditionalInformation": "IUD REMOVAL",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhFIAQ",
+            "AdditionalInformation": "IUI",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhGIAQ",
+            "AdditionalInformation": "LABIAPLASTY 1 HOUR",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhHIAQ",
+            "AdditionalInformation": "LABIAPLASTY 3 HOURS",
+            "duration": "180",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhIIAQ",
+            "AdditionalInformation": "LABIAPLASTY CONSULT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhJIAQ",
+            "AdditionalInformation": "LABIAPLASTY FOLLOW UP",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhKIAQ",
+            "AdditionalInformation": "LABIAPLASTY POST-OP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhLIAQ",
+            "AdditionalInformation": "LABIAPLASTY PRE-OP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhMIAQ",
+            "AdditionalInformation": "LEEP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhNIAQ",
+            "AdditionalInformation": "MRI NRS",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhOIAQ",
+            "AdditionalInformation": "MRI REVIEW",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhPIAQ",
+            "AdditionalInformation": "OB CONSULT GARDEN",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhQIAQ",
+            "AdditionalInformation": "OB INITIAL",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhRIAQ",
+            "AdditionalInformation": "OB RETURN",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhSIAQ",
+            "AdditionalInformation": "OB VISIT WITH NST",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhTIAQ",
+            "AdditionalInformation": "PAP SMEAR",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhUIAQ",
+            "AdditionalInformation": "PCP FOLLOW UP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhVIAQ",
+            "AdditionalInformation": "PCP NEW PT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhWIAQ",
+            "AdditionalInformation": "PLAS AESTHETICS EST",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhXIAQ",
+            "AdditionalInformation": "PLAS AESTHETICS NPV",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhYIAQ",
+            "AdditionalInformation": "PLAS AESTHETICS POST TX",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000008FJOAY",
+            "Work_Type_Group__c": "Aesthetics",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhZIAQ",
+            "AdditionalInformation": "PLAS BREAST AUGMENTATION",
+            "duration": "240",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhaIAA",
+            "AdditionalInformation": "PLAS BREAST LIFT",
+            "duration": "300",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhbIAA",
+            "AdditionalInformation": "PLAS CONSULT AND AES NPV",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhcIAA",
+            "AdditionalInformation": "PLAS FILLER",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhdIAA",
+            "AdditionalInformation": "PLAS FILLER FOLLOW UP",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rheIAA",
+            "AdditionalInformation": "PLAS FILLER NPV",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhfIAA",
+            "AdditionalInformation": "PLAS LIPOSUCTION 3 AREAS",
+            "duration": "300",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhgIAA",
+            "AdditionalInformation": "PLAS LIPOSUCTION 4PLUS AREAS",
+            "duration": "360",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhhIAA",
+            "AdditionalInformation": "PLAS LIPOSUCTION SINGLE AREA",
+            "duration": "240",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhiIAA",
+            "AdditionalInformation": "PLAS MINOR PLASTICS PROCEDURE",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhjIAA",
+            "AdditionalInformation": "PLAS MOMMY MAKEOVER",
+            "duration": "360",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhkIAA",
+            "AdditionalInformation": "PLAS NEUROMODULATOR",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhlIAA",
+            "AdditionalInformation": "PLAS NEUROMODULATOR FU",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhmIAA",
+            "AdditionalInformation": "PLAS NEUROMODULATOR NPV",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhnIAA",
+            "AdditionalInformation": "PLAS PLASTIC SURGERY",
+            "duration": "240",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhoIAA",
+            "AdditionalInformation": "PLAS PLASTIC SURGERY CONSULT",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhpIAA",
+            "AdditionalInformation": "PLAS PLASTIC SURGERY FU 1WK",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhqIAA",
+            "AdditionalInformation": "PLAS PLASTIC SURGERY FU 1YR",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhrIAA",
+            "AdditionalInformation": "PLAS PLASTIC SURGERY FU 3MO",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhsIAA",
+            "AdditionalInformation": "PLAS TUMMY TUCK",
+            "duration": "300",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhtIAA",
+            "AdditionalInformation": "POST OP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhuIAA",
+            "AdditionalInformation": "POST OP IR CONSULT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhvIAA",
+            "AdditionalInformation": "POST OP PLASTIC SURGERY",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhwIAA",
+            "AdditionalInformation": "POSTPARTUM",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhxIAA",
+            "AdditionalInformation": "POSTPARTUM GARDEN",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhyIAA",
+            "AdditionalInformation": "PRE SURGICAL",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000rhzIAA",
+            "AdditionalInformation": "SALINE INFUSED SONO",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000ri0IAA",
+            "AdditionalInformation": "SALINE INFUSED SONO ANESTHESIA",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000ri1IAA",
+            "AdditionalInformation": "STAFF MEETING 60",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000ri2IAA",
+            "AdditionalInformation": "STAFF MEETING",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000ri3IAA",
+            "AdditionalInformation": "SUCTION D AND C",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000ri4IAA",
+            "AdditionalInformation": "SURGERY",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000ri5IAA",
+            "AdditionalInformation": "SURGERY 60",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000ri6IAA",
+            "AdditionalInformation": "SURGICAL CONSULT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000ri7IAA",
+            "AdditionalInformation": "TELEMED - LAB RESULTS",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000ri8IAA",
+            "AdditionalInformation": "TELEMED - PRESCRIPTION REFILL",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000ri9IAA",
+            "AdditionalInformation": "TRIPLE BOOKING BLOCK",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000riAIAQ",
+            "AdditionalInformation": "URINE CULTURE",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000riBIAQ",
+            "AdditionalInformation": "VAGINOPLASTY CONSULT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000riCIAQ",
+            "AdditionalInformation": "VAGINOPLASTY FOLLOW UP",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000riDIAQ",
+            "AdditionalInformation": "VAGINOPLASTY POST-OP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000riEIAQ",
+            "AdditionalInformation": "VAGINOPLASTY PRE-OP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000riFIAQ",
+            "AdditionalInformation": "VAGINOPLASTY PROCEDURE",
+            "duration": "120",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000riGIAQ",
+            "AdditionalInformation": "VIABILITY",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000riHIAQ",
+            "AdditionalInformation": "VIRTUAL DISCOVERY CALL",
+            "duration": "15",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "Telehealth"
+        },
+        {
+            "WorkTypeId": "08qRj0000000riIIAQ",
+            "AdditionalInformation": "VULVAR ABSCESS",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000riJIAQ",
+            "AdditionalInformation": "VULVAR BIOPSY",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000riKIAQ",
+            "AdditionalInformation": "WART REMOVAL",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007xZOAQ",
+            "Work_Type_Group__c": "Other",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000riLIAQ",
+            "AdditionalInformation": "ZOCDOC GYN",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000riMIAQ",
+            "AdditionalInformation": "ZOCDOC NEW PATIENT",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wQbIAI",
+            "AdditionalInformation": "BLOCK",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wSDIAY",
+            "AdditionalInformation": "ESTABLISHED PATIENT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wTpIAI",
+            "AdditionalInformation": "HOSPITAL VISIT",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wVRIAY",
+            "AdditionalInformation": "NEW PATIENT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wX3IAI",
+            "AdditionalInformation": "NURSING HOME VISIT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wYfIAI",
+            "AdditionalInformation": "PHYSICAL EXAM",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000waHIAQ",
+            "AdditionalInformation": "E-VISIT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wbtIAA",
+            "AdditionalInformation": "HOLD_FOR_SAME_DAY",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wdVIAQ",
+            "AdditionalInformation": "ABDOMINAL MYOMECTOMY",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wf7IAA",
+            "AdditionalInformation": "BLOCK 45 MINUTES",
+            "duration": "45",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wgjIAA",
+            "AdditionalInformation": "COLPO NO NO",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wiLIAQ",
+            "AdditionalInformation": "DR LERMAN",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wjxIAA",
+            "AdditionalInformation": "DR LEVIN FIBROIDS",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wlZIAQ",
+            "AdditionalInformation": "FEMVIEW HSG NO NO",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wnBIAQ",
+            "AdditionalInformation": "GYN NEW",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wonIAA",
+            "AdditionalInformation": "GYN NEW PATIENT NO NO",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wqPIAQ",
+            "AdditionalInformation": "GYN RETURN",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000ws1IAA",
+            "AdditionalInformation": "INCISION-DRAINAGE",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wtdIAA",
+            "AdditionalInformation": "IUD INSERTION NO NO",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wvFIAQ",
+            "AdditionalInformation": "LSC BILAT OVARIAN CYSTECTOMY",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wwrIAA",
+            "AdditionalInformation": "LSC BILATERAL SALPINGECTOMY",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wyTIAQ",
+            "AdditionalInformation": "NERVE CONDUCTION",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000x05IAA",
+            "AdditionalInformation": "NOVASURE ABLATION",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000x1hIAA",
+            "AdditionalInformation": "OB GENETIC TESTING",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000x3JIAQ",
+            "AdditionalInformation": "PANORAMA",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000x4vIAA",
+            "AdditionalInformation": "PAPSMEAR NO NO",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000x6XIAQ",
+            "AdditionalInformation": "PHONE CALL",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "Telehealth"
+        },
+        {
+            "WorkTypeId": "08qRj0000000x89IAA",
+            "AdditionalInformation": "PPD CHECK",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000x9lIAA",
+            "AdditionalInformation": "PPD TEST",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xBNIAY",
+            "AdditionalInformation": "PRE OP PLASTIC SURGERY",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xCzIAI",
+            "AdditionalInformation": "RESULTS",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xEbIAI",
+            "AdditionalInformation": "SALINE-INFUSED SONOGRAM NO NO",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xGDIAY",
+            "AdditionalInformation": "SONO HYSTOGRAM",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xHpIAI",
+            "AdditionalInformation": "SONOGRAM",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xJRIAY",
+            "AdditionalInformation": "TCM 14 DAY",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xL3IAI",
+            "AdditionalInformation": "TCM 7 DAY",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xMfIAI",
+            "AdditionalInformation": "TLH BS",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xOHIAY",
+            "AdditionalInformation": "TLH BSO",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xPtIAI",
+            "AdditionalInformation": "UFE NEW PATIENT NO NO",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007SvOAI",
+            "Work_Type_Group__c": "Fibroids",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xRVIAY",
+            "AdditionalInformation": "VEINS COMPLIMENTARY PRESCREEN",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj000000099lOAA",
+            "Work_Type_Group__c": "Veins",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xT7IAI",
+            "AdditionalInformation": "VEINS CONSULT PREOP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj000000099lOAA",
+            "Work_Type_Group__c": "Veins",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xUjIAI",
+            "AdditionalInformation": "VEINS POSTOP",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj000000099lOAA",
+            "Work_Type_Group__c": "Veins",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xWLIAY",
+            "AdditionalInformation": "VEINS POSTOP WITH TREATMENT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj000000099lOAA",
+            "Work_Type_Group__c": "Veins",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xHqIAI",
+            "AdditionalInformation": "VEINS PROCEDURE",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj000000099lOAA",
+            "Work_Type_Group__c": "Veins",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000wQcIAI",
+            "AdditionalInformation": "VIVAEVE VIDEO SHOOT",
+            "duration": "30",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        },
+        {
+            "WorkTypeId": "08qRj0000000xXxIAI",
+            "AdditionalInformation": "ZOCDOC NEW PATIENT NO NO",
+            "duration": "60",
+            "Work_Type_Group_Id": "0VSRj00000007W9OAI",
+            "Work_Type_Group__c": "OBGYN",
+            "AppointmentType": "In-Office"
+        }
+    ]

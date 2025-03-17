@@ -1,0 +1,4 @@
+{
+  "code": 400,
+  "description":"Bad Request, The request could not be understood by the server due to incorrect syntax"
+}
