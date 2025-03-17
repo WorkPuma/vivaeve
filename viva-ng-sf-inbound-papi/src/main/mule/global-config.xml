@@ -90,13 +90,19 @@ http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org
 	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="3d290ecf-b658-400b-971d-7fc96bf282d5" >
 		<http:request-connection host="${request.host}" port="${request.port}" />
 	</http:request-config>
-	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="47ad693c-9965-4d34-8011-728dc204663a" >
-		<salesforce:basic-connection username="${sf.username}" password="${secure::sf.password}" >
-			<reconnection >
-				<reconnect frequency="${sf.retryfrequency}" count="${sf.retryattempts}" />
-			</reconnection>
-		</salesforce:basic-connection>
-	</salesforce:sfdc-config>
+<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="09fcc72b-2794-4529-829a-7b2d07fe3265">
+    <salesforce:jwt-connection 
+        consumerKey="${sf.consumer.key}" 
+        keyStore="${sf.keystore.path}" 
+        storePassword="${sf.keystore.password}" 
+        keyAlias="${sf.key.alias}" 
+        keyPassword="${sf.key.password}" 
+        principal="${sf.username}">
+        <reconnection>
+            <reconnect frequency="${sf.retryfrequency}" count="${sf.retryattempts}" />
+        </reconnection>
+    </salesforce:jwt-connection>
+</salesforce:sfdc-config>
 	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="96bdf21a-6169-4fe2-aa98-f1f0c56fc76d" >
 		<email:smtp-connection host="${email.host}" port="${email.port}" user="${email.username}" password="${secure::email.password}" >
 			<email:properties >
