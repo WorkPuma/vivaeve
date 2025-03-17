@@ -28,7 +28,7 @@
         <grizzlyAhcVersion>1.14-MULE-019</grizzlyAhcVersion>
         <javaxActivationVersion>1.2.0</javaxActivationVersion>
         <javaxMailVersion>1.4.3</javaxMailVersion>
-        <jettyVersion>9.0.7.v20131107</jettyVersion>
+        <jettyVersion>9.4.55.v20240627</jettyVersion>
 
         <commonsLang3Version>3.12.0</commonsLang3Version>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
@@ -54,7 +54,7 @@
         <scriptingModuleVersion>1.1.7</scriptingModuleVersion>
         <muleObjectStoreConnectorTestVersion>1.2.1</muleObjectStoreConnectorTestVersion>
 
-        <springVersion>5.3.30</springVersion>
+        <springVersion>6.1.14</springVersion>
 
         <mulesoftLicenseVersion>1.4.0</mulesoftLicenseVersion>
         <license.maven.plugin.version>4.2</license.maven.plugin.version>

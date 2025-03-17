@@ -21,8 +21,8 @@
     <properties>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <assertJVersion>3.3.0</assertJVersion>
-        <commonsIoVersion>2.4</commonsIoVersion>
-        <guavaVersion>23.5-jre</guavaVersion>
+        <commonsIoVersion>2.14.0</commonsIoVersion>
+        <guavaVersion>32.0.0-jre</guavaVersion>
         <muleSpringModuleVersion>1.0.0</muleSpringModuleVersion>
     </properties>
 

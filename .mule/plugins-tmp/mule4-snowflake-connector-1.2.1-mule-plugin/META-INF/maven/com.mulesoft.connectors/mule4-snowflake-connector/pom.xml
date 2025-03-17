@@ -27,7 +27,7 @@
         <mule.sdk.api.version>0.7.0</mule.sdk.api.version>
         <runtimeProduct>MULE_EE</runtimeProduct>
         <skipTests>false</skipTests>
-        <snowflake.jdbc.version>3.18.0</snowflake.jdbc.version>
+        <snowflake.jdbc.version>3.23.1</snowflake.jdbc.version>
         <!-- W-14011108-->
         <mule.db.client.version>1.6.15</mule.db.client.version>
         <apache.commons.lang3>3.16.0</apache.commons.lang3>
@@ -35,7 +35,7 @@
         <mtf.javaopts></mtf.javaopts>
         <jakarta.activation.version>1.2.2</jakarta.activation.version>
         <runtimeVersion>4.3.0</runtimeVersion>
-        <bc.version>1.77</bc.version>
+        <bc.version>1.78</bc.version>
     </properties>
 
     <build>
