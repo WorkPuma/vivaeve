@@ -1,85 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
-	<error-handler name="global-error-handlerError_Handler" doc:id="15811fa1-6913-4fea-a6a2-da8f2d439054" >
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="004543ee-82d2-43b0-9594-5e700cfa32d6" type="FILE:ACCESS_DENIED, FILE:CONNECTIVITY, FILE:FILE_LOCK, FILE:ILLEGAL_PATH, FILE:RETRY_EXHAUSTED">
-			<set-variable value='#[output application/json&#10;---&#10;{&#10;	"type"  : error.errorType.identifier ,&#10;	"description"  : error.description &#10;}]' doc:name="SET Var Error Message" doc:id="9f6570d9-baec-40cc-9a0b-b46fa4c069e1" variableName="errorMessage"/>
-			<ee:transform doc:name="DW Set Error Payload" doc:id="6ddbb48c-0bb8-43d6-90a3-b6a046d354ce" >
-				<ee:message >
-					<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-vars.errorMessage]]></ee:set-payload>
-				</ee:message>
-			</ee:transform>
-			<logger level="INFO" doc:name="LOG INFO Error Message" doc:id="125b5721-2e5c-4c76-aa47-f64c5779b66f" message="#[payload]"/>
-			<os:store doc:name="Store DeltaFlowState as Error" doc:id="81858004-cd91-4538-a262-ee31e87febd8" key="DeltaFlowState">
-				<os:value><![CDATA[Error]]></os:value>
-			</os:store>
-		</on-error-propagate>
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d248c323-3596-4800-af3e-f011d50c7a1e" type="OS:INVALID_KEY, OS:KEY_ALREADY_EXISTS, OS:KEY_NOT_FOUND, OS:NULL_VALUE, OS:STORE_NOT_AVAILABLE">
-			<set-variable value='#[output application/json&#10;---&#10;{&#10;	"type"  : error.errorType.identifier ,&#10;	"description"  : error.description &#10;}]' doc:name="SET Var Error Message" doc:id="fdca4fc0-4e5b-472c-a823-9b8b40bb2bed" variableName="errorMessage"/>
-			<ee:transform doc:name="DW Set Error Payload" doc:id="3f254422-285a-4f66-8056-b33fcbdfb90f" >
-				<ee:message >
-					<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-vars.errorMessage]]></ee:set-payload>
-				</ee:message>
-			</ee:transform>
-			<logger level="INFO" doc:name="LOG INFO Error Message" doc:id="1bab8f99-0b18-4fb1-99be-14694cbda513" message="#[payload]"/>
-			<os:store doc:name="Store DeltaFlowState as Error" doc:id="5d756a46-7d4c-46cf-9705-6a6b20c94f1e" key="DeltaFlowState">
-				<os:value><![CDATA[Error]]></os:value>
-			</os:store>
-		</on-error-propagate>
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="a7b2041e-c7f8-4e31-b209-abf80358a412" type="SALESFORCE:INVALID_RESPONSE, SALESFORCE:LIMIT_EXCEEDED, SALESFORCE:OPERATION_NOT_SUPPORTED, SALESFORCE:INSUFFICIENT_PERMISSIONS, SALESFORCE:INVALID_INPUT, SALESFORCE:COMMUNICATION, SALESFORCE:CONNECTIVITY, SALESFORCE:MUTUAL_AUTHENTICATION_FAILED, SALESFORCE:NOT_FOUND, SALESFORCE:TIMEOUT, SALESFORCE:UNAVAILABLE">
-			<set-variable value='#[output application/json&#10;---&#10;{&#10;	"type"  : error.errorType.identifier ,&#10;	"description"  : error.description &#10;}]' doc:name="SET Var Error Message" doc:id="c1db868e-37a2-4142-afb2-8f5c8683ee43" variableName="errorMessage"/>
-			<ee:transform doc:name="DW Set Error Payload" doc:id="f4905445-9e0b-44b4-9ac5-dbf6ad1827d4" >
-				<ee:message >
-					<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-vars.errorMessage]]></ee:set-payload>
-				</ee:message>
-			</ee:transform>
-			<logger level="INFO" doc:name="LOG INFO Error Message" doc:id="6f6b5d66-e3a4-4592-838d-8be3155a02f7" message="#[payload]"/>
-			<os:store doc:name="Store DeltaFlowState as Error" doc:id="b3f9b227-bf8d-4a28-9357-d1504822dc69" key="DeltaFlowState">
-				<os:value><![CDATA[Error]]></os:value>
-			</os:store>
-		</on-error-propagate>
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="045828b2-fe39-40b1-a3f4-9f3121731ceb" type="S3:BAD_REQUEST, S3:CONNECTIVITY, S3:FORBIDDEN, S3:INVALID_OBJECT_STATE, S3:NO_SUCH_KEY, S3:REQUEST_TIMEOUT, S3:RETRY_EXHAUSTED, S3:S3_ERROR, S3:SERVER_BUSY, S3:SERVICE_ERROR">
-			<set-variable value='#[output application/json&#10;---&#10;{&#10;	"type"  : error.errorType.identifier ,&#10;	"description"  : error.description &#10;}]' doc:name="SET Var Error Message" doc:id="c7369ef4-f8b4-42bc-b9f4-9aeb9d5ddd17" variableName="errorMessage"/>
-			<ee:transform doc:name="DW Set Error Payload" doc:id="8e9fd87c-5e4c-4041-b0ec-97a52f84bcdb" >
-				<ee:message >
-					<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-vars.errorMessage]]></ee:set-payload>
-				</ee:message>
-			</ee:transform>
-			<logger level="INFO" doc:name="LOG INFO Error Message" doc:id="fadc2895-7627-46d6-a44f-d7266a4b9627" message="#[payload]"/>
-			<os:store doc:name="Store DeltaFlowState as Error" doc:id="efab5adc-1353-4b34-9018-be1ad587a5b8" key="DeltaFlowState" >
-				<os:value ><![CDATA[Error]]></os:value>
-			</os:store>
-		</on-error-propagate>
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="8d745da0-9733-405a-9803-17653664b8fc" type="ANY">
-			<set-variable value='#[output application/json&#10;---&#10;{&#10;	"type"  : error.errorType.identifier ,&#10;	"description"  : error.description &#10;}]' doc:name="SET Var Error Message" doc:id="4b10ef4c-c854-4e21-b284-e1edd1d36812" variableName="errorMessage"/>
-			<ee:transform doc:name="DW Set Error Payload" doc:id="28026563-79c8-4bbc-a90c-a31df7f6578b" >
-				<ee:message >
-					<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-vars.errorMessage]]></ee:set-payload>
-				</ee:message>
-			</ee:transform>
-			<logger level="INFO" doc:name="LOG INFO Error Message" doc:id="954be6c3-c663-4424-bbb8-e09ca3c8e55b" message="#[payload]"/>
-			<os:store doc:name="Store DeltaFlowState as Error" doc:id="79e4bf0a-b2a9-49e7-abae-3332485adca6" key="DeltaFlowState" >
-				<os:value ><![CDATA[Error]]></os:value>
-			</os:store>
-		</on-error-propagate>
-	</error-handler>
-</mule>
