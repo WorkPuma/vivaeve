@@ -1,7 +1,0 @@
-%dw 2.0
-
-type auto_ea3e6f41_2bf1_40a8_9d8c_44c98028eb0c_Output_Payload = {|
-  statusCode: Number, 
-  message: String
-|}
-

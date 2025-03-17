@@ -1,4 +1,0 @@
-%dw 2.0
-
-type auto_d40ad214_3b64_4179_bc92_972093d4590b_Input_Variables_contactFields = Array<{|  FirstName: Null,   LastName: Null,   Language_Preferred__c: Any,   Email: Null,   Phone: Null,   MailingState: Null,   MailingCity: Null,   MailingPostalCode: Null,   MailingStreet: Null,   Patient_Ethnicity__c: Null,   Patient_Race__c: Null,   Visit_Reason__c: Null,   Patient_Gender_2__c: Null,   HealthFusion_Patient_Record_ID__c: Null,   Date_of_Birth__c: Date|}>
-
