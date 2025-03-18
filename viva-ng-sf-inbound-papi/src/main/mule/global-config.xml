@@ -90,19 +90,6 @@ http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org
 	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="3d290ecf-b658-400b-971d-7fc96bf282d5" >
 		<http:request-connection host="${request.host}" port="${request.port}" />
 	</http:request-config>
-<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="e555840e-d13a-4488-93e1-ccd0b7dc8f07">
-    <salesforce:jwt-connection 
-        consumerKey="${sf.consumer.key}" 
-        keyStore="${sf.keystore.path}" 
-        storePassword="${sf.keystore.password}"        
-        principal="${sf.username}" 
-        tokenEndpoint="https://test.salesforce.com/services/oauth2/token" 
-        certificateAlias="${sf.key.alias}" audienceUrl="https://test.salesforce.com">
-        <reconnection>
-            <reconnect frequency="${sf.retryfrequency}" count="${sf.retryattempts}" />
-        </reconnection>
-    </salesforce:jwt-connection>
-</salesforce:sfdc-config>
 	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="96bdf21a-6169-4fe2-aa98-f1f0c56fc76d" >
 		<email:smtp-connection host="${email.host}" port="${email.port}" user="${email.username}" password="${secure::email.password}" >
 			<email:properties >
@@ -110,6 +97,12 @@ http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org
 			</email:properties>
 		</email:smtp-connection>
 	</email:smtp-config>
-
-
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config">
+  <salesforce:oauth-user-pass-connection 
+      consumerKey="${sf.consumer.key}" 
+      consumerSecret="${sf.client.secret}" 
+      username="${sf.username}" 
+      password="${sf.password}"
+      tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
+</salesforce:sfdc-config>
 </mule>
