@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -6,7 +7,6 @@
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
       xmlns:java="http://www.mulesoft.org/schema/mule/java"
-      xmlns:os="http://www.mulesoft.org/schema/mule/objectstore"
       xsi:schemaLocation="
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
@@ -15,7 +15,6 @@
         http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
         http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
 
-        
     <flow name="viva-ng-sf-generate-mappings-flow" initialState="started">
         <scheduler doc:name="Scheduler (Hourly)">
             <scheduling-strategy>
@@ -60,10 +59,12 @@ payload map {
 output application/java
 ---
 sizeOf(payload)]]></ee:set-variable>
+                <ee:set-variable variableName="TerritoryMapping"><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
-
-        <os:store key="TerritoryMapping" value="#[payload]" doc:name="Store Territory Mapping"/>
 
         <logger level="INFO" message="Stored #[vars.mappingCount] Service Territory mappings"/>
     </sub-flow>
@@ -99,10 +100,12 @@ payload map {
 output application/java
 ---
 sizeOf(payload)]]></ee:set-variable>
+                <ee:set-variable variableName="WorkTypeMapping"><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
-
-        <os:store key="WorkTypeMapping" value="#[payload]" doc:name="Store Work Type Mapping"/>
 
         <logger level="INFO" message="Stored #[vars.mappingCount] Work Type mappings"/>
     </sub-flow>
@@ -137,10 +140,12 @@ payload map {
 output application/java
 ---
 sizeOf(payload)]]></ee:set-variable>
+                <ee:set-variable variableName="ProviderMapping"><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
-
-        <os:store key="ProviderMapping" value="#[payload]" doc:name="Store Provider Mapping"/>
 
         <logger level="INFO" message="Stored #[vars.mappingCount] Provider mappings"/>
     </sub-flow>
@@ -160,7 +165,7 @@ output application/json
 ---
 {
     status: "success",
-    message: "Mapping files stored in object store",
+    message: "Mapping files stored in flow variables",
     timestamp: now()
 }]]></ee:set-payload>
             </ee:message>

@@ -1,9 +1,9 @@
 # Common File to be use in All env
 application:
-  name: "viva-ng-sf-inbound-papi"
+  name: "viva-ng-sf-inbound-eapi"
   
-source: "viva-ng-sf-inbound-papi"
-target: "salesforce"
+source: "viva-ng-sf-inbound-eapi"
+target: "viva-ng-sf-inbound-papi"
  
 # Logger
 logger:
@@ -17,6 +17,12 @@ milestone:
   requetSent: "RequetSent"
   successResponseReceived: "SuccessResponseReceived"
   successResponseSent: "SuccessResponseSent"
-  
-  app:
-  home: "."
+  app: "application" # Added this line with a string value
+
+# Object Store common settings
+os:
+  entryTtl: "30"
+  entryTtlUnit: "DAYS"
+  maxEntries: "100"
+  persistent: "false"
+  directory: "./local-store"

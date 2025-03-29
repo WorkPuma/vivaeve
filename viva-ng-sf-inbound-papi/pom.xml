@@ -36,7 +36,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<cloudHubDeployment>
-						<objectStoreV2>false</objectStoreV2>
+						<objectStoreV2>true</objectStoreV2>
 						<muleVersion>${mule.version}</muleVersion>
 						<businessGroupId>${cloudhub.businessGroupId}</businessGroupId>
 						<artifact>${mule.artifact}</artifact>
@@ -171,14 +171,7 @@
 			<artifactId>mule-file-connector</artifactId>
 			<version>1.5.3</version>
 			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.mulesoft.munit</groupId>
-			<artifactId>munit-tools</artifactId>
-			<version>3.4.0</version>
-			<classifier>mule-plugin</classifier>
-			<scope>test</scope>
-		</dependency>		
+		</dependency>				
 		<dependency>
 			<groupId>com.mulesoft.connectors</groupId>
 			<artifactId>mule-salesforce-connector</artifactId>
