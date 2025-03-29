@@ -9,3 +9,7 @@ tls:
   
 backendBearerToken:
   clientSecret: "![a0juUHzIqxQasdfpoinuy/TasdLoasdf8kjKjuBliEdxopfR3aPiNjKaWsdB]"
+  
+  # Email settings
+email:
+  password: "![your-encrypted-password-here]"

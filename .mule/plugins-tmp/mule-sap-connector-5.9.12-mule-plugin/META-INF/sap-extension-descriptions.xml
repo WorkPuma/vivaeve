@@ -1,0 +1,650 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension-documentation>
+    <configs>
+        <config name="sap">
+            <description><![CDATA[This refers to the default configuration for SAP extension outbound elements.]]></description>
+            <parameters>
+                <parameter name="expirationPolicy">
+                    <description><![CDATA[Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.]]></description>
+                </parameter>
+                <parameter name="encoding">
+                    <description><![CDATA[Canonical name of the encoding. See Oracle's supported encodings at https://docs.oracle.com/javase/7/docs/technotes/guides/intl/encoding.doc.html.]]></description>
+                </parameter>
+                <parameter name="defaultIdocumentVersion">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="disableJcoInternalCache">
+                    <description><![CDATA[Flag that indicates whether to use the JCo internal cache. Set this flag to true to use the SAP JCo internal cache. By default, JCo stores the metadata after the first call and populates that template in the following calls. This flag applies to both functions and sources.]]></description>
+                </parameter>
+                <parameter name="evaluateResponseFlag">
+                    <description><![CDATA[Flag that indicates whether to throw an exception or let the user handle it as another result. This flag is an exception or logging mechanism you use to specify whether a message throws an exception (E) or is treated as a result with a warning (W). If you set the flag to true and an E message is returned, an exception is thrown with that message. If W is returned, a warning message is logged.]]></description>
+                </parameter>
+                <parameter name="logTraceFlag">
+                    <description><![CDATA[Flag that indicates whether to log the trace on the Mule server. Set this to true to log a trace.]]></description>
+                </parameter>
+                <parameter name="useSAPFormat">
+                    <description><![CDATA[Parameter added to support the Mule 3 format for returning SAP values. Used to parse a JCoField. If set to true, values are returned as strings with the original SAP format. If set to false, values are converted to the corresponding Java objects, serialized, and returned.]]></description>
+                </parameter>
+                <parameter name="useSAPFormatOnFunctionListener">
+                    <description><![CDATA[Parameter added to support the Mule 3 format for returning SAP values. Used to parse a JCoField. If set to true, values are returned as strings with the original SAP format. If set to false, values are converted to the corresponding Java objects, serialized, and returned.]]></description>
+                </parameter>
+            </parameters>
+        </config>
+    </configs>
+    <connections>
+        <connection name="certificate">
+            <description><![CDATA[This connection provider relies on an X509 certificate to authenticate the user.]]></description>
+            <parameters>
+                <parameter name="systemNumber">
+                    <description><![CDATA[Two-digit system number (sysnr) of the SAP system]]></description>
+                </parameter>
+                <parameter name="client">
+                    <description><![CDATA[Three-digit client number. Leading zeroes are preserved if they appear in the number.]]></description>
+                </parameter>
+                <parameter name="destinationName">
+                    <description><![CDATA[Connector generates an identifier of the destination. If none is set, then a random value is created.]]></description>
+                </parameter>
+                <parameter name="language">
+                    <description><![CDATA[Connector uses a language code that determines the code page used for communicating between the SAP Adapter and the application server.]]></description>
+                </parameter>
+                <parameter name="extendedProperties">
+                    <description><![CDATA[Connector uses this to pass in all the database server-specific connection parameters.]]></description>
+                </parameter>
+                <parameter name="path">
+                    <description><![CDATA[Path to the X.509 certificate. This is required when the connector is working as a client.]]></description>
+                </parameter>
+                <parameter name="applicationServerHost">
+                    <description><![CDATA[Host of the SAP application server]]></description>
+                </parameter>
+                <parameter name="messageServer">
+                    <description><![CDATA[Configuration for message server usage]]></description>
+                </parameter>
+                <parameter name="traceFromServerFlag">
+                    <description><![CDATA[Enable or disable RFC trace on the server]]></description>
+                </parameter>
+                <parameter name="cpicTracingLevel">
+                    <description><![CDATA[Enable or disable CPIC trace on the server]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="kerberos">
+            <description><![CDATA[This connection provider implements the Kerberos protocol to authenticate and authorize the user.]]></description>
+            <parameters>
+                <parameter name="systemNumber">
+                    <description><![CDATA[Two-digit system number (sysnr) of the SAP system]]></description>
+                </parameter>
+                <parameter name="client">
+                    <description><![CDATA[Three-digit client number. Leading zeroes are preserved if they appear in the number.]]></description>
+                </parameter>
+                <parameter name="destinationName">
+                    <description><![CDATA[Connector generates an identifier of the destination. If none is set, then a random value is created.]]></description>
+                </parameter>
+                <parameter name="language">
+                    <description><![CDATA[Connector uses a language code that determines the code page used for communicating between the SAP Adapter and the application server.]]></description>
+                </parameter>
+                <parameter name="extendedProperties">
+                    <description><![CDATA[Connector uses this to pass in all the database server-specific connection parameters.]]></description>
+                </parameter>
+                <parameter name="applicationServerHost">
+                    <description><![CDATA[Host of the SAP application server]]></description>
+                </parameter>
+                <parameter name="messageServer">
+                    <description><![CDATA[Configuration for message server usage]]></description>
+                </parameter>
+                <parameter name="traceFromServerFlag">
+                    <description><![CDATA[Enable or disable RFC trace on the server]]></description>
+                </parameter>
+                <parameter name="cpicTracingLevel">
+                    <description><![CDATA[Enable or disable CPIC trace on the server]]></description>
+                </parameter>
+                <parameter name="krb5ConfFilePath">
+                    <description><![CDATA[The path to the krb5.conf file.]]></description>
+                </parameter>
+                <parameter name="keytabPath">
+                    <description><![CDATA[The path to the keytab file.]]></description>
+                </parameter>
+                <parameter name="gssLibraryPath">
+                    <description><![CDATA[The path to the gss library.]]></description>
+                </parameter>
+                <parameter name="principal">
+                    <description><![CDATA[Principal the connector uses to log in to SAP.]]></description>
+                </parameter>
+                <parameter name="clientSncPartnerName">
+                    <description><![CDATA[The jco.client.snc_partnername property]]></description>
+                </parameter>
+                <parameter name="clientSncMyName">
+                    <description><![CDATA[The jco.client.snc_myname property]]></description>
+                </parameter>
+                <parameter name="serverSncPartnerName">
+                    <description><![CDATA[The jco.server.snc_partnername property.]]></description>
+                </parameter>
+                <parameter name="serverSncMyName">
+                    <description><![CDATA[The jco.server.snc_myname property]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="simple-connection-provider">
+            <description><![CDATA[This connection provider connects using a username and password.]]></description>
+            <parameters>
+                <parameter name="systemNumber">
+                    <description><![CDATA[Two-digit system number (sysnr) of the SAP system]]></description>
+                </parameter>
+                <parameter name="client">
+                    <description><![CDATA[Three-digit client number. Leading zeroes are preserved if they appear in the number.]]></description>
+                </parameter>
+                <parameter name="destinationName">
+                    <description><![CDATA[Connector generates an identifier of the destination. If none is set, then a random value is created.]]></description>
+                </parameter>
+                <parameter name="language">
+                    <description><![CDATA[Connector uses a language code that determines the code page used for communicating between the SAP Adapter and the application server.]]></description>
+                </parameter>
+                <parameter name="extendedProperties">
+                    <description><![CDATA[Connector uses this to pass in all the database server-specific connection parameters.]]></description>
+                </parameter>
+                <parameter name="username">
+                    <description><![CDATA[Username the connector uses to log in to SAP.]]></description>
+                </parameter>
+                <parameter name="password">
+                    <description><![CDATA[Password associated with the login username]]></description>
+                </parameter>
+                <parameter name="applicationServerHost">
+                    <description><![CDATA[Host of the SAP application server]]></description>
+                </parameter>
+                <parameter name="messageServer">
+                    <description><![CDATA[Configuration for message server usage]]></description>
+                </parameter>
+                <parameter name="traceFromServerFlag">
+                    <description><![CDATA[Enable or disable RFC trace on the server]]></description>
+                </parameter>
+                <parameter name="cpicTracingLevel">
+                    <description><![CDATA[Enable or disable CPIC trace on the server]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+    </connections>
+    <extension name="SAP">
+        <description><![CDATA[Class that has an overall configuration for the SAP extension.]]></description>
+        <parameters/>
+    </extension>
+    <operations>
+        <operation name="asyncRfc">
+            <description><![CDATA[This operation executes a BAPIFunction over a queued Remote Function Call (qRFC).<br> A qRFC is an extension of a transactional RFC (tRFC) that ensures that individual steps are processed in sequence. This guarantees that multiple logical unit of work (LUW) transactions are processed in the order specified by the application. tRFC can be serialized using inbound and outbound queues, hence the name queued RFC.<br> <br> qRFC is best used for: <ul> <li>Extension of the Transactional RFC</li> <li>Defined processing sequence</li> </ul> <br> qRFC is recommended if you want to guarantee that several transactions are processed in a predefined order.]]></description>
+            <parameters>
+                <parameter name="key">
+                    <description><![CDATA[Name of the function to execute]]></description>
+                </parameter>
+                <parameter name="content">
+                    <description><![CDATA[BAPIFunction to execute]]></description>
+                </parameter>
+                <parameter name="transactionId">
+                    <description><![CDATA[ID that identifies an RFC so it runs only once]]></description>
+                </parameter>
+                <parameter name="queueName">
+                    <description><![CDATA[Name of the queue where the RFC executes]]></description>
+                </parameter>
+                <parameter name="encoding">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="transactionalAction">
+                    <description><![CDATA[The type of joining action that operations can take regarding transactions.]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="asynchronousRemoteFunctionCall">
+            <description><![CDATA[This operation executes a BAPIFunction over a queued Remote Function Call (qRFC).<br> A qRFC is an extension of a transactional RFC (tRFC) that ensures that individual steps are processed in sequence. This guarantees that multiple logical unit of work (LUW) transactions are processed in the order specified by the application. tRFC can be serialized using inbound and outbound queues, hence the name queued RFC.<br> <br> qRFC is best used for: <ul> <li>Extension of the Transactional RFC</li> <li>Defined processing sequence</li> </ul> <br> qRFC is recommended if you want to guarantee that several transactions are processed in a predefined order.]]></description>
+            <parameters>
+                <parameter name="key">
+                    <description><![CDATA[Name of the function to execute]]></description>
+                </parameter>
+                <parameter name="content">
+                    <description><![CDATA[BAPIFunction to execute]]></description>
+                </parameter>
+                <parameter name="transactionId">
+                    <description><![CDATA[ID that identifies an RFC so it runs only once]]></description>
+                </parameter>
+                <parameter name="queueName">
+                    <description><![CDATA[Name of the queue where the RFC executes]]></description>
+                </parameter>
+                <parameter name="encoding">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="transactionalAction">
+                    <description><![CDATA[The type of joining action that operations can take regarding transactions.]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="confirmTransactionId">
+            <description><![CDATA[This operation confirms to the server that a transaction is successful.]]></description>
+            <parameters>
+                <parameter name="transactionId">
+                    <description><![CDATA[ID of the transaction to confirm]]></description>
+                </parameter>
+                <parameter name="transactionalAction">
+                    <description><![CDATA[The type of joining action that operations can take regarding transactions.]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="createTransactionId">
+            <description><![CDATA[This operation creates a transaction ID to be used as part of future calls.]]></description>
+            <parameters>
+                <parameter name="transactionalAction">
+                    <description><![CDATA[The type of joining action that operations can take regarding transactions.]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="getFunction">
+            <description><![CDATA[This operation retrieves a BAPIFunction based on its name.]]></description>
+            <parameters>
+                <parameter name="key">
+                    <description><![CDATA[Name of the function to retrieve]]></description>
+                </parameter>
+                <parameter name="encoding">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="transactionalAction">
+                    <description><![CDATA[The type of joining action that operations can take regarding transactions.]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="retrieveIdoc">
+            <description><![CDATA[This operation retrieves an IDocument based on its key.]]></description>
+            <parameters>
+                <parameter name="key">
+                    <description><![CDATA[Key that contains the required information to retrieve the IDocument]]></description>
+                </parameter>
+                <parameter name="encoding">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="transactionalAction">
+                    <description><![CDATA[The type of joining action that operations can take regarding transactions.]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="send">
+            <description><![CDATA[This operation sends an IDocument to SAP over an RFC.<br> An RFC can be one of two types for IDocuments: 1. Transactional (tRFC): A special form of asynchronous Remote Function Call (aRFC) that ensures transaction-like execution of processing steps that were originally executed autonomously and that executes the called function module in the RFC server only once, even if the data is sent multiple times.<br> tRFC is an asynchronous communication method that executes the called function module in the RFC server only once, even if the data is sent multiple times.<br> <br> <p> 2. Queued (qRFC): A qRFC is an extension of tRFC that guarantees that multiple LUWs are processed in the order specified by the application, using inbound and outbound queues, hence the name queued RFC.<br> <br> qRFC is best used as an extension of tRFC to define a processing sequence. Both of these types have a TID handler. <br> The implementation of qRFC is recommended if you want to guarantee that several transactions are processed in a predefined order.]]></description>
+            <parameters>
+                <parameter name="key">
+                    <description><![CDATA[Name of the IDoc to execute]]></description>
+                </parameter>
+                <parameter name="content">
+                    <description><![CDATA[IDocument to execute]]></description>
+                </parameter>
+                <parameter name="version">
+                    <description><![CDATA[Version of the IDoc]]></description>
+                </parameter>
+                <parameter name="transactionId">
+                    <description><![CDATA[ID that identifies an RFC so it runs only once]]></description>
+                </parameter>
+                <parameter name="queueName">
+                    <description><![CDATA[Name of the queue on which the RFC executes. This applies for qRFC since each tRFC call that is processed is given a queue name by the application. A queue name and version are required for each qRFC transaction.]]></description>
+                </parameter>
+                <parameter name="iDocParseOptions">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="encoding">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="transactionalAction">
+                    <description><![CDATA[The type of joining action that operations can take regarding transactions.]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="syncRfc">
+            <description><![CDATA[This operation executes a BAPIFunction over a Synchronous Remote Function Call (sRFC), which requires both client and server to be available for communication or data transfer and also to be available to return a result immediately after the execution. <br> sRFC is best used for: <ul> <li>Communication between systems</li> <li>Communication between SAP Web Application Server to SAP GUI</li> </ul>]]></description>
+            <parameters>
+                <parameter name="key">
+                    <description><![CDATA[Name of the function to execute]]></description>
+                </parameter>
+                <parameter name="content">
+                    <description><![CDATA[BAPIFunction to execute]]></description>
+                </parameter>
+                <parameter name="encoding">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="transactionalAction">
+                    <description><![CDATA[The type of joining action that operations can take regarding transactions.]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="synchronousRemoteFunctionCall">
+            <description><![CDATA[This operation executes a BAPIFunction over a Synchronous Remote Function Call (sRFC), which requires both client and server to be available for communication or data transfer and also to be available to return a result immediately after the execution. <br> sRFC is best used for: <ul> <li>Communication between systems</li> <li>Communication between SAP Web Application Server to SAP GUI</li> </ul>]]></description>
+            <parameters>
+                <parameter name="key">
+                    <description><![CDATA[Name of the function to execute]]></description>
+                </parameter>
+                <parameter name="content">
+                    <description><![CDATA[BAPIFunction to execute]]></description>
+                </parameter>
+                <parameter name="encoding">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="transactionalAction">
+                    <description><![CDATA[The type of joining action that operations can take regarding transactions.]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+    </operations>
+    <sources>
+        <source name="document-listener">
+            <description><![CDATA[This source listens for incoming IDocs.]]></description>
+            <parameters>
+                <parameter name="gatewayHost">
+                    <description><![CDATA[This is the name of the host running the gateway handler. SAP Gateway is a development framework used to connect non-SAP applications to SAP applications. You can configure the SAP Gateway host to be the trusted system using an RFC destination.]]></description>
+                </parameter>
+                <parameter name="gatewayService">
+                    <description><![CDATA[Either the name or service port for the gateway service of the SAP system]]></description>
+                </parameter>
+                <parameter name="programID">
+                    <description><![CDATA[SAP system program ID that is registered on the gateway. Must be unique for the given gateway.]]></description>
+                </parameter>
+                <parameter name="connectionCount">
+                    <description><![CDATA[This parameter indicates the number of connections to register on the gateway. If there is more than one connection, handler requests are processed in parallel. For example, if two connections are set, this will create two handler workers or threads that are going to handle requests in parallel, almost like having two sources start together.]]></description>
+                </parameter>
+                <parameter name="idocTypeFilterRegex">
+                    <description><![CDATA[Expression to filter all incoming IDocs by type.]]></description>
+                </parameter>
+                <parameter name="idocTypeExtensionFilterRegex">
+                    <description><![CDATA[Expression to filter all incoming IDocs by type extension.]]></description>
+                </parameter>
+                <parameter name="host">
+                    <description><![CDATA[Host of the message server]]></description>
+                </parameter>
+                <parameter name="port">
+                    <description><![CDATA[The message server name or port number]]></description>
+                </parameter>
+                <parameter name="systemId">
+                    <description><![CDATA[The system ID of the system the message server belongs to]]></description>
+                </parameter>
+                <parameter name="group">
+                    <description><![CDATA[The logon group defined in ABAP which is identifying a set of application servers]]></description>
+                </parameter>
+                <parameter name="updateInterval">
+                    <description><![CDATA[The update time how often the list of application servers is fetched from the message server]]></description>
+                </parameter>
+                <parameter name="iDocRenderOptions">
+                    <description><![CDATA[IDoc Rendering options]]></description>
+                </parameter>
+                <parameter name="encoding">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="transactionalAction">
+                    <description><![CDATA[The type of beginning action that sources can take regarding transactions.]]></description>
+                </parameter>
+                <parameter name="transactionType">
+                    <description><![CDATA[The type of transaction to create. Availability will depend on the runtime version.]]></description>
+                </parameter>
+                <parameter name="primaryNodeOnly">
+                    <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </source>
+        <source name="function-listener">
+            <description><![CDATA[This source listens for incoming BAPI Functions.]]></description>
+            <parameters>
+                <parameter name="gatewayHost">
+                    <description><![CDATA[This is the name of the host running the gateway handler. SAP Gateway is a development framework used to connect non-SAP applications to SAP applications. You can configure the SAP Gateway host to be the trusted system using an RFC destination.]]></description>
+                </parameter>
+                <parameter name="gatewayService">
+                    <description><![CDATA[Either the name or service port for the gateway service of the SAP system]]></description>
+                </parameter>
+                <parameter name="programID">
+                    <description><![CDATA[SAP system program ID that is registered on the gateway. Must be unique for the given gateway.]]></description>
+                </parameter>
+                <parameter name="connectionCount">
+                    <description><![CDATA[This parameter indicates the number of connections to register on the gateway. If there is more than one connection, handler requests are processed in parallel. For example, if two connections are set, this will create two handler workers or threads that are going to handle requests in parallel, almost like having two sources start together.]]></description>
+                </parameter>
+                <parameter name="targetedFunction">
+                    <description><![CDATA[Filters the incoming BAPI functions by their name. The name of the function you want to receive.]]></description>
+                </parameter>
+                <parameter name="host">
+                    <description><![CDATA[Host of the message server]]></description>
+                </parameter>
+                <parameter name="port">
+                    <description><![CDATA[The message server name or port number]]></description>
+                </parameter>
+                <parameter name="systemId">
+                    <description><![CDATA[The system ID of the system the message server belongs to]]></description>
+                </parameter>
+                <parameter name="group">
+                    <description><![CDATA[The logon group defined in ABAP which is identifying a set of application servers]]></description>
+                </parameter>
+                <parameter name="updateInterval">
+                    <description><![CDATA[The update time how often the list of application servers is fetched from the message server]]></description>
+                </parameter>
+                <parameter name="encoding">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="transactionalAction">
+                    <description><![CDATA[The type of beginning action that sources can take regarding transactions.]]></description>
+                </parameter>
+                <parameter name="transactionType">
+                    <description><![CDATA[The type of transaction to create. Availability will depend on the runtime version.]]></description>
+                </parameter>
+                <parameter name="primaryNodeOnly">
+                    <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+                <parameter name="response">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </source>
+    </sources>
+    <types>
+        <type name="com.mulesoft.connector.sap.api.IDocParseParameterGroup">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="parseWithFieldValueChecking">
+                    <description><![CDATA[Parsing option for enabling the field value checking mechanism in accordance with the respective IDoc field metadata.]]></description>
+                </parameter>
+                <parameter name="parseIgnoreUnknownFields">
+                    <description><![CDATA[Parsing option for ignoring unknown fields, e.g. when parsing with older IDoc metadata.]]></description>
+                </parameter>
+                <parameter name="parseIgnoreInvalidCharErrors">
+                    <description><![CDATA[Parsing option for ignoring character range check errors in accordance with the declared XML specification version. If using
+ this option invalid characters within field values are accepted although the XML document to parse may not be well-formed
+ because it potentially contains characters not being in the valid character range.]]></description>
+                </parameter>
+                <parameter name="parseWithoutFieldDataTypeChecking">
+                    <description><![CDATA[Parsing option for disabling the field data type checking mechanism in accordance with the respective IDoc field metadata.
+ Caution: This option should be used with care. Sending IDocs with illegal field contents that are violating the field's
+ defined datatype may cause ABAP system dumps and result in unrecognized partial loss of data when later being processed in an
+ AS ABAP system.]]></description>
+                </parameter>
+                <parameter name="parseRefuseUnknownXMLVersion">
+                    <description><![CDATA[Parsing option for refusing XML documents that declare to use an unknown XML specification version, i.e. a potential future
+ XML specification version 1.2 or 2.0.]]></description>
+                </parameter>
+                <parameter name="parseRefuseXMLVersion10">
+                    <description><![CDATA[Parsing option for refusing XML documents that declare to use the XML specification version 1.0 or do not contain an XML
+ declaration header.]]></description>
+                </parameter>
+                <parameter name="parseRefuseXMLVersion11">
+                    <description><![CDATA[Parsing option for refusing XML documents that declare to use the XML specification version 1.1.]]></description>
+                </parameter>
+                <parameter name="parseAcceptOnlyXmlVersion10">
+                    <description><![CDATA[Parsing option for accepting only XML documents that declare to use the XML specification version 1.0 or do not contain an
+ XML declaration header.]]></description>
+                </parameter>
+                <parameter name="parseAcceptOnlyXmlVersion11">
+                    <description><![CDATA[Parsing option for accepting only XML documents that declare to use the XML specification version 1.1.]]></description>
+                </parameter>
+                <parameter name="parseAcceptOnlyXmlVersion10To11">
+                    <description><![CDATA[Parsing option for accepting only XML documents that declare to use the XML specification version 1.0 or 1.1 or do not
+ contain an XML declaration header.]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connector.sap.api.IDocRenderParameterGroup">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="renderIDocEmptyTags">
+                    <description><![CDATA[Rendering option for including also all empty tags in the resulting XML document.]]></description>
+                </parameter>
+                <parameter name="renderIDocIgnoreInvalidCharErrors">
+                    <description><![CDATA[Rendering option for ignoring character range check errors in accordance with the used XML specification version.]]></description>
+                </parameter>
+                <parameter name="renderIDocIgnoreTagEscapeErrors">
+                    <description><![CDATA[Rendering option for ignoring escape character errors within XML tags in accordance with the used IDocXML format.]]></description>
+                </parameter>
+                <parameter name="renderIDocOmitXmlDeclaration">
+                    <description><![CDATA[Rendering option for omitting the XML declaration section in the resulting XML document.]]></description>
+                </parameter>
+                <parameter name="renderIDocOptionalEncodingDecl">
+                    <description><![CDATA[Rendering option for writing also an optional XML encoding declaration attribute into the resulting XML document.]]></description>
+                </parameter>
+                <parameter name="renderIDocSubstituteInvalidChars">
+                    <description><![CDATA[Rendering option for substituting invalid characters within IDoc field values with the number sign '#' (U+0023).]]></description>
+                </parameter>
+                <parameter name="renderIDocWithCR">
+                    <description><![CDATA[Rendering option for inserting CR (Carriage Return) characters into the resulting XML document.]]></description>
+                </parameter>
+                <parameter name="renderIDocWithCRLF">
+                    <description><![CDATA[Rendering option for inserting CR+LF (Carriage Return and Line Feed) characters into the resulting XML document.]]></description>
+                </parameter>
+                <parameter name="renderIDocWithLF">
+                    <description><![CDATA[Rendering option for inserting LF (Line Feed) characters into the resulting XML document.]]></description>
+                </parameter>
+                <parameter name="renderIDocWithTabsAndCR">
+                    <description><![CDATA[Rendering option for inserting TAB and CR (Tabulators and Carriage Return) characters into the resulting XML document.]]></description>
+                </parameter>
+                <parameter name="renderIDocWithTabsAndCRLF">
+                    <description><![CDATA[Rendering option for inserting TAB and CR+LF (Tabulators, Carriage Return and Line Feed) characters into the resulting XML
+ document.]]></description>
+                </parameter>
+                <parameter name="renderIDocWithTabsAndLF">
+                    <description><![CDATA[Rendering option for inserting TAB and LF (Tabulators and Line Feed) characters into the resulting XML document.]]></description>
+                </parameter>
+                <parameter name="renderIDocXml10">
+                    <description><![CDATA[Rendering option for creating an XML document compliant to the XML specification version 1.0]]></description>
+                </parameter>
+                <parameter name="renderIDocXml11">
+                    <description><![CDATA[Rendering option for creating an XML document compliant to the XML specification version 1.1]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connector.sap.api.MessageServer">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="host">
+                    <description><![CDATA[Host of the message server]]></description>
+                </parameter>
+                <parameter name="systemId">
+                    <description><![CDATA[System ID of the SAP system]]></description>
+                </parameter>
+                <parameter name="port">
+                    <description><![CDATA[Port through which the connector logs in to the message server]]></description>
+                </parameter>
+                <parameter name="group">
+                    <description><![CDATA[Group of SAP application servers]]></description>
+                </parameter>
+                <parameter name="router">
+                    <description><![CDATA[SAP router string used for a system protected by a firewall]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connector.sap.api.SapAttributes">
+            <description><![CDATA[Attributes for SAP payload.]]></description>
+            <parameters>
+                <parameter name="transactionId">
+                    <description><![CDATA[]]></description>
+                </parameter>
+            </parameters>
+        </type>
+    </types>
+</extension-documentation>

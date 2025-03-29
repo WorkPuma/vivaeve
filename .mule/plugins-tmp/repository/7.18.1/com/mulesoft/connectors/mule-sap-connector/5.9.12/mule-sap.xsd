@@ -1,0 +1,1017 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:mule="http://www.mulesoft.org/schema/mule/core" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.mulesoft.org/schema/mule/sap" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace"></xs:import>
+  <xs:import namespace="http://www.mulesoft.org/schema/mule/core" schemaLocation="http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></xs:import>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstract-shared-extension" name="sap-config">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractExtensionType">
+          <xs:annotation>
+            <xs:documentation>This refers to the default configuration for SAP extension outbound elements.</xs:documentation>
+          </xs:annotation>
+          <xs:sequence minOccurs="1" maxOccurs="1">
+            <xs:element minOccurs="1" maxOccurs="1" ref="mule:abstractConnectionProvider"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:expiration-policy"></xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:string" use="required" name="name">
+            <xs:annotation>
+              <xs:documentation>The identifier of this element used to reference it in other components</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="encoding">
+            <xs:annotation>
+              <xs:documentation>Canonical name of the encoding. See Oracle's supported encodings at https://docs.oracle.com/javase/7/docs/technotes/guides/intl/encoding.doc.html.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" default="0" name="defaultIdocumentVersion"></xs:attribute>
+          <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="disableJcoInternalCache">
+            <xs:annotation>
+              <xs:documentation>Flag that indicates whether to use the JCo internal cache. Set this flag to true to use the SAP JCo internal cache. By default, JCo stores the metadata after the first call and populates that template in the following calls. This flag applies to both functions and sources.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="evaluateResponseFlag">
+            <xs:annotation>
+              <xs:documentation>Flag that indicates whether to throw an exception or let the user handle it as another result. This flag is an exception or logging mechanism you use to specify whether a message throws an exception (E) or is treated as a result with a warning (W). If you set the flag to true and an E message is returned, an exception is thrown with that message. If W is returned, a warning message is logged.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="logTraceFlag">
+            <xs:annotation>
+              <xs:documentation>Flag that indicates whether to log the trace on the Mule server. Set this to true to log a trace.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="useSAPFormat">
+            <xs:annotation>
+              <xs:documentation>Parameter added to support the Mule 3 format for returning SAP values. Used to parse a JCoField. If set to true, values are returned as strings with the original SAP format. If set to false, values are converted to the corresponding Java objects, serialized, and returned.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="useSAPFormatOnFunctionListener">
+            <xs:annotation>
+              <xs:documentation>Parameter added to support the Mule 3 format for returning SAP values. Used to parse a JCoField. If set to true, values are returned as strings with the original SAP format. If set to false, values are converted to the corresponding Java objects, serialized, and returned.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="certificate-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="extended-properties">
+              <xs:annotation>
+                <xs:documentation>Connector uses this to pass in all the database server-specific connection parameters.</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="extended-property">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="message-server">
+              <xs:annotation>
+                <xs:documentation>Configuration for message server usage</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:sap="http://www.mulesoft.org/schema/mule/sap" base="sap:com.mulesoft.connector.sap.api.MessageServer"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="mule:expressionString" use="required" name="systemNumber">
+            <xs:annotation>
+              <xs:documentation>Two-digit system number (sysnr) of the SAP system</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="client">
+            <xs:annotation>
+              <xs:documentation>Three-digit client number. Leading zeroes are preserved if they appear in the number.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="destinationName">
+            <xs:annotation>
+              <xs:documentation>Connector generates an identifier of the destination. If none is set, then a random value is created.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" default="EN" name="language">
+            <xs:annotation>
+              <xs:documentation>Connector uses a language code that determines the code page used for communicating between the SAP Adapter and the application server.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="extendedProperties">
+            <xs:annotation>
+              <xs:documentation>Connector uses this to pass in all the database server-specific connection parameters.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="path">
+            <xs:annotation>
+              <xs:documentation>Path to the X.509 certificate. This is required when the connector is working as a client.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="applicationServerHost">
+            <xs:annotation>
+              <xs:documentation>Host of the SAP application server</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="messageServer">
+            <xs:annotation>
+              <xs:documentation>Configuration for message server usage</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="traceFromServerFlag">
+            <xs:annotation>
+              <xs:documentation>Enable or disable RFC trace on the server</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/sap" type="com.mulesoft.connector.sap.api.CPICTracingLevelEnumType" use="optional" name="cpicTracingLevel">
+            <xs:annotation>
+              <xs:documentation>Enable or disable CPIC trace on the server</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="com.mulesoft.connector.sap.api.MessageServer">
+    <xs:annotation>
+      <xs:documentation>Configuration for message server usage</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:attribute type="mule:expressionString" use="required" name="host"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="systemId"></xs:attribute>
+        <xs:attribute type="mule:expressionInt" use="optional" name="port"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="group"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="router"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="kerberos-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="extended-properties">
+              <xs:annotation>
+                <xs:documentation>Connector uses this to pass in all the database server-specific connection parameters.</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="extended-property">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="message-server">
+              <xs:annotation>
+                <xs:documentation>Configuration for message server usage</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:sap="http://www.mulesoft.org/schema/mule/sap" base="sap:com.mulesoft.connector.sap.api.MessageServer"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="mule:expressionString" use="required" name="systemNumber">
+            <xs:annotation>
+              <xs:documentation>Two-digit system number (sysnr) of the SAP system</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="client">
+            <xs:annotation>
+              <xs:documentation>Three-digit client number. Leading zeroes are preserved if they appear in the number.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="destinationName">
+            <xs:annotation>
+              <xs:documentation>Connector generates an identifier of the destination. If none is set, then a random value is created.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" default="EN" name="language">
+            <xs:annotation>
+              <xs:documentation>Connector uses a language code that determines the code page used for communicating between the SAP Adapter and the application server.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="extendedProperties">
+            <xs:annotation>
+              <xs:documentation>Connector uses this to pass in all the database server-specific connection parameters.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="applicationServerHost">
+            <xs:annotation>
+              <xs:documentation>Host of the SAP application server</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="messageServer">
+            <xs:annotation>
+              <xs:documentation>Configuration for message server usage</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="traceFromServerFlag">
+            <xs:annotation>
+              <xs:documentation>Enable or disable RFC trace on the server</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/sap" type="com.mulesoft.connector.sap.api.CPICTracingLevelEnumType" use="optional" name="cpicTracingLevel">
+            <xs:annotation>
+              <xs:documentation>Enable or disable CPIC trace on the server</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="krb5ConfFilePath">
+            <xs:annotation>
+              <xs:documentation>The path to the krb5.conf file.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="keytabPath">
+            <xs:annotation>
+              <xs:documentation>The path to the keytab file.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="gssLibraryPath">
+            <xs:annotation>
+              <xs:documentation>The path to the gss library.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="principal">
+            <xs:annotation>
+              <xs:documentation>Principal the connector uses to log in to SAP.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="clientSncPartnerName">
+            <xs:annotation>
+              <xs:documentation>The jco.client.snc_partnername property</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="clientSncMyName">
+            <xs:annotation>
+              <xs:documentation>The jco.client.snc_myname property</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="serverSncPartnerName">
+            <xs:annotation>
+              <xs:documentation>The jco.server.snc_partnername property.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="serverSncMyName">
+            <xs:annotation>
+              <xs:documentation>The jco.server.snc_myname property</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns:mule="http://www.mulesoft.org/schema/mule/core" substitutionGroup="mule:abstractConnectionProvider" name="simple-connection-provider-connection">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="mule:abstractConnectionProviderType">
+          <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element minOccurs="0" maxOccurs="1" ref="mule:reconnection"></xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="extended-properties">
+              <xs:annotation>
+                <xs:documentation>Connector uses this to pass in all the database server-specific connection parameters.</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="unbounded" name="extended-property">
+                    <xs:complexType>
+                      <xs:attribute type="mule:expressionString" use="required" name="key"></xs:attribute>
+                      <xs:attribute type="mule:expressionString" use="required" name="value"></xs:attribute>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="message-server">
+              <xs:annotation>
+                <xs:documentation>Configuration for message server usage</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension xmlns:sap="http://www.mulesoft.org/schema/mule/sap" base="sap:com.mulesoft.connector.sap.api.MessageServer"></xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="mule:expressionString" use="required" name="systemNumber">
+            <xs:annotation>
+              <xs:documentation>Two-digit system number (sysnr) of the SAP system</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="client">
+            <xs:annotation>
+              <xs:documentation>Three-digit client number. Leading zeroes are preserved if they appear in the number.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="destinationName">
+            <xs:annotation>
+              <xs:documentation>Connector generates an identifier of the destination. If none is set, then a random value is created.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" default="EN" name="language">
+            <xs:annotation>
+              <xs:documentation>Connector uses a language code that determines the code page used for communicating between the SAP Adapter and the application server.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionMap" use="optional" name="extendedProperties">
+            <xs:annotation>
+              <xs:documentation>Connector uses this to pass in all the database server-specific connection parameters.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="username">
+            <xs:annotation>
+              <xs:documentation>Username the connector uses to log in to SAP.</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="required" name="password">
+            <xs:annotation>
+              <xs:documentation>Password associated with the login username</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionString" use="optional" name="applicationServerHost">
+            <xs:annotation>
+              <xs:documentation>Host of the SAP application server</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="xs:string" use="optional" name="messageServer">
+            <xs:annotation>
+              <xs:documentation>Configuration for message server usage</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute type="mule:expressionBoolean" use="optional" default="false" name="traceFromServerFlag">
+            <xs:annotation>
+              <xs:documentation>Enable or disable RFC trace on the server</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/sap" type="com.mulesoft.connector.sap.api.CPICTracingLevelEnumType" use="optional" name="cpicTracingLevel">
+            <xs:annotation>
+              <xs:documentation>Enable or disable CPIC trace on the server</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/sap" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="Document-listenerType" substitutionGroup="mule:abstract-message-source" name="document-listener">
+    <xs:annotation>
+      <xs:documentation>This source listens for incoming IDocs.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="Document-listenerType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="i-doc-render-options">
+            <xs:annotation>
+              <xs:documentation>IDoc Rendering options</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:sap="http://www.mulesoft.org/schema/mule/sap" base="sap:com.mulesoft.connector.sap.api.IDocRenderParameterGroup"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="gatewayHost">
+          <xs:annotation>
+            <xs:documentation>This is the name of the host running the gateway handler. SAP Gateway is a development framework used to connect non-SAP applications to SAP applications. You can configure the SAP Gateway host to be the trusted system using an RFC destination.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="gatewayService">
+          <xs:annotation>
+            <xs:documentation>Either the name or service port for the gateway service of the SAP system</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="programID">
+          <xs:annotation>
+            <xs:documentation>SAP system program ID that is registered on the gateway. Must be unique for the given gateway.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="connectionCount">
+          <xs:annotation>
+            <xs:documentation>This parameter indicates the number of connections to register on the gateway. If there is more than one connection, handler requests are processed in parallel. For example, if two connections are set, this will create two handler workers or threads that are going to handle requests in parallel, almost like having two sources start together.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="idocTypeFilterRegex">
+          <xs:annotation>
+            <xs:documentation>Expression to filter all incoming IDocs by type.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="idocTypeExtensionFilterRegex">
+          <xs:annotation>
+            <xs:documentation>Expression to filter all incoming IDocs by type extension.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="host">
+          <xs:annotation>
+            <xs:documentation>Host of the message server</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="port">
+          <xs:annotation>
+            <xs:documentation>The message server name or port number</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="systemId">
+          <xs:annotation>
+            <xs:documentation>The system ID of the system the message server belongs to</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="group">
+          <xs:annotation>
+            <xs:documentation>The logon group defined in ABAP which is identifying a set of application servers</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="updateInterval">
+          <xs:annotation>
+            <xs:documentation>The update time how often the list of application servers is fetched from the message server</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="iDocRenderOptions">
+          <xs:annotation>
+            <xs:documentation>IDoc Rendering options</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="encoding"></xs:attribute>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/sap" type="org.mule.sdk.api.tx.SourceTransactionalActionEnumType" use="optional" default="NONE" name="transactionalAction">
+          <xs:annotation>
+            <xs:documentation>The type of beginning action that sources can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:transactionType" use="optional" default="LOCAL" name="transactionType">
+          <xs:annotation>
+            <xs:documentation>The type of transaction to create. Availability will depend on the runtime version.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="com.mulesoft.connector.sap.api.IDocRenderParameterGroup">
+    <xs:annotation>
+      <xs:documentation>IDoc Rendering options</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="renderIDocEmptyTags"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="renderIDocIgnoreInvalidCharErrors"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="renderIDocIgnoreTagEscapeErrors"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="renderIDocOmitXmlDeclaration"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="renderIDocOptionalEncodingDecl"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="renderIDocSubstituteInvalidChars"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="renderIDocWithCR"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="renderIDocWithCRLF"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="renderIDocWithLF"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="renderIDocWithTabsAndCR"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="renderIDocWithTabsAndCRLF"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="renderIDocWithTabsAndLF"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="renderIDocXml10"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="renderIDocXml11"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/sap" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="Function-listenerType" substitutionGroup="mule:abstract-message-source" name="function-listener">
+    <xs:annotation>
+      <xs:documentation>This source listens for incoming BAPI Functions.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="Function-listenerType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageSourceType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-redelivery-policy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="response"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="xs:string" use="optional" name="gatewayHost">
+          <xs:annotation>
+            <xs:documentation>This is the name of the host running the gateway handler. SAP Gateway is a development framework used to connect non-SAP applications to SAP applications. You can configure the SAP Gateway host to be the trusted system using an RFC destination.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="gatewayService">
+          <xs:annotation>
+            <xs:documentation>Either the name or service port for the gateway service of the SAP system</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="programID">
+          <xs:annotation>
+            <xs:documentation>SAP system program ID that is registered on the gateway. Must be unique for the given gateway.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:substitutableInt" use="optional" default="1" name="connectionCount">
+          <xs:annotation>
+            <xs:documentation>This parameter indicates the number of connections to register on the gateway. If there is more than one connection, handler requests are processed in parallel. For example, if two connections are set, this will create two handler workers or threads that are going to handle requests in parallel, almost like having two sources start together.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="targetedFunction">
+          <xs:annotation>
+            <xs:documentation>Filters the incoming BAPI functions by their name. The name of the function you want to receive.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="host">
+          <xs:annotation>
+            <xs:documentation>Host of the message server</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="port">
+          <xs:annotation>
+            <xs:documentation>The message server name or port number</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="systemId">
+          <xs:annotation>
+            <xs:documentation>The system ID of the system the message server belongs to</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="group">
+          <xs:annotation>
+            <xs:documentation>The logon group defined in ABAP which is identifying a set of application servers</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="updateInterval">
+          <xs:annotation>
+            <xs:documentation>The update time how often the list of application servers is fetched from the message server</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="encoding"></xs:attribute>
+        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/sap" type="org.mule.sdk.api.tx.SourceTransactionalActionEnumType" use="optional" default="NONE" name="transactionalAction">
+          <xs:annotation>
+            <xs:documentation>The type of beginning action that sources can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:transactionType" use="optional" default="LOCAL" name="transactionType">
+          <xs:annotation>
+            <xs:documentation>The type of transaction to create. Availability will depend on the runtime version.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" name="primaryNodeOnly">
+          <xs:annotation>
+            <xs:documentation>Whether this source should only be executed on the primary node when runnning in Cluster</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/sap" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="AsyncRfcType" substitutionGroup="mule:abstract-operator" name="async-rfc">
+    <xs:annotation>
+      <xs:documentation>This operation executes a BAPIFunction over a queued Remote Function Call (qRFC).&lt;br&gt; A qRFC is an extension of a transactional RFC (tRFC) that ensures that individual steps are processed in sequence. This guarantees that multiple logical unit of work (LUW) transactions are processed in the order specified by the application. tRFC can be serialized using inbound and outbound queues, hence the name queued RFC.&lt;br&gt; &lt;br&gt; qRFC is best used for: &lt;ul&gt; &lt;li&gt;Extension of the Transactional RFC&lt;/li&gt; &lt;li&gt;Defined processing sequence&lt;/li&gt; &lt;/ul&gt; &lt;br&gt; qRFC is recommended if you want to guarantee that several transactions are processed in a predefined order.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="AsyncRfcType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content">
+            <xs:annotation>
+              <xs:documentation>BAPIFunction to execute</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="key">
+          <xs:annotation>
+            <xs:documentation>Name of the function to execute</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="transactionId">
+          <xs:annotation>
+            <xs:documentation>ID that identifies an RFC so it runs only once</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="queueName">
+          <xs:annotation>
+            <xs:documentation>Name of the queue where the RFC executes</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="encoding"></xs:attribute>
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
+          <xs:annotation>
+            <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/sap" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="AsynchronousRemoteFunctionCallType" substitutionGroup="mule:abstract-operator" name="asynchronous-remote-function-call">
+    <xs:annotation>
+      <xs:documentation>This operation executes a BAPIFunction over a queued Remote Function Call (qRFC).&lt;br&gt; A qRFC is an extension of a transactional RFC (tRFC) that ensures that individual steps are processed in sequence. This guarantees that multiple logical unit of work (LUW) transactions are processed in the order specified by the application. tRFC can be serialized using inbound and outbound queues, hence the name queued RFC.&lt;br&gt; &lt;br&gt; qRFC is best used for: &lt;ul&gt; &lt;li&gt;Extension of the Transactional RFC&lt;/li&gt; &lt;li&gt;Defined processing sequence&lt;/li&gt; &lt;/ul&gt; &lt;br&gt; qRFC is recommended if you want to guarantee that several transactions are processed in a predefined order.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="AsynchronousRemoteFunctionCallType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content">
+            <xs:annotation>
+              <xs:documentation>BAPIFunction to execute</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="key">
+          <xs:annotation>
+            <xs:documentation>Name of the function to execute</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="required" name="transactionId">
+          <xs:annotation>
+            <xs:documentation>ID that identifies an RFC so it runs only once</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="queueName">
+          <xs:annotation>
+            <xs:documentation>Name of the queue where the RFC executes</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="encoding"></xs:attribute>
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
+          <xs:annotation>
+            <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/sap" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="ConfirmTransactionIdType" substitutionGroup="mule:abstract-operator" name="confirm-transaction-id">
+    <xs:annotation>
+      <xs:documentation>This operation confirms to the server that a transaction is successful.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="ConfirmTransactionIdType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="transactionId">
+          <xs:annotation>
+            <xs:documentation>ID of the transaction to confirm</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
+          <xs:annotation>
+            <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/sap" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="CreateTransactionIdType" substitutionGroup="mule:abstract-operator" name="create-transaction-id">
+    <xs:annotation>
+      <xs:documentation>This operation creates a transaction ID to be used as part of future calls.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="CreateTransactionIdType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
+          <xs:annotation>
+            <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/sap" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="GetFunctionType" substitutionGroup="mule:abstract-operator" name="get-function">
+    <xs:annotation>
+      <xs:documentation>This operation retrieves a BAPIFunction based on its name.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="GetFunctionType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="key">
+          <xs:annotation>
+            <xs:documentation>Name of the function to retrieve</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="encoding"></xs:attribute>
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
+          <xs:annotation>
+            <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/sap" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="RetrieveIdocType" substitutionGroup="mule:abstract-operator" name="retrieve-idoc">
+    <xs:annotation>
+      <xs:documentation>This operation retrieves an IDocument based on its key.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="RetrieveIdocType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="key">
+          <xs:annotation>
+            <xs:documentation>Key that contains the required information to retrieve the IDocument</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="encoding"></xs:attribute>
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
+          <xs:annotation>
+            <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/sap" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SendType" substitutionGroup="mule:abstract-operator" name="send">
+    <xs:annotation>
+      <xs:documentation>This operation sends an IDocument to SAP over an RFC.&lt;br&gt; An RFC can be one of two types for IDocuments: 1. Transactional (tRFC): A special form of asynchronous Remote Function Call (aRFC) that ensures transaction-like execution of processing steps that were originally executed autonomously and that executes the called function module in the RFC server only once, even if the data is sent multiple times.&lt;br&gt; tRFC is an asynchronous communication method that executes the called function module in the RFC server only once, even if the data is sent multiple times.&lt;br&gt; &lt;br&gt; &lt;p&gt; 2. Queued (qRFC): A qRFC is an extension of tRFC that guarantees that multiple LUWs are processed in the order specified by the application, using inbound and outbound queues, hence the name queued RFC.&lt;br&gt; &lt;br&gt; qRFC is best used as an extension of tRFC to define a processing sequence. Both of these types have a TID handler. &lt;br&gt; The implementation of qRFC is recommended if you want to guarantee that several transactions are processed in a predefined order.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="SendType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content">
+            <xs:annotation>
+              <xs:documentation>IDocument to execute</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" name="i-doc-parse-options">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns:sap="http://www.mulesoft.org/schema/mule/sap" base="sap:com.mulesoft.connector.sap.api.IDocParseParameterGroup"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="key">
+          <xs:annotation>
+            <xs:documentation>Name of the IDoc to execute</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="version">
+          <xs:annotation>
+            <xs:documentation>Version of the IDoc</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="transactionId">
+          <xs:annotation>
+            <xs:documentation>ID that identifies an RFC so it runs only once</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="queueName">
+          <xs:annotation>
+            <xs:documentation>Name of the queue on which the RFC executes. This applies for qRFC since each tRFC call that is processed is given a queue name by the application. A queue name and version are required for each qRFC transaction.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="iDocParseOptions"></xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="encoding"></xs:attribute>
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
+          <xs:annotation>
+            <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="com.mulesoft.connector.sap.api.IDocParseParameterGroup">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractExtensionType">
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="parseWithFieldValueChecking"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="parseIgnoreUnknownFields"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="parseIgnoreInvalidCharErrors"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="parseWithoutFieldDataTypeChecking"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="parseRefuseUnknownXMLVersion"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="parseRefuseXMLVersion10"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="parseRefuseXMLVersion11"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="parseAcceptOnlyXmlVersion10"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="parseAcceptOnlyXmlVersion11"></xs:attribute>
+        <xs:attribute type="mule:substitutableBoolean" use="optional" default="false" name="parseAcceptOnlyXmlVersion10To11"></xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/sap" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SyncRfcType" substitutionGroup="mule:abstract-operator" name="sync-rfc">
+    <xs:annotation>
+      <xs:documentation>This operation executes a BAPIFunction over a Synchronous Remote Function Call (sRFC), which requires both client and server to be available for communication or data transfer and also to be available to return a result immediately after the execution. &lt;br&gt; sRFC is best used for: &lt;ul&gt; &lt;li&gt;Communication between systems&lt;/li&gt; &lt;li&gt;Communication between SAP Web Application Server to SAP GUI&lt;/li&gt; &lt;/ul&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="SyncRfcType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content">
+            <xs:annotation>
+              <xs:documentation>BAPIFunction to execute</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="key">
+          <xs:annotation>
+            <xs:documentation>Name of the function to execute</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="encoding"></xs:attribute>
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
+          <xs:annotation>
+            <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/sap" xmlns:mule="http://www.mulesoft.org/schema/mule/core" type="SynchronousRemoteFunctionCallType" substitutionGroup="mule:abstract-operator" name="synchronous-remote-function-call">
+    <xs:annotation>
+      <xs:documentation>This operation executes a BAPIFunction over a Synchronous Remote Function Call (sRFC), which requires both client and server to be available for communication or data transfer and also to be available to return a result immediately after the execution. &lt;br&gt; sRFC is best used for: &lt;ul&gt; &lt;li&gt;Communication between systems&lt;/li&gt; &lt;li&gt;Communication between SAP Web Application Server to SAP GUI&lt;/li&gt; &lt;/ul&gt;</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="SynchronousRemoteFunctionCallType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractOperatorType">
+        <xs:sequence minOccurs="0" maxOccurs="1">
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-byte-streaming-strategy"></xs:element>
+          <xs:element minOccurs="0" maxOccurs="1" ref="mule:abstract-reconnection-strategy"></xs:element>
+          <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="content">
+            <xs:annotation>
+              <xs:documentation>BAPIFunction to execute</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute type="mule:expressionString" use="required" name="key">
+          <xs:annotation>
+            <xs:documentation>Name of the function to execute</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" name="encoding"></xs:attribute>
+        <xs:attribute type="mule:operationTransactionalActionType" use="optional" default="JOIN_IF_POSSIBLE" name="transactionalAction">
+          <xs:annotation>
+            <xs:documentation>The type of joining action that operations can take regarding transactions.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="required" name="config-ref">
+          <xs:annotation>
+            <xs:documentation>The name of the configuration to be used to execute this component</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="xs:string" use="optional" name="target">
+          <xs:annotation>
+            <xs:documentation>The name of a variable on which the operation's output will be placed</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute type="mule:expressionString" use="optional" default="#[payload]" name="targetValue">
+          <xs:annotation>
+            <xs:documentation>An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="com.mulesoft.connector.sap.api.CPICTracingLevelEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="INHERIT"></xs:enumeration>
+          <xs:enumeration value="NO_TRACING"></xs:enumeration>
+          <xs:enumeration value="LEVEL_1"></xs:enumeration>
+          <xs:enumeration value="LEVEL_2"></xs:enumeration>
+          <xs:enumeration value="LEVEL_3"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="org.mule.sdk.api.tx.SourceTransactionalActionEnumType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="ALWAYS_BEGIN"></xs:enumeration>
+          <xs:enumeration value="NONE"></xs:enumeration>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:propertyPlaceholderType"></xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+</xs:schema>

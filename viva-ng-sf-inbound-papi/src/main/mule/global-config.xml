@@ -91,7 +91,7 @@ http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org
 		<http:request-connection host="${request.host}" port="${request.port}" />
 	</http:request-config>
 	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="96bdf21a-6169-4fe2-aa98-f1f0c56fc76d" >
-		<email:smtp-connection host="${email.host}" port="${email.port}" user="${email.username}" password="${secure::email.password}" >
+		<email:smtp-connection host="${email.host}" port="${email.port}" user="${email.username}" password="${email.password}" >
 			<email:properties >
 				<email:property key="mail.smtp.starttls.enable" value="true" />
 			</email:properties>
