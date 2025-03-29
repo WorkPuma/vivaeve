@@ -17,3 +17,6 @@ milestone:
   requetSent: "RequetSent"
   successResponseReceived: "SuccessResponseReceived"
   successResponseSent: "SuccessResponseSent"
+  
+  app:
+  home: "."
