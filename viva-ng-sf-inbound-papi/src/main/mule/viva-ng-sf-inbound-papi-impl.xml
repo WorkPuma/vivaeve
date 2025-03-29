@@ -375,7 +375,7 @@ payload.Data.ADT_A08.PV1."PV1-03"."PL-09"]]></ee:set-variable>
 output application/java
 ---
 [{
-	 "Id":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
+	 "HealthFusion_Patient_Record_ID__c":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
      
       "FirstName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
       "LastName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
@@ -442,7 +442,7 @@ output application/java
 output application/java
 ---
 [{
-	 "Contact_Id__c":(payload.Data.ADT_A08.PID."PID-03"."CX-01"[0])[0 to 14],
+	 "HealthFusion_Patient_Record_ID__c":(payload.Data.ADT_A08.PID."PID-03"."CX-01"[0])[0 to 14],
      
       "FirstName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
       "LastName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
@@ -537,7 +537,7 @@ output application/java
 output application/java
 ---
 [{
-	 "Id":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
+	 "HealthFusion_Patient_Record_ID__c":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
      
       "FirstName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
       "LastName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
