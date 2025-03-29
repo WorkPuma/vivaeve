@@ -29,6 +29,8 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
         </scheduler>
 
         <logger level="INFO" doc:name="Log Start" message="Starting automatic mapping file generation"/>
+        <logger level="INFO" doc:name="Debug - App Home" message="App home directory: #[server.home]"/>
+        <logger level="INFO" doc:name="Debug - User Dir" message="User directory: #[System.getProperty('user.dir')]"/>
 
         <!-- Call your sub-flows -->
         <flow-ref name="generate-territory-mapping" doc:name="Generate Territory Mapping"/>
@@ -50,6 +52,9 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
             ]]></salesforce:salesforce-query>
         </salesforce:query>
 
+        <!-- Log territories retrieved -->
+        <logger level="INFO" doc:name="Debug - Territories Retrieved" message="Retrieved territories: #[payload map ($.Name)]"/>
+
         <ee:transform doc:name="Format LocationId.json">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
@@ -67,13 +72,23 @@ payload map {
 output application/java
 ---
 sizeOf(payload)]]></ee:set-variable>
+                <ee:set-variable variableName="formattedJson"><![CDATA[%dw 2.0
+output application/json
+---
+write(payload, "application/json", {indent: true})]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
 
-        <file:write doc:name="Write LocationId.json"
-                    path="src/main/resources/LocationId.json"
-                    mode="OVERWRITE"/>
+        <!-- Debug logs for file writing -->
+        <logger level="INFO" doc:name="Debug - Before File Write" message="About to write LocationId.json to: src/main/resources/LocationId.json"/>
+        <logger level="INFO" doc:name="Debug - Content Preview" message="First territory data: #[vars.formattedJson[0 to min(250, sizeOf(vars.formattedJson) - 1)]]"/>
 
+        <file:write doc:name="Write LocationId.json"
+            path="src/main/resources/LocationId.json"
+            mode="OVERWRITE"/>
+
+        <logger level="INFO" doc:name="Debug - After File Write" message="File write operation completed for LocationId.json"/>
+        
         <logger level="INFO" doc:name="Log Completion"
                 message="Generated Service Territory mapping with #[vars.mappingCount] records"/>
     </sub-flow>
@@ -89,6 +104,9 @@ sizeOf(payload)]]></ee:set-variable>
                 FROM WorkType                
             ]]></salesforce:salesforce-query>
         </salesforce:query>
+
+        <!-- Log work types retrieved -->
+        <logger level="INFO" doc:name="Debug - Work Types Retrieved" message="Retrieved work types: #[sizeOf(payload)] records"/>
 
         <ee:transform doc:name="Format Appointment_type_mappings.json">
             <ee:message>
@@ -110,12 +128,22 @@ payload map {
 output application/java
 ---
 sizeOf(payload)]]></ee:set-variable>
+                <ee:set-variable variableName="formattedJson"><![CDATA[%dw 2.0
+output application/json
+---
+write(payload, "application/json", {indent: true})]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
 
+        <!-- Debug logs for file writing -->
+        <logger level="INFO" doc:name="Debug - Before File Write" message="About to write Appointment_type_mappings.json to: src/main/resources/Appointment_type_mappings.json"/>
+        <logger level="INFO" doc:name="Debug - Content Preview" message="First work type data: #[vars.formattedJson[0 to min(250, sizeOf(vars.formattedJson) - 1)]]"/>
+
         <file:write doc:name="Write Appointment_type_mappings.json"
-                    path="src/main/resources/Appointment_type_mappings.json"
-                    mode="OVERWRITE"/>
+                path="src/main/resources/Appointment_type_mappings.json"
+                mode="OVERWRITE"/>
+
+        <logger level="INFO" doc:name="Debug - After File Write" message="File write operation completed for Appointment_type_mappings.json"/>
 
         <logger level="INFO" doc:name="Log Completion"
                 message="Generated Work Type mapping with #[vars.mappingCount] records"/>
@@ -133,6 +161,9 @@ sizeOf(payload)]]></ee:set-variable>
                 WHERE IsActive = true
             ]]></salesforce:salesforce-query>
         </salesforce:query>
+
+        <!-- Log providers retrieved -->
+        <logger level="INFO" doc:name="Debug - Providers Retrieved" message="Retrieved providers: #[payload map ($.Name)]"/>
 
         <ee:transform doc:name="Format appointmentProviderExtract.json">
             <ee:message>
@@ -152,12 +183,22 @@ payload map {
 output application/java
 ---
 sizeOf(payload)]]></ee:set-variable>
+                <ee:set-variable variableName="formattedJson"><![CDATA[%dw 2.0
+output application/json
+---
+write(payload, "application/json", {indent: true})]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
 
+        <!-- Debug logs for file writing -->
+        <logger level="INFO" doc:name="Debug - Before File Write" message="About to write appointmentProviderExtract.json to: src/main/resources/appointmentProviderExtract.json"/>
+        <logger level="INFO" doc:name="Debug - Content Preview" message="First provider data: #[vars.formattedJson[0 to min(250, sizeOf(vars.formattedJson) - 1)]]"/>
+
         <file:write doc:name="Write appointmentProviderExtract.json"
-                    path="src/main/resources/appointmentProviderExtract.json"
-                    mode="OVERWRITE"/>
+                path="src/main/resources/appointmentProviderExtract.json"
+                mode="OVERWRITE"/>
+
+        <logger level="INFO" doc:name="Debug - After File Write" message="File write operation completed for appointmentProviderExtract.json"/>
 
         <logger level="INFO" doc:name="Log Completion"
                 message="Generated Service Resource mapping with #[vars.mappingCount] records"/>
@@ -188,9 +229,9 @@ output application/json
 
     <!-- Flow to generate mappings once on startup, then stop itself -->
     <flow name="viva-ng-sf-startup-mapping-generation" initialState="started">
-        <scheduler doc:name="Scheduler (Startup)">
+        <scheduler doc:name="Scheduler (Startup - Once)">
             <scheduling-strategy>
-                <fixed-frequency frequency="1" timeUnit="HOURS"/>
+                <fixed-frequency frequency="1" timeUnit="DAYS" startDelay="0"/>
             </scheduling-strategy>
         </scheduler>
 
@@ -199,20 +240,7 @@ output application/json
         <flow-ref name="generate-territory-mapping"/>
         <flow-ref name="generate-worktype-mapping"/>
         <flow-ref name="generate-provider-mapping"/>
-
-        <scripting:execute engine="groovy">
-            <scripting:code>
-                // Get the current Mule Context
-                def muleContext = registry.lookupByName('_muleContext').getValue()
-
-                // Get the current flow
-                def flow = muleContext.getRegistry().lookupFlowConstruct('viva-ng-sf-startup-mapping-generation')
-
-                // Stop the flow to prevent it from running again
-                flow.stop()
-
-                return payload
-            </scripting:code>
-        </scripting:execute>
+        
+        <logger level="INFO" message="Startup mapping generation completed successfully - will not run again for 1 days"/>
     </flow>
 </mule>
