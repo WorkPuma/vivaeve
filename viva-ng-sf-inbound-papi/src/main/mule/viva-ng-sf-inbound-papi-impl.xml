@@ -113,21 +113,15 @@ output application/json
 payload]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
-				<ee:transform doc:name="language_field" doc:id="a67400c1-e40f-4f32-82e5-f142ddf9ba0b">
-					<ee:message>
-					</ee:message>
-					<ee:variables>
-						<ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
-output application/json
-var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
----
-(language filter ($.primarylanguage == payload.Data.ADT_A04.PID."PID-15"."CE_0296-01"))[0].Language_Preferred__c]]></ee:set-variable>
-							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
-output application/java
----
-payload.Data.ADT_A04.PV1."PV1-03"."PL-09"]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
+				<ee:transform doc:name="language_field" doc:id="b8ca1c0e-4592-4100-a5d8-ff7fbb811cd1">
+    <ee:variables>
+        <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
+        output application/json
+        var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
+        ---
+        (language filter ($.primarylanguage == payload.Data.ADT_A08.PID."PID-15"."CE_0296-01"))[0].Language_Preferred__c]]></ee:set-variable>
+    </ee:variables>
+</ee:transform>
 				<ee:transform doc:name="sfMappings" doc:id="34c96d5e-daad-4b1c-ac52-819005526808">
 					<ee:message>
 					</ee:message>
@@ -358,7 +352,7 @@ payload]]></ee:set-payload>
 					<ee:variables>
 						<ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
 output application/json
-var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
+var language = vars.LanguageMapping
 ---
 (language filter ($.primarylanguage == payload.Data.ADT_A08.PID."PID-15"."CE_0296-01"))[0].Language_Preferred__c]]></ee:set-variable>
 							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
@@ -624,47 +618,47 @@ var language =  readUrl("classpath://Language_Preferred__c.json","application/js
 (language filter ($.primarylanguage == payload.Data.SIU_S12.PATIENT.PID."PID-15"[0]."CE_0296-01" ))[0].Language_Preferred__c]]></ee:set-variable>
 						<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].AdditionalInformation]]></ee:set-variable>
 						<ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
 output application/json
-var provider =  readUrl("classpath://appointmentProviderExtract.json","application/json")
+var provider = vars.ProviderMapping
 ---
 (provider filter ($.Last_Name == flatten(payload.Data.SIU_S12.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
 						<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
-var location =  readUrl("classpath://LocationId.json","application/json")
+var location = vars.TerritoryMapping
 ---
 (location filter ($.LOCATION == payload.Data.SIU_S12.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
 						<ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].duration]]></ee:set-variable>
 						<ee:set-variable variableName="apType"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].AppointmentType]]></ee:set-variable>
 						<ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].WorkTypeId]]></ee:set-variable>
 						<ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
 						<ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
 						<ee:set-variable variableName="serviceId"><![CDATA[%dw 2.0
 output application/json
-var provider =  readUrl("classpath://appointmentProviderExtract.json","application/json")
+var provider = vars.ProviderMapping
 ---
 (provider filter ($.Last_Name == flatten(payload.Data.SIU_S12.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].providerId]]></ee:set-variable>
 							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
@@ -765,42 +759,42 @@ var language =  readUrl("classpath://Language_Preferred__c.json","application/js
 (language filter ($.primarylanguage == payload.Data.SIU_S13.PATIENT.PID."PID-15"[0]."CE_0296-01" ))[0].Language_Preferred__c]]></ee:set-variable>
 						<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].AdditionalInformation]]></ee:set-variable>
 						<ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
 output application/json
-var provider =  readUrl("classpath://appointmentProviderExtract.json","application/json")
+var provider = vars.ProviderMapping
 ---
 (provider filter ($.Last_Name == flatten(payload.Data.SIU_S13.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
 						<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
-var location =  readUrl("classpath://LocationId.json","application/json")
+var location = vars.TerritoryMapping
 ---
 (location filter ($.LOCATION == payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
 						<ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].duration]]></ee:set-variable>
 						<ee:set-variable variableName="apType"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].AppointmentType]]></ee:set-variable>
 						<ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.AdditionalInformation == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].WorkTypeId]]></ee:set-variable>
 						<ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
 						<ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
 							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
@@ -940,42 +934,42 @@ var language =  readUrl("classpath://Language_Preferred__c.json","application/js
 (language filter ($.primarylanguage == payload.Data.SIU_S14.PATIENT.PID."PID-15"."CE_0296-01"[0]))[0].Language_Preferred__c]]></ee:set-variable>
 						<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].AdditionalInformation]]></ee:set-variable>
 						<ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
 output application/json
-var provider =  readUrl("classpath://appointmentProviderExtract.json","application/json")
+var provider = vars.ProviderMapping
 ---
 (provider filter ($.Last_Name == flatten(payload.Data.SIU_S14.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
 						<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
-var location =  readUrl("classpath://LocationId.json","application/json")
+var location = vars.TerritoryMapping
 ---
 (location filter ($.LOCATION == payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
 						<ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].duration]]></ee:set-variable>
 						<ee:set-variable variableName="apType"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].AppointmentType]]></ee:set-variable>
 						<ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].WorkTypeId]]></ee:set-variable>
 						<ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
 						<ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
 							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
@@ -1113,42 +1107,42 @@ var language =  readUrl("classpath://Language_Preferred__c.json","application/js
 (language filter ($.primarylanguage == payload.Data.SIU_S15.PATIENT.PID."PID-15"."CE_0296-01"[0]))[0].Language_Preferred__c]]></ee:set-variable>
 						<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].AdditionalInformation]]></ee:set-variable>
 						<ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
 output application/json
-var provider =  readUrl("classpath://appointmentProviderExtract.json","application/json")
+var provider = vars.ProviderMapping
 ---
 (provider filter ($.Last_Name == flatten(payload.Data.SIU_S15.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
 						<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
-var location =  readUrl("classpath://LocationId.json","application/json")
+var location = vars.TerritoryMapping
 ---
 (location filter ($.LOCATION == payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
 						<ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].duration]]></ee:set-variable>
 						<ee:set-variable variableName="apType"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].AppointmentType]]></ee:set-variable>
 						<ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].WorkTypeId]]></ee:set-variable>
 						<ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
 						<ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
 output application/json
-var appType =  readUrl("classpath://Appointment_type_mappings.json","application/json")
+var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
 							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0

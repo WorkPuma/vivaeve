@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	
+	<error-handler name="error-handler"
+		doc:id="0f9f98b5-0b98-46c3-a3a1-f0395617047a">
+		
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e53d19e2-ad7e-47ca-b984-0f25eddb69f9" type="APIKIT:NOT_FOUND,APIKIT:BAD_REQUEST,APIKIT:METHOD_NOT_ALLOWED,APIKIT:NOT_ACCEPTABLE,APIKIT:UNSUPPORTED_MEDIA_TYPE,APIKIT:NOT_IMPLEMENTED">
+			<ee:transform doc:name="ApiKitErrors" doc:id="ec07c5dd-15df-4804-aadf-d5240fdf73e8" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+if(!isEmpty(error.errorMessage.payload) and !isEmpty(error.errorMessage.payload.errorOrigin)) 
+	error.errorMessage.payload
+else { 
+  "messages" :  if(error.cause.errorMessage.payload.messages != null) (error.cause.errorMessage.payload.messages) else error.description,
+  "errorOrigin": p('application.name'),
+  "status" : "ERROR",
+  "code": error.errorType.asString default error.errorMessage.attributes.statusCode,
+  "description" : error.detailedDescription,
+  "correlationId" : vars.correlationId default "",
+  "timestamp":  now() >> "America/Chicago" as String {format: "yyyy-MM-dd'T'HH:mm:ss.SSS"}
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<flow-ref doc:name="error-handler-exit" doc:id="6ea5b70a-99f4-4cc5-9256-ab1ee692b17b" name="error-handler-exit" />
+		</on-error-propagate>
+		
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d8e2a10b-9772-4457-a334-53630e05afc4" type="HTTP:BAD_GATEWAY,HTTP:BAD_REQUEST, HTTP:CLIENT_SECURITY, HTTP:CONNECTIVITY, HTTP:INTERNAL_SERVER_ERROR, HTTP:METHOD_NOT_ALLOWED, HTTP:NOT_ACCEPTABLE, HTTP:RETRY_EXHAUSTED, HTTP:SECURITY, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:TOO_MANY_REQUESTS, HTTP:UNSUPPORTED_MEDIA_TYPE, STREAM_MAXIMUM_SIZE_EXCEEDED" >
+			<ee:transform doc:name="HTTPErrors" doc:id="0d1c9672-5cab-4f3a-9efa-73283d4ed74d" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+if(!isEmpty(error.errorMessage.payload) and !isEmpty(error.errorMessage.payload.errorOrigin)) 
+	error.errorMessage.payload
+else { 
+  "messages" :  if(error.cause.errorMessage.payload.messages != null) (error.cause.errorMessage.payload.messages) else error.description,
+  "errorOrigin": p('application.name'),
+  "status" : "ERROR",
+  "code": error.errorType.asString default error.errorMessage.attributes.statusCode,
+  "description" : error.detailedDescription,
+  "correlationId" : vars.correlationId default "",
+  "timestamp":  now() >> "America/Chicago" as String {format: "yyyy-MM-dd'T'HH:mm:ss.SSS"}
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[error.errorMessage.attributes.statusCode default "500"]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="error-handler-exit" doc:id="70d0642d-1cd2-4a62-9b9c-d9584a83ab8d" name="error-handler-exit" />
+		</on-error-propagate>
+		
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ad0b2d87-0724-45ba-97f9-21d673d31ca2" type="ANY">
+			<ee:transform doc:name="Handling Mapping Errors" doc:id="62e6473f-6395-4f58-95f9-54dcbd82b7f1">
+				<ee:message>
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+if(!isEmpty(error.errorMessage.payload) and !isEmpty(error.errorMessage.payload.errorOrigin)) 
+	error.errorMessage.payload
+else { 
+  "messages" :  if(error.cause.errorMessage.payload.messages != null) (error.cause.errorMessage.payload.messages) else error.description,
+  "errorOrigin": p('application.name'),
+  "status" : "ERROR",
+  "code": error.errorType.asString default error.errorMessage.attributes.statusCode,
+  "description" : error.detailedDescription,
+  "correlationId" : vars.correlationId default "",
+  "timestamp":  now() >> "America/Chicago" as String {format: "yyyy-MM-dd'T'HH:mm:ss.SSS"}
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[error.errorMessage.attributes.statusCode default "500"]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="error-handler-exit" doc:id="b954f252-0968-4e77-a663-f71de2b2cb4f" name="error-handler-exit" />
+		</on-error-propagate>
+		
+	</error-handler>
+	
+	<sub-flow name="error-handler-exit-api"
+		doc:id="6e87c075-19b4-4ad8-8e98-63c84e0219d5">
+		<logger level="ERROR" doc:name="Logger" doc:id="7994d4af-7e8a-4e72-84e6-84186bc7f61d" message="#[payload]"/>
+	</sub-flow>
+	
+	<sub-flow name="impl-error-email-flow" doc:id="8295eff9-ef66-458a-afaf-2c14e036049a" >
+		<ee:transform doc:name="Set Error Email Details" doc:id="2853a83c-2851-41a3-9bc8-dbb464d54a87">
+			<ee:message>
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+    "body": "Error occurred in " ++ p('application.name') ++ "\n\n" ++
+            "Correlation ID: " ++ (vars.correlationId default "Not available") ++ "\n" ++
+            "Error Type: " ++ (error.errorType.asString default "Unknown") ++ "\n" ++
+            "Description: " ++ (error.description default "No description available") ++ "\n\n" ++
+            "Payload: " ++ write(payload, "application/json", {"indent": false})
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Mail Start Log" doc:id="f38c1179-aee0-49bf-a4a1-d8800872285e" message='CorrelationId::: #[vars.transactionId default vars.correlationId]  "Sending Error Email to InternalTeam "' />
+		<email:send doc:name="errorEmail" doc:id="26d16af3-8e85-4d87-b811-27ec5dfc8419" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- payload.body]">
+			<email:to-addresses>
+				<email:to-address value="${email.to}" />
+			</email:to-addresses>
+			<email:body contentType="text/plain" />
+		</email:send>
+		<logger level="INFO" doc:name="Mail End Log" doc:id="c7775a57-a915-4cf8-b0c6-da84ebcc439c" message='CorrelationId::: #[vars.transactionId default vars.correlationId]   "Error Email sent successfully"' />
+		<ee:transform doc:name="Set Response" doc:id="90de70a4-c232-4fc4-9f01-d54358ae1485">
+			<ee:message>
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "status": "ERROR",
+  "message": "Error notification sent to the support team",
+  "correlationId": vars.correlationId default "",
+  "timestamp": now() as String {format: "yyyy-MM-dd'T'HH:mm:ss.SSS"}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>
