@@ -1,0 +1,14 @@
+{
+    "name": "viva-ng-sf-inbound-papi",
+    "classLoaderModelLoaderDescriptor": {
+        "attributes": {
+            "exportedPackages": [],
+            "exportedResources": []
+        },
+        "id": "mule"
+    },
+    "minMuleVersion": "4.4.0",
+    "objectStoreV2": true,
+    "javaSpecificationVersions": ["21"],
+    "secureProperties": []
+}

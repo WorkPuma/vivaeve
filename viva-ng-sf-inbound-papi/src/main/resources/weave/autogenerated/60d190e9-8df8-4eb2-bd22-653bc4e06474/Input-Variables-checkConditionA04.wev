@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_60d190e9_8df8_4eb2_bd22_653bc4e06474_Input_Variables_checkConditionA04 = Any
+

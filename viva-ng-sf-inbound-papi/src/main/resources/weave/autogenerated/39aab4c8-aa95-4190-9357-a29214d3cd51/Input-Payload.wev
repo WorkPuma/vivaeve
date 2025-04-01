@@ -1,0 +1,1064 @@
+%dw 2.0
+
+type auto_39aab4c8_aa95_4190_9357_a29214d3cd51_Input_Payload = {|
+  Delimiters: String, 
+  Id: String, 
+  Name: String, 
+  Data: {|
+    ADT_A04?: {|
+      Id: String, 
+      Name: String, 
+      MSH: {|
+        "MSH-01": String, 
+        "MSH-02": String, 
+        "MSH-03"?: {|
+          "HD-01"?: String, 
+          "HD-02"?: String, 
+          "HD-03"?: String
+        |}, 
+        "MSH-04"?: anonymousType_10, 
+        "MSH-05"?: anonymousType_10, 
+        "MSH-06"?: anonymousType_10, 
+        "MSH-07"?: {|
+          "TS-01"?: String, 
+          "TS-02"?: String
+        |}, 
+        "MSH-08"?: String, 
+        "MSH-09": {|
+          "CM_MSG-01"?: String, 
+          "CM_MSG-02"?: String
+        |}, 
+        "MSH-10": String, 
+        "MSH-11": {|
+          "PT-01"?: String, 
+          "PT-02"?: String
+        |}, 
+        "MSH-12": String, 
+        "MSH-13"?: Number {"typeId": "double"}, 
+        "MSH-14"?: String, 
+        "MSH-15"?: String, 
+        "MSH-16"?: String, 
+        "MSH-17"?: String, 
+        "MSH-18"?: String, 
+        "MSH-19"?: {|
+          "CE-01"?: String, 
+          "CE-02"?: String, 
+          "CE-03"?: String, 
+          "CE-04"?: String, 
+          "CE-05"?: String, 
+          "CE-06"?: String
+        |}
+      |}, 
+      EVN: {|
+        "EVN-01": String, 
+        "EVN-02"?: anonymousType_14, 
+        "EVN-03"?: anonymousType_14, 
+        "EVN-04"?: String, 
+        "EVN-05"?: {|
+          "XCN-01"?: String, 
+          "XCN-02"?: String, 
+          "XCN-03"?: String, 
+          "XCN-04"?: String, 
+          "XCN-05"?: String, 
+          "XCN-06"?: String, 
+          "XCN-07"?: String, 
+          "XCN-08"?: String, 
+          "XCN-09"?: anonymousType_10, 
+          "XCN-10"?: String, 
+          "XCN-11"?: String, 
+          "XCN-12"?: String, 
+          "XCN-13"?: String, 
+          "XCN-14"?: anonymousType_10
+        |}, 
+        "EVN-06"?: anonymousType_14
+      |}, 
+      PID: {|
+        "PID-01"?: Number, 
+        "PID-02"?: {|
+          "CX-01"?: String, 
+          "CX-02"?: String, 
+          "CX-03"?: String, 
+          "CX-04"?: anonymousType_10, 
+          "CX-05"?: String, 
+          "CX-06"?: anonymousType_10
+        |}, 
+        "PID-03": Array<anonymousType_56>, 
+        "PID-04"?: Array<anonymousType_56>, 
+        "PID-05": Array<{|          "XPN-01"?: String,           "XPN-02"?: String,           "XPN-03"?: String,           "XPN-04"?: String,           "XPN-05"?: String,           "XPN-06"?: String,           "XPN-07"?: String,           "XPN-08"?: String        |}>, 
+        "PID-06"?: anonymousType_64, 
+        "PID-07"?: anonymousType_14, 
+        "PID-08"?: String, 
+        "PID-09"?: Array<anonymousType_64>, 
+        "PID-10"?: String, 
+        "PID-11"?: Array<{|          "XAD-01"?: String,           "XAD-02"?: String,           "XAD-03"?: String,           "XAD-04"?: String,           "XAD-05"?: String,           "XAD-06"?: String,           "XAD-07"?: String,           "XAD-08"?: String,           "XAD-09"?: String,           "XAD-10"?: String        |}>, 
+        "PID-12"?: String, 
+        "PID-13"?: Array<{|          "XTN-01"?: String,           "XTN-02"?: String,           "XTN-03"?: String,           "XTN-04"?: String,           "XTN-05"?: Number {"typeId": "double"},           "XTN-06"?: Number {"typeId": "double"},           "XTN-07"?: Number {"typeId": "double"},           "XTN-08"?: Number {"typeId": "double"},           "XTN-09"?: String        |}>, 
+        "PID-14"?: Array<anonymousType_90>, 
+        "PID-15"?: {|
+          "CE_0296-01"?: String, 
+          "CE_0296-02"?: String, 
+          "CE_0296-03"?: String, 
+          "CE_0296-04"?: String, 
+          "CE_0296-05"?: String, 
+          "CE_0296-06"?: String
+        |}, 
+        "PID-16"?: String, 
+        "PID-17"?: String, 
+        "PID-18"?: anonymousType_56, 
+        "PID-19"?: String, 
+        "PID-20"?: {|
+          "DLN-01"?: String, 
+          "DLN-02"?: String, 
+          "DLN-03"?: DateTime
+        |}, 
+        "PID-21"?: Array<anonymousType_56>, 
+        "PID-22"?: String, 
+        "PID-23"?: String, 
+        "PID-24"?: String, 
+        "PID-25"?: Number {"typeId": "double"}, 
+        "PID-26"?: Array<String>, 
+        "PID-27"?: {|
+          "CE_0172-01"?: String, 
+          "CE_0172-02"?: String, 
+          "CE_0172-03"?: String, 
+          "CE_0172-04"?: String, 
+          "CE_0172-05"?: String, 
+          "CE_0172-06"?: String
+        |}, 
+        "PID-28"?: {|
+          "CE_0212-01"?: String, 
+          "CE_0212-02"?: String, 
+          "CE_0212-03"?: String, 
+          "CE_0212-04"?: String, 
+          "CE_0212-05"?: String, 
+          "CE_0212-06"?: String
+        |}, 
+        "PID-29"?: anonymousType_14, 
+        "PID-30"?: String
+      |}, 
+      PD1?: {|
+        "PD1-01"?: Array<String>, 
+        "PD1-02"?: String, 
+        "PD1-03"?: Array<{|          "XON-01"?: String,           "XON-02"?: String,           "XON-03"?: Number {"typeId": "double"},           "XON-04"?: String,           "XON-05"?: String,           "XON-06"?: anonymousType_10,           "XON-07"?: String,           "XON-08"?: anonymousType_10        |}>, 
+        "PD1-04"?: Array<anonymousType_41>, 
+        "PD1-05"?: String, 
+        "PD1-06"?: String, 
+        "PD1-07"?: String, 
+        "PD1-08"?: String, 
+        "PD1-09"?: String, 
+        "PD1-10"?: Array<anonymousType_56>, 
+        "PD1-11"?: {|
+          "CE_0215-01"?: String, 
+          "CE_0215-02"?: String, 
+          "CE_0215-03"?: String, 
+          "CE_0215-04"?: String, 
+          "CE_0215-05"?: String, 
+          "CE_0215-06"?: String
+        |}, 
+        "PD1-12"?: String
+      |}, 
+      NK1?: Array<{|        "NK1-01": Number,         "NK1-02"?: Array<anonymousType_64>, 
+        "NK1-03"?: {|
+          "CE_0063-01"?: String, 
+          "CE_0063-02"?: String, 
+          "CE_0063-03"?: String, 
+          "CE_0063-04"?: String, 
+          "CE_0063-05"?: String, 
+          "CE_0063-06"?: String
+        |}, 
+        "NK1-04"?: Array<anonymousType_77>, 
+        "NK1-05"?: Array<anonymousType_90>, 
+        "NK1-06"?: Array<anonymousType_90>, 
+        "NK1-07": {|
+          "CE_0131-01"?: String, 
+          "CE_0131-02"?: String, 
+          "CE_0131-03"?: String, 
+          "CE_0131-04"?: String, 
+          "CE_0131-05"?: String, 
+          "CE_0131-06"?: String
+        |}, 
+        "NK1-08"?: DateTime, 
+        "NK1-09"?: DateTime, 
+        "NK1-10"?: String, 
+        "NK1-11"?: {|
+          "JCC-01"?: String, 
+          "JCC-02"?: String
+        |}, 
+        "NK1-12"?: anonymousType_56, 
+        "NK1-13"?: Array<anonymousType_142>, 
+        "NK1-14"?: Array<String>, 
+        "NK1-15"?: String, 
+        "NK1-16"?: anonymousType_14, 
+        "NK1-17"?: Array<String>, 
+        "NK1-18"?: Array<String>, 
+        "NK1-19"?: Array<String>, 
+        "NK1-20"?: anonymousType_101, 
+        "NK1-21"?: String, 
+        "NK1-22"?: anonymousType_156, 
+        "NK1-23"?: String, 
+        "NK1-24"?: String, 
+        "NK1-25"?: String, 
+        "NK1-26"?: anonymousType_64, 
+        "NK1-27"?: anonymousType_129, 
+        "NK1-28"?: String, 
+        "NK1-29"?: Array<{|          "CE_0222-01"?: String,           "CE_0222-02"?: String,           "CE_0222-03"?: String,           "CE_0222-04"?: String,           "CE_0222-05"?: String,           "CE_0222-06"?: String        |}>, 
+        "NK1-30"?: Array<anonymousType_64>, 
+        "NK1-31"?: Array<anonymousType_90>, 
+        "NK1-32"?: Array<anonymousType_77>, 
+        "NK1-33"?: Array<anonymousType_56>, 
+        "NK1-34"?: String, 
+        "NK1-35"?: String, 
+        "NK1-36"?: String, 
+        "NK1-37"?: String
+      |}>, 
+      PV1: {|
+        "PV1-01"?: Number, 
+        "PV1-02": String, 
+        "PV1-03"?: {|
+          "PL-01"?: String, 
+          "PL-02"?: String, 
+          "PL-03"?: String, 
+          "PL-04"?: anonymousType_10, 
+          "PL-05"?: String, 
+          "PL-06"?: String, 
+          "PL-07"?: String, 
+          "PL-08"?: String, 
+          "PL-09"?: String
+        |}, 
+        "PV1-04"?: String, 
+        "PV1-05"?: anonymousType_56, 
+        "PV1-06"?: anonymousType_225, 
+        "PV1-07"?: Array<anonymousType_41>, 
+        "PV1-08"?: Array<anonymousType_41>, 
+        "PV1-09"?: Array<anonymousType_41>, 
+        "PV1-10"?: String, 
+        "PV1-11"?: anonymousType_225, 
+        "PV1-12"?: String, 
+        "PV1-13"?: String, 
+        "PV1-14"?: String, 
+        "PV1-15"?: Array<String>, 
+        "PV1-16"?: String, 
+        "PV1-17"?: Array<anonymousType_41>, 
+        "PV1-18"?: String, 
+        "PV1-19"?: anonymousType_56, 
+        "PV1-20"?: Array<{|          "FC-01"?: String,           "FC-02"?: anonymousType_14        |}>, 
+        "PV1-21"?: String, 
+        "PV1-22"?: String, 
+        "PV1-23"?: String, 
+        "PV1-24"?: Array<String>, 
+        "PV1-25"?: Array<DateTime>, 
+        "PV1-26"?: Array<Number {"typeId": "double"}>, 
+        "PV1-27"?: Array<Number {"typeId": "double"}>, 
+        "PV1-28"?: String, 
+        "PV1-29"?: String, 
+        "PV1-30"?: DateTime, 
+        "PV1-31"?: String, 
+        "PV1-32"?: Number {"typeId": "double"}, 
+        "PV1-33"?: Number {"typeId": "double"}, 
+        "PV1-34"?: String, 
+        "PV1-35"?: DateTime, 
+        "PV1-36"?: String, 
+        "PV1-37"?: {|
+          "CM_DLD-01"?: String, 
+          "CM_DLD-02"?: anonymousType_14
+        |}, 
+        "PV1-38"?: String, 
+        "PV1-39"?: String, 
+        "PV1-40"?: String, 
+        "PV1-41"?: String, 
+        "PV1-42"?: anonymousType_225, 
+        "PV1-43"?: anonymousType_225, 
+        "PV1-44"?: anonymousType_14, 
+        "PV1-45"?: anonymousType_14, 
+        "PV1-46"?: Number {"typeId": "double"}, 
+        "PV1-47"?: Number {"typeId": "double"}, 
+        "PV1-48"?: Number {"typeId": "double"}, 
+        "PV1-49"?: Number {"typeId": "double"}, 
+        "PV1-50"?: anonymousType_56, 
+        "PV1-51"?: String, 
+        "PV1-52"?: Array<anonymousType_41>
+      |}, 
+      PV2?: {|
+        "PV2-01"?: anonymousType_225, 
+        "PV2-02"?: {|
+          "CE_0129-01"?: String, 
+          "CE_0129-02"?: String, 
+          "CE_0129-03"?: String, 
+          "CE_0129-04"?: String, 
+          "CE_0129-05"?: String, 
+          "CE_0129-06"?: String
+        |}, 
+        "PV2-03"?: anonymousType_31, 
+        "PV2-04"?: anonymousType_31, 
+        "PV2-05"?: Array<String>, 
+        "PV2-06"?: String, 
+        "PV2-07"?: String, 
+        "PV2-08"?: anonymousType_14, 
+        "PV2-09"?: anonymousType_14, 
+        "PV2-10"?: Number {"typeId": "double"}, 
+        "PV2-11"?: Number {"typeId": "double"}, 
+        "PV2-12"?: String, 
+        "PV2-13"?: anonymousType_41, 
+        "PV2-14"?: DateTime, 
+        "PV2-15"?: String, 
+        "PV2-16"?: String, 
+        "PV2-17"?: DateTime, 
+        "PV2-18"?: String, 
+        "PV2-19"?: String, 
+        "PV2-20"?: Number {"typeId": "double"}, 
+        "PV2-21"?: String, 
+        "PV2-22"?: String, 
+        "PV2-23"?: Array<anonymousType_142>, 
+        "PV2-24"?: String, 
+        "PV2-25"?: String, 
+        "PV2-26"?: DateTime, 
+        "PV2-27"?: String, 
+        "PV2-28"?: DateTime, 
+        "PV2-29"?: DateTime, 
+        "PV2-30"?: String, 
+        "PV2-31"?: String, 
+        "PV2-32"?: String, 
+        "PV2-33"?: anonymousType_14, 
+        "PV2-34"?: String, 
+        "PV2-35"?: String, 
+        "PV2-36"?: String, 
+        "PV2-37"?: String
+      |}, 
+      DB1?: Array<{|        "DB1-01": Number,         "DB1-02"?: String,         "DB1-03"?: Array<anonymousType_56>, 
+        "DB1-04"?: String, 
+        "DB1-05"?: DateTime, 
+        "DB1-06"?: DateTime, 
+        "DB1-07"?: DateTime, 
+        "DB1-08"?: DateTime
+      |}>, 
+      OBX?: Array<{|        "OBX-01"?: Number,         "OBX-02": String,         "OBX-03": anonymousType_31,         "OBX-04"?: String,         "OBX-05"?: Array<Array<{|  |}>>, 
+        "OBX-06"?: anonymousType_31, 
+        "OBX-07"?: String, 
+        "OBX-08"?: Array<String>, 
+        "OBX-09"?: Number {"typeId": "double"}, 
+        "OBX-10"?: String, 
+        "OBX-11": String, 
+        "OBX-12"?: anonymousType_14, 
+        "OBX-13"?: String, 
+        "OBX-14"?: anonymousType_14, 
+        "OBX-15"?: anonymousType_31, 
+        "OBX-16"?: anonymousType_41, 
+        "OBX-17"?: Array<anonymousType_31>
+      |}>, 
+      AL1?: Array<{|        "AL1-01": Number,         "AL1-02"?: String,         "AL1-03": anonymousType_31,         "AL1-04"?: String,         "AL1-05"?: String,         "AL1-06"?: DateTime      |}>, 
+      DG1?: Array<{|        "DG1-01": Number,         "DG1-02"?: String,         "DG1-03"?: {|          "CE_0051-01"?: String,           "CE_0051-02"?: String,           "CE_0051-03"?: String,           "CE_0051-04"?: String,           "CE_0051-05"?: String,           "CE_0051-06"?: String        |},         "DG1-04"?: String,         "DG1-05"?: anonymousType_14,         "DG1-06": String,         "DG1-07"?: {|          "CE_0118-01"?: String,           "CE_0118-02"?: String,           "CE_0118-03"?: String,           "CE_0118-04"?: String,           "CE_0118-05"?: String,           "CE_0118-06"?: String        |},         "DG1-08"?: {|          "CE_0055-01"?: String,           "CE_0055-02"?: String,           "CE_0055-03"?: String,           "CE_0055-04"?: String,           "CE_0055-05"?: String,           "CE_0055-06"?: String        |},         "DG1-09"?: String,         "DG1-10"?: String,         "DG1-11"?: {|          "CE_0083-01"?: String,           "CE_0083-02"?: String,           "CE_0083-03"?: String,           "CE_0083-04"?: String,           "CE_0083-05"?: String,           "CE_0083-06"?: String        |},         "DG1-12"?: Number {"typeId": "double"},         "DG1-13"?: {|          "CP-01"?: {|            "MO-01"?: Number {"typeId": "double"},             "MO-02"?: String          |},           "CP-02"?: String,           "CP-03"?: Number {"typeId": "double"},           "CP-04"?: Number {"typeId": "double"},           "CP-05"?: anonymousType_31,           "CP-06"?: String        |},         "DG1-14"?: String,         "DG1-15"?: Number {"typeId": "double"},         "DG1-16"?: Array<anonymousType_41>, 
+        "DG1-17"?: String, 
+        "DG1-18"?: String, 
+        "DG1-19"?: anonymousType_14
+      |}>, 
+      DRG?: {|
+        "DRG-01"?: anonymousType_373, 
+        "DRG-02"?: anonymousType_14, 
+        "DRG-03"?: String, 
+        "DRG-04"?: String, 
+        "DRG-05"?: anonymousType_382, 
+        "DRG-06"?: Number {"typeId": "double"}, 
+        "DRG-07"?: anonymousType_390, 
+        "DRG-08"?: String, 
+        "DRG-09"?: anonymousType_390, 
+        "DRG-10"?: String
+      |}, 
+      PROCEDURE?: Array<{|        PR1: {|          "PR1-01": Number,           "PR1-02": String,           "PR1-03": {|            "CE_0088-01"?: String,             "CE_0088-02"?: String,             "CE_0088-03"?: String,             "CE_0088-04"?: String,             "CE_0088-05"?: String,             "CE_0088-06"?: String          |},           "PR1-04"?: String,           "PR1-05"?: anonymousType_14,           "PR1-06": String,           "PR1-07"?: Number {"typeId": "double"},           "PR1-08"?: Array<anonymousType_41>, 
+          "PR1-09"?: String, 
+          "PR1-10"?: Number {"typeId": "double"}, 
+          "PR1-11"?: Array<anonymousType_41>, 
+          "PR1-12"?: Array<anonymousType_41>, 
+          "PR1-13"?: {|
+            "CE_0059-01"?: String, 
+            "CE_0059-02"?: String, 
+            "CE_0059-03"?: String, 
+            "CE_0059-04"?: String, 
+            "CE_0059-05"?: String, 
+            "CE_0059-06"?: String
+          |}, 
+          "PR1-14"?: Number {"typeId": "double"}, 
+          "PR1-15"?: anonymousType_31
+        |}, 
+        ROL?: Array<{|          "ROL-01": {|            "EI-01"?: String,             "EI-02"?: String,             "EI-03"?: String,             "EI-04"?: String          |},           "ROL-02": String,           "ROL-03"?: anonymousType_31,           "ROL-04": anonymousType_41,           "ROL-05"?: anonymousType_14,           "ROL-06"?: anonymousType_14,           "ROL-07"?: anonymousType_31,           "ROL-08"?: anonymousType_31        |}>
+      |}>, 
+      GT1?: Array<{|        "GT1-01": Number,         "GT1-02"?: Array<anonymousType_56>, 
+        "GT1-03": Array<anonymousType_64>, 
+        "GT1-04"?: Array<anonymousType_64>, 
+        "GT1-05"?: Array<anonymousType_77>, 
+        "GT1-06"?: Array<anonymousType_90>, 
+        "GT1-07"?: Array<anonymousType_90>, 
+        "GT1-08"?: anonymousType_14, 
+        "GT1-09"?: String, 
+        "GT1-10"?: String, 
+        "GT1-11"?: String, 
+        "GT1-12"?: String, 
+        "GT1-13"?: DateTime, 
+        "GT1-14"?: DateTime, 
+        "GT1-15"?: Number {"typeId": "double"}, 
+        "GT1-16"?: Array<anonymousType_64>, 
+        "GT1-17"?: Array<anonymousType_77>, 
+        "GT1-18"?: Array<anonymousType_90>, 
+        "GT1-19"?: Array<anonymousType_56>, 
+        "GT1-20"?: String, 
+        "GT1-21"?: Array<anonymousType_142>, 
+        "GT1-22"?: String, 
+        "GT1-23"?: anonymousType_31, 
+        "GT1-24"?: anonymousType_14, 
+        "GT1-25"?: String, 
+        "GT1-26"?: {|
+          "CE_0218-01"?: String, 
+          "CE_0218-02"?: String, 
+          "CE_0218-03"?: String, 
+          "CE_0218-04"?: String, 
+          "CE_0218-05"?: String, 
+          "CE_0218-06"?: String
+        |}, 
+        "GT1-27"?: anonymousType_390, 
+        "GT1-28"?: Number {"typeId": "double"}, 
+        "GT1-29"?: Array<anonymousType_56>, 
+        "GT1-30"?: String, 
+        "GT1-31"?: DateTime, 
+        "GT1-32"?: DateTime, 
+        "GT1-33"?: String, 
+        "GT1-34"?: String, 
+        "GT1-35"?: String, 
+        "GT1-36"?: anonymousType_101, 
+        "GT1-37"?: String, 
+        "GT1-38"?: anonymousType_156, 
+        "GT1-39"?: String, 
+        "GT1-40"?: String, 
+        "GT1-41"?: String, 
+        "GT1-42"?: anonymousType_64, 
+        "GT1-43"?: anonymousType_129, 
+        "GT1-44"?: String, 
+        "GT1-45"?: Array<anonymousType_64>, 
+        "GT1-46"?: Array<anonymousType_90>, 
+        "GT1-47"?: anonymousType_207, 
+        "GT1-48"?: String, 
+        "GT1-49"?: String, 
+        "GT1-50"?: anonymousType_188, 
+        "GT1-51"?: Array<anonymousType_142>, 
+        "GT1-52"?: String, 
+        "GT1-53"?: String, 
+        "GT1-54"?: anonymousType_248, 
+        "GT1-55"?: String
+      |}>, 
+      INSURANCE?: Array<{|        IN1: {|          "IN1-01": Number,           "IN1-02"?: {|            "CE_0072-01"?: String,             "CE_0072-02"?: String,             "CE_0072-03"?: String,             "CE_0072-04"?: String,             "CE_0072-05"?: String,             "CE_0072-06"?: String          |},           "IN1-03": anonymousType_56,           "IN1-04"?: anonymousType_142,           "IN1-05"?: anonymousType_77,           "IN1-06"?: anonymousType_64,           "IN1-07"?: Array<anonymousType_90>, 
+          "IN1-08"?: String, 
+          "IN1-09"?: anonymousType_142, 
+          "IN1-10"?: anonymousType_56, 
+          "IN1-11"?: anonymousType_142, 
+          "IN1-12"?: DateTime, 
+          "IN1-13"?: DateTime, 
+          "IN1-14"?: {|
+            "CM_AUI-01"?: String, 
+            "CM_AUI-02"?: anonymousType_14, 
+            "CM_AUI-03"?: String
+          |}, 
+          "IN1-15"?: String, 
+          "IN1-16"?: anonymousType_64, 
+          "IN1-17"?: String, 
+          "IN1-18"?: anonymousType_14, 
+          "IN1-19"?: anonymousType_77, 
+          "IN1-20"?: String, 
+          "IN1-21"?: String, 
+          "IN1-22"?: String, 
+          "IN1-23"?: String, 
+          "IN1-24"?: DateTime, 
+          "IN1-25"?: String, 
+          "IN1-26"?: DateTime, 
+          "IN1-27"?: String, 
+          "IN1-28"?: String, 
+          "IN1-29"?: anonymousType_14, 
+          "IN1-30"?: anonymousType_64, 
+          "IN1-31"?: String, 
+          "IN1-32"?: String, 
+          "IN1-33"?: Number {"typeId": "double"}, 
+          "IN1-34"?: Number {"typeId": "double"}, 
+          "IN1-35"?: String, 
+          "IN1-36"?: String, 
+          "IN1-37"?: anonymousType_390, 
+          "IN1-38"?: anonymousType_390, 
+          "IN1-39"?: Number {"typeId": "double"}, 
+          "IN1-40"?: anonymousType_390, 
+          "IN1-41"?: anonymousType_390, 
+          "IN1-42"?: {|
+            "CE_0066-01"?: String, 
+            "CE_0066-02"?: String, 
+            "CE_0066-03"?: String, 
+            "CE_0066-04"?: String, 
+            "CE_0066-05"?: String, 
+            "CE_0066-06"?: String
+          |}, 
+          "IN1-43"?: String, 
+          "IN1-44"?: anonymousType_77, 
+          "IN1-45"?: String, 
+          "IN1-46"?: String, 
+          "IN1-47"?: String, 
+          "IN1-48"?: String, 
+          "IN1-49"?: anonymousType_56
+        |}, 
+        IN2?: {|
+          "IN2-01"?: anonymousType_56, 
+          "IN2-02"?: String, 
+          "IN2-03"?: anonymousType_41, 
+          "IN2-04"?: String, 
+          "IN2-05"?: String, 
+          "IN2-06"?: String, 
+          "IN2-07"?: anonymousType_64, 
+          "IN2-08"?: String, 
+          "IN2-09"?: anonymousType_64, 
+          "IN2-10"?: String, 
+          "IN2-11"?: anonymousType_31, 
+          "IN2-12"?: String, 
+          "IN2-13"?: String, 
+          "IN2-14"?: String, 
+          "IN2-15"?: String, 
+          "IN2-16"?: String, 
+          "IN2-17"?: DateTime, 
+          "IN2-18"?: String, 
+          "IN2-19"?: String, 
+          "IN2-20"?: String, 
+          "IN2-21"?: String, 
+          "IN2-22"?: anonymousType_64, 
+          "IN2-23"?: String, 
+          "IN2-24"?: Array<String>, 
+          "IN2-25"?: anonymousType_56, 
+          "IN2-26"?: anonymousType_56, 
+          "IN2-27"?: String, 
+          "IN2-28"?: Array<{|            "CM_RMC-01"?: String,             "CM_RMC-02"?: String,             "CM_RMC-03"?: Number {"typeId": "double"}          |}>, 
+          "IN2-29"?: Array<{|            "CM_PTA-01"?: String,             "CM_PTA-02"?: String,             "CM_PTA-03"?: Number {"typeId": "double"}          |}>, 
+          "IN2-30"?: {|
+            "CM_DDI-01"?: Number {"typeId": "double"}, 
+            "CM_DDI-02"?: Number {"typeId": "double"}, 
+            "CM_DDI-03"?: Number {"typeId": "double"}
+          |}, 
+          "IN2-31"?: String, 
+          "IN2-32"?: String, 
+          "IN2-33"?: String, 
+          "IN2-34"?: anonymousType_101, 
+          "IN2-35"?: String, 
+          "IN2-36"?: anonymousType_156, 
+          "IN2-37"?: String, 
+          "IN2-38"?: String, 
+          "IN2-39"?: String, 
+          "IN2-40"?: anonymousType_64, 
+          "IN2-41"?: anonymousType_129, 
+          "IN2-42"?: String, 
+          "IN2-43"?: Array<String>, 
+          "IN2-44"?: DateTime, 
+          "IN2-45"?: DateTime, 
+          "IN2-46"?: String, 
+          "IN2-47"?: anonymousType_188, 
+          "IN2-48"?: String, 
+          "IN2-49"?: Array<anonymousType_64>, 
+          "IN2-50"?: Array<anonymousType_90>, 
+          "IN2-51"?: String, 
+          "IN2-52"?: Array<anonymousType_64>, 
+          "IN2-53"?: Array<anonymousType_90>, 
+          "IN2-54"?: Array<String>, 
+          "IN2-55"?: DateTime, 
+          "IN2-56"?: Array<DateTime>, 
+          "IN2-57"?: String, 
+          "IN2-58"?: anonymousType_90, 
+          "IN2-59"?: String, 
+          "IN2-60"?: String, 
+          "IN2-61"?: anonymousType_56, 
+          "IN2-62"?: String, 
+          "IN2-63"?: Array<anonymousType_90>, 
+          "IN2-64"?: Array<anonymousType_90>, 
+          "IN2-65"?: anonymousType_31, 
+          "IN2-66"?: String, 
+          "IN2-67"?: String, 
+          "IN2-68"?: String, 
+          "IN2-69"?: Array<anonymousType_142>, 
+          "IN2-70"?: Array<anonymousType_142>, 
+          "IN2-71"?: String, 
+          "IN2-72"?: String
+        |}, 
+        IN3?: {|
+          "IN3-01": Number, 
+          "IN3-02"?: anonymousType_56, 
+          "IN3-03"?: Array<anonymousType_41>, 
+          "IN3-04"?: String, 
+          "IN3-05"?: {|
+            "CM_PEN-01"?: String, 
+            "CM_PEN-02"?: Number {"typeId": "double"}
+          |}, 
+          "IN3-06"?: anonymousType_14, 
+          "IN3-07"?: anonymousType_14, 
+          "IN3-08"?: Array<anonymousType_41>, 
+          "IN3-09"?: DateTime, 
+          "IN3-10"?: DateTime, 
+          "IN3-11"?: {|
+            "CM_DTN-01"?: String, 
+            "CM_DTN-02"?: Number {"typeId": "double"}
+          |}, 
+          "IN3-12"?: {|
+            "CE_0233-01"?: String, 
+            "CE_0233-02"?: String, 
+            "CE_0233-03"?: String, 
+            "CE_0233-04"?: String, 
+            "CE_0233-05"?: String, 
+            "CE_0233-06"?: String
+          |}, 
+          "IN3-13"?: anonymousType_14, 
+          "IN3-14"?: Array<anonymousType_41>, 
+          "IN3-15"?: String, 
+          "IN3-16"?: Array<anonymousType_90>, 
+          "IN3-17"?: anonymousType_31, 
+          "IN3-18"?: anonymousType_31, 
+          "IN3-19"?: Array<anonymousType_90>, 
+          "IN3-20"?: Array<{|            "CM_PCF-01"?: String,             "CM_PCF-02"?: String,             "CM_PCF-03"?: anonymousType_14          |}>, 
+          "IN3-21"?: String, 
+          "IN3-22"?: DateTime, 
+          "IN3-23"?: String, 
+          "IN3-24"?: Array<String>, 
+          "IN3-25"?: Array<anonymousType_41>
+        |}
+      |}>, 
+      ACC?: {|
+        "ACC-01"?: anonymousType_14, 
+        "ACC-02"?: {|
+          "CE_0050-01"?: String, 
+          "CE_0050-02"?: String, 
+          "CE_0050-03"?: String, 
+          "CE_0050-04"?: String, 
+          "CE_0050-05"?: String, 
+          "CE_0050-06"?: String
+        |}, 
+        "ACC-03"?: String, 
+        "ACC-04"?: anonymousType_31, 
+        "ACC-05"?: String, 
+        "ACC-06"?: String
+      |}, 
+      UB1?: {|
+        "UB1-01"?: Number, 
+        "UB1-02"?: Number {"typeId": "double"}, 
+        "UB1-03"?: Number {"typeId": "double"}, 
+        "UB1-04"?: Number {"typeId": "double"}, 
+        "UB1-05"?: Number {"typeId": "double"}, 
+        "UB1-06"?: Number {"typeId": "double"}, 
+        "UB1-07"?: Array<String>, 
+        "UB1-08"?: Number {"typeId": "double"}, 
+        "UB1-09"?: Number {"typeId": "double"}, 
+        "UB1-10"?: Array<{|          "CM_UVC-01"?: String,           "CM_UVC-02"?: Number {"typeId": "double"}        |}>, 
+        "UB1-11"?: Number {"typeId": "double"}, 
+        "UB1-12"?: anonymousType_31, 
+        "UB1-13"?: String, 
+        "UB1-14"?: DateTime, 
+        "UB1-15"?: DateTime, 
+        "UB1-16"?: Array<{|          "CM_OCD-01"?: anonymousType_31,           "CM_OCD-02"?: DateTime        |}>, 
+        "UB1-17"?: String, 
+        "UB1-18"?: DateTime, 
+        "UB1-19"?: DateTime, 
+        "UB1-20"?: String, 
+        "UB1-21"?: String, 
+        "UB1-22"?: String, 
+        "UB1-23"?: String
+      |}, 
+      UB2?: {|
+        "UB2-01"?: Number, 
+        "UB2-02"?: String, 
+        "UB2-03"?: Array<String>, 
+        "UB2-04"?: String, 
+        "UB2-05"?: String, 
+        "UB2-06"?: Array<anonymousType_674>, 
+        "UB2-07"?: Array<anonymousType_682>, 
+        "UB2-08"?: Array<{|          "CM_OSP-01"?: anonymousType_31,           "CM_OSP-02"?: DateTime,           "CM_OSP-03"?: DateTime        |}>, 
+        "UB2-09"?: Array<String>, 
+        "UB2-10"?: Array<String>, 
+        "UB2-11"?: String, 
+        "UB2-12"?: Array<String>, 
+        "UB2-13"?: Array<String>, 
+        "UB2-14"?: Array<String>, 
+        "UB2-15"?: String, 
+        "UB2-16"?: Array<String>, 
+        "UB2-17"?: Number {"typeId": "double"}
+      |}
+    |}
+  |}, 
+  MSH: anonymousType_7, 
+  ACK: {|
+    MSH: {|
+      "MSH-01": String, 
+      "MSH-02": String, 
+      "MSH-03"?: {|
+        "HD-01"?: String, 
+        "HD-02"?: String, 
+        "HD-03"?: String
+      |}, 
+      "MSH-04"?: anonymousType_10, 
+      "MSH-05"?: anonymousType_10, 
+      "MSH-06"?: anonymousType_10, 
+      "MSH-07": {|
+        "TS-01": DateTime, 
+        "TS-02"?: String
+      |}, 
+      "MSH-08"?: String, 
+      "MSH-09": {|
+        "MSG-01": String, 
+        "MSG-02": String, 
+        "MSG-03": String
+      |}, 
+      "MSH-10": String, 
+      "MSH-11": {|
+        "PT-01"?: String, 
+        "PT-02"?: String
+      |}, 
+      "MSH-12": {|
+        "VID-01"?: String, 
+        "VID-02"?: {|
+          "CE-01"?: String, 
+          "CE-02"?: String, 
+          "CE-03"?: String, 
+          "CE-04"?: String, 
+          "CE-05"?: String, 
+          "CE-06"?: String
+        |}, 
+        "VID-03"?: anonymousType_741
+      |}, 
+      "MSH-13"?: Number {"typeId": "double"}, 
+      "MSH-14"?: String, 
+      "MSH-15"?: String, 
+      "MSH-16"?: String, 
+      "MSH-17"?: String, 
+      "MSH-18"?: Array<String>, 
+      "MSH-19"?: anonymousType_741, 
+      "MSH-20"?: String, 
+      "MSH-21"?: Array<{|        "EI-01"?: String,         "EI-02"?: String,         "EI-03"?: String,         "EI-04"?: String      |}>
+    |}, 
+    SFT?: Array<{|      "SFT-01": {|        "XON-01"?: String,         "XON-02"?: String,         "XON-03"?: Number {"typeId": "double"},         "XON-04"?: Number {"typeId": "double"},         "XON-05"?: String,         "XON-06"?: anonymousType_10,         "XON-07"?: String,         "XON-08"?: anonymousType_10,         "XON-09"?: String,         "XON-10"?: String      |},       "SFT-02": String,       "SFT-03": String,       "SFT-04": String,       "SFT-05"?: String,       "SFT-06"?: anonymousType_727    |}>, 
+    MSA: {|
+      "MSA-01": String, 
+      "MSA-02": String, 
+      "MSA-03"?: String, 
+      "MSA-04"?: Number {"typeId": "double"}, 
+      "MSA-05"?: Array<{|  |}>, 
+      "MSA-06"?: anonymousType_741
+    |}, 
+    ERR?: Array<{|      "ERR-01"?: Array<{|        "ELD-01"?: String,         "ELD-02"?: Number {"typeId": "double"},         "ELD-03"?: Number {"typeId": "double"},         "ELD-04"?: anonymousType_741      |}>, 
+      "ERR-02"?: Array<{|        "ERL-01": String,         "ERL-02": Number {"typeId": "double"},         "ERL-03"?: Number {"typeId": "double"},         "ERL-04"?: Number {"typeId": "double"},         "ERL-05"?: Number {"typeId": "double"},         "ERL-06"?: Number {"typeId": "double"}      |}>, 
+      "ERR-03": {|
+        "CWE-01"?: String, 
+        "CWE-02"?: String, 
+        "CWE-03"?: String, 
+        "CWE-04"?: String, 
+        "CWE-05"?: String, 
+        "CWE-06"?: String, 
+        "CWE-07"?: String, 
+        "CWE-08"?: String, 
+        "CWE-09"?: String
+      |}, 
+      "ERR-04": String, 
+      "ERR-05"?: anonymousType_799, 
+      "ERR-06"?: Array<String>, 
+      "ERR-07"?: String, 
+      "ERR-08"?: String, 
+      "ERR-09"?: Array<String>, 
+      "ERR-10"?: anonymousType_799, 
+      "ERR-11"?: Array<anonymousType_799>, 
+      "ERR-12"?: Array<{|        "XTN-01"?: String,         "XTN-02"?: String,         "XTN-03"?: String,         "XTN-04"?: String,         "XTN-05"?: Number {"typeId": "double"},         "XTN-06"?: Number {"typeId": "double"},         "XTN-07"?: Number {"typeId": "double"},         "XTN-08"?: Number {"typeId": "double"},         "XTN-09"?: String,         "XTN-10"?: String,         "XTN-11"?: String,         "XTN-12"?: String      |}>
+    |}>
+  |}, 
+  Errors: Array<com_mulesoft_flatfile_schema_hl7_HL7Error {"class": "com.mulesoft.flatfile.schema.hl7.HL7Error",
+  "typeId": "com.mulesoft.flatfile.schema.hl7.HL7Error"}>
+|}
+type anonymousType_799 = {|
+  "CWE-01"?: String, 
+  "CWE-02"?: String, 
+  "CWE-03"?: String, 
+  "CWE-04"?: String, 
+  "CWE-05"?: String, 
+  "CWE-06"?: String, 
+  "CWE-07"?: String, 
+  "CWE-08"?: String, 
+  "CWE-09"?: String
+|}
+
+
+type anonymousType_31 = {|
+  "CE-01"?: String, 
+  "CE-02"?: String, 
+  "CE-03"?: String, 
+  "CE-04"?: String, 
+  "CE-05"?: String, 
+  "CE-06"?: String
+|}
+
+
+type anonymousType_64 = {|
+  "XPN-01"?: String, 
+  "XPN-02"?: String, 
+  "XPN-03"?: String, 
+  "XPN-04"?: String, 
+  "XPN-05"?: String, 
+  "XPN-06"?: String, 
+  "XPN-07"?: String, 
+  "XPN-08"?: String
+|}
+
+
+type anonymousType_129 = {|
+  "CE_0212-01"?: String, 
+  "CE_0212-02"?: String, 
+  "CE_0212-03"?: String, 
+  "CE_0212-04"?: String, 
+  "CE_0212-05"?: String, 
+  "CE_0212-06"?: String
+|}
+
+
+type anonymousType_7 = {|
+  "MSH-01": String, 
+  "MSH-02": String, 
+  "MSH-03"?: {|
+    "HD-01"?: String, 
+    "HD-02"?: String, 
+    "HD-03"?: String
+  |}, 
+  "MSH-04"?: anonymousType_10, 
+  "MSH-05"?: anonymousType_10, 
+  "MSH-06"?: anonymousType_10, 
+  "MSH-07"?: {|
+    "TS-01"?: String, 
+    "TS-02"?: String
+  |}, 
+  "MSH-08"?: String, 
+  "MSH-09": {|
+    "CM_MSG-01"?: String, 
+    "CM_MSG-02"?: String
+  |}, 
+  "MSH-10": String, 
+  "MSH-11": {|
+    "PT-01"?: String, 
+    "PT-02"?: String
+  |}, 
+  "MSH-12": String, 
+  "MSH-13"?: Number {"typeId": "double"}, 
+  "MSH-14"?: String, 
+  "MSH-15"?: String, 
+  "MSH-16"?: String, 
+  "MSH-17"?: String, 
+  "MSH-18"?: String, 
+  "MSH-19"?: {|
+    "CE-01"?: String, 
+    "CE-02"?: String, 
+    "CE-03"?: String, 
+    "CE-04"?: String, 
+    "CE-05"?: String, 
+    "CE-06"?: String
+  |}
+|}
+type anonymousType_10 = {|
+  "HD-01"?: String, 
+  "HD-02"?: String, 
+  "HD-03"?: String
+|}
+
+
+
+
+type anonymousType_682 = {|
+  "CM_OCD-01"?: anonymousType_31, 
+  "CM_OCD-02"?: DateTime
+|}
+
+
+type anonymousType_14 = {|
+  "TS-01"?: String, 
+  "TS-02"?: String
+|}
+
+
+type anonymousType_248 = {|
+  "FC-01"?: String, 
+  "FC-02"?: anonymousType_14
+|}
+
+
+type anonymousType_225 = {|
+  "PL-01"?: String, 
+  "PL-02"?: String, 
+  "PL-03"?: String, 
+  "PL-04"?: anonymousType_10, 
+  "PL-05"?: String, 
+  "PL-06"?: String, 
+  "PL-07"?: String, 
+  "PL-08"?: String, 
+  "PL-09"?: String
+|}
+
+
+type anonymousType_373 = {|
+  "CE_0055-01"?: String, 
+  "CE_0055-02"?: String, 
+  "CE_0055-03"?: String, 
+  "CE_0055-04"?: String, 
+  "CE_0055-05"?: String, 
+  "CE_0055-06"?: String
+|}
+
+
+type anonymousType_90 = {|
+  "XTN-01"?: String, 
+  "XTN-02"?: String, 
+  "XTN-03"?: String, 
+  "XTN-04"?: String, 
+  "XTN-05"?: Number {"typeId": "double"}, 
+  "XTN-06"?: Number {"typeId": "double"}, 
+  "XTN-07"?: Number {"typeId": "double"}, 
+  "XTN-08"?: Number {"typeId": "double"}, 
+  "XTN-09"?: String
+|}
+
+
+type anonymousType_188 = {|
+  "JCC-01"?: String, 
+  "JCC-02"?: String
+|}
+
+
+type anonymousType_56 = {|
+  "CX-01"?: String, 
+  "CX-02"?: String, 
+  "CX-03"?: String, 
+  "CX-04"?: anonymousType_10, 
+  "CX-05"?: String, 
+  "CX-06"?: anonymousType_10
+|}
+
+
+type anonymousType_207 = {|
+  "CE_0222-01"?: String, 
+  "CE_0222-02"?: String, 
+  "CE_0222-03"?: String, 
+  "CE_0222-04"?: String, 
+  "CE_0222-05"?: String, 
+  "CE_0222-06"?: String
+|}
+
+
+type anonymousType_674 = {|
+  "CM_UVC-01"?: String, 
+  "CM_UVC-02"?: Number {"typeId": "double"}
+|}
+
+
+type anonymousType_741 = {|
+  "CE-01"?: String, 
+  "CE-02"?: String, 
+  "CE-03"?: String, 
+  "CE-04"?: String, 
+  "CE-05"?: String, 
+  "CE-06"?: String
+|}
+
+
+type anonymousType_101 = {|
+  "CE_0296-01"?: String, 
+  "CE_0296-02"?: String, 
+  "CE_0296-03"?: String, 
+  "CE_0296-04"?: String, 
+  "CE_0296-05"?: String, 
+  "CE_0296-06"?: String
+|}
+
+
+type anonymousType_77 = {|
+  "XAD-01"?: String, 
+  "XAD-02"?: String, 
+  "XAD-03"?: String, 
+  "XAD-04"?: String, 
+  "XAD-05"?: String, 
+  "XAD-06"?: String, 
+  "XAD-07"?: String, 
+  "XAD-08"?: String, 
+  "XAD-09"?: String, 
+  "XAD-10"?: String
+|}
+
+
+type anonymousType_156 = {|
+  "CE_0215-01"?: String, 
+  "CE_0215-02"?: String, 
+  "CE_0215-03"?: String, 
+  "CE_0215-04"?: String, 
+  "CE_0215-05"?: String, 
+  "CE_0215-06"?: String
+|}
+
+
+type anonymousType_727 = {|
+  "TS-01": DateTime, 
+  "TS-02"?: String
+|}
+
+
+type anonymousType_142 = {|
+  "XON-01"?: String, 
+  "XON-02"?: String, 
+  "XON-03"?: Number {"typeId": "double"}, 
+  "XON-04"?: String, 
+  "XON-05"?: String, 
+  "XON-06"?: anonymousType_10, 
+  "XON-07"?: String, 
+  "XON-08"?: anonymousType_10
+|}
+
+
+type anonymousType_382 = {|
+  "CE_0083-01"?: String, 
+  "CE_0083-02"?: String, 
+  "CE_0083-03"?: String, 
+  "CE_0083-04"?: String, 
+  "CE_0083-05"?: String, 
+  "CE_0083-06"?: String
+|}
+
+
+type anonymousType_41 = {|
+  "XCN-01"?: String, 
+  "XCN-02"?: String, 
+  "XCN-03"?: String, 
+  "XCN-04"?: String, 
+  "XCN-05"?: String, 
+  "XCN-06"?: String, 
+  "XCN-07"?: String, 
+  "XCN-08"?: String, 
+  "XCN-09"?: anonymousType_10, 
+  "XCN-10"?: String, 
+  "XCN-11"?: String, 
+  "XCN-12"?: String, 
+  "XCN-13"?: String, 
+  "XCN-14"?: anonymousType_10
+|}
+
+
+type com_mulesoft_flatfile_schema_hl7_HL7Error = {|
+  errorCode?: String, 
+  errorText?: String, 
+  errorType?: anonymousType_337, 
+  fatal?: Boolean {"typeId": "boolean"}, 
+  segment?: Number
+|} {"class": "com.mulesoft.flatfile.schema.hl7.HL7Error",
+"typeId": "com.mulesoft.flatfile.schema.hl7.HL7Error"}
+type anonymousType_337 = {|  |}
+
+
+
+
+type anonymousType_390 = {|
+  "CP-01"?: {|
+    "MO-01"?: Number {"typeId": "double"}, 
+    "MO-02"?: String
+  |}, 
+  "CP-02"?: String, 
+  "CP-03"?: Number {"typeId": "double"}, 
+  "CP-04"?: Number {"typeId": "double"}, 
+  "CP-05"?: anonymousType_31, 
+  "CP-06"?: String
+|}
+
+
+
