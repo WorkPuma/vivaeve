@@ -1,385 +1,337 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+      xmlns:email="http://www.mulesoft.org/schema/mule/email"
+      xmlns:salesforce-composite="http://www.mulesoft.org/schema/mule/salesforce-composite"
+      xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module"
+      xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7"
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xmlns:object-store-v2="http://www.mulesoft.org/schema/mule/object-store-v2"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+        http://www.mulesoft.org/schema/mule/core 
+          http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/ee/core 
+          http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+        http://www.mulesoft.org/schema/mule/hl7 
+          http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd
+        http://www.mulesoft.org/schema/mule/xml-module 
+          http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd
+        http://www.mulesoft.org/schema/mule/http 
+          http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/salesforce 
+          http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+        http://www.mulesoft.org/schema/mule/salesforce-composite 
+          http://www.mulesoft.org/schema/mule/salesforce-composite/current/mule-salesforce-composite.xsd
+        http://www.mulesoft.org/schema/mule/email 
+          http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+        http://www.mulesoft.org/schema/mule/vm 
+          http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+        http://www.mulesoft.org/schema/mule/object-store-v2
+          http://www.mulesoft.org/schema/mule/object-store-v2/current/mule-object-store-v2.xsd">
 
-<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm" xmlns:email="http://www.mulesoft.org/schema/mule/email"
-	xmlns:salesforce-composite="http://www.mulesoft.org/schema/mule/salesforce-composite"
-	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xml-module="http://www.mulesoft.org/schema/mule/xml-module" xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd
-http://www.mulesoft.org/schema/mule/xml-module http://www.mulesoft.org/schema/mule/xml-module/current/mule-xml-module.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
-http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org/schema/mule/salesforce-composite/current/mule-salesforce-composite.xsd
-http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
-http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
-	<vm:config name="VM_Config" doc:name="VM Config" doc:id="b6409a26-714b-4b33-9d70-f193150bc31a">
-		<vm:connection >
-			<reconnection >
-				<reconnect />
-			</reconnection>
-		</vm:connection>
-		<vm:queues >
-			<vm:queue queueName="nextgenqueue" queueType="PERSISTENT" />
-		</vm:queues>
-	</vm:config>
-	<sub-flow name="nextgen-sf-papi-impl" doc:id="1f415dc2-5e93-4135-ac8e-8ca300986eec" >
-		<logger level="INFO" doc:name="startLogger" doc:id="371c977c-15a0-4445-bfcb-6cb7e2631264" message="#[%dw 2.0&#10;output application/json &#10;&#10;---&#10;{&#10;	correlationId : vars.correlationId,&#10;	eventTimestamp : now(),&#10;	applicationName: p('application.name'),&#10;	flowName: flow.name default &quot;implementation-flow&quot;,&#10;	environment: upper(p('mule.env')),&#10;	source: p('source'),&#10;	target: p('target'),&#10;	message: &quot;request received from eapi&quot;&#10;}]"/>
-		<ee:transform doc:name="inputPayload" doc:id="46bb389b-cad0-4352-9e25-5ca00a2bd244" >
-			<ee:message >
-			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="inputPayload" ><![CDATA[%dw 2.0
+	
+    <vm:config name="VM_Config" doc:name="VM Config" doc:id="78e8266a-2594-4bd2-bff9-948a0ad7ff55">
+        <vm:connection>
+            <reconnection>
+                <reconnect/>
+            </reconnection>
+        </vm:connection>
+        <vm:queues>
+            <vm:queue queueName="nextgenqueue" queueType="PERSISTENT" />
+        </vm:queues>
+    </vm:config>
+    
+    
+<sub-flow name="nextgen-sf-papi-impl" doc:id="4deccf72-9bbb-42dd-95ce-2ae61270a06a">
+    <logger level="INFO" doc:name="startLogger" doc:id="d75f5918-2e14-4a46-b4f6-a950c207d72e" 
+            message="#[%dw 2.0
+output application/json
+
+---
+{
+	correlationId : vars.correlationId,
+	eventTimestamp : now(),
+	applicationName: p('application.name'),
+	flowName: flow.name default 'implementation-flow',
+	environment: upper(p('mule.env')),
+	source: p('source'),
+	target: p('target'),
+	message: 'request received from eapi'
+}]"/>
+
+    <!-- Retrieve Mappings from Object Store V2 -->
+    <object-store-v2:get doc:name="Get TerritoryMapping"
+        config-ref="MappingsObjectStore"
+        key="TerritoryMapping"
+        target="TerritoryMapping" />
+    <object-store-v2:get doc:name="Get WorkTypeMapping"
+        config-ref="MappingsObjectStore"
+        key="WorkTypeMapping"
+        target="WorkTypeMapping" />
+    <object-store-v2:get doc:name="Get ProviderMapping"
+        config-ref="MappingsObjectStore"
+        key="ProviderMapping"
+        target="ProviderMapping" />
+    
+    <!-- Log the sizes of each retrieved mapping -->
+    <logger level="INFO" doc:name="MappingsLogger" 
+            message="TerritoryMapping size: #[sizeOf(vars.TerritoryMapping)], WorkTypeMapping size: #[sizeOf(vars.WorkTypeMapping)], ProviderMapping size: #[sizeOf(vars.ProviderMapping)]"/>
+
+    <ee:transform doc:name="inputPayload" doc:id="50e635b0-00ee-492d-98d9-9b511b36fa73">
+        <ee:message />
+        <ee:variables>
+            <ee:set-variable variableName="inputPayload"><![CDATA[%dw 2.0
 output text/plain
 ---
 payload]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
-		<logger level="INFO" doc:name="printInputPayload" doc:id="9c52693e-16c2-4917-be4b-1aa864ff14a3" message="#[vars.inputPayload]"/>
-		<ee:transform doc:name="conditionCheck" doc:id="54f08ddf-6d3d-401e-948a-5f53584fe176" >
-			<ee:message >
-			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="checkConditionA04" ><![CDATA[%dw 2.0
-output application/json
-fun checkADT(payload) = 
-    if (payload contains "ADT^A04")  true 
-    else false
+        </ee:variables>
+    </ee:transform>
 
----
-{
-    result: checkADT(payload)
-}]]></ee:set-variable>
-				<ee:set-variable variableName="checkConditionA08" ><![CDATA[%dw 2.0
-output application/json
-fun checkADT(payload) = 
-    if (payload contains "ADT^A08")  true 
-    else false
+    <logger level="INFO" doc:name="printInputPayload" 
+            doc:id="c37fd0c4-3294-49d2-887e-0e687115c4a7" 
+            message="#[vars.inputPayload]"/>
 
----
-{
-    result: checkADT(payload)
-}]]></ee:set-variable>
-				<ee:set-variable variableName="checkConditionS12" ><![CDATA[%dw 2.0
+    <ee:transform doc:name="conditionCheck" doc:id="c0bc540e-17e9-4f5f-9e54-0c40c9d694e6">
+        <ee:message />
+        <ee:variables>
+            <ee:set-variable variableName="checkConditionA04"><![CDATA[%dw 2.0
 output application/json
-fun checkADT(payload) = 
-    if (payload contains "SIU^S12")  true 
-    else false
-
+fun checkADT(payload) = payload contains "ADT^A04"
 ---
-{
-    result: checkADT(payload)
-}]]></ee:set-variable>
-				<ee:set-variable variableName="checkConditionS13" ><![CDATA[%dw 2.0
+{ result: checkADT(payload) }
+]]></ee:set-variable>
+
+            <ee:set-variable variableName="checkConditionA08"><![CDATA[%dw 2.0
 output application/json
-fun checkADT(payload) = 
-    if (payload contains "SIU^S13")  true 
-    else false
-
+fun checkADT(payload) = payload contains "ADT^A08"
 ---
-{
-    result: checkADT(payload)
-}]]></ee:set-variable>
-				<ee:set-variable variableName="checkConditionS14" ><![CDATA[%dw 2.0
+{ result: checkADT(payload) }
+]]></ee:set-variable>
+
+            <ee:set-variable variableName="checkConditionS12"><![CDATA[%dw 2.0
 output application/json
-fun checkADT(payload) = 
-    if (payload contains "SIU^S14")  true 
-    else false
-
+fun checkADT(payload) = payload contains "SIU^S12"
 ---
-{
-    result: checkADT(payload)
-}]]></ee:set-variable>
-				<ee:set-variable variableName="checkConditionS15" ><![CDATA[%dw 2.0
+{ result: checkADT(payload) }
+]]></ee:set-variable>
+
+            <ee:set-variable variableName="checkConditionS13"><![CDATA[%dw 2.0
 output application/json
-fun checkADT(payload) = 
-    if (payload contains "SIU^S15")  true 
-    else false
-
+fun checkADT(payload) = payload contains "SIU^S13"
 ---
-{
-    result: checkADT(payload)
-}]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
-		<choice doc:name="Choice" doc:id="077ac664-8f0a-43ca-a1e3-ee50446e9eed">
-			<when expression="#[vars.checkConditionA04.result]">
-				<hl7:read doc:name="A04" doc:id="21a5dfd8-a398-4712-a4ab-07a662601707" config-ref="HL7_EDI_Config_A04">
-					<hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
-				</hl7:read>
-				<ee:transform doc:name="jsonPayload" doc:id="25edede3-1db2-4a08-b63a-ea5b5cf86a19">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
+{ result: checkADT(payload) }
+]]></ee:set-variable>
+
+            <ee:set-variable variableName="checkConditionS14"><![CDATA[%dw 2.0
+output application/json
+fun checkADT(payload) = payload contains "SIU^S14"
+---
+{ result: checkADT(payload) }
+]]></ee:set-variable>
+
+            <ee:set-variable variableName="checkConditionS15"><![CDATA[%dw 2.0
+output application/json
+fun checkADT(payload) = payload contains "SIU^S15"
+---
+{ result: checkADT(payload) }
+]]></ee:set-variable>
+        </ee:variables>
+    </ee:transform>
+
+    <choice doc:name="Choice" doc:id="e7635a7d-c523-49c5-8363-825d3becb8a8">
+
+        <!--  ========== ADT^A04 ========== -->
+        <when expression="#[vars.checkConditionA04.result]">
+            <hl7:read doc:name="A04" doc:id="fa8aac9f-fadd-40c5-b122-c64daab95bcc" config-ref="HL7_EDI_Config_A04">
+                <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+            </hl7:read>
+            <ee:transform doc:name="jsonPayload" doc:id="cc41f729-058e-4078-ae5f-3d008ef63564">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 payload]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<ee:transform doc:name="language_field" doc:id="b8ca1c0e-4592-4100-a5d8-ff7fbb811cd1">
-    <ee:variables>
-        <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
-        output application/json
-        var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
-        ---
-        (language filter ($.primarylanguage == payload.Data.ADT_A08.PID."PID-15"."CE_0296-01"))[0].Language_Preferred__c]]></ee:set-variable>
-    </ee:variables>
-</ee:transform>
-				<ee:transform doc:name="sfMappings" doc:id="34c96d5e-daad-4b1c-ac52-819005526808">
-					<ee:message>
-					</ee:message>
-					<ee:variables>
-						<ee:set-variable variableName="accountCreate"><![CDATA[%dw 2.0
-output application/java
----
-[{
-	 
-      "Name":flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-02"[0] ++ " " ++ flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-01"[0],
-    "Date_of_Birth__c":(payload.Data.ADT_A04.PID."PID-07"."TS-01") as Number as DateTime as Date { format:"MM-dd-yyyy"},
-    "Email_DO_NOT_USE__c":payload.Data.ADT_A04.PID."PID-13"."XTN-04"[0] default null,
-       
-     
+                </ee:message>
+            </ee:transform>
 
-       
-    }]]]></ee:set-variable>
-						<ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
+            <!-- Example language field from a local JSON file -->
+            <ee:transform doc:name="language_field" doc:id="6af659ac-be96-4100-ad09-9113fe48fa13">
+                <ee:variables>
+                    <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
+output application/json
+var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
+---
+(language filter ($.primarylanguage == payload.Data.ADT_A08.PID."PID-15"."CE_0296-01"))[0].Language_Preferred__c
+]]></ee:set-variable>
+                </ee:variables>
+            </ee:transform>
+
+            <!-- Prepare SF payloads for Account + Contact -->
+            <ee:transform doc:name="sfMappings" doc:id="3eb2fb8f-d4de-4b59-8ea8-d5456f5816f4">
+                <ee:message/>
+                <ee:variables>
+                    <ee:set-variable variableName="accountCreate"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
-	
-      "FirstName":flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-02"[0],
-      "LastName":flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-01"[0],
-      "MiddleName": payload.Data.ADT_A04.PID."PID-05"."XPN-03"[0],
-//      "HF_Chart_Number__c":flatten(payload.Data.ADT_A04.PID."PID-04")."CX-01"[0],
-    //   "Language_Preferred__c":vars.patientLanguage,
-//      "HF_Chart_Number__c":payload.Data.ADT_A04.PID."PID-03"."CX-01"[0],
-      "Email":payload.Data.ADT_A04.PID."PID-13"."XTN-04"[0],
-      "Phone": payload.Data.ADT_A04.PID."PID-13"."XTN-01"[0],
-//       "MailingCountry":payload.Data.ADT_A04.PID."PID-11",
-      "MailingState":payload.Data.ADT_A04.PID."PID-11"."XAD-04"[0],
-      "MailingPostalCode":payload.Data.ADT_A04.PID."PID-11"."XAD-05"[0],
-      "MailingCity":payload.Data.ADT_A04.PID."PID-11"."XAD-03"[0],
-      "MailingStreet":payload.Data.ADT_A04.PID."PID-11"."XAD-01"[0],
-      "Patient_Ethnicity__c":payload.Data.ADT_A04.PID."PID-22",
-      "Patient_Race__c":payload.Data.ADT_A04.PID."PID-10",
-      "Patient_Gender_2__c":if(payload.Data.ADT_A04.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A04.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A04.PID."PID-08"),
-       "Date_of_Birth__c":(payload.Data.ADT_A04.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}),
-       "HealthFusion_Patient_Record_ID__c":payload.Data.ADT_A04.PID."PID-04"."CX-01"[0]
-//       ("Insurance_Plan_Id_Identifier__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0] !=
-//null)),
-//         ("Insurance_Member_ID__c" :payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0] !=
-//null))
-//          ("Insurance_Company_Picklist__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0] !=
-//null)),
-//      
-//          "Effective_Date__c":(payload.Data.ADT_A04.INSURANCE.IN1."IN1-12"[0]) as Date as Date { format:"MM-dd-yyyy"},
-//          
-//          ("FirstName":payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0] !=
-//null)),
-//          ("LastName":payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0] !=
-//null)),
-//          ("MailingState":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0] !=
-//null)),
-//          ("MailingPostalCode":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0] !=
-//null)),
-//          ("MailingCity":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0] !=
-//null)),
-//          ("MailingStreet":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0] !=
-//null)),
-//          ("Insureds_Relationship__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0] !=
-//null)),
-//          ("Insurance_Plan_ID_Text__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0] !=
-//null)),
-          
-// ("Insurance_Company_ID__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0]) if
-//((payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0]?)
-//and
-//(payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0] !=
-//null
-//))
-       
-    }]]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<flow-ref doc:name="callToGetContactId" doc:id="6a0baf35-6bb1-407b-bf6f-d40e06d90649" name="salesforce_queryaccoun_Sub_Flow" />
-				<choice doc:name="Choice" doc:id="bee1c93c-0b2b-419b-be66-1a5855fb5961">
-					<when expression="#[sizeOf(vars.queryRes.AccountId[0]) == null]">
-						<flow-ref doc:name="flow reference to createAccount" doc:id="d2de6ba2-1ae9-4393-be3e-1daa71b3b145" name="createAccount" />
-						<ee:transform doc:name="transformedSfData" doc:id="20db954f-9947-45ef-8a3d-8b054e7abcb2">
-					<ee:message>
-					</ee:message>
-					<ee:variables>
-								<ee:set-variable variableName="sfContactData" ><![CDATA[%dw 2.0
+    Name: flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-02"[0]
+          ++ " " ++
+          flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-01"[0],
+    Date_of_Birth__c: (payload.Data.ADT_A04.PID."PID-07"."TS-01") as Number as DateTime as Date { format:"MM-dd-yyyy"},
+    Email_DO_NOT_USE__c: payload.Data.ADT_A04.PID."PID-13"."XTN-04"[0] default null
+}]]]></ee:set-variable>
+
+                    <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
-	 "AccountId" : vars.accountResponse.items.id[0],
-      "FirstName":vars.sfContactData.FirstName[0],
-      "LastName":vars.sfContactData.LastName[0],
-//      "HF_Chart_Number__c":flatten(payload.Data.ADT_A04.PID."PID-04")."CX-01"[0],
-    //   "Language_Preferred__c":vars.patientLanguage,
-//      "HF_Chart_Number__c":payload.Data.ADT_A04.PID."PID-03"."CX-01"[0],
-      "Email":vars.sfContactData.Email[0],
-      "Phone": vars.sfContactData.Phone[0],
-//       "MailingCountry":payload.Data.ADT_A04.PID."PID-11",
-      "MailingState":vars.sfContactData.MailingState[0],
-      "MailingPostalCode":vars.sfContactData.MailingPostalCode[0],
-      "MailingCity":vars.sfContactData.MailingCity[0],
-      "MailingStreet":vars.sfContactData.MailingStreet[0],
-      "Patient_Ethnicity__c":vars.sfContactData.Patient_Ethnicity__c[0],
-      "Patient_Race__c":vars.sfContactData.Patient_Race__c[0],
-      "Patient_Gender_2__c":vars.sfContactData.Patient_Gender_2__c[0],
-       "Date_of_Birth__c":vars.sfContactData.Date_of_Birth__c[0],
-       "HealthFusion_Patient_Record_ID__c":vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
-//       ("Insurance_Plan_Id_Identifier__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0] !=
-//null)),
-//         ("Insurance_Member_ID__c" :payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0] !=
-//null))
-//          ("Insurance_Company_Picklist__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0] !=
-//null)),
-//      
-//          "Effective_Date__c":(payload.Data.ADT_A04.INSURANCE.IN1."IN1-12"[0]) as Date as Date { format:"MM-dd-yyyy"},
-//          
-//          ("FirstName":payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0] !=
-//null)),
-//          ("LastName":payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0] !=
-//null)),
-//          ("MailingState":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0] !=
-//null)),
-//          ("MailingPostalCode":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0] !=
-//null)),
-//          ("MailingCity":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0] !=
-//null)),
-//          ("MailingStreet":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0] !=
-//null)),
-//          ("Insureds_Relationship__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0] !=
-//null)),
-//          ("Insurance_Plan_ID_Text__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0] !=
-//null)),
-          
-// ("Insurance_Company_ID__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0]) if
-//((payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0]?)
-//and
-//(payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0] !=
-//null
-//))
-       
-    }]]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-						<logger level="INFO" doc:name="Logger" doc:id="c31016f6-f15f-48e2-bf52-c8523f6a4eb5" message="CREATING THE CONTACT" />
-					</when>
-					<otherwise>
-						<logger level="INFO" doc:name="Logger" doc:id="c6b1ac2e-2bc1-47fc-b668-f3d26e105440" message="CONTACT ID EXISTS" />
-						<ee:transform doc:name="requiredSfMappings" doc:id="d9d1dd02-9fef-4b90-a67e-a09f087aac96">
-					<ee:message>
-					</ee:message>
-							<ee:variables >
-								<ee:set-variable variableName="sfContactData" ><![CDATA[%dw 2.0
+   FirstName: flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-02"[0],
+   LastName: flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-01"[0],
+   MiddleName: payload.Data.ADT_A04.PID."PID-05"."XPN-03"[0],
+   Email: payload.Data.ADT_A04.PID."PID-13"."XTN-04"[0],
+   Phone: payload.Data.ADT_A04.PID."PID-13"."XTN-01"[0],
+   MailingState: payload.Data.ADT_A04.PID."PID-11"."XAD-04"[0],
+   MailingPostalCode: payload.Data.ADT_A04.PID."PID-11"."XAD-05"[0],
+   MailingCity: payload.Data.ADT_A04.PID."PID-11"."XAD-03"[0],
+   MailingStreet: payload.Data.ADT_A04.PID."PID-11"."XAD-01"[0],
+   Patient_Ethnicity__c: payload.Data.ADT_A04.PID."PID-22",
+   Patient_Race__c: payload.Data.ADT_A04.PID."PID-10",
+   Patient_Gender_2__c: if (payload.Data.ADT_A04.PID."PID-08" == "M") "Male"
+                        else if (payload.Data.ADT_A04.PID."PID-08" == "F") "Female"
+                        else (payload.Data.ADT_A04.PID."PID-08"),
+   Date_of_Birth__c: (payload.Data.ADT_A04.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}),
+   HealthFusion_Patient_Record_ID__c: payload.Data.ADT_A04.PID."PID-04"."CX-01"[0]
+}]]]></ee:set-variable>
+                </ee:variables>
+            </ee:transform>
+
+            <!-- Query existing Contact by name -->
+            <flow-ref doc:name="callToGetContactId" doc:id="91e68d3e-a92a-487a-9746-7ef4dd5c2f89" name="salesforce_queryaccoun_Sub_Flow" />
+
+            <choice doc:name="Choice" doc:id="0f4ec9ce-d060-4bc0-8ef4-b9955dba4f0e">
+                <when expression="#[sizeOf(vars.queryRes.AccountId[0]) == null]">
+                    <flow-ref doc:name="flow reference to createAccount" 
+                              doc:id="8c378fd0-9909-4627-a515-6bf19c83d309" 
+                              name="createAccount" />
+
+                    <ee:transform doc:name="transformedSfData" doc:id="50c9447d-72c2-40e1-8714-0dbd3b6f094f">
+                        <ee:message/>
+                        <ee:variables>
+                            <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
-	 "AccountId" : vars.queryRes.AccountId[0],
-     "FirstName":vars.sfContactData.FirstName[0],
-      "LastName":vars.sfContactData.LastName[0],
-//      "HF_Chart_Number__c":flatten(payload.Data.ADT_A04.PID."PID-04")."CX-01"[0],
-    //   "Language_Preferred__c":vars.patientLanguage,
-//      "HF_Chart_Number__c":payload.Data.ADT_A04.PID."PID-03"."CX-01"[0],
-      "Email":vars.sfContactData.Email[0],
-      "Phone": vars.sfContactData.Phone[0],
-//       "MailingCountry":payload.Data.ADT_A04.PID."PID-11",
-      "MailingState":vars.sfContactData.MailingState[0],
-      "MailingPostalCode":vars.sfContactData.MailingPostalCode[0],
-      "MailingCity":vars.sfContactData.MailingCity[0],
-      "MailingStreet":vars.sfContactData.MailingStreet[0],
-      "Patient_Ethnicity__c":vars.sfContactData.Patient_Ethnicity__c[0],
-      "Patient_Race__c":vars.sfContactData.Patient_Race__c[0],
-      "Patient_Gender_2__c":vars.sfContactData.Patient_Gender_2__c[0],
-       "Date_of_Birth__c":vars.sfContactData.Date_of_Birth__c[0],
-       "HealthFusion_Patient_Record_ID__c":vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
-//       ("Insurance_Plan_Id_Identifier__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-01"[0] !=
-//null)),
-//         ("Insurance_Member_ID__c" :payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-36"[0] !=
-//null))
-//          ("Insurance_Company_Picklist__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-04"."XON-01"[0] !=
-//null)),
-//      
-//          "Effective_Date__c":(payload.Data.ADT_A04.INSURANCE.IN1."IN1-12"[0]) as Date as Date { format:"MM-dd-yyyy"},
-//          
-//          ("FirstName":payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-02"[0] !=
-//null)),
-//          ("LastName":payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-16"."XPN-01"[0] !=
-//null)),
-//          ("MailingState":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-04"[0] !=
-//null)),
-//          ("MailingPostalCode":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-05"[0] !=
-//null)),
-//          ("MailingCity":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-03"[0] !=
-//null)),
-//          ("MailingStreet":payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-19"."XAD-01"[0] !=
-//null)),
-//          ("Insureds_Relationship__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-17"[0] !=
-//null)),
-//          ("Insurance_Plan_ID_Text__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0])if((payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0]?) and (payload.Data.ADT_A04.INSURANCE.IN1."IN1-02"."CE_0072-02"[0] !=
-//null)),
-          
-// ("Insurance_Company_ID__c":payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0]) if
-//((payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0]?)
-//and
-//(payload.Data.ADT_A04.INSURANCE.IN1."IN1-03"."CX-02"[0] !=
-//null
-//))
-       
-    }] ]]></ee:set-variable>
-							</ee:variables>
-				</ee:transform>
-						<logger level="INFO" doc:name="Logger" doc:id="1d775cfe-39a2-499d-af48-4d08f879ed71" message="CREATING THE CONTACT" />
-					</otherwise>
-				</choice>
-				<flow-ref doc:name="callToUpsertFlow" doc:id="aa78b47f-1ff7-4beb-8162-cbfeb7d1db6b" name="common-sf-upsert-flow" />
-			</when>
-			<when expression="#[vars.checkConditionA08.result]">
-				<hl7:read doc:name="A08" doc:id="8eadcafe-d192-4e09-8148-5181ecbf9d17" config-ref="HL7_EDI_Config_A08">
-					<hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
-				</hl7:read>
-				<ee:transform doc:name="jsonPayload" doc:id="769feed6-88ba-40bb-a504-a89e7b16b3dc">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
+   AccountId: vars.accountResponse.items.id[0],
+   FirstName: vars.sfContactData.FirstName[0],
+   LastName: vars.sfContactData.LastName[0],
+   Email: vars.sfContactData.Email[0],
+   Phone: vars.sfContactData.Phone[0],
+   MailingState: vars.sfContactData.MailingState[0],
+   MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
+   MailingCity: vars.sfContactData.MailingCity[0],
+   MailingStreet: vars.sfContactData.MailingStreet[0],
+   Patient_Ethnicity__c: vars.sfContactData.Patient_Ethnicity__c[0],
+   Patient_Race__c: vars.sfContactData.Patient_Race__c[0],
+   Patient_Gender_2__c: vars.sfContactData.Patient_Gender_2__c[0],
+   Date_of_Birth__c: vars.sfContactData.Date_of_Birth__c[0],
+   HealthFusion_Patient_Record_ID__c: vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
+}]]]></ee:set-variable>
+                        </ee:variables>
+                    </ee:transform>
+                    <logger level="INFO" 
+                            doc:name="Logger" 
+                            doc:id="b93897b8-b987-4e55-b98d-dfa6c2311cee" 
+                            message="CREATING THE CONTACT"/>
+
+                </when>
+                <otherwise>
+                    <logger level="INFO" doc:name="Logger" 
+                            doc:id="5d0d2394-e4b7-4790-aafa-165a945f045a" 
+                            message="CONTACT ID EXISTS" />
+                    <ee:transform doc:name="requiredSfMappings" 
+                                  doc:id="6c9532e7-eca5-4c05-923a-f1cf56819b5a">
+                        <ee:message/>
+                        <ee:variables>
+                            <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+   AccountId: vars.queryRes.AccountId[0],
+   FirstName: vars.sfContactData.FirstName[0],
+   LastName: vars.sfContactData.LastName[0],
+   Email: vars.sfContactData.Email[0],
+   Phone: vars.sfContactData.Phone[0],
+   MailingState: vars.sfContactData.MailingState[0],
+   MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
+   MailingCity: vars.sfContactData.MailingCity[0],
+   MailingStreet: vars.sfContactData.MailingStreet[0],
+   Patient_Ethnicity__c: vars.sfContactData.Patient_Ethnicity__c[0],
+   Patient_Race__c: vars.sfContactData.Patient_Race__c[0],
+   Patient_Gender_2__c: vars.sfContactData.Patient_Gender_2__c[0],
+   Date_of_Birth__c: vars.sfContactData.Date_of_Birth__c[0],
+   HealthFusion_Patient_Record_ID__c: vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
+}]]]></ee:set-variable>
+                        </ee:variables>
+                    </ee:transform>
+                    <logger level="INFO" doc:name="Logger" 
+                            doc:id="255f2523-b2fb-48a1-87dc-019a06544496" 
+                            message="CREATING THE CONTACT" />
+                </otherwise>
+            </choice>
+
+            <!-- Upsert the contact record -->
+            <flow-ref doc:name="callToUpsertFlow" 
+                      doc:id="3798f12d-10f2-4859-a394-a987e6ab8aa1" 
+                      name="common-sf-upsert-flow" />
+        </when>
+
+        <!--  ========== ADT^A08 ========== -->
+        <when expression="#[vars.checkConditionA08.result]">
+            <hl7:read doc:name="A08" doc:id="f789d95a-e2ee-4173-a15e-97ac57afd4fa" config-ref="HL7_EDI_Config_A08">
+                <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+            </hl7:read>
+            <ee:transform doc:name="jsonPayload" doc:id="c07cdea7-4ded-4883-8c2b-cb1f90c31fd5">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 payload]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<ee:transform doc:name="language_field" doc:id="edc477ab-6e52-471d-8ad4-34c5872fec96">
-					<ee:message />
-					<ee:variables>
-						<ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
+                </ee:message>
+            </ee:transform>
+            <ee:transform doc:name="language_field" doc:id="3e5cdd9f-0955-41a4-b8d2-3a32c54b628e">
+                <ee:message />
+                <ee:variables>
+                    <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
 output application/json
 var language = vars.LanguageMapping
 ---
 (language filter ($.primarylanguage == payload.Data.ADT_A08.PID."PID-15"."CE_0296-01"))[0].Language_Preferred__c]]></ee:set-variable>
-							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
 output application/java
 ---
 payload.Data.ADT_A08.PV1."PV1-03"."PL-09"]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<ee:transform doc:name="sfMappings" doc:id="890eab0b-d850-465e-956a-1a68f81e1ef1">
-					<ee:message>
-					</ee:message>
-					<ee:variables>
-						<ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
+                </ee:variables>
+            </ee:transform>
+            <ee:transform doc:name="sfMappings" doc:id="aeb816ce-a687-4d01-ac64-6b26db99f808">
+                <ee:message>
+                </ee:message>
+                <ee:variables>
+                    <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
-	 "HealthFusion_Patient_Record_ID__c":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
+     "HealthFusion_Patient_Record_ID__c":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
      
       "FirstName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
       "LastName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
       "MiddleName": payload.Data.ADT_A08.PID."PID-05"."XPN-03"[0],
-//      "HF_Chart_Number__c":flatten(payload.Data.ADT_A08.PID."PID-04")."CX-01"[0],
-    //   "Language_Preferred__c":vars.patientLanguage,
-//      "HF_Chart_Number__c":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
       "Email":payload.Data.ADT_A08.PID."PID-13"."XTN-04"[0],
       "Phone": payload.Data.ADT_A08.PID."PID-13"."XTN-01"[0],
-//       "MailingCountry":payload.Data.ADT_A08.PID."PID-11",
       "MailingState":payload.Data.ADT_A08.PID."PID-11"."XAD-04"[0],
       "MailingPostalCode":payload.Data.ADT_A08.PID."PID-11"."XAD-05"[0],
       "MailingCity":payload.Data.ADT_A08.PID."PID-11"."XAD-03"[0],
@@ -387,66 +339,26 @@ output application/java
       "Patient_Ethnicity__c":payload.Data.ADT_A08.PID."PID-22",
       "Patient_Race__c":payload.Data.ADT_A08.PID."PID-10",
       "Patient_Gender_2__c":if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
-//       "Date_of_Birth__c":(payload.Data.ADT_A08.PID."PID-07"."TS-01") as Number as DateTime as Date { format:"MM-dd-yyyy"},
-//      "Date_of_Birth__c" : (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) as String {format: "MM-dd-yyyy"},
      "Date_of_Birth__c" :  (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}),
        "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A08.PID."PID-04"."CX-01"[0]
-       
-//         ("Insurance_Member_ID__c" :payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0] !=
-//null)),
-//          ("Insurance_Plan_Id_Identifier__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0] !=
-//null))
-//          ("Insurance_Company_Picklist__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0] !=
-//null)),
-//      
-//          "Effective_Date__c":(payload.Data.ADT_A08.INSURANCE.IN1."IN1-12"[0]) as Date as Date { format:"MM-dd-yyyy"},
-//          
-//          ("FirstName":payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0] !=
-//null)),
-//          ("LastName":payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0] !=
-//null)),
-//          ("MailingState":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0] !=
-//null)),
-//          ("MailingPostalCode":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0] !=
-//null)),
-//          ("MailingCity":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0] !=
-//null)),
-//          ("MailingStreet":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0] !=
-//null)),
-//          ("Insureds_Relationship__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0] !=
-//null)),
-//          ("Insurance_Plan_ID_Text__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0] !=
-//null)),
-//          
-// ("Insurance_Company_ID__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0]) if
-//((payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0]?)
-//and
-//(payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0] !=
-//null
-//))
-       
     }]]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<choice doc:name="Choice" doc:id="1a524317-3779-43e7-850e-af9de241b2ac">
-					<when expression="#[sizeOf(vars.sfContactData.Id[0]) == 18]">
-						<ee:transform doc:name="settingContactId" doc:id="331ecbf0-e23b-4f47-bc1b-5dfbd99c048f">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
+                </ee:variables>
+            </ee:transform>
+            <choice doc:name="Choice" doc:id="eb51a932-440c-4ead-a8bc-1ea006efc0bc">
+                <when expression="#[sizeOf(vars.sfContactData.Id[0]) == 18]">
+                    <ee:transform doc:name="settingContactId" doc:id="3bbaaef2-180e-4136-816f-ff4e184cb18f">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
 [{
-	 "HealthFusion_Patient_Record_ID__c":(payload.Data.ADT_A08.PID."PID-03"."CX-01"[0])[0 to 14],
+     "HealthFusion_Patient_Record_ID__c":(payload.Data.ADT_A08.PID."PID-03"."CX-01"[0])[0 to 14],
      
       "FirstName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
       "LastName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
       "MiddleName": payload.Data.ADT_A08.PID."PID-05"."XPN-03"[0],
-//      "HF_Chart_Number__c":flatten(payload.Data.ADT_A08.PID."PID-04")."CX-01"[0],
-    //   "Language_Preferred__c":vars.patientLanguage,
-//      "HF_Chart_Number__c":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
       "Email":payload.Data.ADT_A08.PID."PID-13"."XTN-04"[0],
       "Phone": payload.Data.ADT_A08.PID."PID-13"."XTN-01"[0],
-//       "MailingCountry":payload.Data.ADT_A08.PID."PID-11",
       "MailingState":payload.Data.ADT_A08.PID."PID-11"."XAD-04"[0],
       "MailingPostalCode":payload.Data.ADT_A08.PID."PID-11"."XAD-05"[0],
       "MailingCity":payload.Data.ADT_A08.PID."PID-11"."XAD-03"[0],
@@ -454,51 +366,15 @@ output application/java
       "Patient_Ethnicity__c":payload.Data.ADT_A08.PID."PID-22",
       "Patient_Race__c":payload.Data.ADT_A08.PID."PID-10",
       "Patient_Gender_2__c":if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
-//       "Date_of_Birth__c":(payload.Data.ADT_A08.PID."PID-07"."TS-01") as Number as DateTime as Date { format:"MM-dd-yyyy"},
-//      "Date_of_Birth__c" : (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) as String {format: "MM-dd-yyyy"},
      "Date_of_Birth__c" :  (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}),
        "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A08.PID."PID-04"."CX-01"[0]
-       
-//         ("Insurance_Member_ID__c" :payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0] !=
-//null)),
-//          ("Insurance_Plan_Id_Identifier__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0] !=
-//null))
-//          ("Insurance_Company_Picklist__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0] !=
-//null)),
-//      
-//          "Effective_Date__c":(payload.Data.ADT_A08.INSURANCE.IN1."IN1-12"[0]) as Date as Date { format:"MM-dd-yyyy"},
-//          
-//          ("FirstName":payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0] !=
-//null)),
-//          ("LastName":payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0] !=
-//null)),
-//          ("MailingState":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0] !=
-//null)),
-//          ("MailingPostalCode":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0] !=
-//null)),
-//          ("MailingCity":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0] !=
-//null)),
-//          ("MailingStreet":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0] !=
-//null)),
-//          ("Insureds_Relationship__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0] !=
-//null)),
-//          ("Insurance_Plan_ID_Text__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0] !=
-//null)),
-//          
-// ("Insurance_Company_ID__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0]) if
-//((payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0]?)
-//and
-//(payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0] !=
-//null
-//))
-       
     }]]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-						<flow-ref doc:name="callToGetTheContactId" doc:id="cae59cc6-5701-41b3-bcde-9aedaced18aa" name="salesforce_querycontact_Sub_Flow" />
-						<ee:transform doc:name="sfMappings" doc:id="d64a8eaf-3393-4f5a-aadc-a66f5458657b">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
+                </ee:message>
+            </ee:transform>
+                    <flow-ref doc:name="callToGetTheContactId" doc:id="cd7c4e1e-d640-4b9d-a4f7-06191fe7b0fe" name="salesforce_querycontact_Sub_Flow" />
+                    <ee:transform doc:name="sfMappings" doc:id="a37f47a9-0e0e-4650-998b-c92de09eeb4d">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
 [
@@ -520,28 +396,24 @@ output application/java
     "HealthFusion_Patient_Record_ID__c": payload.HealthFusion_Patient_Record_ID__c[0]
   }
 ]]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-						<flow-ref doc:name="callToUpsertFlow" doc:id="4a1619db-9b78-4407-8e92-6cece935b9a9" name="common-sf-update-flow" />
-					</when>
-					<otherwise>
-						<ee:transform doc:name="requiredPayloadForSalesforceUpdate" doc:id="51ad16f4-6435-4e5d-87b5-fa7227e57ae1">
-					<ee:message>
-								<ee:set-payload><![CDATA[%dw 2.0
+                </ee:message>
+            </ee:transform>
+                    <flow-ref doc:name="callToUpsertFlow" doc:id="26e78ff4-389c-42cf-b50e-77cc24661052" name="common-sf-update-flow" />
+                </when>
+                <otherwise>
+                    <ee:transform doc:name="requiredPayloadForSalesforceUpdate" doc:id="d934457c-8c8a-476e-a18c-7327109232a2">
+                <ee:message>
+                            <ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
 [{
-	 "HealthFusion_Patient_Record_ID__c":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
+     "HealthFusion_Patient_Record_ID__c":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
      
       "FirstName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
       "LastName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
       "MiddleName": payload.Data.ADT_A08.PID."PID-05"."XPN-03"[0],
-//      "HF_Chart_Number__c":flatten(payload.Data.ADT_A08.PID."PID-04")."CX-01"[0],
-    //   "Language_Preferred__c":vars.patientLanguage,
-//      "HF_Chart_Number__c":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
       "Email":payload.Data.ADT_A08.PID."PID-13"."XTN-04"[0],
       "Phone": payload.Data.ADT_A08.PID."PID-13"."XTN-01"[0],
-//       "MailingCountry":payload.Data.ADT_A08.PID."PID-11",
       "MailingState":payload.Data.ADT_A08.PID."PID-11"."XAD-04"[0],
       "MailingPostalCode":payload.Data.ADT_A08.PID."PID-11"."XAD-05"[0],
       "MailingCity":payload.Data.ADT_A08.PID."PID-11"."XAD-03"[0],
@@ -549,129 +421,95 @@ output application/java
       "Patient_Ethnicity__c":payload.Data.ADT_A08.PID."PID-22",
       "Patient_Race__c":payload.Data.ADT_A08.PID."PID-10",
       "Patient_Gender_2__c":if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
-//       "Date_of_Birth__c":(payload.Data.ADT_A08.PID."PID-07"."TS-01") as Number as DateTime as Date { format:"MM-dd-yyyy"},
-//      "Date_of_Birth__c" : (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) as String {format: "MM-dd-yyyy"},
      "Date_of_Birth__c" :  (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}),
        "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A08.PID."PID-04"."CX-01"[0]
-       
-//         ("Insurance_Member_ID__c" :payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-36"[0] !=
-//null)),
-//          ("Insurance_Plan_Id_Identifier__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-01"[0] !=
-//null))
-//          ("Insurance_Company_Picklist__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-04"."XON-01"[0] !=
-//null)),
-//      
-//          "Effective_Date__c":(payload.Data.ADT_A08.INSURANCE.IN1."IN1-12"[0]) as Date as Date { format:"MM-dd-yyyy"},
-//          
-//          ("FirstName":payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-02"[0] !=
-//null)),
-//          ("LastName":payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-16"."XPN-01"[0] !=
-//null)),
-//          ("MailingState":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-04"[0] !=
-//null)),
-//          ("MailingPostalCode":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-05"[0] !=
-//null)),
-//          ("MailingCity":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-03"[0] !=
-//null)),
-//          ("MailingStreet":payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-19"."XAD-01"[0] !=
-//null)),
-//          ("Insureds_Relationship__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-17"[0] !=
-//null)),
-//          ("Insurance_Plan_ID_Text__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0])if((payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0]?) and (payload.Data.ADT_A08.INSURANCE.IN1."IN1-02"."CE_0072-02"[0] !=
-//null)),
-//          
-// ("Insurance_Company_ID__c":payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0]) if
-//((payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0]?)
-//and
-//(payload.Data.ADT_A08.INSURANCE.IN1."IN1-03"."CX-02"[0] !=
-//null
-//))
-       
     }]]]></ee:set-payload>
-							</ee:message>
-					<ee:variables>
-					</ee:variables>
-				</ee:transform>
-						<flow-ref doc:name="callToUpdateUsingHfChart" doc:id="f953e9df-d119-42c1-aa89-ca8f1f249ad7" name="contact-update-hfchartnumber-subflow" />
-					</otherwise>
-				</choice>
-			</when>
-			<when expression="#[vars.checkConditionS12.result]">
-				<hl7:read doc:name="S12" doc:id="6db61ca5-597e-4e34-9a93-1f33ba7040ff" config-ref="HL7_EDI_Config_S12">
-					<hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
-				</hl7:read>
-				<ee:transform doc:name="jsonPayload" doc:id="1eff1e28-0b9f-42e9-b992-b48bbdace7cf">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
+                        </ee:message>
+                <ee:variables>
+                </ee:variables>
+            </ee:transform>
+                    <flow-ref doc:name="callToUpdateUsingHfChart" doc:id="db831568-47f7-44db-b568-a969dcff7c66" name="contact-update-hfchartnumber-subflow" />
+                </otherwise>
+            </choice>
+        </when>
+
+        <!--  ========== SIU^S12 ========== -->
+        <when expression="#[vars.checkConditionS12.result]">
+            <hl7:read doc:name="S12" doc:id="2e01c917-c001-4686-b1c5-651865169b86" config-ref="HL7_EDI_Config_S12">
+                <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+            </hl7:read>
+            <ee:transform doc:name="jsonPayload" doc:id="9f506b30-d1bc-4324-a318-4c425904a7d6">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 payload]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<ee:transform doc:name="input_mappings" doc:id="55940ab9-334b-45e1-b517-42620322917a">
-					<ee:message />
-					<ee:variables>
-						<ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
+                </ee:message>
+            </ee:transform>
+            <ee:transform doc:name="input_mappings" doc:id="858fd4b6-ab17-427d-a3f2-1a748b4c99f0">
+                <ee:message />
+                <ee:variables>
+                    <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
 output application/json
 var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
 ---
 (language filter ($.primarylanguage == payload.Data.SIU_S12.PATIENT.PID."PID-15"[0]."CE_0296-01" ))[0].Language_Preferred__c]]></ee:set-variable>
-						<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].AdditionalInformation]]></ee:set-variable>
-						<ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
 output application/json
 var provider = vars.ProviderMapping
 ---
 (provider filter ($.Last_Name == flatten(payload.Data.SIU_S12.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
-						<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
 var location = vars.TerritoryMapping
 ---
 (location filter ($.LOCATION == payload.Data.SIU_S12.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
-						<ee:set-variable variableName="duration"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].duration]]></ee:set-variable>
-						<ee:set-variable variableName="apType"><![CDATA[%dw 2.0
+<ee:set-variable variableName="apType"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].AppointmentType]]></ee:set-variable>
-						<ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].WorkTypeId]]></ee:set-variable>
-						<ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
-						<ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
-						<ee:set-variable variableName="serviceId"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="serviceId"><![CDATA[%dw 2.0
 output application/json
 var provider = vars.ProviderMapping
 ---
 (provider filter ($.Last_Name == flatten(payload.Data.SIU_S12.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].providerId]]></ee:set-variable>
-							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
+                        <ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
 output application/java
 ---
 payload.Data.SIU_S12.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<flow-ref doc:name="call To Salesforce For ContactId" doc:id="1297e7df-bb2f-4af1-a28a-a2362bcbeaa4" name="salesforce_query_Sub_Flow" />
-				<ee:transform doc:name="sfMappings" doc:id="8b7202d6-b048-47cf-bc42-e678741df985">
-					<ee:message />
-					<ee:variables>
-						<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+                </ee:variables>
+            </ee:transform>
+            <flow-ref doc:name="call To Salesforce For ContactId" doc:id="878c0733-586e-4e6b-9474-ee97910fdd27" name="salesforce_query_Sub_Flow" />
+            <ee:transform doc:name="sfMappings" doc:id="fae4a407-3384-48b7-b9de-829d15aaf099">
+                <ee:message />
+                <ee:variables>
+                    <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
 ---
 
@@ -709,105 +547,107 @@ output application/java
 //        "Opportunity__c": vars.opportunity_c.Opportunity__c
     }]
 ]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<logger level="INFO" doc:name="Logger" doc:id="6ff9f6b3-51d8-4012-b838-8c4fec0d04d2" message="CREATING THE SERVICE APPOINTMENT" />
-				<flow-ref doc:name="callToSFupsertSubFlow" doc:id="000db286-c26b-4202-adcb-a5e79ba47785" name="common-sf-appointment-upsert-flow" />
-				<ee:transform doc:name="fetchingAppointmentId" doc:id="7b7235de-350c-4837-82e6-087104c7f7e3">
-					<ee:message>
-					</ee:message>
-					<ee:variables>
-						<ee:set-variable variableName="appointmentId"><![CDATA[%dw 2.0
+                </ee:variables>
+            </ee:transform>
+            <logger level="INFO" doc:name="Logger" doc:id="885db280-f954-443b-8818-eb89c9002c38" message="CREATING THE SERVICE APPOINTMENT" />
+            <flow-ref doc:name="callToSFupsertSubFlow" doc:id="39aa9efa-4118-4697-82b1-f1771a972ad8" name="common-sf-appointment-upsert-flow" />
+            <ee:transform doc:name="fetchingAppointmentId" doc:id="139964f7-2467-4448-9786-f927cf3a033f">
+                <ee:message>
+                </ee:message>
+                <ee:variables>
+                    <ee:set-variable variableName="appointmentId"><![CDATA[%dw 2.0
 output application/json
 ---
 vars.appRes.items.id[0]]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<ee:transform doc:name="requiredPayloadForUpdation" doc:id="8d0051af-65f7-4021-a868-a2f4348b9941">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
+                </ee:variables>
+            </ee:transform>
+            <ee:transform doc:name="requiredPayloadForUpdation" doc:id="d79565b3-4206-4b4b-b328-6b931bb62b28">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
 [{
 	"ServiceAppointmentId" : vars.appointmentId ,
 	"ServiceResourceId": vars.serviceId
 }]]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<logger level="INFO" doc:name="Logger" doc:id="a73dd9a3-9fbe-412a-8928-5156660a1461" message="UPDATING THE RESOURCEID TO THE ASSIGNED RESOURCE" />
-				<flow-ref doc:name="flow Call To Update the Appointment" doc:id="d2f37945-137b-4712-9231-a6aeaf70144e" name="appointment-update-Sub_Flow" />
-			</when>
-			<when expression="#[vars.checkConditionS13.result]">
-				<hl7:read doc:name="S13" doc:id="793ca39d-eaf3-44eb-8b49-c1178c7bdf2f" config-ref="HL7_EDI_Config_S13">
-					<hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
-				</hl7:read>
-				<ee:transform doc:name="jsonPayload" doc:id="2f35e056-5286-433e-b47f-b936d9426e4f">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
+                </ee:message>
+            </ee:transform>
+            <logger level="INFO" doc:name="Logger" doc:id="90a9a923-0e05-4d8f-a419-d322b91fecc3" message="UPDATING THE RESOURCEID TO THE ASSIGNED RESOURCE" />
+            <flow-ref doc:name="flow Call To Update the Appointment" doc:id="c119ca2b-c44b-4921-bf86-79f43a8281a8" name="appointment-update-Sub_Flow" />
+        </when>
+
+        <!--  ========== SIU^S13 ========== -->
+        <when expression="#[vars.checkConditionS13.result]">
+            <hl7:read doc:name="S13" doc:id="4b149248-c88a-405e-a0ac-45e09cf63d5c" config-ref="HL7_EDI_Config_S13">
+                <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+            </hl7:read>
+            <ee:transform doc:name="jsonPayload" doc:id="6ab01630-e5f4-43ad-b15f-709e277cd8e3">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 payload]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<ee:transform doc:name="input_mappings" doc:id="96672973-b174-4eea-a0d6-8e830a399bd3">
-					<ee:message />
-					<ee:variables>
-						<ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
+                </ee:message>
+            </ee:transform>
+            <ee:transform doc:name="input_mappings" doc:id="c5d8f1ab-3465-4e2b-ad61-57100334168e">
+                <ee:message />
+                <ee:variables>
+                    <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
 output application/json
 var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
 ---
 (language filter ($.primarylanguage == payload.Data.SIU_S13.PATIENT.PID."PID-15"[0]."CE_0296-01" ))[0].Language_Preferred__c]]></ee:set-variable>
-						<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].AdditionalInformation]]></ee:set-variable>
-						<ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
 output application/json
 var provider = vars.ProviderMapping
 ---
 (provider filter ($.Last_Name == flatten(payload.Data.SIU_S13.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
-						<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
 var location = vars.TerritoryMapping
 ---
 (location filter ($.LOCATION == payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
-						<ee:set-variable variableName="duration"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].duration]]></ee:set-variable>
-						<ee:set-variable variableName="apType"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="apType"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].AppointmentType]]></ee:set-variable>
-						<ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.AdditionalInformation == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].WorkTypeId]]></ee:set-variable>
-						<ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
-						<ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S13.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
-							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
+                        <ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
 output application/java
 ---
 payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<ee:transform doc:name="sfMappings" doc:id="eba57166-7bf8-4edb-997e-a88748d68850">
-					<ee:message>
-					</ee:message>
-					<ee:variables>
-						<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+                </ee:variables>
+            </ee:transform>
+            <ee:transform doc:name="sfMappings" doc:id="42d424dd-6b14-449c-a78e-e839db542019">
+                <ee:message>
+                </ee:message>
+                <ee:variables>
+                    <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
@@ -835,14 +675,14 @@ output application/java
         
     }]
 ]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<choice doc:name="Choice" doc:id="066c1905-fc96-422d-848d-9c10adfd0944">
-					<when expression="#[sizeOf(vars.appointmentFields.NextGen_ID__c[0]) == 18]">
-						<ee:transform doc:name="sfMappings" doc:id="ecfb6114-a9d0-441c-8f0f-6e585049609f">
-							<ee:message />
-							<ee:variables>
-								<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+                </ee:variables>
+            </ee:transform>
+            <choice doc:name="Choice" doc:id="e70c649b-5072-4696-a727-4a5157a86ae0">
+                <when expression="#[sizeOf(vars.appointmentFields.NextGen_ID__c[0]) == 18]">
+                    <ee:transform doc:name="sfMappings" doc:id="c89dba6c-961a-4442-9ede-d872b98325d3">
+                        <ee:message />
+                        <ee:variables>
+                            <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
@@ -870,13 +710,13 @@ output application/java
         
     }]
 ]]></ee:set-variable>
-							</ee:variables>
-						</ee:transform>
-						<flow-ref doc:name="callToQueryAppointmnetId" doc:id="de2d662d-cb42-4066-8ff2-297be62a75d0" name="salesforce-appointmnet-querySub_Flow" />
-						<ee:transform doc:name="sfMappings" doc:id="06e1b8ca-c182-46d9-ab89-52a45551b28c">
-							<ee:message />
-							<ee:variables>
-								<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+                        </ee:variables>
+                    </ee:transform>
+                    <flow-ref doc:name="callToQueryAppointmnetId" doc:id="ee49c6d8-3070-4832-a2a5-917bd94cb8ad" name="salesforce-appointmnet-querySub_Flow" />
+                    <ee:transform doc:name="sfMappings" doc:id="2e089ba3-a5fa-4434-9d2d-fc6503ddc31c">
+                        <ee:message />
+                        <ee:variables>
+                            <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
@@ -904,85 +744,87 @@ output application/java
         
     }]
 ]]></ee:set-variable>
-							</ee:variables>
-						</ee:transform>
-						<flow-ref doc:name="callToUpdateAppointment" doc:id="2e11a6f1-c9fe-4552-afd3-23fdcd5b4956" name="sf-appointment-update-flow" />
-					</when>
-					<otherwise>
-						<logger level="INFO" doc:name="Logger" doc:id="d86f63be-9347-48ec-b06d-c28ffbd4b599" message="NEXTGEN ID EXISTS" />
-						<flow-ref doc:name="callToUpdateAppointment" doc:id="cb2ec7af-4e1f-4667-b28c-edd570d5fbae" name="common-sf-appointment-upsert-flow" />
-					</otherwise>
-				</choice>
-			</when>
-			<when expression="#[vars.checkConditionS14.result]">
-				<hl7:read doc:name="S14" doc:id="cb6962d4-b365-42e3-91d1-cbf53d98bede" config-ref="HL7_EDI_Config_S14" />
-				<ee:transform doc:name="jsonPayload" doc:id="e4b7393b-d244-40df-a616-1a52429da731">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
+                        </ee:variables>
+                    </ee:transform>
+                    <flow-ref doc:name="callToUpdateAppointment" doc:id="0b012d30-c97e-4d29-a35a-dee862335041" name="sf-appointment-update-flow" />
+                </when>
+                <otherwise>
+                    <logger level="INFO" doc:name="Logger" doc:id="359b54ce-0c57-4415-bc3b-040aa3b31aa3" message="NEXTGEN ID EXISTS" />
+                    <flow-ref doc:name="callToUpdateAppointment" doc:id="66bf8695-56da-485d-8570-80ada65260ff" name="common-sf-appointment-upsert-flow" />
+                </otherwise>
+            </choice>
+        </when>
+
+        <!--  ========== SIU^S14 ========== -->
+        <when expression="#[vars.checkConditionS14.result]">
+            <hl7:read doc:name="S14" doc:id="670da900-5a1e-4c9d-a4f9-9c9295bfd337" config-ref="HL7_EDI_Config_S14" />
+            <ee:transform doc:name="jsonPayload" doc:id="ca7232ab-7389-4584-abf3-15bbe1881479">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 payload]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<ee:transform doc:name="input_mappings" doc:id="86d36d5a-3127-4dee-b7c8-13ab490a546b">
-					<ee:message />
-					<ee:variables>
-						<ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
+                </ee:message>
+            </ee:transform>
+            <ee:transform doc:name="input_mappings" doc:id="a326c130-417a-4ade-8802-307a059236d8">
+                <ee:message />
+                <ee:variables>
+                    <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
 output application/json
 var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
 ---
 (language filter ($.primarylanguage == payload.Data.SIU_S14.PATIENT.PID."PID-15"."CE_0296-01"[0]))[0].Language_Preferred__c]]></ee:set-variable>
-						<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].AdditionalInformation]]></ee:set-variable>
-						<ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
 output application/json
 var provider = vars.ProviderMapping
 ---
 (provider filter ($.Last_Name == flatten(payload.Data.SIU_S14.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
-						<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
 var location = vars.TerritoryMapping
 ---
 (location filter ($.LOCATION == payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
-						<ee:set-variable variableName="duration"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].duration]]></ee:set-variable>
-						<ee:set-variable variableName="apType"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="apType"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].AppointmentType]]></ee:set-variable>
-						<ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].WorkTypeId]]></ee:set-variable>
-						<ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
-						<ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
-							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
+                        <ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
 output application/java
 ---
 payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<ee:transform doc:name="sfMappings" doc:id="73aca6e7-bc6b-4797-81c4-9fb06ccbb6ac">
-					<ee:message>
-					</ee:message>
-					<ee:variables>
-						<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+                </ee:variables>
+            </ee:transform>
+            <ee:transform doc:name="sfMappings" doc:id="42b97e64-5fb9-41da-87d2-6847cab4432c">
+                <ee:message>
+                </ee:message>
+                <ee:variables>
+                    <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
@@ -1008,15 +850,15 @@ output application/java
          
 //        "Opportunity__c": vars.opportunity_c.opportunity__c
 }]]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<choice doc:name="Choice" doc:id="5096628a-62e5-44ec-8daa-c3a7b7e01dfe">
-					<when expression="#[sizeOf(vars.appointmentFields.NextGen_ID__c[0]) == 18]">
-						<ee:transform doc:name="Transform Message" doc:id="e0e8b152-c5c1-4f5a-8b67-dc07bb26e2f5">
-							<ee:message>
-							</ee:message>
-							<ee:variables>
-								<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+                </ee:variables>
+            </ee:transform>
+            <choice doc:name="Choice" doc:id="347d0d9b-39f8-4ef9-9578-ca34f4953d2b">
+                <when expression="#[sizeOf(vars.appointmentFields.NextGen_ID__c[0]) == 18]">
+                    <ee:transform doc:name="Transform Message" doc:id="154c8141-3b1b-408f-a9af-ef47859a59ce">
+                        <ee:message>
+                        </ee:message>
+                        <ee:variables>
+                            <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
@@ -1042,14 +884,14 @@ output application/java
          
 //        "Opportunity__c": vars.opportunity_c.opportunity__c
 }]]]></ee:set-variable>
-							</ee:variables>
-						</ee:transform>
-						<flow-ref doc:name="callToQueryAppointmnetId" doc:id="1c0201ed-087f-4cfc-8d44-999347dab8db" name="salesforce-appointmnet-querySub_Flow" />
-						<ee:transform doc:name="Transform Message" doc:id="5783ecd6-3838-46e9-a4bb-f79f33802a6f">
-							<ee:message>
-							</ee:message>
-							<ee:variables>
-								<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+                        </ee:variables>
+                    </ee:transform>
+                    <flow-ref doc:name="callToQueryAppointmnetId" doc:id="e0abe05e-adc7-476b-b7c3-7e6320af024f" name="salesforce-appointmnet-querySub_Flow" />
+                    <ee:transform doc:name="Transform Message" doc:id="85783665-e2bf-4977-bdf2-cb449c2ad788">
+                        <ee:message>
+                        </ee:message>
+                        <ee:variables>
+                            <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
@@ -1075,87 +917,89 @@ output application/java
          
 //        "Opportunity__c": vars.opportunity_c.opportunity__c
 }]]]></ee:set-variable>
-							</ee:variables>
-						</ee:transform>
-						<flow-ref doc:name="callToUpdateAppointment" doc:id="59dcd5bc-864b-4b0d-acb5-dcb40602c4d8" name="sf-appointment-update-flow" />
-					</when>
-					<otherwise>
-						<logger level="INFO" doc:name="Logger" doc:id="303e6940-e806-45ec-ad09-ed3e2300dc6e" message="NEXTGEN ID EXISTS" />
-						<flow-ref doc:name="callToUpdateAppointment" doc:id="1b0bade9-ea9a-464a-985f-16fb3904a110" name="common-sf-appointment-upsert-flow" />
-					</otherwise>
-				</choice>
-			</when>
-			<when expression="#[vars.checkConditionS15.result]">
-				<hl7:read doc:name="S15" doc:id="94e68d2a-f0e9-47fb-91ce-cf14e18dfad5" config-ref="HL7_EDI_Config_S15">
-					<hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
-				</hl7:read>
-				<ee:transform doc:name="jsonPayload" doc:id="b59de35f-b2d3-43c3-ac16-073931e72408">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
+                        </ee:variables>
+                    </ee:transform>
+                    <flow-ref doc:name="callToUpdateAppointment" doc:id="74018766-764b-417d-8ee0-fc5b9618a27d" name="sf-appointment-update-flow" />
+                </when>
+                <otherwise>
+                    <logger level="INFO" doc:name="Logger" doc:id="5bf1949a-546d-4af2-aca6-43e0197db89b" message="NEXTGEN ID EXISTS" />
+                    <flow-ref doc:name="callToUpdateAppointment" doc:id="c53f3321-a2b9-45c5-9199-6745309b1615" name="common-sf-appointment-upsert-flow" />
+                </otherwise>
+            </choice>
+        </when>
+
+        <!--  ========== SIU^S15 ========== -->
+        <when expression="#[vars.checkConditionS15.result]">
+            <hl7:read doc:name="S15" doc:id="fdc8444d-60ec-48b6-bdd2-cd0af7dfe562" config-ref="HL7_EDI_Config_S15">
+                <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+            </hl7:read>
+            <ee:transform doc:name="jsonPayload" doc:id="090993d0-d843-4a84-adc5-8275d36c703f">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 payload]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<ee:transform doc:name="input_mappings" doc:id="3c81f004-80f7-443d-b6e4-e6edc683fac1">
-					<ee:message />
-					<ee:variables>
-						<ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
+                </ee:message>
+            </ee:transform>
+            <ee:transform doc:name="input_mappings" doc:id="541a83e7-992e-440d-8afc-7dfe1417fd34">
+                <ee:message />
+                <ee:variables>
+                    <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
 output application/json
 var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
 ---
 (language filter ($.primarylanguage == payload.Data.SIU_S15.PATIENT.PID."PID-15"."CE_0296-01"[0]))[0].Language_Preferred__c]]></ee:set-variable>
-						<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].AdditionalInformation]]></ee:set-variable>
-						<ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="providerExtract"><![CDATA[%dw 2.0
 output application/json
 var provider = vars.ProviderMapping
 ---
 (provider filter ($.Last_Name == flatten(payload.Data.SIU_S15.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
-						<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
 var location = vars.TerritoryMapping
 ---
 (location filter ($.LOCATION == payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
-						<ee:set-variable variableName="duration"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].duration]]></ee:set-variable>
-						<ee:set-variable variableName="apType"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="apType"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].AppointmentType]]></ee:set-variable>
-						<ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="workTypeId"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].WorkTypeId]]></ee:set-variable>
-						<ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="workGroupId"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
-						<ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="workTypeGroup"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
-							<ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
+                        <ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
 output application/java
 ---
 payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<ee:transform doc:name="sfMappings" doc:id="be9bfc69-7113-4cac-990b-83d28ec1d4a4">
-					<ee:message>
-					</ee:message>
-					<ee:variables>
-						<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+                </ee:variables>
+            </ee:transform>
+            <ee:transform doc:name="sfMappings" doc:id="1efee067-f78a-4ab2-81f7-51725442d82f">
+                <ee:message>
+                </ee:message>
+                <ee:variables>
+                    <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
@@ -1182,14 +1026,14 @@ output application/java
          
 //        "Opportunity__c": vars.opportunity_c.opportunity__c
 }]]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<choice doc:name="Choice" doc:id="34db6f3d-0710-4b55-9ee9-f5eb93387cf3">
-					<when expression="#[sizeOf(vars.appointmentFields.NextGen_ID__c[0]) == 18]">
-						<ee:transform doc:name="sfMappings" doc:id="17e14a06-162a-42af-93a7-c3ab578d07a3">
-							<ee:message />
-							<ee:variables>
-								<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+                </ee:variables>
+            </ee:transform>
+            <choice doc:name="Choice" doc:id="01224c35-4faa-457f-b26a-7f9b68701e8e">
+                <when expression="#[sizeOf(vars.appointmentFields.NextGen_ID__c[0]) == 18]">
+                    <ee:transform doc:name="sfMappings" doc:id="a3c8b2d2-a980-4cca-b61e-7a33ddb176b4">
+                        <ee:message />
+                        <ee:variables>
+                            <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
@@ -1216,13 +1060,13 @@ output application/java
          
 //        "Opportunity__c": vars.opportunity_c.opportunity__c
 }]]]></ee:set-variable>
-							</ee:variables>
-						</ee:transform>
-						<flow-ref doc:name="callToQueryAppointmnetId" doc:id="33f82b82-63f2-4d81-85a7-c7201695db7d" name="salesforce-appointmnet-querySub_Flow" />
-						<ee:transform doc:name="sfMappings" doc:id="42a35919-a218-46a0-b770-a444612bee3c">
-							<ee:message />
-							<ee:variables>
-								<ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+                        </ee:variables>
+                    </ee:transform>
+                    <flow-ref doc:name="callToQueryAppointmnetId" doc:id="fb3d5eed-5b2f-426d-b01e-77d38ff959c1" name="salesforce-appointmnet-querySub_Flow" />
+                    <ee:transform doc:name="sfMappings" doc:id="16395f12-6e35-4e89-a088-833276d3f1e6">
+                        <ee:message />
+                        <ee:variables>
+                            <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
@@ -1249,26 +1093,44 @@ output application/java
          
 //        "Opportunity__c": vars.opportunity_c.opportunity__c
 }]]]></ee:set-variable>
-							</ee:variables>
-						</ee:transform>
-						<flow-ref doc:name="callToUpdateAppointment" doc:id="756954b4-903e-4bcd-9854-fd029ac47a31" name="sf-appointment-update-flow" />
-					</when>
-					<otherwise>
-						<logger level="INFO" doc:name="Logger" doc:id="b2eb6aff-9bf9-443b-8d55-5d5993a59e37" message="NEXTGEN ID EXISTS" />
-						<flow-ref doc:name="callToUpdateAppointment" doc:id="ec436fcc-483f-4f49-b45d-3fc7fc17b6c2" name="common-sf-appointment-upsert-flow" />
-					</otherwise>
-				</choice>
-			</when>
-			<otherwise>
-				<ee:transform doc:name="defaultCase" doc:id="80ba2033-525b-43a3-8f26-1f9129ffa5dc">
-					<ee:message>
-						<ee:set-payload><![CDATA["Invalid Message"]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</otherwise>
-		</choice>
-		<logger level="INFO" doc:name="endLogger" doc:id="51b54071-0562-4e22-b164-caa1e133c555" message="#[%dw 2.0&#10;output application/json&#10;&#10;---&#10;{&#10;	correlationId : vars.correlationId,&#10;	eventTimestamp : now(),&#10;	applicationName: Mule::p('app.name'),&#10;	&#10;	flowName: flow.name default &quot;implementation-flows&quot;,&#10;	environment: upper(Mule::p('mule.env')),&#10;	source: Mule::p('source'),&#10;	target:  Mule::p('target'),&#10;	message: &quot;response sent to Salesforce&quot;&#10;}]"/>
-	</sub-flow>
+                        </ee:variables>
+                    </ee:transform>
+                    <flow-ref doc:name="callToUpdateAppointment" doc:id="3a2fffd6-82bc-46cc-ac7f-b21eca030638" name="sf-appointment-update-flow" />
+                </when>
+                <otherwise>
+                    <logger level="INFO" doc:name="Logger" doc:id="c2895300-35d2-454b-a1ae-97a48b7f4ecc" message="NEXTGEN ID EXISTS" />
+                    <flow-ref doc:name="callToUpdateAppointment" doc:id="bcff5c92-9c07-4e03-92c7-2331342bc657" name="common-sf-appointment-upsert-flow" />
+                </otherwise>
+            </choice>
+        </when>
+
+        <otherwise>
+            <ee:transform doc:name="defaultCase" doc:id="be0e8cd4-0a0a-4472-aa38-d042a2db6fbd">
+                <ee:message>
+                    <ee:set-payload><![CDATA["Invalid Message"]]></ee:set-payload>
+                </ee:message>
+            </ee:transform>
+        </otherwise>
+    </choice>
+
+<logger level="INFO" doc:name="endLogger" doc:id="e1af0804-ad9e-4987-b570-8807854d6182" 
+            message="#[%dw 2.0
+output application/json
+
+---
+{
+	correlationId : vars.correlationId,
+	eventTimestamp : now(),
+	applicationName: Mule::p('app.name'),
+	flowName: flow.name default 'implementation-flows',
+	environment: upper(Mule::p('mule.env')),
+	source: Mule::p('source'),
+	target:  Mule::p('target'),
+	message: 'response sent to Salesforce'
+}]" />
+</sub-flow>
+
+
 	<sub-flow name="common-sf-upsert-flow" doc:id="a3165efe-c015-4ea4-8362-e80a2c53f0e5" >
 		<logger level="INFO" doc:name="beforeInsert" doc:id="c6068ee8-7f91-4af8-9c64-22698bd02017" message="##########Before Salesforce Upsert###################" />
 		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="72724815-f270-4e95-aa10-797bd2c725eb" millisBetweenRetries="${sf.retryfrequency}">

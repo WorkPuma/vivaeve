@@ -1,43 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:object-store-v2="http://www.mulesoft.org/schema/mule/object-store-v2"
       xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+      xmlns:scheduler="http://www.mulesoft.org/schema/mule/scheduler"
       xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-      xmlns:http="http://www.mulesoft.org/schema/mule/http"
-      xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
-      xmlns:java="http://www.mulesoft.org/schema/mule/java"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="
-        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-        http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
-        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-        http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
-        http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+        http://www.mulesoft.org/schema/mule/core 
+          http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/ee/core 
+          http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+        http://www.mulesoft.org/schema/mule/salesforce
+          http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+        http://www.mulesoft.org/schema/mule/scheduler
+          http://www.mulesoft.org/schema/mule/scheduler/current/mule-scheduler.xsd
+        http://www.mulesoft.org/schema/mule/object-store-v2
+          http://www.mulesoft.org/schema/mule/object-store-v2/current/mule-object-store-v2.xsd">
 
+    <!-- 
+        Global Object Store V2 config with local fallback: 
+        - Uses your OSv2 credentials in CloudHub 
+        - Falls back to an in-memory store locally 
+    -->
+    <object-store-v2:config 
+        name="MappingsObjectStore"
+        doc:name="Object Store V2 Config"
+        doc:id="3c21c619-5df6-4702-abe8-cd58e9780338">
+        <object-store-v2:connection>
+            <object-store-v2:cloud-connection
+                clientId="${osv2.clientId}"
+                clientSecret="${osv2.clientSecret}"
+                region="${osv2.region}"
+            />
+        </object-store-v2:connection>
+        <!-- Enables local fallback if OSv2 is unavailable locally -->
+        <object-store-v2:local-config enabled="true" />
+    </object-store-v2:config>
+
+    <!-- 
+        Main scheduled flow that runs every hour
+        and calls each sub-flow to query Salesforce,
+        transform the data, and store it in OSv2. 
+    -->
     <flow name="viva-ng-sf-generate-mappings-flow" initialState="started">
-        <scheduler doc:name="Scheduler (Hourly)">
-            <scheduling-strategy>
-                <fixed-frequency frequency="1" timeUnit="HOURS"/>
-            </scheduling-strategy>
-        </scheduler>
-
+        <scheduler:scheduler doc:name="Scheduler (Hourly)">
+            <scheduler:fixed-frequency frequency="1" timeUnit="HOURS"/>
+        </scheduler:scheduler>
+        
         <logger level="INFO" message="Starting automatic mapping file generation"/>
 
-        <flow-ref name="generate-territory-mapping"/>
-        <flow-ref name="generate-worktype-mapping"/>
-        <flow-ref name="generate-provider-mapping"/>
+        <!-- Call each sub-flow in sequence -->
+        <flow-ref name="generate-territory-mapping" />
+        <flow-ref name="generate-worktype-mapping" />
+        <flow-ref name="generate-provider-mapping" />
 
-        <logger level="INFO" message="Mapping files generation completed successfully"/>
-        <logger level="INFO" message="Current TerritoryMapping: #[output application/json --- vars.TerritoryMapping]"/>
-        <logger level="INFO" message="Current WorkTypeMapping: #[output application/json --- vars.WorkTypeMapping]"/>
-        <logger level="INFO" message="Current ProviderMapping: #[output application/json --- vars.ProviderMapping]"/>
+        <logger level="INFO" message="Mapping file generation completed successfully"/>
     </flow>
 
+    <!-- 
+        Sub-flow: Generate Service Territory Mapping
+        1) Query Salesforce
+        2) Transform to JSON array
+        3) Store in OSv2 under key = "TerritoryMapping"
+    -->
     <sub-flow name="generate-territory-mapping">
         <logger level="INFO" message="Generating Service Territory mapping"/>
 
-        <salesforce:query doc:name="Query Service Territories" config-ref="Salesforce_Config">
+        <salesforce:query config-ref="Salesforce_Config" doc:name="Query Service Territories">
             <salesforce:salesforce-query><![CDATA[
                 SELECT Id, Name, IsActive, NextGen_Appointment_Location__c, NextGen_Location__c, NextGen_Location_ID__c
                 FROM ServiceTerritory
@@ -45,41 +76,52 @@
             ]]></salesforce:salesforce-query>
         </salesforce:query>
 
-        <ee:transform doc:name="Format LocationId Mapping">
+        <ee:transform doc:name="Format Territory Mapping">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 payload map {
-    "Id": $.Id,
-    "Name": $.Name,
-    "LOCATION": $.NextGen_Location_ID__c default $.NextGen_Location__c default $.NextGen_Appointment_Location__c default $.Name,
-    "IsActive": $.IsActive
+    Id: $.Id,
+    Name: $.Name,
+    LOCATION: $.NextGen_Location_ID__c 
+                default $.NextGen_Location__c 
+                default $.NextGen_Appointment_Location__c 
+                default $.Name,
+    IsActive: $.IsActive
 }]]></ee:set-payload>
             </ee:message>
             <ee:variables>
+                <!-- Keep a local variable for logging the size -->
                 <ee:set-variable variableName="mappingCount"><![CDATA[%dw 2.0
 output application/java
 ---
 sizeOf(payload)]]></ee:set-variable>
-                <ee:set-variable variableName="TerritoryMapping"><![CDATA[%dw 2.0
-output application/java
----
-payload]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
 
-        <logger level="INFO" message="Stored #[vars.mappingCount] Service Territory mappings"/>
-        <logger level="INFO" message="TerritoryMapping contents: #[output application/json --- vars.TerritoryMapping]"/>
+        <!-- Store the entire array of Territorries in the OSv2 under "TerritoryMapping" -->
+        <object-store-v2:set 
+            doc:name="Store TerritoryMapping"
+            config-ref="MappingsObjectStore"
+            key="TerritoryMapping"
+            value="#[payload]" />
+
+        <logger level="INFO" 
+                message="TerritoryMapping: Stored #[vars.mappingCount] territories into OSv2." />
     </sub-flow>
 
+    <!-- 
+        Sub-flow: Generate Work Type Mapping
+    -->
     <sub-flow name="generate-worktype-mapping">
         <logger level="INFO" message="Generating Work Type mapping"/>
 
-        <salesforce:query doc:name="Query Work Types" config-ref="Salesforce_Config">
+        <salesforce:query config-ref="Salesforce_Config" doc:name="Query Work Types">
             <salesforce:salesforce-query><![CDATA[
                 SELECT Id, Name, EstimatedDuration, DefaultAppointmentType, NextGen_External_ID__c,
-                       Work_Type_Group_Reference__c, Work_Type_Group_Reference__r.Name, Work_Type_Group_Reference__r.Id
+                       Work_Type_Group_Reference__c, 
+                       Work_Type_Group_Reference__r.Name
                 FROM WorkType
             ]]></salesforce:salesforce-query>
         </salesforce:query>
@@ -90,13 +132,13 @@ payload]]></ee:set-variable>
 output application/json
 ---
 payload map {
-    "WorkTypeId": $.Id,
-    "duration": $.EstimatedDuration default 30,
-    "AppointmentType": $.DefaultAppointmentType default "In-Office",
-    "NextGenField": $.NextGen_External_ID__c default $.Name,
-    "AdditionalInformation": $.Name,
-    "Work_Type_Group_Id": $.Work_Type_Group_Reference__c,
-    "Work_Type_Group__c": $.Work_Type_Group_Reference__r.Name
+    WorkTypeId: $.Id,
+    duration: $.EstimatedDuration default 30,
+    AppointmentType: $.DefaultAppointmentType default "In-Office",
+    NextGenField: $.NextGen_External_ID__c default $.Name,
+    AdditionalInformation: $.Name,
+    Work_Type_Group_Id: $.Work_Type_Group_Reference__c,
+    Work_Type_Group__c: $.Work_Type_Group_Reference__r.Name
 }]]></ee:set-payload>
             </ee:message>
             <ee:variables>
@@ -104,24 +146,33 @@ payload map {
 output application/java
 ---
 sizeOf(payload)]]></ee:set-variable>
-                <ee:set-variable variableName="WorkTypeMapping"><![CDATA[%dw 2.0
-output application/java
----
-payload]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
 
-        <logger level="INFO" message="Stored #[vars.mappingCount] Work Type mappings"/>
-        <logger level="INFO" message="WorkTypeMapping contents: #[output application/json --- vars.WorkTypeMapping]"/>
+        <!-- Store the final JSON array of Work Types in OSv2 -->
+        <object-store-v2:set
+            doc:name="Store WorkTypeMapping"
+            config-ref="MappingsObjectStore"
+            key="WorkTypeMapping"
+            value="#[payload]" />
+
+        <logger level="INFO" 
+                message="WorkTypeMapping: Stored #[vars.mappingCount] work types into OSv2." />
     </sub-flow>
 
+    <!-- 
+        Sub-flow: Generate Provider Mapping
+        (ServiceResource + optional user data)
+    -->
     <sub-flow name="generate-provider-mapping">
-        <logger level="INFO" message="Generating Service Resource mapping"/>
+        <logger level="INFO" message="Generating Service Resource (Provider) mapping"/>
 
-        <salesforce:query doc:name="Query Service Resources" config-ref="Salesforce_Config">
+        <salesforce:query config-ref="Salesforce_Config" doc:name="Query Service Resources">
             <salesforce:salesforce-query><![CDATA[
-                SELECT Id, Name, IsActive, RelatedRecord.FirstName, RelatedRecord.LastName,
-                       NextGen_First_Name__c, NextGen_Last_Name__c, NextGen_Provider_for_Appointment__c, NPI__c
+                SELECT Id, Name, IsActive,
+                       RelatedRecord.FirstName, RelatedRecord.LastName,
+                       NextGen_First_Name__c, NextGen_Last_Name__c,
+                       NextGen_Provider_for_Appointment__c, NPI__c
                 FROM ServiceResource
                 WHERE IsActive = true
             ]]></salesforce:salesforce-query>
@@ -133,11 +184,16 @@ payload]]></ee:set-variable>
 output application/json
 ---
 payload map {
-    "providerId": $.Id,
-    "Provider_for_Appointment__c": $.NextGen_Provider_for_Appointment__c default $.Name,
-    "First_Name": $.NextGen_First_Name__c default $.RelatedRecord.FirstName default "",
-    "Last_Name": $.NextGen_Last_Name__c default $.RelatedRecord.LastName default $.Name,
-    "NPI": $.NPI__c default ""
+    providerId: $.Id,
+    Provider_for_Appointment__c: $.NextGen_Provider_for_Appointment__c 
+                                  default $.Name,
+    First_Name: $.NextGen_First_Name__c 
+                default $.RelatedRecord.FirstName 
+                default "",
+    Last_Name: $.NextGen_Last_Name__c 
+               default $.RelatedRecord.LastName 
+               default $.Name,
+    NPI: $.NPI__c default ""
 }]]></ee:set-payload>
             </ee:message>
             <ee:variables>
@@ -145,56 +201,18 @@ payload map {
 output application/java
 ---
 sizeOf(payload)]]></ee:set-variable>
-                <ee:set-variable variableName="ProviderMapping"><![CDATA[%dw 2.0
-output application/java
----
-payload]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
 
-        <logger level="INFO" message="Stored #[vars.mappingCount] Provider mappings"/>
-        <logger level="INFO" message="ProviderMapping contents: #[output application/json --- vars.ProviderMapping]"/>
+        <!-- Store final list in OSv2 under "ProviderMapping" -->
+        <object-store-v2:set 
+            doc:name="Store ProviderMapping"
+            config-ref="MappingsObjectStore"
+            key="ProviderMapping"
+            value="#[payload]" />
+
+        <logger level="INFO" 
+                message="ProviderMapping: Stored #[vars.mappingCount] providers into OSv2." />
     </sub-flow>
 
-    <flow name="viva-ng-sf-manual-mapping-generation">
-        <http:listener config-ref="http-listener-config" path="/api/generate-mappings"/>
-        <logger level="INFO" message="Manual mapping generation triggered"/>
-
-        <flow-ref name="generate-territory-mapping"/>
-        <flow-ref name="generate-worktype-mapping"/>
-        <flow-ref name="generate-provider-mapping"/>
-
-        <ee:transform>
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-    status: "success",
-    message: "Mapping files stored in flow variables",
-    timestamp: now(),
-    territoryCount: sizeOf(vars.TerritoryMapping),
-    workTypeCount: sizeOf(vars.WorkTypeMapping),
-    providerCount: sizeOf(vars.ProviderMapping)
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
-    </flow>
-
-    <flow name="viva-ng-sf-startup-mapping-generation" initialState="started">
-        <scheduler doc:name="Scheduler (Startup)">
-            <scheduling-strategy>
-                <fixed-frequency frequency="1" timeUnit="DAYS" startDelay="0"/>
-            </scheduling-strategy>
-        </scheduler>
-
-        <logger level="INFO" message="Startup mapping generation triggered"/>
-
-        <flow-ref name="generate-territory-mapping"/>
-        <flow-ref name="generate-worktype-mapping"/>
-        <flow-ref name="generate-provider-mapping"/>
-
-        <logger level="INFO" message="Startup mapping generation completed"/>
-        <logger level="INFO" message="Final mapping state - Territory: #[sizeOf(vars.TerritoryMapping)] entries, WorkType: #[sizeOf(vars.WorkTypeMapping)] entries, Provider: #[sizeOf(vars.ProviderMapping)] entries"/>
-    </flow>
 </mule>

@@ -46,3 +46,7 @@ email:
   to: "cgainus@cokergroup.com"
   host: "smtp.gmail.com"
   port: "587"
+  
+  osv2.clientId: "4ac92be9ab7a4f6aaacaf3ac4ca198f3"
+osv2.clientSecret: "385d4032B22349538557DBC1B9d871e2"
+osv2.region: "us-east-1"

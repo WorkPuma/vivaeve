@@ -167,12 +167,6 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>com.mulesoft.connectors</groupId>
-			<artifactId>mule-salesforce-connector</artifactId>
-			<version>10.12.4</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
 			<groupId>org.mule.weave</groupId>
 			<artifactId>assertions</artifactId>
 			<version>1.0.2</version>
@@ -190,6 +184,12 @@
 			<version>3.4.0</version>
 			<classifier>mule-plugin</classifier>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.connectors</groupId>
+			<artifactId>mule-salesforce-connector</artifactId>
+			<version>10.22.9</version>
+			<classifier>mule-plugin</classifier>
 		</dependency>
 	</dependencies>
 	<repositories>

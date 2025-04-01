@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <mule xmlns:email="http://www.mulesoft.org/schema/mule/email"
-	xmlns:salesforce-composite="http://www.mulesoft.org/schema/mule/salesforce-composite"
-	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
-	xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7"
-	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
-	xmlns:cofww-logger="http://www.mulesoft.org/schema/mule/cofww-logger"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
-	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
-http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd 
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+xmlns:salesforce-composite="http://www.mulesoft.org/schema/mule/salesforce-composite"
+xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7"
+xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+xmlns:cofww-logger="http://www.mulesoft.org/schema/mule/cofww-logger"
+xmlns:http="http://www.mulesoft.org/schema/mule/http"
+xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+xmlns:object-store-v2="http://www.mulesoft.org/schema/mule/object-store-v2"
+xmlns="http://www.mulesoft.org/schema/mule/core" 
+xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
 http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
 http://www.mulesoft.org/schema/mule/cofww-logger http://www.mulesoft.org/schema/mule/cofww-logger/current/mule-cofww-logger.xsd
 http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
 http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
-http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org/schema/mule/salesforce-composite/current/mule-salesforce-composite.xsd">
+http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org/schema/mule/salesforce-composite/current/mule-salesforce-composite.xsd
+http://www.mulesoft.org/schema/mule/object-store-v2 http://www.mulesoft.org/schema/mule/object-store-v2/current/mule-object-store-v2.xsd">
+
 
 	<!-- This configuration uses default algorithm (AES) and mode (CBC) -->
 	
@@ -46,6 +53,23 @@ http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org
 	<global-property doc:name="default mule.encryption.key"
 		doc:id="3f3a5efc-a81c-4f51-bc17-3311b8623eec"
 		name="mule.key" value="mulevivaeve09876" />
+		
+
+<!-- Object Store V2 config -->
+<object-store-v2:config
+name="MappingsObjectStore"
+doc:name="Object Store V2 Config"
+doc:id="60e042a9-484f-487e-b9f4-b76491a01767">
+    <object-store-v2:connection>
+        <object-store-v2:cloud-connection
+            clientId="${osv2.clientId}"
+            clientSecret="${osv2.clientSecret}"
+            region="${osv2.region}" />
+    </object-store-v2:connection>
+    <!-- Enables local fallback so it works offline/locally. -->
+    <object-store-v2:local-config enabled="true" />
+</object-store-v2:config>
+		
 
 	<!-- <api-gateway:autodiscovery apiId="${api.autodiscoveryId}"
 		doc:name="API Autodiscovery"
