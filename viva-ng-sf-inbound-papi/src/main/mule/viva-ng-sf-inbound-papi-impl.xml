@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os"
+      xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
       xmlns:email="http://www.mulesoft.org/schema/mule/email"
       xmlns:salesforce-composite="http://www.mulesoft.org/schema/mule/salesforce-composite"
       xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
@@ -10,8 +11,7 @@
       xmlns:object-store-v2="http://www.mulesoft.org/schema/mule/object-store-v2"
       xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
         http://www.mulesoft.org/schema/mule/core 
           http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -32,7 +32,8 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
         http://www.mulesoft.org/schema/mule/vm 
           http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
         http://www.mulesoft.org/schema/mule/object-store-v2
-          http://www.mulesoft.org/schema/mule/object-store-v2/current/mule-object-store-v2.xsd">
+          http://www.mulesoft.org/schema/mule/object-store-v2/current/mule-object-store-v2.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 
 	
     <vm:config name="VM_Config" doc:name="VM Config" doc:id="78e8266a-2594-4bd2-bff9-948a0ad7ff55">
@@ -64,23 +65,30 @@ output application/json
 	message: 'request received from eapi'
 }]"/>
 
-    <!-- Retrieve Mappings from Object Store V2 -->
-    <object-store-v2:get doc:name="Get TerritoryMapping"
-        config-ref="MappingsObjectStore"
-        key="TerritoryMapping"
-        target="TerritoryMapping" />
-    <object-store-v2:get doc:name="Get WorkTypeMapping"
-        config-ref="MappingsObjectStore"
-        key="WorkTypeMapping"
-        target="WorkTypeMapping" />
-    <object-store-v2:get doc:name="Get ProviderMapping"
-        config-ref="MappingsObjectStore"
-        key="ProviderMapping"
-        target="ProviderMapping" />
-    
-    <!-- Log the sizes of each retrieved mapping -->
-    <logger level="INFO" doc:name="MappingsLogger" 
-            message="TerritoryMapping size: #[sizeOf(vars.TerritoryMapping)], WorkTypeMapping size: #[sizeOf(vars.WorkTypeMapping)], ProviderMapping size: #[sizeOf(vars.ProviderMapping)]"/>
+<!-- Retrieve Mappings from Object Store V2 -->
+<os:retrieve 
+    doc:name="Retrieve TerritoryMapping" 
+    doc:id="9ef81997-0646-4eeb-a0c3-a2c8f07a6b78"
+    key="TerritoryMapping"
+    target="TerritoryMapping" objectStore="MappingsObjectStore"/>
+
+<os:retrieve 
+    doc:name="Retrieve WorkTypeMapping"
+    doc:id="3ba50b2c-6924-4a36-ac0b-f727158b0af4"
+    key="WorkTypeMapping"
+    target="WorkTypeMapping" objectStore="MappingsObjectStore"/>
+
+<os:retrieve 
+    doc:name="Retrieve ProviderMapping"
+    doc:id="37834789-7744-46b3-9a8d-0533ef916f48"
+    key="ProviderMapping"
+    target="ProviderMapping" objectStore="MappingsObjectStore"/>
+
+<!-- Log the sizes of each retrieved mapping -->
+<logger 
+    level="INFO" 
+    doc:name="MappingsLogger" 
+    message="TerritoryMapping size: #[sizeOf(vars.TerritoryMapping)], WorkTypeMapping size: #[sizeOf(vars.WorkTypeMapping)], ProviderMapping size: #[sizeOf(vars.ProviderMapping)]" />
 
     <ee:transform doc:name="inputPayload" doc:id="50e635b0-00ee-492d-98d9-9b511b36fa73">
         <ee:message />
@@ -186,27 +194,30 @@ output application/java
     Email_DO_NOT_USE__c: payload.Data.ADT_A04.PID."PID-13"."XTN-04"[0] default null
 }]]]></ee:set-variable>
 
-                    <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
+<ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
-   FirstName: flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-02"[0],
-   LastName: flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-01"[0],
-   MiddleName: payload.Data.ADT_A04.PID."PID-05"."XPN-03"[0],
-   Email: payload.Data.ADT_A04.PID."PID-13"."XTN-04"[0],
-   Phone: payload.Data.ADT_A04.PID."PID-13"."XTN-01"[0],
-   MailingState: payload.Data.ADT_A04.PID."PID-11"."XAD-04"[0],
-   MailingPostalCode: payload.Data.ADT_A04.PID."PID-11"."XAD-05"[0],
-   MailingCity: payload.Data.ADT_A04.PID."PID-11"."XAD-03"[0],
-   MailingStreet: payload.Data.ADT_A04.PID."PID-11"."XAD-01"[0],
-   Patient_Ethnicity__c: payload.Data.ADT_A04.PID."PID-22",
-   Patient_Race__c: payload.Data.ADT_A04.PID."PID-10",
-   Patient_Gender_2__c: if (payload.Data.ADT_A04.PID."PID-08" == "M") "Male"
-                        else if (payload.Data.ADT_A04.PID."PID-08" == "F") "Female"
-                        else (payload.Data.ADT_A04.PID."PID-08"),
-   Date_of_Birth__c: (payload.Data.ADT_A04.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}),
-   HealthFusion_Patient_Record_ID__c: payload.Data.ADT_A04.PID."PID-04"."CX-01"[0]
-}]]]></ee:set-variable>
+     "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A08.PID."PID-04"."CX-01"[0],
+     
+      "FirstName": flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
+      "LastName": flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
+      "MiddleName": payload.Data.ADT_A08.PID."PID-05"."XPN-03"[0],
+      "Email": payload.Data.ADT_A08.PID."PID-13"."XTN-04"[0],
+      "Phone": payload.Data.ADT_A08.PID."PID-13"."XTN-01"[0],
+      "MailingState": payload.Data.ADT_A08.PID."PID-11"."XAD-04"[0],
+      "MailingPostalCode": payload.Data.ADT_A08.PID."PID-11"."XAD-05"[0],
+      "MailingCity": payload.Data.ADT_A08.PID."PID-11"."XAD-03"[0],
+      "MailingStreet": payload.Data.ADT_A08.PID."PID-11"."XAD-01"[0],
+      "Patient_Ethnicity__c": payload.Data.ADT_A08.PID."PID-22",
+      "Patient_Race__c": payload.Data.ADT_A08.PID."PID-10",
+      "Patient_Gender_2__c": if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
+      "Date_of_Birth__c": if (payload.Data.ADT_A08.PID."PID-07"."TS-01" != null) 
+                     (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) 
+                     else if (payload.Data.ADT_A08.PID."PID-07" != null)
+                     (payload.Data.ADT_A08.PID."PID-07" as String as Date {format: "yyyyMMdd"})
+                     else null
+    }]]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
 
@@ -339,8 +350,12 @@ output application/java
       "Patient_Ethnicity__c":payload.Data.ADT_A08.PID."PID-22",
       "Patient_Race__c":payload.Data.ADT_A08.PID."PID-10",
       "Patient_Gender_2__c":if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
-     "Date_of_Birth__c" :  (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}),
-       "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A08.PID."PID-04"."CX-01"[0]
+      "Date_of_Birth__c" : if (payload.Data.ADT_A08.PID."PID-07"."TS-01" != null) 
+                     (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) 
+                     else if (payload.Data.ADT_A08.PID."PID-07" != null)
+                     (payload.Data.ADT_A08.PID."PID-07" as String as Date {format: "yyyyMMdd"})
+                     else null
+       
     }]]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
@@ -366,8 +381,11 @@ output application/java
       "Patient_Ethnicity__c":payload.Data.ADT_A08.PID."PID-22",
       "Patient_Race__c":payload.Data.ADT_A08.PID."PID-10",
       "Patient_Gender_2__c":if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
-     "Date_of_Birth__c" :  (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}),
-       "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A08.PID."PID-04"."CX-01"[0]
+       "Date_of_Birth__c" : if (payload.Data.ADT_A08.PID."PID-07"."TS-01" != null) 
+                     (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) 
+                     else if (payload.Data.ADT_A08.PID."PID-07" != null)
+                     (payload.Data.ADT_A08.PID."PID-07" as String as Date {format: "yyyyMMdd"})
+                     else null      
     }]]]></ee:set-payload>
                 </ee:message>
             </ee:transform>
@@ -421,8 +439,12 @@ output application/java
       "Patient_Ethnicity__c":payload.Data.ADT_A08.PID."PID-22",
       "Patient_Race__c":payload.Data.ADT_A08.PID."PID-10",
       "Patient_Gender_2__c":if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
-     "Date_of_Birth__c" :  (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}),
-       "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A08.PID."PID-04"."CX-01"[0]
+      "Date_of_Birth__c" : if (payload.Data.ADT_A08.PID."PID-07"."TS-01" != null) 
+                     (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) 
+                     else if (payload.Data.ADT_A08.PID."PID-07" != null)
+                     (payload.Data.ADT_A08.PID."PID-07" as String as Date {format: "yyyyMMdd"})
+                     else null
+      
     }]]]></ee:set-payload>
                         </ee:message>
                 <ee:variables>

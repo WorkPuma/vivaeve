@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
       xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
       xmlns:object-store-v2="http://www.mulesoft.org/schema/mule/object-store-v2"
       xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
       xmlns:scheduler="http://www.mulesoft.org/schema/mule/scheduler"
       xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
         http://www.mulesoft.org/schema/mule/core 
           http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -15,41 +15,28 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
         http://www.mulesoft.org/schema/mule/salesforce
           http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
         http://www.mulesoft.org/schema/mule/scheduler
-          http://www.mulesoft.org/schema/mule/scheduler/current/mule-scheduler.xsd
-        http://www.mulesoft.org/schema/mule/object-store-v2
-          http://www.mulesoft.org/schema/mule/object-store-v2/current/mule-object-store-v2.xsd">
+          http://www.mulesoft.org/schema/mule/scheduler/current/mule-scheduler.xsd        
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 
     <!-- 
         Global Object Store V2 config with local fallback: 
         - Uses your OSv2 credentials in CloudHub 
         - Falls back to an in-memory store locally 
     -->
-    <object-store-v2:config 
-        name="MappingsObjectStore"
-        doc:name="Object Store V2 Config"
-        doc:id="3c21c619-5df6-4702-abe8-cd58e9780338">
-        <object-store-v2:connection>
-            <object-store-v2:cloud-connection
-                clientId="${osv2.clientId}"
-                clientSecret="${osv2.clientSecret}"
-                region="${osv2.region}"
-            />
-        </object-store-v2:connection>
-        <!-- Enables local fallback if OSv2 is unavailable locally -->
-        <object-store-v2:local-config enabled="true" />
-    </object-store-v2:config>
 
     <!-- 
         Main scheduled flow that runs every hour
         and calls each sub-flow to query Salesforce,
         transform the data, and store it in OSv2. 
     -->
-    <flow name="viva-ng-sf-generate-mappings-flow" initialState="started">
-        <scheduler:scheduler doc:name="Scheduler (Hourly)">
-            <scheduler:fixed-frequency frequency="1" timeUnit="HOURS"/>
-        </scheduler:scheduler>
+	<flow name="viva-ng-sf-generate-mappings-flow" initialState="started">
         
-        <logger level="INFO" message="Starting automatic mapping file generation"/>
+        <scheduler doc:name="Scheduler" doc:id="353e9dfc-e281-4929-8173-ed1be0c55009" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="1" timeUnit="DAYS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" message="Starting automatic mapping file generation"/>
 
         <!-- Call each sub-flow in sequence -->
         <flow-ref name="generate-territory-mapping" />
@@ -100,15 +87,12 @@ sizeOf(payload)]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
 
-        <!-- Store the entire array of Territorries in the OSv2 under "TerritoryMapping" -->
-        <object-store-v2:set 
-            doc:name="Store TerritoryMapping"
-            config-ref="MappingsObjectStore"
-            key="TerritoryMapping"
-            value="#[payload]" />
+<!-- Store the entire array of Territories in the OSv2 under "TerritoryMapping" -->
 
-        <logger level="INFO" 
-                message="TerritoryMapping: Stored #[vars.mappingCount] territories into OSv2." />
+<os:store doc:name="Store TerritoryMapping" doc:id="d291fe46-109a-4b6a-9a78-e131f3191379" key="TerritoryMapping" objectStore="MappingsObjectStore"/>
+		<logger 
+    level="INFO" 
+    message="TerritoryMapping: Stored #[vars.mappingCount] territories into OSv2." />
     </sub-flow>
 
     <!-- 
@@ -149,15 +133,10 @@ sizeOf(payload)]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
 
-        <!-- Store the final JSON array of Work Types in OSv2 -->
-        <object-store-v2:set
-            doc:name="Store WorkTypeMapping"
-            config-ref="MappingsObjectStore"
-            key="WorkTypeMapping"
-            value="#[payload]" />
-
-        <logger level="INFO" 
-                message="WorkTypeMapping: Stored #[vars.mappingCount] work types into OSv2." />
+<os:store doc:name="Store WorkTypeMapping" doc:id="d23204fb-23f8-485e-aa75-0c8459343ba1" key="WorkTypeMapping" objectStore="MappingsObjectStore"/>
+		<logger 
+    level="INFO" 
+    message="WorkTypeMapping: Stored #[vars.mappingCount] work types into OSv2." />
     </sub-flow>
 
     <!-- 
@@ -203,16 +182,13 @@ output application/java
 sizeOf(payload)]]></ee:set-variable>
             </ee:variables>
         </ee:transform>
+<!-- Store final list in OSv2 under "ProviderMapping" -->
 
-        <!-- Store final list in OSv2 under "ProviderMapping" -->
-        <object-store-v2:set 
-            doc:name="Store ProviderMapping"
-            config-ref="MappingsObjectStore"
-            key="ProviderMapping"
-            value="#[payload]" />
+<os:store doc:name="Store ProviderMapping" doc:id="9a0035d0-4ba4-4fc2-8576-12ef676dc59b" key="ProviderMapping" objectStore="MappingsObjectStore"/>
+		<logger 
+    level="INFO" 
+    message="ProviderMapping: Stored #[vars.mappingCount] providers into OSv2." />
 
-        <logger level="INFO" 
-                message="ProviderMapping: Stored #[vars.mappingCount] providers into OSv2." />
     </sub-flow>
 
 </mule>

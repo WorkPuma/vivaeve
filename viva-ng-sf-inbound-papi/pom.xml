@@ -140,7 +140,7 @@
 			<artifactId>mule-apikit-module</artifactId>
 			<version>1.11.5</version>
 			<classifier>mule-plugin</classifier>
-		</dependency>
+		</dependency>	
 		<dependency>
 			<groupId>org.mule.connectors</groupId>
 			<artifactId>mule-email-connector</artifactId>
@@ -189,6 +189,12 @@
 			<groupId>com.mulesoft.connectors</groupId>
 			<artifactId>mule-salesforce-connector</artifactId>
 			<version>10.22.9</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-objectstore-connector</artifactId>
+			<version>1.2.2</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 	</dependencies>

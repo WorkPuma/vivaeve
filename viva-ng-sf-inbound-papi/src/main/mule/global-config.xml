@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:email="http://www.mulesoft.org/schema/mule/email"
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os"
+xmlns:email="http://www.mulesoft.org/schema/mule/email"
 xmlns:salesforce-composite="http://www.mulesoft.org/schema/mule/salesforce-composite"
 xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
 xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7"
@@ -9,11 +10,10 @@ xmlns:cofww-logger="http://www.mulesoft.org/schema/mule/cofww-logger"
 xmlns:http="http://www.mulesoft.org/schema/mule/http"
 xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
 xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
-xmlns:object-store-v2="http://www.mulesoft.org/schema/mule/object-store-v2"
+xmlns:object-store-v2="http://www.mulesoft.org/schema/mule/object-store-v2" 
 xmlns="http://www.mulesoft.org/schema/mule/core" 
 xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xsi:schemaLocation="
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -24,7 +24,7 @@ http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/
 http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org/schema/mule/salesforce-composite/current/mule-salesforce-composite.xsd
-http://www.mulesoft.org/schema/mule/object-store-v2 http://www.mulesoft.org/schema/mule/object-store-v2/current/mule-object-store-v2.xsd">
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 
 
 	<!-- This configuration uses default algorithm (AES) and mode (CBC) -->
@@ -56,19 +56,7 @@ http://www.mulesoft.org/schema/mule/object-store-v2 http://www.mulesoft.org/sche
 		
 
 <!-- Object Store V2 config -->
-<object-store-v2:config
-name="MappingsObjectStore"
-doc:name="Object Store V2 Config"
-doc:id="60e042a9-484f-487e-b9f4-b76491a01767">
-    <object-store-v2:connection>
-        <object-store-v2:cloud-connection
-            clientId="${osv2.clientId}"
-            clientSecret="${osv2.clientSecret}"
-            region="${osv2.region}" />
-    </object-store-v2:connection>
-    <!-- Enables local fallback so it works offline/locally. -->
-    <object-store-v2:local-config enabled="true" />
-</object-store-v2:config>
+
 		
 
 	<!-- <api-gateway:autodiscovery apiId="${api.autodiscoveryId}"
@@ -129,4 +117,7 @@ doc:id="60e042a9-484f-487e-b9f4-b76491a01767">
       password="${sf.password}"
       tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
 </salesforce:sfdc-config>
+	<os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="7c107e4e-3e10-4d28-be1c-2d59a4ef7f9f" />
+	<os:object-store name="MappingsObjectStore" doc:name="Object store" doc:id="c98e4b6d-4fa5-49a5-8aaf-5baf4be41ad3" maxEntries="1000" entryTtl="3600000" entryTtlUnit="MILLISECONDS" expirationInterval="60000" expirationIntervalUnit="MILLISECONDS" config-ref="ObjectStore_Config" />
+
 </mule>
