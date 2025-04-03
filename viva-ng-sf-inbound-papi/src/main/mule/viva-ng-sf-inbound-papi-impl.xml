@@ -948,17 +948,17 @@ output application/java
 ---
 payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
                         <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
-output application/java
+output text/plain
 var pid = payload.Data.SIU_S14.PATIENT.PID
+var id = pid."PID-04"[0]."CX-01" default 
+         pid."PID-04"."CX-01"[0] default
+         pid."PID-4"."CX-01"[0] default
+         pid."PID-02"."CX-01" default
+         "HF" ++ (pid."PID-03"[0]."CX-01" default "") default
+         ""
 ---
-// PID-04 already contains the full HealthFusion ID (HF402447924)
-pid."PID-04"."CX-01"[0] default 
-// If first path doesn't work, try alternative paths
-pid."PID-04"[0]."CX-01" default
-pid."PID-4"."CX-01"[0] default
-// If no HealthFusion ID found, use the patient ID with HF prefix
-pid."PID-02"."CX-01" default
-"HF" ++ (pid."PID-03"[0]."CX-01" default "")
+// Force output to be a string using text/plain
+id
 ]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
