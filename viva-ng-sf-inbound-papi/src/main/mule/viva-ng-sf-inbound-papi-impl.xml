@@ -344,12 +344,29 @@ output application/java
         </ee:variables>
     </ee:transform>
     
+    <!-- Add phone unformatting for better matching -->
+    <ee:transform doc:name="Phone Unformatting">
+        <ee:message />
+        <ee:variables>
+            <ee:set-variable variableName="unformattedPhone"><![CDATA[%dw 2.0
+output text/plain
+
+fun stripPhone(num) =
+    if (num == null) null
+    else num replace /[^\d]/ with ""  // remove everything that's not a digit
+    
+---
+stripPhone(vars.sfContactData.Phone[0])
+]]></ee:set-variable>
+        </ee:variables>
+    </ee:transform>
+    
     <!-- Query for existing contact by HealthFusion ID -->
     <salesforce:query doc:name="Query Contact by HF ID" doc:id="589ecdf3-5260-47fa-bdc2-24ca7c43446b" config-ref="Salesforce_Config" target="contactByHfId">
         <salesforce:salesforce-query><![CDATA[
             SELECT Id, AccountId, FirstName, LastName, Email, Phone, Date_of_Birth__c
             FROM Contact 
-            WHERE HealthFusion_Patient_Record_ID__c = ':hfId'
+            WHERE HealthFusion_Patient_Record_ID__c = :hfId
         ]]></salesforce:salesforce-query>
         <salesforce:parameters><![CDATA[
 #[output application/java
@@ -374,13 +391,11 @@ output application/java
                         AND (Email = :email OR Phone = :phone OR Date_of_Birth__c = :dob)
                         LIMIT 1
                     ]]></salesforce:salesforce-query>
-                    <salesforce:parameters><![CDATA[#[output application/java
----
-{
+                    <salesforce:parameters><![CDATA[#[{
     "firstName": vars.sfContactData.FirstName[0],
     "lastName": vars.sfContactData.LastName[0],
     "email": vars.sfContactData.Email[0],
-    "phone": vars.sfContactData.Phone[0],
+    "phone": vars.unformattedPhone default vars.sfContactData.Phone[0],
     "dob": vars.sfContactData.Date_of_Birth__c[0]
 }]]]></salesforce:parameters>
                 </salesforce:query>
@@ -593,6 +608,10 @@ var provider = vars.ProviderMapping
 output application/java
 ---
 payload.Data.SIU_S12.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
+                        <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
+output application/java
+---
+payload.Data.SIU_S12.PATIENT.PID."PID-04"."CX-01"[0]]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
             <flow-ref doc:name="call To Salesforce For ContactId" doc:id="878c0733-586e-4e6b-9474-ee97910fdd27" name="salesforce_query_Sub_Flow" />
@@ -612,10 +631,10 @@ output application/java
      "SchedEndTime": (payload.Data.SIU_S12.SCH."SCH-11"."TQ-05"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
      "NextGen_ID__c": payload.Data.SIU_S12.SCH."SCH-02"."EI-01",
      
-     "ParentRecordId": vars.queryResponse.AccountId[0],
+     "ParentRecordId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].AccountId,
      "DurationType": if(payload.Data.SIU_S12.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S12.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S12.SCH."SCH-10"."CE-01"),
      
-     "ContactId": vars.queryResponse.Id[0],
+     "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
      "AppointmentType": vars.apType,
      "WorkTypeId" : vars.workTypeId,
 //     "Work_Type_Group_Id": vars.workGroupId,
@@ -768,7 +787,7 @@ output application/java
                 </ee:variables>
             </ee:transform>
             <choice doc:name="Choice" doc:id="e70c649b-5072-4696-a727-4a5157a86ae0">
-                <when expression="#[sizeOf(vars.appointmentFields.NextGen_ID__c[0]) == 18]">
+                <when expression="#[false]">
                     <ee:transform doc:name="sfMappings" doc:id="c89dba6c-961a-4442-9ede-d872b98325d3">
                         <ee:message />
                         <ee:variables>
@@ -908,8 +927,14 @@ var appType = vars.WorkTypeMapping
 output application/java
 ---
 payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
+                        <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
+output application/java
+---
+payload.Data.SIU_S14.PATIENT.PID."PID-04"."CX-01"[0]]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
+            <logger level="INFO" message="Extracted HF ID for SIU_S14: #[vars.hfId]" />
+            <flow-ref doc:name="call To Salesforce For ContactId" name="salesforce_query_Sub_Flow" />
             <ee:transform doc:name="sfMappings" doc:id="42b97e64-5fb9-41da-87d2-6847cab4432c">
                 <ee:message>
                 </ee:message>
@@ -925,6 +950,7 @@ output application/java
       "ActualEndTime" : (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
     "NextGen_ID__c":payload.Data.SIU_S14.SCH."SCH-02"."EI-01",
 	"Status": if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01" == "CHECKED IN")("Checked In")  else if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"=="CHECKED OUT")("Checked Out") else (payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"),
+	"ParentRecordId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].AccountId,
     "AdditionalInformation": vars.appointmentType,
     "DurationType": if(payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S14.SCH."SCH-10"."CE-01"),
 	
@@ -943,7 +969,7 @@ output application/java
                 </ee:variables>
             </ee:transform>
             <choice doc:name="Choice" doc:id="347d0d9b-39f8-4ef9-9578-ca34f4953d2b">
-                <when expression="#[sizeOf(vars.appointmentFields.NextGen_ID__c[0]) == 18]">
+                <when expression="#[false]">
                     <ee:transform doc:name="Transform Message" doc:id="154c8141-3b1b-408f-a9af-ef47859a59ce">
                         <ee:message>
                         </ee:message>
@@ -959,6 +985,7 @@ output application/java
       "ActualEndTime" : (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
     "NextGen_ID__c":payload.Data.SIU_S14.SCH."SCH-02"."EI-01"[0 to 14],
 	"Status": if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01" == "CHECKED IN")("Checked In")  else if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"=="CHECKED OUT")("Checked Out") else (payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"),
+	"ParentRecordId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].AccountId,
     "AdditionalInformation": vars.appointmentType,
     "DurationType": if(payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S14.SCH."SCH-10"."CE-01"),
 	
@@ -1101,6 +1128,7 @@ output application/java
     "NextGen_ID__c":payload.Data.SIU_S15.SCH."SCH-02"."EI-01",
     "DurationType": payload.Data.SIU_S15.SCH."SCH-10"."CE-01",
 	"Status": if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "CANCELLED") ("Cancelled by Provider") else if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "NO SHOW") ("No Show") else  (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01") ,
+	 "ParentRecordId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].AccountId,
     "AdditionalInformation": vars.appointmentType,
 //	"ServiceTerritoryId": flatten(payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],  
         "Service_Resource__c": vars.providerExtract,
@@ -1119,7 +1147,7 @@ output application/java
                 </ee:variables>
             </ee:transform>
             <choice doc:name="Choice" doc:id="01224c35-4faa-457f-b26a-7f9b68701e8e">
-                <when expression="#[sizeOf(vars.appointmentFields.NextGen_ID__c[0]) == 18]">
+                <when expression="#[false]">
                     <ee:transform doc:name="sfMappings" doc:id="a3c8b2d2-a980-4cca-b61e-7a33ddb176b4">
                         <ee:message />
                         <ee:variables>
@@ -1136,6 +1164,7 @@ output application/java
     "DurationType": payload.Data.SIU_S15.SCH."SCH-10"."CE-01",
 	"Status": if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "CANCELLED") ("Cancelled by Provider") else if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "NO SHOW") ("No Show") else  (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01") ,
     "AdditionalInformation": vars.appointmentType,
+    "ParentRecordId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].AccountId,
 //	"ServiceTerritoryId": flatten(payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],  
         "Service_Resource__c": vars.providerExtract,
         "ServiceTerritoryId": vars.locationId,
@@ -1488,17 +1517,40 @@ output application/json
 		</until-successful>
 		<logger level="INFO" doc:name="Logger" doc:id="b558f2e6-0f4d-4d02-b742-8c6de91425bf" message="#[%dw 2.0&#10;output application/json&#10;&#45;&#45;-&#10;payload&#93;" />
 	</sub-flow> [STUDIO] -->
-	<sub-flow name="salesforce_query_Sub_Flow" doc:id="1b38a52c-5379-4009-b444-31a047fe1cba" >
-		<salesforce:query doc:name="Query" doc:id="d14fb987-b245-42f2-9e2f-2ef3a953b3fb" config-ref="Salesforce_Config" target="queryResponse">
-			<reconnect frequency="${sf.retryfrequency}" count="${sf.retryattempts}" />
-			<salesforce:salesforce-query><![CDATA[select Id, AccountId, Firstname ,LastName ,MiddleName, Date_of_Birth__c from Contact where HealthFusion_Patient_Record_ID__c = ':HealthFusion_Patient_Record_ID__c']]></salesforce:salesforce-query>
-			<salesforce:parameters ><![CDATA[#[output application/java
----
-{
-	"HealthFusion_Patient_Record_ID__c" : flatten(payload.Data.SIU_S12.PATIENT.PID."PID-04")."CX-01"[0]
-}]]]></salesforce:parameters>
-		</salesforce:query>
-	</sub-flow>
+	<sub-flow name="salesforce_query_Sub_Flow" doc:id="2ca016e9-9df9-4cd4-a38a-5d9875448e5e">
+    <!-- 1. Primary: HealthFusion Patient Record ID Lookup -->
+    <salesforce:query doc:name="Query by HealthFusion ID" doc:id="d9930eb6-4a4f-415f-b6ee-992a6c083de2"
+                      config-ref="Salesforce_Config"
+                      target="queryResponse">
+        <salesforce:salesforce-query>
+            <![CDATA[
+                SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c
+                FROM Contact
+                WHERE HealthFusion_Patient_Record_ID__c = :hfId
+            ]]>
+        </salesforce:salesforce-query>
+        <salesforce:parameters>
+            <![CDATA[#[{
+                "hfId": vars.hfId
+            }]]]>
+        </salesforce:parameters>
+    </salesforce:query>
+    <logger level="INFO" doc:name="SF Contact Response" doc:id="sf-contact-log" message="SF Contact Query for hfId: #[vars.hfId] returned count: #[sizeOf(vars.queryResponse)], hasData: #[!isEmpty(vars.queryResponse)]" />
+    
+    <!-- 2. Fallback if HealthFusion ID lookup fails -->
+    <choice doc:name="Contact Found?">
+        <when expression="#[isEmpty(vars.queryResponse)]">
+            <logger level="INFO" message="Contact not found by HealthFusion ID. Trying fallback lookup methods." />
+            <!-- Fallback to Name + Identifier lookup -->
+            <flow-ref name="contact-lookup-by-identifiers" />
+        </when>
+        <otherwise>
+            <!-- Proceed with found contact -->
+            <logger level="INFO" message="Contact found by HealthFusion ID: #[vars.queryResponse.Id[0]]" />
+        </otherwise>
+    </choice>
+</sub-flow>
+
 	<sub-flow name="common-sf-appointment-upsert-flow" doc:id="d40ad214-3b64-4179-bc92-972093d4590b" >
 		<logger level="INFO" doc:name="beforeInsert" doc:id="80766d10-021d-48b0-973f-17ff82af9158" message="##########Before Salesforce Upsert###################" />
 		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="27c377fe-9966-4a17-9aea-3bc533a9f043" millisBetweenRetries="${sf.retryfrequency}">
@@ -1715,12 +1767,10 @@ output application/json
         <salesforce:salesforce-query><![CDATA[
     SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c, Email, Phone, HealthFusion_Patient_Record_ID__c 
     FROM Contact 
-    WHERE HealthFusion_Patient_Record_ID__c = ':HealthFusion_Patient_Record_ID__c'
+    WHERE HealthFusion_Patient_Record_ID__c = :hfId
 ]]></salesforce:salesforce-query>
-        <salesforce:parameters><![CDATA[#[output application/java
-        ---
-        {
-            "HealthFusion_Patient_Record_ID__c": vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
+        <salesforce:parameters><![CDATA[#[{
+            "hfId": vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
         }]]]></salesforce:parameters>
     </salesforce:query>
     
@@ -1728,7 +1778,7 @@ output application/json
 
     
     
-    <logger level="INFO" message="Contact Match Result: #[!isEmpty(vars.queryRes)]" />
+    <logger level="INFO" message="Contact Match Result: #[!isEmpty(vars.queryResByHFID)]" />
 </sub-flow>
 	<sub-flow name="salesforce-appointmnet-querySub_Flow" doc:id="4cd95480-e7f3-4efd-9f4d-f986aaf47473" >
 		<salesforce:query doc:name="Query" doc:id="8b37413b-8a22-4dba-9eeb-8be00f4d6dbe" config-ref="Salesforce_Config" target="accResponse">
@@ -1843,7 +1893,7 @@ output application/json
     <salesforce:query doc:name="Query by HF ID" config-ref="Salesforce_Config" target="existingContactByHF">
         <salesforce:salesforce-query><![CDATA[
             SELECT Id, AccountId FROM Contact 
-            WHERE HealthFusion_Patient_Record_ID__c = ':hfId'
+            WHERE HealthFusion_Patient_Record_ID__c = :hfId
         ]]></salesforce:salesforce-query>
         <salesforce:parameters><![CDATA[#[output application/java
 ---
@@ -1857,6 +1907,19 @@ output application/json
         <choice doc:name="Found by HF ID?">
             <when expression="#[isEmpty(vars.existingContactByHF)]">
                 <!-- If not found, try by name and other identifiers -->
+                <!-- Add phone normalization for better matching -->
+                <ee:transform doc:name="Normalize Phone">
+                    <ee:message />
+                    <ee:variables>
+                        <ee:set-variable variableName="normalizedPhone"><![CDATA[%dw 2.0
+output application/java
+fun stripPhone(num) = if (num == null) null else num replace /[^\d]/ with ""
+---
+stripPhone(payload.Phone[0])
+]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+                
                 <salesforce:query doc:name="Query by Name+Email/Phone/DOB" config-ref="Salesforce_Config" target="existingContactByIdentifiers">
                     <salesforce:salesforce-query><![CDATA[
                         SELECT Id, AccountId FROM Contact 
@@ -1865,13 +1928,11 @@ output application/json
                         AND (Email = :email OR Phone = :phone OR Date_of_Birth__c = :dob)
                         LIMIT 1
                     ]]></salesforce:salesforce-query>
-                    <salesforce:parameters><![CDATA[#[output application/java
----
-{
+                    <salesforce:parameters><![CDATA[#[{
     "firstName": payload.FirstName[0],
     "lastName": payload.LastName[0],
     "email": payload.Email[0],
-    "phone": payload.Phone[0],
+    "phone": vars.normalizedPhone,
     "dob": payload.Date_of_Birth__c[0]
 }]]]></salesforce:parameters>
                 </salesforce:query>
@@ -2126,6 +2187,113 @@ output application/json
 }]]></ee:set-payload>
 				</ee:message>
 			</ee:transform>
+		</otherwise>
+	</choice>
+</sub-flow>
+
+<sub-flow name="contact-lookup-by-identifiers" doc:id="fc845e10-e654-45bf-a8a9-f1e5ac9dcb4e">
+	<!-- Normalize phone number -->
+	<ee:transform doc:name="Normalize Phone">
+		<ee:message />
+		<ee:variables>
+			<ee:set-variable variableName="normalizedPhone"><![CDATA[%dw 2.0
+output application/java
+fun stripPhone(num) = if (num == null) null else num replace /[^\d]/ with ""
+---
+stripPhone(vars.sfContactData.Phone[0])
+]]></ee:set-variable>
+		</ee:variables>
+	</ee:transform>
+	
+	<!-- Query by Name + Identifier -->
+	<salesforce:query doc:name="Query by Name + Identifier" config-ref="Salesforce_Config" target="identifierMatch">
+		<salesforce:salesforce-query><![CDATA[
+SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c
+FROM Contact
+WHERE FirstName = :firstName
+AND LastName = :lastName
+AND (Email = :email OR Phone = :phone OR Date_of_Birth__c = :dob)
+LIMIT 1
+]]></salesforce:salesforce-query>
+		<salesforce:parameters><![CDATA[#[{
+"firstName": vars.sfContactData.FirstName[0],
+"lastName": vars.sfContactData.LastName[0],
+"email": vars.sfContactData.Email[0],
+"phone": vars.normalizedPhone,
+"dob": vars.sfContactData.Date_of_Birth__c[0]
+}]]]></salesforce:parameters>
+	</salesforce:query>
+	
+	<!-- Check if contact found by identifiers -->
+	<choice doc:name="Found by Identifiers?">
+		<when expression="#[isEmpty(vars.identifierMatch)]">
+			<!-- Create new Account and Contact -->
+			<logger level="INFO" message="Contact not found by identifiers. Will create new Account and Contact." />
+			<ee:transform doc:name="Account Creation">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+"Name": vars.sfContactData.LastName[0] default "" + " Family",
+"Type": "Patient",
+"RecordTypeId": p('sf.account.recordtypeid')
+}]]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<salesforce:create doc:name="Create Account" config-ref="Salesforce_Config" type="Account" target="accountResponse" />
+			<logger level="INFO" message="Account created: #[vars.accountResponse]" />
+			
+			<ee:transform doc:name="Contact Creation">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+"AccountId": vars.accountResponse.items[0].id,
+"FirstName": vars.sfContactData.FirstName[0],
+"LastName": vars.sfContactData.LastName[0],
+"MiddleName": vars.sfContactData.MiddleName[0],
+"Date_of_Birth__c": vars.sfContactData.Date_of_Birth__c[0],
+"Email": vars.sfContactData.Email[0],
+"Phone": vars.sfContactData.Phone[0],
+"HealthFusion_Patient_Record_ID__c": vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
+}]]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<salesforce:create doc:name="Create Contact" config-ref="Salesforce_Config" type="Contact" target="contactResponse" />
+			<logger level="INFO" message="Contact created: #[vars.contactResponse]" />
+			
+			<ee:transform doc:name="Set Query Response">
+				<ee:message />
+				<ee:variables>
+					<ee:set-variable variableName="queryResponse"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+"Id": vars.contactResponse.items[0].id,
+"AccountId": vars.accountResponse.items[0].id,
+"FirstName": vars.sfContactData.FirstName[0],
+"LastName": vars.sfContactData.LastName[0],
+"MiddleName": vars.sfContactData.MiddleName[0],
+"Date_of_Birth__c": vars.sfContactData.Date_of_Birth__c[0]
+}]]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</when>
+		<otherwise>
+			<!-- Use found contact -->
+			<ee:transform doc:name="Set Query Response from Identifier Match">
+				<ee:message />
+				<ee:variables>
+					<ee:set-variable variableName="queryResponse"><![CDATA[%dw 2.0
+output application/java
+---
+vars.identifierMatch
+]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<logger level="INFO" message="Contact found by identifiers: #[vars.queryResponse[0].Id]" />
 		</otherwise>
 	</choice>
 </sub-flow>

@@ -19,23 +19,19 @@ payload&#93;&#93;></ee:set-variable>
 		</ee:transform>
 		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="628e5969-ce27-4b67-acfc-fdbccc939646" millisBetweenRetries="${sf.retryfrequency}">
 			<salesforce:query doc:name="Contact Query" doc:id="eb88c311-d9b5-4615-9546-69abbeb11a99" config-ref="Salesforce_Config" target="ContactOutput">
-			<salesforce:salesforce-query><![CDATA[select HealthFusion_Patient_Record_ID__c, Id , OwnerId, AccountId  from  Contact  where HealthFusion_Patient_Record_ID__c = ':HealthFusion_Patient_Record_ID__c'&#93;&#93;></salesforce:salesforce-query>
-			<salesforce:parameters><![CDATA[#[output application/java
-&#45;&#45;-
-{
-	"HealthFusion_Patient_Record_ID__c" : flatten(vars.inputPayload.Data.SIU_S12.PATIENT.PID."PID-04")."CX-01"[0&#93;
-}&#93;&#93;&#93;></salesforce:parameters>
-		</salesforce:query>
+				<salesforce:salesforce-query><![CDATA[select HealthFusion_Patient_Record_ID__c, Id , OwnerId, AccountId from Contact where HealthFusion_Patient_Record_ID__c = :hfId]]></salesforce:salesforce-query>
+				<salesforce:parameters><![CDATA[#[{
+    "hfId": flatten(vars.inputPayload.Data.SIU_S12.PATIENT.PID."PID-04")."CX-01"[0]
+}]]]></salesforce:parameters>
+			</salesforce:query>
 		</until-successful>
 		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="a73c3d1f-0c29-403c-8df6-9c973a83f2f1" millisBetweenRetries="${sf.retryfrequency}">
 			<salesforce:query doc:name="Query to get relation" doc:id="1ac2fc7d-7131-4dcb-af3a-d7480052abb9" config-ref="Salesforce_Config" target="sfName">
-			<salesforce:salesforce-query><![CDATA[select  Id, Name, Patient_Contact__c from Opportunity where Patient_Contact__c = ':contactId'&#93;&#93;></salesforce:salesforce-query>
-			<salesforce:parameters><![CDATA[#[output application/java
-&#45;&#45;-
-{
-	"contactId" : vars.ContactOutput.Id[0&#93;
-}&#93;&#93;&#93;></salesforce:parameters>
-		</salesforce:query>
+				<salesforce:salesforce-query><![CDATA[select Id, Name, Patient_Contact__c from Opportunity where Patient_Contact__c = :contactId]]></salesforce:salesforce-query>
+				<salesforce:parameters><![CDATA[#[{
+    "contactId": vars.ContactOutput.Id[0]
+}]]]></salesforce:parameters>
+			</salesforce:query>
 		</until-successful>
 		<ee:transform doc:name="opportunity_variables" doc:id="dd608247-b7fc-4a57-b62d-d798fb261b47" >
 			<ee:message >
