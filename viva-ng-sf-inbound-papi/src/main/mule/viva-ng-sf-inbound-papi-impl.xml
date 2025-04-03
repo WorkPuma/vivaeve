@@ -951,13 +951,14 @@ payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"
 output application/java
 var pid = payload.Data.SIU_S14.PATIENT.PID
 ---
-// Extract Health Fusion Patient Record ID directly from the PID segment
-pid."PID-04"[0]."CX-01" default 
-// Fallbacks if primary approach doesn't work
-pid."PID-04"."CX-01"[0] default
+// PID-04 already contains the full HealthFusion ID (HF402447924)
+pid."PID-04"."CX-01"[0] default 
+// If first path doesn't work, try alternative paths
+pid."PID-04"[0]."CX-01" default
 pid."PID-4"."CX-01"[0] default
-pid."PID-4" default
-"HF" ++ pid."PID-3"."CX-01"[0]
+// If no HealthFusion ID found, use the patient ID with HF prefix
+pid."PID-02"."CX-01" default
+"HF" ++ (pid."PID-03"[0]."CX-01" default "")
 ]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
