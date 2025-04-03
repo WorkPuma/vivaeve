@@ -631,7 +631,14 @@ output application/java
      "SchedEndTime": (payload.Data.SIU_S12.SCH."SCH-11"."TQ-05"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
      "NextGen_ID__c": payload.Data.SIU_S12.SCH."SCH-02"."EI-01",
      
-     "ParentRecordId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].AccountId,
+     "ParentRecordId": if (isEmpty(vars.queryResponse)) 
+                   null 
+                 else if (vars.queryResponse[0].AccountId != null)
+                   vars.queryResponse[0].AccountId
+                 else if (!isEmpty(vars.contactAccount))
+                   vars.contactAccount[0].AccountId
+                 else
+                   null,
      "DurationType": if(payload.Data.SIU_S12.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S12.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S12.SCH."SCH-10"."CE-01"),
      
      "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
@@ -875,6 +882,9 @@ output application/json
 payload]]></ee:set-payload>
                 </ee:message>
             </ee:transform>
+            <!-- First log the parsed payload to understand structure -->
+            <logger level="INFO" message="Debug SIU_S14 structure: #[%dw 2.0 output application/json --- payload.Data.SIU_S14.PATIENT.PID]" />
+            
             <ee:transform doc:name="input_mappings" doc:id="a326c130-417a-4ade-8802-307a059236d8">
                 <ee:message />
                 <ee:variables>
@@ -929,12 +939,26 @@ output application/java
 payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
                         <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
 output application/java
+var pid = payload.Data.SIU_S14.PATIENT.PID
 ---
-payload.Data.SIU_S14.PATIENT.PID."PID-04"."CX-01"[0]]]></ee:set-variable>
+// Try multiple approaches to extract Health Fusion Patient Record ID
+(
+    // Check various path options in the parsed HL7 structure
+    pid."PID-04"."CX-01"[0] default 
+    pid."PID-4"."CX-01"[0] default
+    pid."PID-4" default
+    
+    // Direct access based on log format: "PID|1|402447924|402447924|HF402447924|GONZALEZ^CLARIBEL||19841227|F"
+    "HF" ++ pid."PID-3"."CX-01"[0]
+)]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
             <logger level="INFO" message="Extracted HF ID for SIU_S14: #[vars.hfId]" />
             <flow-ref doc:name="call To Salesforce For ContactId" name="salesforce_query_Sub_Flow" />
+            
+            <!-- Detailed logging of HF ID extraction and Contact lookup results -->
+            <logger level="INFO" message="PID fields available: #[%dw 2.0 output application/json --- payload.Data.SIU_S14.PATIENT.PID]" />
+            
             <ee:transform doc:name="sfMappings" doc:id="42b97e64-5fb9-41da-87d2-6847cab4432c">
                 <ee:message>
                 </ee:message>
@@ -950,7 +974,14 @@ output application/java
       "ActualEndTime" : (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
     "NextGen_ID__c":payload.Data.SIU_S14.SCH."SCH-02"."EI-01",
 	"Status": if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01" == "CHECKED IN")("Checked In")  else if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"=="CHECKED OUT")("Checked Out") else (payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"),
-	"ParentRecordId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].AccountId,
+	"ParentRecordId": if (isEmpty(vars.queryResponse)) 
+                   null 
+                 else if (vars.queryResponse[0].AccountId != null)
+                   vars.queryResponse[0].AccountId
+                 else if (!isEmpty(vars.contactAccount))
+                   vars.contactAccount[0].AccountId
+                 else
+                   null,
     "AdditionalInformation": vars.appointmentType,
     "DurationType": if(payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S14.SCH."SCH-10"."CE-01"),
 	
@@ -968,6 +999,10 @@ output application/java
 }]]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
+            
+            <!-- Add detailed logging of query results -->
+            <logger level="INFO" message="queryResponse contents: #[%dw 2.0 output application/json --- {'count': sizeOf(vars.queryResponse), 'content': vars.queryResponse}]" />
+            
             <choice doc:name="Choice" doc:id="347d0d9b-39f8-4ef9-9578-ca34f4953d2b">
                 <when expression="#[false]">
                     <ee:transform doc:name="Transform Message" doc:id="154c8141-3b1b-408f-a9af-ef47859a59ce">
@@ -985,7 +1020,14 @@ output application/java
       "ActualEndTime" : (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
     "NextGen_ID__c":payload.Data.SIU_S14.SCH."SCH-02"."EI-01"[0 to 14],
 	"Status": if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01" == "CHECKED IN")("Checked In")  else if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"=="CHECKED OUT")("Checked Out") else (payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"),
-	"ParentRecordId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].AccountId,
+	"ParentRecordId": if (isEmpty(vars.queryResponse)) 
+                   null 
+                 else if (vars.queryResponse[0].AccountId != null)
+                   vars.queryResponse[0].AccountId
+                 else if (!isEmpty(vars.contactAccount))
+                   vars.contactAccount[0].AccountId
+                 else
+                   null,
     "AdditionalInformation": vars.appointmentType,
     "DurationType": if(payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S14.SCH."SCH-10"."CE-01"),
 	
@@ -1128,7 +1170,14 @@ output application/java
     "NextGen_ID__c":payload.Data.SIU_S15.SCH."SCH-02"."EI-01",
     "DurationType": payload.Data.SIU_S15.SCH."SCH-10"."CE-01",
 	"Status": if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "CANCELLED") ("Cancelled by Provider") else if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "NO SHOW") ("No Show") else  (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01") ,
-	 "ParentRecordId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].AccountId,
+	 "ParentRecordId": if (isEmpty(vars.queryResponse)) 
+                   null 
+                 else if (vars.queryResponse[0].AccountId != null)
+                   vars.queryResponse[0].AccountId
+                 else if (!isEmpty(vars.contactAccount))
+                   vars.contactAccount[0].AccountId
+                 else
+                   null,
     "AdditionalInformation": vars.appointmentType,
 //	"ServiceTerritoryId": flatten(payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],  
         "Service_Resource__c": vars.providerExtract,
@@ -1164,7 +1213,14 @@ output application/java
     "DurationType": payload.Data.SIU_S15.SCH."SCH-10"."CE-01",
 	"Status": if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "CANCELLED") ("Cancelled by Provider") else if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "NO SHOW") ("No Show") else  (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01") ,
     "AdditionalInformation": vars.appointmentType,
-    "ParentRecordId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].AccountId,
+    "ParentRecordId": if (isEmpty(vars.queryResponse)) 
+                   null 
+                 else if (vars.queryResponse[0].AccountId != null)
+                   vars.queryResponse[0].AccountId
+                 else if (!isEmpty(vars.contactAccount))
+                   vars.contactAccount[0].AccountId
+                 else
+                   null,
 //	"ServiceTerritoryId": flatten(payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],  
         "Service_Resource__c": vars.providerExtract,
         "ServiceTerritoryId": vars.locationId,
@@ -1535,6 +1591,7 @@ output application/json
             }]]]>
         </salesforce:parameters>
     </salesforce:query>
+    <logger level="INFO" message="Executing Salesforce query with hfId: #[vars.hfId]" />
     <logger level="INFO" doc:name="SF Contact Response" doc:id="sf-contact-log" message="SF Contact Query for hfId: #[vars.hfId] returned count: #[sizeOf(vars.queryResponse)], hasData: #[!isEmpty(vars.queryResponse)]" />
     
     <!-- 2. Fallback if HealthFusion ID lookup fails -->
