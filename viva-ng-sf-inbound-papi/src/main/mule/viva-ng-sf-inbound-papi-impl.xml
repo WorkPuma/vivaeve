@@ -198,8 +198,7 @@ output application/java
 output application/java
 ---
 [{
-     "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A08.PID."PID-04"."CX-01"[0],
-     
+     "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A04.PID."PID-04"."CX-01"[0],     
       "FirstName": flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
       "LastName": flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
       "MiddleName": payload.Data.ADT_A08.PID."PID-05"."XPN-03"[0],
@@ -323,7 +322,7 @@ payload]]></ee:set-payload>
 output application/java
 ---
 [{
-     "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
+     "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A08.PID."PID-04"."CX-01"[0],
      "FirstName": flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
      "LastName": flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
      "MiddleName": payload.Data.ADT_A08.PID."PID-05"."XPN-03"[0],
@@ -350,13 +349,15 @@ output application/java
         <salesforce:salesforce-query><![CDATA[
             SELECT Id, AccountId, FirstName, LastName, Email, Phone, Date_of_Birth__c
             FROM Contact 
-            WHERE HealthFusion_Patient_Record_ID__c = :hfId
+            WHERE HealthFusion_Patient_Record_ID__c = ':hfId'
         ]]></salesforce:salesforce-query>
-        <salesforce:parameters><![CDATA[#[output application/java
+        <salesforce:parameters><![CDATA[
+#[output application/java
 ---
 {
-    "hfId": vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
-}]]]></salesforce:parameters>
+    "hfId": vars.sfContactData.HealthFusion_Patient_Record_ID__c[0] as String
+}]
+]]></salesforce:parameters>
     </salesforce:query>
     
     <!-- Process based on query results -->
@@ -1490,7 +1491,7 @@ output application/json
 	<sub-flow name="salesforce_query_Sub_Flow" doc:id="1b38a52c-5379-4009-b444-31a047fe1cba" >
 		<salesforce:query doc:name="Query" doc:id="d14fb987-b245-42f2-9e2f-2ef3a953b3fb" config-ref="Salesforce_Config" target="queryResponse">
 			<reconnect frequency="${sf.retryfrequency}" count="${sf.retryattempts}" />
-			<salesforce:salesforce-query ><![CDATA[select Id, AccountId, Firstname ,LastName ,MiddleName, Date_of_Birth__c from Contact where HealthFusion_Patient_Record_ID__c =':HealthFusion_Patient_Record_ID__c']]></salesforce:salesforce-query>
+			<salesforce:salesforce-query><![CDATA[select Id, AccountId, Firstname ,LastName ,MiddleName, Date_of_Birth__c from Contact where HealthFusion_Patient_Record_ID__c = ':HealthFusion_Patient_Record_ID__c']]></salesforce:salesforce-query>
 			<salesforce:parameters ><![CDATA[#[output application/java
 ---
 {
@@ -1700,7 +1701,7 @@ output application/json
 	</sub-flow>
 	<sub-flow name="salesforce_querycontact_Sub_Flow" doc:id="d935e78e-0bc1-4572-a85a-e98e10b27dcf" >
 		<salesforce:query doc:name="Query" doc:id="79adbc28-8388-4fc5-b183-b176a2dcea09" config-ref="Salesforce_Config" target="contactResponse" >
-			<salesforce:salesforce-query ><![CDATA[select Id from Contact where Contact_Id__c = ':Contact_Id__c']]></salesforce:salesforce-query>
+			<salesforce:salesforce-query><![CDATA[select Id from Contact where Contact_Id__c = :Contact_Id__c]]></salesforce:salesforce-query>
 			<salesforce:parameters ><![CDATA[#[output application/java
 ---
 {
@@ -1712,10 +1713,10 @@ output application/json
     <!-- First try to match by HealthFusion_Patient_Record_ID__c -->
     <salesforce:query doc:name="Query by Health Fusion ID" doc:id="517fc881-9b9c-4292-a3fb-9f296019a6c5" config-ref="Salesforce_Config" target="queryResByHFID">
         <salesforce:salesforce-query><![CDATA[
-            SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c, Email, Phone, HealthFusion_Patient_Record_ID__c 
-            FROM Contact 
-            WHERE HealthFusion_Patient_Record_ID__c = :HealthFusion_Patient_Record_ID__c
-        ]]></salesforce:salesforce-query>
+    SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c, Email, Phone, HealthFusion_Patient_Record_ID__c 
+    FROM Contact 
+    WHERE HealthFusion_Patient_Record_ID__c = ':HealthFusion_Patient_Record_ID__c'
+]]></salesforce:salesforce-query>
         <salesforce:parameters><![CDATA[#[output application/java
         ---
         {
@@ -1731,7 +1732,7 @@ output application/json
 </sub-flow>
 	<sub-flow name="salesforce-appointmnet-querySub_Flow" doc:id="4cd95480-e7f3-4efd-9f4d-f986aaf47473" >
 		<salesforce:query doc:name="Query" doc:id="8b37413b-8a22-4dba-9eeb-8be00f4d6dbe" config-ref="Salesforce_Config" target="accResponse">
-			<salesforce:salesforce-query ><![CDATA[select Id from ServiceAppointment where NextGen_ID__c = ':NextGen_ID__c']]></salesforce:salesforce-query>
+			<salesforce:salesforce-query><![CDATA[select Id from ServiceAppointment where NextGen_ID__c = :NextGen_ID__c]]></salesforce:salesforce-query>
 			<salesforce:parameters ><![CDATA[#[output application/java
 ---
 {
@@ -1842,7 +1843,7 @@ output application/json
     <salesforce:query doc:name="Query by HF ID" config-ref="Salesforce_Config" target="existingContactByHF">
         <salesforce:salesforce-query><![CDATA[
             SELECT Id, AccountId FROM Contact 
-            WHERE HealthFusion_Patient_Record_ID__c = :hfId
+            WHERE HealthFusion_Patient_Record_ID__c = ':hfId'
         ]]></salesforce:salesforce-query>
         <salesforce:parameters><![CDATA[#[output application/java
 ---
@@ -1912,7 +1913,7 @@ output application/java
                             <try doc:name="Try">
                                 <salesforce:upsert objectType="Contact" externalIdFieldName="HealthFusion_Patient_Record_ID__c" doc:name="Upsert Contact" config-ref="Salesforce_Config" />
                                 <error-handler>
-                                    <on-error-continue type="SALESFORCE:DUPLICATES_DETECTED">
+                                    <on-error-continue type="SALESFORCE:INVALID_INPUT">
                                         <logger level="INFO" message="Duplicate detected, handling it" />
                                         <!-- Handle duplicates by extracting the ID from the error response -->
                                         <ee:transform doc:name="Extract Duplicate ID">
