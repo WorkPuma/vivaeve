@@ -883,7 +883,17 @@ payload]]></ee:set-payload>
                 </ee:message>
             </ee:transform>
             <!-- First log the parsed payload to understand structure -->
-            <logger level="INFO" message="Debug SIU_S14 structure: #[%dw 2.0 output application/json --- payload.Data.SIU_S14.PATIENT.PID]" />
+            <ee:transform doc:name="Extract PID structure">
+                <ee:message />
+                <ee:variables>
+                    <ee:set-variable variableName="pidStructure"><![CDATA[%dw 2.0
+output application/json
+---
+payload.Data.SIU_S14.PATIENT.PID]]></ee:set-variable>
+                </ee:variables>
+            </ee:transform>
+
+            <logger level="INFO" message="Debug SIU_S14 structure: #[vars.pidStructure]" />
             
             <ee:transform doc:name="input_mappings" doc:id="a326c130-417a-4ade-8802-307a059236d8">
                 <ee:message />
@@ -941,23 +951,22 @@ payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"
 output application/java
 var pid = payload.Data.SIU_S14.PATIENT.PID
 ---
-// Try multiple approaches to extract Health Fusion Patient Record ID
-(
-    // Check various path options in the parsed HL7 structure
-    pid."PID-04"."CX-01"[0] default 
-    pid."PID-4"."CX-01"[0] default
-    pid."PID-4" default
-    
-    // Direct access based on log format: "PID|1|402447924|402447924|HF402447924|GONZALEZ^CLARIBEL||19841227|F"
-    "HF" ++ pid."PID-3"."CX-01"[0]
-)]]></ee:set-variable>
+// Extract Health Fusion Patient Record ID directly from the PID segment
+pid."PID-04"[0]."CX-01" default 
+// Fallbacks if primary approach doesn't work
+pid."PID-04"."CX-01"[0] default
+pid."PID-4"."CX-01"[0] default
+pid."PID-4" default
+"HF" ++ pid."PID-3"."CX-01"[0]
+]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
             <logger level="INFO" message="Extracted HF ID for SIU_S14: #[vars.hfId]" />
             <flow-ref doc:name="call To Salesforce For ContactId" name="salesforce_query_Sub_Flow" />
             
             <!-- Detailed logging of HF ID extraction and Contact lookup results -->
-            <logger level="INFO" message="PID fields available: #[%dw 2.0 output application/json --- payload.Data.SIU_S14.PATIENT.PID]" />
+            <logger level="INFO" message="PID fields available: #[vars.pidStructure]" />
+            <logger level="INFO" message="queryResponse results: #[%dw 2.0 output application/json --- {'isEmpty': isEmpty(vars.queryResponse), 'count': sizeOf(vars.queryResponse), 'accountId': (vars.queryResponse[0].AccountId default 'null'), 'contactId': (vars.queryResponse[0].Id default 'null')}]" />
             
             <ee:transform doc:name="sfMappings" doc:id="42b97e64-5fb9-41da-87d2-6847cab4432c">
                 <ee:message>
@@ -1004,7 +1013,8 @@ output application/java
             <logger level="INFO" message="queryResponse contents: #[%dw 2.0 output application/json --- {'count': sizeOf(vars.queryResponse), 'content': vars.queryResponse}]" />
             
             <choice doc:name="Choice" doc:id="347d0d9b-39f8-4ef9-9578-ca34f4953d2b">
-                <when expression="#[false]">
+                <when expression="#[isEmpty(vars.queryResponse)]">
+                    <logger level="ERROR" message="Contact not found for HealthFusion ID: #[vars.hfId]. Cannot create ServiceAppointment without ParentRecordId." />
                     <ee:transform doc:name="Transform Message" doc:id="154c8141-3b1b-408f-a9af-ef47859a59ce">
                         <ee:message>
                         </ee:message>
@@ -1597,13 +1607,12 @@ output application/json
     <!-- 2. Fallback if HealthFusion ID lookup fails -->
     <choice doc:name="Contact Found?">
         <when expression="#[isEmpty(vars.queryResponse)]">
-            <logger level="INFO" message="Contact not found by HealthFusion ID. Trying fallback lookup methods." />
-            <!-- Fallback to Name + Identifier lookup -->
-            <flow-ref name="contact-lookup-by-identifiers" />
+            <logger level="ERROR" message="Contact not found by HealthFusion ID: #[vars.hfId]. Cannot proceed without Contact record." />
+            <!-- No fallback implementation yet -->
         </when>
         <otherwise>
             <!-- Proceed with found contact -->
-            <logger level="INFO" message="Contact found by HealthFusion ID: #[vars.queryResponse.Id[0]]" />
+            <logger level="INFO" message="Contact found by HealthFusion ID: #[vars.queryResponse[0].Id]" />
         </otherwise>
     </choice>
 </sub-flow>
