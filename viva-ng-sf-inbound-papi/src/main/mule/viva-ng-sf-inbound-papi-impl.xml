@@ -948,21 +948,25 @@ output application/java
 ---
 payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
                         <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
-output text/plain
+output application/java
 var pid = payload.Data.SIU_S14.PATIENT.PID
-var id = pid."PID-04"[0]."CX-01" default 
-         pid."PID-04"."CX-01"[0] default
-         pid."PID-4"."CX-01"[0] default
-         pid."PID-02"."CX-01" default
-         "HF" ++ (pid."PID-03"[0]."CX-01" default "") default
-         ""
 ---
-// Force output to be a string using text/plain
-id
+// Try different PID fields in order of preference
+((pid."PID-04"[0]."CX-01")[0] default 
+ (pid."PID-04"."CX-01"[0])[0] default
+ (pid."PID-4"."CX-01"[0])[0] default
+ (pid."PID-02"."CX-01")[0] default
+ "HF" ++ ((pid."PID-03"[0]."CX-01")[0] default "")) as String
 ]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
             <logger level="INFO" message="Extracted HF ID for SIU_S14: #[vars.hfId]" />
+            <logger level="INFO" message="Extracted PID structure: #[%dw 2.0 output application/json --- {
+  'PID-02': payload.Data.SIU_S14.PATIENT.PID.'PID-02',
+  'PID-03': payload.Data.SIU_S14.PATIENT.PID.'PID-03',
+  'PID-04': payload.Data.SIU_S14.PATIENT.PID.'PID-04',
+  'attemptedExtraction': vars.hfId
+}]" />
             <flow-ref doc:name="call To Salesforce For ContactId" name="salesforce_query_Sub_Flow" />
             
             <!-- Detailed logging of HF ID extraction and Contact lookup results -->
@@ -1598,10 +1602,11 @@ output application/json
         </salesforce:salesforce-query>
         <salesforce:parameters>
             <![CDATA[#[{
-                "hfId": vars.hfId
+                "hfId": vars.hfId as String
             }]]]>
         </salesforce:parameters>
     </salesforce:query>
+    <logger level="INFO" message="HealthFusion ID for query: #[%dw 2.0 output application/json --- {'value': vars.hfId, 'type': typeOf(vars.hfId), 'asString': vars.hfId as String}]" />
     <logger level="INFO" message="Executing Salesforce query with hfId: #[vars.hfId]" />
     <logger level="INFO" doc:name="SF Contact Response" doc:id="sf-contact-log" message="SF Contact Query for hfId: #[vars.hfId] returned count: #[sizeOf(vars.queryResponse)], hasData: #[!isEmpty(vars.queryResponse)]" />
     
