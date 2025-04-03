@@ -224,76 +224,76 @@ output application/java
             <!-- Query existing Contact by name -->
             <flow-ref doc:name="callToGetContactId" doc:id="91e68d3e-a92a-487a-9746-7ef4dd5c2f89" name="salesforce_queryaccoun_Sub_Flow" />
 
-            <choice doc:name="Choice" doc:id="0f4ec9ce-d060-4bc0-8ef4-b9955dba4f0e">
-                <when expression="#[sizeOf(vars.queryRes.AccountId[0]) == null]">
-                    <flow-ref doc:name="flow reference to createAccount" 
-                              doc:id="8c378fd0-9909-4627-a515-6bf19c83d309" 
-                              name="createAccount" />
+            <choice doc:name="Choice" doc:id="a2f8637e-3309-4b45-8bc4-4722e1a4160a">
+    <when expression="#[isEmpty(vars.queryRes) or vars.queryRes.AccountId[0] == null]">
+        <flow-ref doc:name="flow reference to createAccount" 
+                  doc:id="0958c45c-043a-4ed0-88a7-761cf97d33bb" 
+                  name="createAccount" />
 
-                    <ee:transform doc:name="transformedSfData" doc:id="50c9447d-72c2-40e1-8714-0dbd3b6f094f">
-                        <ee:message/>
-                        <ee:variables>
-                            <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
-output application/java
----
-[{
-   AccountId: vars.accountResponse.items.id[0],
-   FirstName: vars.sfContactData.FirstName[0],
-   LastName: vars.sfContactData.LastName[0],
-   Email: vars.sfContactData.Email[0],
-   Phone: vars.sfContactData.Phone[0],
-   MailingState: vars.sfContactData.MailingState[0],
-   MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
-   MailingCity: vars.sfContactData.MailingCity[0],
-   MailingStreet: vars.sfContactData.MailingStreet[0],
-   Patient_Ethnicity__c: vars.sfContactData.Patient_Ethnicity__c[0],
-   Patient_Race__c: vars.sfContactData.Patient_Race__c[0],
-   Patient_Gender_2__c: vars.sfContactData.Patient_Gender_2__c[0],
-   Date_of_Birth__c: vars.sfContactData.Date_of_Birth__c[0],
-   HealthFusion_Patient_Record_ID__c: vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
-}]]]></ee:set-variable>
-                        </ee:variables>
-                    </ee:transform>
-                    <logger level="INFO" 
-                            doc:name="Logger" 
-                            doc:id="b93897b8-b987-4e55-b98d-dfa6c2311cee" 
-                            message="CREATING THE CONTACT"/>
-
-                </when>
-                <otherwise>
-                    <logger level="INFO" doc:name="Logger" 
-                            doc:id="5d0d2394-e4b7-4790-aafa-165a945f045a" 
-                            message="CONTACT ID EXISTS" />
-                    <ee:transform doc:name="requiredSfMappings" 
-                                  doc:id="6c9532e7-eca5-4c05-923a-f1cf56819b5a">
-                        <ee:message/>
-                        <ee:variables>
-                            <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
-output application/java
----
-[{
-   AccountId: vars.queryRes.AccountId[0],
-   FirstName: vars.sfContactData.FirstName[0],
-   LastName: vars.sfContactData.LastName[0],
-   Email: vars.sfContactData.Email[0],
-   Phone: vars.sfContactData.Phone[0],
-   MailingState: vars.sfContactData.MailingState[0],
-   MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
-   MailingCity: vars.sfContactData.MailingCity[0],
-   MailingStreet: vars.sfContactData.MailingStreet[0],
-   Patient_Ethnicity__c: vars.sfContactData.Patient_Ethnicity__c[0],
-   Patient_Race__c: vars.sfContactData.Patient_Race__c[0],
-   Patient_Gender_2__c: vars.sfContactData.Patient_Gender_2__c[0],
-   Date_of_Birth__c: vars.sfContactData.Date_of_Birth__c[0],
-   HealthFusion_Patient_Record_ID__c: vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
-}]]]></ee:set-variable>
-                        </ee:variables>
-                    </ee:transform>
-                    <logger level="INFO" doc:name="Logger" 
-                            doc:id="255f2523-b2fb-48a1-87dc-019a06544496" 
-                            message="CREATING THE CONTACT" />
-                </otherwise>
-            </choice>
+        <ee:transform doc:name="transformedSfData" doc:id="68357eba-f2b3-4e87-b35e-678c00107491">
+    <ee:message/>
+    <ee:variables>
+        <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
+        output application/java
+        ---
+        [{
+           AccountId: vars.queryRes.AccountId[0],
+           FirstName: vars.sfContactData.FirstName[0],
+           LastName: vars.sfContactData.LastName[0],
+           Email: vars.sfContactData.Email[0],
+           Phone: vars.sfContactData.Phone[0],
+           MailingState: vars.sfContactData.MailingState[0],
+           MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
+           MailingCity: vars.sfContactData.MailingCity[0],
+           MailingStreet: vars.sfContactData.MailingStreet[0],
+           Patient_Ethnicity__c: vars.sfContactData.Patient_Ethnicity__c[0],
+           Patient_Race__c: vars.sfContactData.Patient_Race__c[0],
+           Patient_Gender_2__c: vars.sfContactData.Patient_Gender_2__c[0],
+           Date_of_Birth__c: vars.sfContactData.Date_of_Birth__c[0],
+           HealthFusion_Patient_Record_ID__c: vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
+        }]]]></ee:set-variable>
+    </ee:variables>
+</ee:transform>
+<logger level="INFO" 
+        doc:name="Logger" 
+        doc:id="f8b22b8d-6055-49bd-bf9f-21e31cb644f3" 
+        message="USING EXISTING ACCOUNT"/>
+</when>
+<otherwise>
+    <logger level="INFO" 
+            doc:name="Logger" 
+            doc:id="b6f7d6cb-a446-4137-a5a8-0b9649375f1a" 
+            message="EXISTING ACCOUNT LOGIC"/>
+    <ee:transform doc:name="requiredSfMappings" 
+                 doc:id="c350a82a-a18a-429f-a548-27579e10bbc9">
+        <ee:message/>
+        <ee:variables>
+            <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
+            output application/java
+            ---
+            [{
+               AccountId: vars.queryRes.AccountId[0],
+               FirstName: vars.sfContactData.FirstName[0],
+               LastName: vars.sfContactData.LastName[0],
+               Email: vars.sfContactData.Email[0],
+               Phone: vars.sfContactData.Phone[0],
+               MailingState: vars.sfContactData.MailingState[0],
+               MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
+               MailingCity: vars.sfContactData.MailingCity[0],
+               MailingStreet: vars.sfContactData.MailingStreet[0],
+               Patient_Ethnicity__c: vars.sfContactData.Patient_Ethnicity__c[0],
+               Patient_Race__c: vars.sfContactData.Patient_Race__c[0],
+               Patient_Gender_2__c: vars.sfContactData.Patient_Gender_2__c[0],
+               Date_of_Birth__c: vars.sfContactData.Date_of_Birth__c[0],
+               HealthFusion_Patient_Record_ID__c: vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
+            }]]]></ee:set-variable>
+        </ee:variables>
+    </ee:transform>
+    <logger level="INFO" doc:name="Logger" 
+            doc:id="73ab13d2-181d-4022-b7f4-6170453c1999" 
+            message="USING EXISTING CONTACT" />
+</otherwise>
+</choice>
 
             <!-- Upsert the contact record -->
             <flow-ref doc:name="callToUpsertFlow" 
@@ -303,157 +303,224 @@ output application/java
 
         <!--  ========== ADT^A08 ========== -->
         <when expression="#[vars.checkConditionA08.result]">
-            <hl7:read doc:name="A08" doc:id="f789d95a-e2ee-4173-a15e-97ac57afd4fa" config-ref="HL7_EDI_Config_A08">
-                <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
-            </hl7:read>
-            <ee:transform doc:name="jsonPayload" doc:id="c07cdea7-4ded-4883-8c2b-cb1f90c31fd5">
-                <ee:message>
-                    <ee:set-payload><![CDATA[%dw 2.0
+    <hl7:read doc:name="A08" doc:id="846ed216-c270-49b6-851f-782adfc6742f" config-ref="HL7_EDI_Config_A08">
+        <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+    </hl7:read>
+    
+    <ee:transform doc:name="jsonPayload" doc:id="0de5c28e-e325-46b5-b5ba-ca264013e22e">
+        <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 payload]]></ee:set-payload>
-                </ee:message>
-            </ee:transform>
-            <ee:transform doc:name="language_field" doc:id="3e5cdd9f-0955-41a4-b8d2-3a32c54b628e">
-                <ee:message />
-                <ee:variables>
-                    <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
+        </ee:message>
+    </ee:transform>
+    
+    <ee:transform doc:name="Extract Contact Fields" doc:id="860a49c0-3071-421c-b95b-5adbd13b25dc">
+        <ee:message />
+        <ee:variables>
+            <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+     "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
+     "FirstName": flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
+     "LastName": flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
+     "MiddleName": payload.Data.ADT_A08.PID."PID-05"."XPN-03"[0],
+     "Email": payload.Data.ADT_A08.PID."PID-13"."XTN-04"[0],
+     "Phone": payload.Data.ADT_A08.PID."PID-13"."XTN-01"[0],
+     "MailingState": payload.Data.ADT_A08.PID."PID-11"."XAD-04"[0],
+     "MailingPostalCode": payload.Data.ADT_A08.PID."PID-11"."XAD-05"[0],
+     "MailingCity": payload.Data.ADT_A08.PID."PID-11"."XAD-03"[0],
+     "MailingStreet": payload.Data.ADT_A08.PID."PID-11"."XAD-01"[0],
+     "Patient_Ethnicity__c": payload.Data.ADT_A08.PID."PID-22",
+     "Patient_Race__c": payload.Data.ADT_A08.PID."PID-10",
+     "Patient_Gender_2__c": if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
+     "Date_of_Birth__c": if (payload.Data.ADT_A08.PID."PID-07"."TS-01" != null) 
+                   (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) 
+                   else if (payload.Data.ADT_A08.PID."PID-07" != null)
+                   (payload.Data.ADT_A08.PID."PID-07" as String as Date {format: "yyyyMMdd"})
+                   else null
+}]]]></ee:set-variable>
+        </ee:variables>
+    </ee:transform>
+    
+    <!-- Query for existing contact by HealthFusion ID -->
+    <salesforce:query doc:name="Query Contact by HF ID" doc:id="589ecdf3-5260-47fa-bdc2-24ca7c43446b" config-ref="Salesforce_Config" target="contactByHfId">
+        <salesforce:salesforce-query><![CDATA[
+            SELECT Id, AccountId, FirstName, LastName, Email, Phone, Date_of_Birth__c
+            FROM Contact 
+            WHERE HealthFusion_Patient_Record_ID__c = :hfId
+        ]]></salesforce:salesforce-query>
+        <salesforce:parameters><![CDATA[#[output application/java
+---
+{
+    "hfId": vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
+}]]]></salesforce:parameters>
+    </salesforce:query>
+    
+    <!-- Process based on query results -->
+    <try>
+        <choice doc:name="Found by HF ID?" doc:id="fcb84039-d730-4226-b01b-27300a32b6de">
+            <when expression="#[isEmpty(vars.contactByHfId)]">
+                <!-- Not found by HF ID, try other identifiers -->
+                <salesforce:query doc:name="Query by Name and Other Fields" doc:id="d141630a-4738-41af-8a02-4c421c977d98" config-ref="Salesforce_Config" target="contactByOtherFields">
+                    <salesforce:salesforce-query><![CDATA[
+                        SELECT Id, AccountId, FirstName, LastName, Email, Phone, Date_of_Birth__c
+                        FROM Contact 
+                        WHERE FirstName = :firstName 
+                        AND LastName = :lastName
+                        AND (Email = :email OR Phone = :phone OR Date_of_Birth__c = :dob)
+                        LIMIT 1
+                    ]]></salesforce:salesforce-query>
+                    <salesforce:parameters><![CDATA[#[output application/java
+---
+{
+    "firstName": vars.sfContactData.FirstName[0],
+    "lastName": vars.sfContactData.LastName[0],
+    "email": vars.sfContactData.Email[0],
+    "phone": vars.sfContactData.Phone[0],
+    "dob": vars.sfContactData.Date_of_Birth__c[0]
+}]]]></salesforce:parameters>
+                </salesforce:query>
+                
+                <choice doc:name="Found by Other Fields?">
+                    <when expression="#[!isEmpty(vars.contactByOtherFields)]">
+                        <!-- Update existing contact found by other fields -->
+                        <ee:transform doc:name="Prepare Update with ID">
+                            <ee:message>
+                                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+    Id: vars.contactByOtherFields[0].Id,
+    HealthFusion_Patient_Record_ID__c: vars.sfContactData.HealthFusion_Patient_Record_ID__c[0],
+    FirstName: vars.sfContactData.FirstName[0],
+    LastName: vars.sfContactData.LastName[0],
+    MiddleName: vars.sfContactData.MiddleName[0],
+    Email: vars.sfContactData.Email[0],
+    Phone: vars.sfContactData.Phone[0],
+    MailingState: vars.sfContactData.MailingState[0],
+    MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
+    MailingCity: vars.sfContactData.MailingCity[0],
+    MailingStreet: vars.sfContactData.MailingStreet[0],
+    Patient_Ethnicity__c: vars.sfContactData.Patient_Ethnicity__c[0],
+    Patient_Race__c: vars.sfContactData.Patient_Race__c[0],
+    Patient_Gender_2__c: vars.sfContactData.Patient_Gender_2__c[0],
+    Date_of_Birth__c: vars.sfContactData.Date_of_Birth__c[0]
+}]]]></ee:set-payload>
+                            </ee:message>
+                            <ee:variables>
+                                <ee:set-variable variableName="accountId"><![CDATA[%dw 2.0
+output application/java
+---
+vars.contactByOtherFields[0].AccountId]]></ee:set-variable>
+                            </ee:variables>
+                        </ee:transform>
+                        
+                        <salesforce:update type="Contact" doc:name="Update Existing Contact" config-ref="Salesforce_Config" />
+                        <logger level="INFO" message="Updated existing contact by name + other fields"/>
+                    </when>
+                    <otherwise>
+                        <!-- Create new account and contact -->
+                        <flow-ref doc:name="Create Account" name="createAccount" />
+                        
+                        <ee:transform doc:name="Prepare Contact with AccountId">
+                            <ee:message>
+                                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+    AccountId: vars.accountResponse.items.id[0],
+    HealthFusion_Patient_Record_ID__c: vars.sfContactData.HealthFusion_Patient_Record_ID__c[0],
+    FirstName: vars.sfContactData.FirstName[0],
+    LastName: vars.sfContactData.LastName[0],
+    MiddleName: vars.sfContactData.MiddleName[0],
+    Email: vars.sfContactData.Email[0],
+    Phone: vars.sfContactData.Phone[0],
+    MailingState: vars.sfContactData.MailingState[0],
+    MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
+    MailingCity: vars.sfContactData.MailingCity[0],
+    MailingStreet: vars.sfContactData.MailingStreet[0],
+    Patient_Ethnicity__c: vars.sfContactData.Patient_Ethnicity__c[0],
+    Patient_Race__c: vars.sfContactData.Patient_Race__c[0],
+    Patient_Gender_2__c: vars.sfContactData.Patient_Gender_2__c[0],
+    Date_of_Birth__c: vars.sfContactData.Date_of_Birth__c[0]
+}]]]></ee:set-payload>
+                            </ee:message>
+                        </ee:transform>
+                        
+                        <salesforce:create type="Contact" doc:name="Create New Contact" config-ref="Salesforce_Config" />
+                        <logger level="INFO" message="Created new contact"/>
+                    </otherwise>
+                </choice>
+            </when>
+            <otherwise>
+                <!-- Update existing contact found by HF ID -->
+                <ee:transform doc:name="Prepare Update with HF ID">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+    Id: vars.contactByHfId[0].Id,
+    FirstName: vars.sfContactData.FirstName[0],
+    LastName: vars.sfContactData.LastName[0],
+    MiddleName: vars.sfContactData.MiddleName[0],
+    Email: vars.sfContactData.Email[0],
+    Phone: vars.sfContactData.Phone[0],
+    MailingState: vars.sfContactData.MailingState[0],
+    MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
+    MailingCity: vars.sfContactData.MailingCity[0],
+    MailingStreet: vars.sfContactData.MailingStreet[0],
+    Patient_Ethnicity__c: vars.sfContactData.Patient_Ethnicity__c[0],
+    Patient_Race__c: vars.sfContactData.Patient_Race__c[0],
+    Patient_Gender_2__c: vars.sfContactData.Patient_Gender_2__c[0],
+    Date_of_Birth__c: vars.sfContactData.Date_of_Birth__c[0]
+}]]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                
+                <salesforce:update type="Contact" doc:name="Update Contact" config-ref="Salesforce_Config" />
+                <logger level="INFO" message="Updated existing contact by HF ID"/>
+            </otherwise>
+        </choice>
+        
+        <!-- Ensure a serializable response -->
+        <ee:transform doc:name="Ensure Serializable Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
 output application/json
-var language = vars.LanguageMapping
 ---
-(language filter ($.primarylanguage == payload.Data.ADT_A08.PID."PID-15"."CE_0296-01"))[0].Language_Preferred__c]]></ee:set-variable>
-                    <ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
-output application/java
+{
+    status: if (payload.successful default false) "SUCCESS" else "ERROR",
+    message: if (payload.successful default false) 
+               "Contact operation completed successfully" 
+             else 
+               (payload.items.message[0] default "An error occurred")
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        
+        <error-handler>
+            <on-error-continue type="ANY">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
 ---
-payload.Data.ADT_A08.PV1."PV1-03"."PL-09"]]></ee:set-variable>
-                </ee:variables>
-            </ee:transform>
-            <ee:transform doc:name="sfMappings" doc:id="aeb816ce-a687-4d01-ac64-6b26db99f808">
-                <ee:message>
-                </ee:message>
-                <ee:variables>
-                    <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
-output application/java
----
-[{
-     "HealthFusion_Patient_Record_ID__c":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
-     
-      "FirstName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
-      "LastName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
-      "MiddleName": payload.Data.ADT_A08.PID."PID-05"."XPN-03"[0],
-      "Email":payload.Data.ADT_A08.PID."PID-13"."XTN-04"[0],
-      "Phone": payload.Data.ADT_A08.PID."PID-13"."XTN-01"[0],
-      "MailingState":payload.Data.ADT_A08.PID."PID-11"."XAD-04"[0],
-      "MailingPostalCode":payload.Data.ADT_A08.PID."PID-11"."XAD-05"[0],
-      "MailingCity":payload.Data.ADT_A08.PID."PID-11"."XAD-03"[0],
-      "MailingStreet":payload.Data.ADT_A08.PID."PID-11"."XAD-01"[0],
-      "Patient_Ethnicity__c":payload.Data.ADT_A08.PID."PID-22",
-      "Patient_Race__c":payload.Data.ADT_A08.PID."PID-10",
-      "Patient_Gender_2__c":if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
-      "Date_of_Birth__c" : if (payload.Data.ADT_A08.PID."PID-07"."TS-01" != null) 
-                     (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) 
-                     else if (payload.Data.ADT_A08.PID."PID-07" != null)
-                     (payload.Data.ADT_A08.PID."PID-07" as String as Date {format: "yyyyMMdd"})
-                     else null
-       
-    }]]]></ee:set-variable>
-                </ee:variables>
-            </ee:transform>
-            <choice doc:name="Choice" doc:id="eb51a932-440c-4ead-a8bc-1ea006efc0bc">
-                <when expression="#[sizeOf(vars.sfContactData.Id[0]) == 18]">
-                    <ee:transform doc:name="settingContactId" doc:id="3bbaaef2-180e-4136-816f-ff4e184cb18f">
-                <ee:message>
-                    <ee:set-payload><![CDATA[%dw 2.0
-output application/java
----
-[{
-     "HealthFusion_Patient_Record_ID__c":(payload.Data.ADT_A08.PID."PID-03"."CX-01"[0])[0 to 14],
-     
-      "FirstName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
-      "LastName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
-      "MiddleName": payload.Data.ADT_A08.PID."PID-05"."XPN-03"[0],
-      "Email":payload.Data.ADT_A08.PID."PID-13"."XTN-04"[0],
-      "Phone": payload.Data.ADT_A08.PID."PID-13"."XTN-01"[0],
-      "MailingState":payload.Data.ADT_A08.PID."PID-11"."XAD-04"[0],
-      "MailingPostalCode":payload.Data.ADT_A08.PID."PID-11"."XAD-05"[0],
-      "MailingCity":payload.Data.ADT_A08.PID."PID-11"."XAD-03"[0],
-      "MailingStreet":payload.Data.ADT_A08.PID."PID-11"."XAD-01"[0],
-      "Patient_Ethnicity__c":payload.Data.ADT_A08.PID."PID-22",
-      "Patient_Race__c":payload.Data.ADT_A08.PID."PID-10",
-      "Patient_Gender_2__c":if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
-       "Date_of_Birth__c" : if (payload.Data.ADT_A08.PID."PID-07"."TS-01" != null) 
-                     (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) 
-                     else if (payload.Data.ADT_A08.PID."PID-07" != null)
-                     (payload.Data.ADT_A08.PID."PID-07" as String as Date {format: "yyyyMMdd"})
-                     else null      
-    }]]]></ee:set-payload>
-                </ee:message>
-            </ee:transform>
-                    <flow-ref doc:name="callToGetTheContactId" doc:id="cd7c4e1e-d640-4b9d-a4f7-06191fe7b0fe" name="salesforce_querycontact_Sub_Flow" />
-                    <ee:transform doc:name="sfMappings" doc:id="a37f47a9-0e0e-4650-998b-c92de09eeb4d">
-                <ee:message>
-                    <ee:set-payload><![CDATA[%dw 2.0
-output application/java
----
-[
-  {
-    "Id": vars.contactResponse.Id[0],
-    "FirstName": payload.FirstName[0],
-    "LastName": payload.LastName[0],
-    "MiddleName": payload.MiddleName[0],
-    "Email": payload.Email[0],
-    "Phone": payload.Email[0],
-    "MailingState": payload.MailingState[0],
-    "MailingPostalCode": payload.MailingPostalCode[0],
-    "MailingCity": payload.MailingCity[0],
-    "MailingStreet": payload.MailingStreet[0],
-    "Patient_Ethnicity__c": payload.Patient_Ethnicity__c[0],
-    "Patient_Race__c": payload.Patient_Race__c[0],
-    "Patient_Gender_2__c": payload.Patient_Gender_2__c[0],
-    "Date_of_Birth__c": payload.Date_of_Birth__c[0],
-    "HealthFusion_Patient_Record_ID__c": payload.HealthFusion_Patient_Record_ID__c[0]
-  }
-]]]></ee:set-payload>
-                </ee:message>
-            </ee:transform>
-                    <flow-ref doc:name="callToUpsertFlow" doc:id="26e78ff4-389c-42cf-b50e-77cc24661052" name="common-sf-update-flow" />
-                </when>
-                <otherwise>
-                    <ee:transform doc:name="requiredPayloadForSalesforceUpdate" doc:id="d934457c-8c8a-476e-a18c-7327109232a2">
-                <ee:message>
-                            <ee:set-payload><![CDATA[%dw 2.0
-output application/java
----
-[{
-     "HealthFusion_Patient_Record_ID__c":payload.Data.ADT_A08.PID."PID-03"."CX-01"[0],
-     
-      "FirstName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
-      "LastName":flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
-      "MiddleName": payload.Data.ADT_A08.PID."PID-05"."XPN-03"[0],
-      "Email":payload.Data.ADT_A08.PID."PID-13"."XTN-04"[0],
-      "Phone": payload.Data.ADT_A08.PID."PID-13"."XTN-01"[0],
-      "MailingState":payload.Data.ADT_A08.PID."PID-11"."XAD-04"[0],
-      "MailingPostalCode":payload.Data.ADT_A08.PID."PID-11"."XAD-05"[0],
-      "MailingCity":payload.Data.ADT_A08.PID."PID-11"."XAD-03"[0],
-      "MailingStreet":payload.Data.ADT_A08.PID."PID-11"."XAD-01"[0],
-      "Patient_Ethnicity__c":payload.Data.ADT_A08.PID."PID-22",
-      "Patient_Race__c":payload.Data.ADT_A08.PID."PID-10",
-      "Patient_Gender_2__c":if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
-      "Date_of_Birth__c" : if (payload.Data.ADT_A08.PID."PID-07"."TS-01" != null) 
-                     (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) 
-                     else if (payload.Data.ADT_A08.PID."PID-07" != null)
-                     (payload.Data.ADT_A08.PID."PID-07" as String as Date {format: "yyyyMMdd"})
-                     else null
-      
-    }]]]></ee:set-payload>
-                        </ee:message>
-                <ee:variables>
-                </ee:variables>
-            </ee:transform>
-                    <flow-ref doc:name="callToUpdateUsingHfChart" doc:id="db831568-47f7-44db-b568-a969dcff7c66" name="contact-update-hfchartnumber-subflow" />
-                </otherwise>
-            </choice>
-        </when>
+{
+    status: "ERROR",
+    message: error.description default "An error occurred processing the ADT^A08 message",
+    errorType: error.errorType.identifier default "UNKNOWN"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <logger level="ERROR" message="ADT^A08 Processing Error: #[error.description]" />
+            </on-error-continue>
+        </error-handler>
+    </try>
+</when>
 
         <!--  ========== SIU^S12 ========== -->
         <when expression="#[vars.checkConditionS12.result]">
@@ -485,7 +552,7 @@ var appType = vars.WorkTypeMapping
 output application/json
 var provider = vars.ProviderMapping
 ---
-(provider filter ($.Last_Name == flatten(payload.Data.SIU_S12.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
+(provider filter ($.NPI == flatten(payload.Data.SIU_S12.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
                     <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
 var location = vars.TerritoryMapping
@@ -520,7 +587,7 @@ var appType = vars.WorkTypeMapping
 output application/json
 var provider = vars.ProviderMapping
 ---
-(provider filter ($.Last_Name == flatten(payload.Data.SIU_S12.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].providerId]]></ee:set-variable>
+(provider filter ($.NPI == flatten(payload.Data.SIU_S12.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].providerId]]></ee:set-variable>
                         <ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
 output application/java
 ---
@@ -628,7 +695,7 @@ var appType = vars.WorkTypeMapping
 output application/json
 var provider = vars.ProviderMapping
 ---
-(provider filter ($.Last_Name == flatten(payload.Data.SIU_S13.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
+(provider filter ($.NPI == flatten(payload.Data.SIU_S13.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
                     <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
 var location = vars.TerritoryMapping
@@ -805,7 +872,7 @@ var appType = vars.WorkTypeMapping
 output application/json
 var provider = vars.ProviderMapping
 ---
-(provider filter ($.Last_Name == flatten(payload.Data.SIU_S14.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
+(provider filter ($.NPI == flatten(payload.Data.SIU_S14.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
                     <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
 var location = vars.TerritoryMapping
@@ -980,7 +1047,7 @@ var appType = vars.WorkTypeMapping
 output application/json
 var provider = vars.ProviderMapping
 ---
-(provider filter ($.Last_Name == flatten(payload.Data.SIU_S15.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-02"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
+(provider filter ($.NPI == flatten(payload.Data.SIU_S15.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
                     <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
 var location = vars.TerritoryMapping
@@ -1641,19 +1708,29 @@ output application/json
 }]]]></salesforce:parameters>
 		</salesforce:query>
 	</sub-flow>
-	<sub-flow name="salesforce_queryaccoun_Sub_Flow" doc:id="39aab4c8-aa95-4190-9357-a29214d3cd51" >
-		<salesforce:query doc:name="Query" doc:id="8035e9d6-75d1-44dc-96ef-aee71449b2f3" config-ref="Salesforce_Config" target="queryRes" >
-			<salesforce:salesforce-query ><![CDATA[select  AccountId from Contact where LastName = ':LastName'  and FirstName=':FirstName']]></salesforce:salesforce-query>
-			<salesforce:parameters ><![CDATA[#[output application/java
----
-{
-	"LastName" : vars.sfContactData.LastName[0],
-	"FirstName" : vars.sfContactData.FirstName[0]
-}]]]></salesforce:parameters>
-		</salesforce:query>
-	</sub-flow>
-	<sub-flow name="salesforce-appointmnet-querySub_Flow" doc:id="8d4aee44-43a6-46be-b1a9-cae1a4cb9990" >
-		<salesforce:query doc:name="Query" doc:id="cd2d1d00-ec8a-4833-842e-d3e61926d7bf" config-ref="Salesforce_Config" target="accResponse">
+	<sub-flow name="salesforce_queryaccoun_Sub_Flow" doc:id="95e83ba3-8e03-4590-b8ae-498853142a96">
+    <!-- First try to match by HealthFusion_Patient_Record_ID__c -->
+    <salesforce:query doc:name="Query by Health Fusion ID" doc:id="517fc881-9b9c-4292-a3fb-9f296019a6c5" config-ref="Salesforce_Config" target="queryResByHFID">
+        <salesforce:salesforce-query><![CDATA[
+            SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c, Email, Phone, HealthFusion_Patient_Record_ID__c 
+            FROM Contact 
+            WHERE HealthFusion_Patient_Record_ID__c = :HealthFusion_Patient_Record_ID__c
+        ]]></salesforce:salesforce-query>
+        <salesforce:parameters><![CDATA[#[output application/java
+        ---
+        {
+            "HealthFusion_Patient_Record_ID__c": vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
+        }]]]></salesforce:parameters>
+    </salesforce:query>
+    
+    
+
+    
+    
+    <logger level="INFO" message="Contact Match Result: #[!isEmpty(vars.queryRes)]" />
+</sub-flow>
+	<sub-flow name="salesforce-appointmnet-querySub_Flow" doc:id="4cd95480-e7f3-4efd-9f4d-f986aaf47473" >
+		<salesforce:query doc:name="Query" doc:id="8b37413b-8a22-4dba-9eeb-8be00f4d6dbe" config-ref="Salesforce_Config" target="accResponse">
 			<salesforce:salesforce-query ><![CDATA[select Id from ServiceAppointment where NextGen_ID__c = ':NextGen_ID__c']]></salesforce:salesforce-query>
 			<salesforce:parameters ><![CDATA[#[output application/java
 ---
@@ -1662,17 +1739,17 @@ output application/json
 }]]]></salesforce:parameters>
 		</salesforce:query>
 	</sub-flow>
-	<sub-flow name="sf-appointment-update-flow" doc:id="7c77a221-aa07-4264-8ef0-a8fa37b7ba61" >
-		<logger level="INFO" doc:name="beforeInsert" doc:id="a040c226-4edd-429e-b90e-9f5b8fed1432" message="##########Before Salesforce Upsert###################" />
-		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="09118984-4cd1-4771-bc27-06f9e72fa25e" millisBetweenRetries="${sf.retryfrequency}" >
-			<salesforce:upsert objectType="ServiceAppointment" externalIdFieldName="Id" doc:name="Update/Insert" doc:id="005689f3-1b60-43ea-9783-43f8435b5a9a" config-ref="Salesforce_Config">
+	<sub-flow name="sf-appointment-update-flow" doc:id="2e865459-87cd-4184-be25-4cb2699ad694" >
+		<logger level="INFO" doc:name="beforeInsert" doc:id="779a792c-a5dc-4924-9f7e-8fdb409c6c35" message="##########Before Salesforce Upsert###################" />
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="58f1789d-034d-4b90-92ea-6508d721af1c" millisBetweenRetries="${sf.retryfrequency}" >
+			<salesforce:upsert objectType="ServiceAppointment" externalIdFieldName="Id" doc:name="Update/Insert" doc:id="31cf06a7-9f66-48bf-8150-793ec6d159b6" config-ref="Salesforce_Config">
 				<salesforce:records><![CDATA[#[vars.appointmentFields]]]></salesforce:records>
 			</salesforce:upsert>
 		</until-successful>
-		<logger level="INFO" doc:name="afterInsert" doc:id="b07eb6c0-8b79-45ec-a2ef-b7cb0d6cdbb1" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
-		<choice doc:name="Choice" doc:id="03b70ed9-89d9-4bf6-a493-5489f2012ff9" >
+		<logger level="INFO" doc:name="afterInsert" doc:id="1086da16-5944-438d-bcae-5f8742add7c2" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
+		<choice doc:name="Choice" doc:id="b25a081f-7d0c-42d5-a2c8-6dcf7fc5865b" >
 			<when expression="#[payload.successful== false]" >
-				<ee:transform doc:name="errorDetails" doc:id="d41f21a7-9ffa-4655-ac38-cff2973f772c" >
+				<ee:transform doc:name="errorDetails" doc:id="38ca6cdb-f4b4-4ad0-9675-388daf0df2e5" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -1708,7 +1785,7 @@ output application/json
 "Appointment Updation Error"  ++ vars.queryResponse.FirstName[0] ++ " " ++ vars.queryResponse.MiddleName[0] ++ " " ++ vars.queryResponse.LastName[0] default " "]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<ee:transform doc:name="emailAddress" doc:id="367c0fee-2909-414b-a3af-a36a027e5ddc">
+				<ee:transform doc:name="emailAddress" doc:id="8a939a9e-a1e0-4569-bdb3-d7bee50ae2fe">
 					<ee:message />
 					<ee:variables>
 						<ee:set-variable variableName="errorMesg"><![CDATA[%dw 2.0
@@ -1733,7 +1810,7 @@ if (vars.errorMessage."Error Details".Location == "FOREST HILLS") p('email.fores
  ]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<email:send doc:name="sendEmail" doc:id="69bfef1e-7057-40a1-8c92-688423cecbf3" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
+				<email:send doc:name="sendEmail" doc:id="35cd6a96-a0d9-4e73-a8c1-f8289aa473a2" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
 					<email:to-addresses >
 						<email:to-address value="#[vars.locationAddress]" />
 					</email:to-addresses>
@@ -1743,8 +1820,8 @@ if (vars.errorMessage."Error Details".Location == "FOREST HILLS") p('email.fores
 				</email:send>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="defaultMessage" doc:id="9e085750-10ea-404e-ac08-79acf0f8e2d7" message="###########No errors##############" />
-				<ee:transform doc:name="successMessage" doc:id="eb271003-71c6-4f66-8836-8c30730beb24" >
+				<logger level="INFO" doc:name="defaultMessage" doc:id="6cff0653-4325-44ba-a856-11f243cc7e16" message="###########No errors##############" />
+				<ee:transform doc:name="successMessage" doc:id="a839348f-7db4-4c64-b7b6-47e1593aae7f" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -1758,128 +1835,297 @@ output application/json
 			</otherwise>
 		</choice>
 	</sub-flow>
-	<sub-flow name="contact-update-hfchartnumber-subflow" doc:id="3cb980f1-d099-4117-bbca-177a7fb25c35" >
-		<logger level="INFO" doc:name="beforeInsert" doc:id="1a4ace4d-4e40-4016-9649-ae41c674b19a" message="##########Before Salesforce Upsert###################" />
-		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="10862969-1686-4114-822a-2468c3b7dc37" millisBetweenRetries="${sf.retryfrequency}" >
-			<salesforce:upsert objectType="Contact" externalIdFieldName="HealthFusion_Patient_Record_ID__c" doc:name="Update/Insert" doc:id="128c6a30-dc35-4a6f-8459-4018addb34d1" config-ref="Salesforce_Config" />
-		</until-successful>
-		<logger level="INFO" doc:name="afterInsert" doc:id="b8a66897-fee3-4975-947e-de16146c4b5d" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
-		<choice doc:name="Choice" doc:id="7bdd1603-36a1-4caf-8c68-3e71ad041a3f" >
-			<when expression="#[payload.successful== false]" >
-				<ee:transform doc:name="errorDetails" doc:id="0fbf032f-5861-410e-b0d3-5d3a097990d2" >
-					<ee:message >
-						<ee:set-payload ><![CDATA[%dw 2.0
+<sub-flow name="contact-update-hfchartnumber-subflow" doc:id="982cd180-985c-4701-892d-9bb7cd740f2c">
+    <logger level="INFO" doc:name="beforeInsert" message="##########Before Salesforce Upsert###################" />
+    
+    <!-- First try to find by HF ID -->
+    <salesforce:query doc:name="Query by HF ID" config-ref="Salesforce_Config" target="existingContactByHF">
+        <salesforce:salesforce-query><![CDATA[
+            SELECT Id, AccountId FROM Contact 
+            WHERE HealthFusion_Patient_Record_ID__c = :hfId
+        ]]></salesforce:salesforce-query>
+        <salesforce:parameters><![CDATA[#[output application/java
+---
+{
+    "hfId": payload.HealthFusion_Patient_Record_ID__c[0]
+}]]]></salesforce:parameters>
+    </salesforce:query>
+    
+    <!-- Process based on query results -->
+    <try>
+        <choice doc:name="Found by HF ID?">
+            <when expression="#[isEmpty(vars.existingContactByHF)]">
+                <!-- If not found, try by name and other identifiers -->
+                <salesforce:query doc:name="Query by Name+Email/Phone/DOB" config-ref="Salesforce_Config" target="existingContactByIdentifiers">
+                    <salesforce:salesforce-query><![CDATA[
+                        SELECT Id, AccountId FROM Contact 
+                        WHERE FirstName = :firstName 
+                        AND LastName = :lastName
+                        AND (Email = :email OR Phone = :phone OR Date_of_Birth__c = :dob)
+                        LIMIT 1
+                    ]]></salesforce:salesforce-query>
+                    <salesforce:parameters><![CDATA[#[output application/java
+---
+{
+    "firstName": payload.FirstName[0],
+    "lastName": payload.LastName[0],
+    "email": payload.Email[0],
+    "phone": payload.Phone[0],
+    "dob": payload.Date_of_Birth__c[0]
+}]]]></salesforce:parameters>
+                </salesforce:query>
+                
+                <choice doc:name="Found by identifiers?">
+                    <when expression="#[!isEmpty(vars.existingContactByIdentifiers)]">
+                        <!-- Update the existing contact -->
+                        <ee:transform doc:name="Prepare Update">
+                            <ee:message>
+                                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+    Id: vars.existingContactByIdentifiers[0].Id,
+    HealthFusion_Patient_Record_ID__c: payload.HealthFusion_Patient_Record_ID__c[0],
+    FirstName: payload.FirstName[0],
+    LastName: payload.LastName[0],
+    MiddleName: payload.MiddleName[0],
+    Email: payload.Email[0],
+    Phone: payload.Phone[0],
+    MailingState: payload.MailingState[0],
+    MailingPostalCode: payload.MailingPostalCode[0],
+    MailingCity: payload.MailingCity[0],
+    MailingStreet: payload.MailingStreet[0],
+    Patient_Ethnicity__c: payload.Patient_Ethnicity__c[0],
+    Patient_Race__c: payload.Patient_Race__c[0], 
+    Patient_Gender_2__c: payload.Patient_Gender_2__c[0],
+    Date_of_Birth__c: payload.Date_of_Birth__c[0]
+}]]]></ee:set-payload>
+                            </ee:message>
+                        </ee:transform>
+                        
+                        <salesforce:update type="Contact" doc:name="Update Existing Contact" config-ref="Salesforce_Config" />
+                        <logger level="INFO" message="Updated existing contact by identifiers" />
+                    </when>
+                    <otherwise>
+                        <!-- Try creating new contact with upsert -->
+                        <until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" millisBetweenRetries="${sf.retryfrequency}">
+                            <try doc:name="Try">
+                                <salesforce:upsert objectType="Contact" externalIdFieldName="HealthFusion_Patient_Record_ID__c" doc:name="Upsert Contact" config-ref="Salesforce_Config" />
+                                <error-handler>
+                                    <on-error-continue type="SALESFORCE:DUPLICATES_DETECTED">
+                                        <logger level="INFO" message="Duplicate detected, handling it" />
+                                        <!-- Handle duplicates by extracting the ID from the error response -->
+                                        <ee:transform doc:name="Extract Duplicate ID">
+                                            <ee:message />
+                                            <ee:variables>
+                                                <ee:set-variable variableName="duplicateId"><![CDATA[%dw 2.0
+output application/java
+---
+payload.items.payload.errors[0].duplicateResult.matchResults[0].matchRecords[0].record.Id
+]]></ee:set-variable>
+                                            </ee:variables>
+                                        </ee:transform>
+                                        
+                                        <!-- Update the existing contact with the duplicate ID -->
+                                        <ee:transform doc:name="Prepare Update for Duplicate">
+                                            <ee:message>
+                                                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+    Id: vars.duplicateId,
+    HealthFusion_Patient_Record_ID__c: payload.items.payload.HealthFusion_Patient_Record_ID__c[0],
+    FirstName: payload.items.payload.FirstName[0],
+    LastName: payload.items.payload.LastName[0],
+    MiddleName: payload.items.payload.MiddleName[0],
+    Email: payload.items.payload.Email[0],
+    Phone: payload.items.payload.Phone[0],
+    MailingState: payload.items.payload.MailingState[0],
+    MailingPostalCode: payload.items.payload.MailingPostalCode[0],
+    MailingCity: payload.items.payload.MailingCity[0],
+    MailingStreet: payload.items.payload.MailingStreet[0],
+    Patient_Ethnicity__c: payload.items.payload.Patient_Ethnicity__c[0],
+    Patient_Race__c: payload.items.payload.Patient_Race__c[0],
+    Patient_Gender_2__c: payload.items.payload.Patient_Gender_2__c[0],
+    Date_of_Birth__c: payload.items.payload.Date_of_Birth__c[0]
+}]]]></ee:set-payload>
+                                            </ee:message>
+                                        </ee:transform>
+                                        
+                                        <salesforce:update type="Contact" doc:name="Update Duplicate Contact" config-ref="Salesforce_Config" />
+                                        <logger level="INFO" message="Updated duplicate contact" />
+                                    </on-error-continue>
+                                </error-handler>
+                            </try>
+                        </until-successful>
+                    </otherwise>
+                </choice>
+            </when>
+            <otherwise>
+                <!-- Update existing contact found by HF ID -->
+                <ee:transform doc:name="Prepare Update for HF ID Match">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+    Id: vars.existingContactByHF[0].Id,
+    FirstName: payload.FirstName[0],
+    LastName: payload.LastName[0],
+    MiddleName: payload.MiddleName[0],
+    Email: payload.Email[0],
+    Phone: payload.Phone[0],
+    MailingState: payload.MailingState[0],
+    MailingPostalCode: payload.MailingPostalCode[0],
+    MailingCity: payload.MailingCity[0],
+    MailingStreet: payload.MailingStreet[0],
+    Patient_Ethnicity__c: payload.Patient_Ethnicity__c[0],
+    Patient_Race__c: payload.Patient_Race__c[0],
+    Patient_Gender_2__c: payload.Patient_Gender_2__c[0],
+    Date_of_Birth__c: payload.Date_of_Birth__c[0]
+}]]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                
+                <salesforce:update type="Contact" doc:name="Update Contact" config-ref="Salesforce_Config" />
+                <logger level="INFO" message="Updated existing contact by HF ID" />
+            </otherwise>
+        </choice>     
+       <ee:transform doc:name="Ensure Serializable Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 {
-status: "ERROR",
-errorMessage: payload.items.message[0],
-statusMessage : payload.items.statusCode[0]
-} ]]></ee:set-payload>
-					</ee:message>
-					<ee:variables >
-						<ee:set-variable variableName="errorMessage" ><![CDATA[%dw 2.0
+    status: if (payload.successful default false) "SUCCESS" else "ERROR",
+    message: if (payload.successful default false) 
+               "Contact operation completed successfully" 
+             else 
+               (payload.items[0].message default "An error occurred"),
+    contactId: if (payload.successful default false)
+                payload.items[0].id
+              else
+                null
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        
+        <error-handler>
+            <on-error-continue type="ANY">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    status: "ERROR",
+    message: error.description default "An error occurred processing contact data",
+    errorType: error.errorType.identifier default "UNKNOWN"
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <logger level="ERROR" message="Contact Update Error: #[error.description]" />
+            </on-error-continue>
+        </error-handler>
+    </try>
+</sub-flow>
+		<sub-flow name="contact-update-response-handler" doc:id="422ea442-5710-47cb-9bac-709dd6d59350">
+	<choice doc:name="Choice">
+		<when expression="#[payload.successful == false]">
+			<ee:transform doc:name="errorDetails">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	status: "ERROR",
+	errorMessage: payload.items.message[0],
+	statusMessage: payload.items.statusCode[0]
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="errorMessage"><![CDATA[%dw 2.0
 output application/json
 ---
 {   
-    "message": "Hello Team This email is to notify you that an error occurred while attempting to Update a Contact in Salesforce",
+    message: "Hello Team This email is to notify you that an error occurred while attempting to Update a Contact in Salesforce",
     "Contact Details": {
-        "contactId": payload.items.id[0],
+        contactId: payload.items.id[0],
         "Date of Birth": vars.sfContactData.Date_of_Birth__c[0],
-        "Email": vars.sfContactData.Email[0],
-        "Phone": vars.sfContactData.Phone[0],
-        "Location": vars.mailLocation,
-        "Contact Full Name": if(vars.sfContactData.FirstName[0] == null) " " else (vars.sfContactData.FirstName[0]) ++ " " ++  if(vars.sfContactData.LastName[0] == null) " " else (vars.sfContactData.LastName[0]) ++ " " ++  if(vars.sfContactData.MiddleName[0] == null) "" else (vars.sfContactData.MiddleName[0])
-    },  
+        Email: vars.sfContactData.Email[0],
+        Phone: vars.sfContactData.Phone[0],
+        Location: vars.mailLocation,
+        "Contact Full Name": 
+            (vars.sfContactData.FirstName[0] default "") ++ " " ++ 
+            (vars.sfContactData.MiddleName[0] default "") ++ " " ++ 
+            (vars.sfContactData.LastName[0] default "")
+    },
     "Error Details": {
-        "statusCode": payload.items.statusCode[0],
-        "errorMessage": payload.items.message[0],
+        statusCode: payload.items.statusCode[0],
+        errorMessage: payload.items.message[0],
         "error Type": error.errorType
     }
-}
-]]></ee:set-variable>
-						<ee:set-variable variableName="subject" ><![CDATA[%dw 2.0
+}]]></ee:set-variable>
+
+					<ee:set-variable variableName="subject"><![CDATA[%dw 2.0
 output application/json
 ---
-"Contact Updation Error" ++ " " ++ vars.sfContactData.FirstName[0]++ " " ++ vars.sfContactData.MiddleName[0] ++ " " ++ vars.sfContactData.LastName[0] default " "]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<ee:transform doc:name="Transform Message" doc:id="5aceb901-f0c3-4a3b-a5d6-779ce1b12971">
-					<ee:message />
-					<ee:variables>
-						<ee:set-variable variableName="errorMesg"><![CDATA[%dw 2.0
+"Contact Updation Error " ++ vars.sfContactData.FirstName[0] ++ " " ++ vars.sfContactData.MiddleName[0] ++ " " ++ vars.sfContactData.LastName[0] default " "]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+
+			<ee:transform doc:name="Transform Message">
+				<ee:message />
+				<ee:variables>
+					<ee:set-variable variableName="errorMesg"><![CDATA[%dw 2.0
 output text/plain
 ---
 "Hello Team,\n\n" ++
 "This email is to notify you that an error occurred while attempting to Update a Contact in Salesforce.\n\n" ++
 "Contact Details:\n" ++
-"Contact ID: " ++ (if (vars.errorMessage["Contact Details"]["contactId"] != null) (vars.errorMessage["Contact Details"]["contactId"] as String) else "N/A") ++ "\n" ++
-"Date of Birth: " ++ (if (vars.errorMessage["Contact Details"]["Date of Birth"] != null) (vars.errorMessage["Contact Details"]["Date of Birth"] as String) else "N/A") ++ "\n" ++
-"Email: " ++ (if (vars.errorMessage["Contact Details"]["Email"] != null) (vars.errorMessage["Contact Details"]["Email"] as String) else "N/A") ++ "\n" ++
-"Phone: " ++ (if (vars.errorMessage["Contact Details"]["Phone"] != null) (vars.errorMessage["Contact Details"]["Phone"] as String) else "N/A") ++ "\n" ++
-"Contact Full Name: " ++ (if (vars.errorMessage["Contact Details"]["Contact Full Name"] != null) (vars.errorMessage["Contact Details"]["Contact Full Name"] as String) else "N/A") ++ "\n\n" ++
+"Contact ID: " ++ (vars.errorMessage."Contact Details".contactId default "N/A") ++ "\n" ++
+"Date of Birth: " ++ (vars.errorMessage."Contact Details"."Date of Birth" default "N/A") ++ "\n" ++
+"Email: " ++ (vars.errorMessage."Contact Details".Email default "N/A") ++ "\n" ++
+"Phone: " ++ (vars.errorMessage."Contact Details".Phone default "N/A") ++ "\n" ++
+"Contact Full Name: " ++ (vars.errorMessage."Contact Details"."Contact Full Name" default "N/A") ++ "\n\n" ++
 "Error Details:\n" ++
-"Status Code: " ++ (if (vars.errorMessage["Error Details"]["statusCode"] != null) (vars.errorMessage["Error Details"]["statusCode"] as String) else "N/A") ++ "\n" ++
-"Error Message: " ++ (if (vars.errorMessage["Error Details"]["errorMessage"] != null) (vars.errorMessage["Error Details"]["errorMessage"] as String) else "N/A") ++ "\n" ++
-"Error Type: " ++ (if (vars.errorMessage["Error Details"]["error Type"] != null) (vars.errorMessage["Error Details"]["error Type"] as String) else "N/A")]]></ee:set-variable>
-						<ee:set-variable variableName="locationAddress" ><![CDATA[%dw 2.0
+"Status Code: " ++ (vars.errorMessage."Error Details".statusCode default "N/A") ++ "\n" ++
+"Error Message: " ++ (vars.errorMessage."Error Details".errorMessage default "N/A") ++ "\n" ++
+"Error Type: " ++ (vars.errorMessage."Error Details"."error Type" default "N/A")]]></ee:set-variable>
+
+					<ee:set-variable variableName="locationAddress"><![CDATA[%dw 2.0
 output application/json
 ---
-if (vars.errorMessage."Contact Details".Location == "FOREST HILLS") p('email.forest.to') else if (vars.errorMessage."Contact Details".Location == "MADISON") p('email.madison.to') else p('email.to') ]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-				<email:send doc:name="sendEmail" doc:id="2927a551-7913-4f45-8f8f-2ede951ec8ae" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
-					<email:to-addresses >
-						<email:to-address value="#[vars.locationAddress]" />
-					</email:to-addresses>
-					<email:body contentType="text/plain" >
-						<email:content ><![CDATA[#[vars.errorMesg]]]></email:content>
-					</email:body>
-				</email:send>
-			</when>
-			<otherwise >
-				<logger level="INFO" doc:name="defaultMessage" doc:id="5887c3c6-4ce7-48a5-bbc7-328bdffe85d5" message="###########No errors##############" />
-				<ee:transform doc:name="successMessage" doc:id="c28fdbf2-bda2-451d-9fce-da200c6d8df5" >
-					<ee:message >
-						<ee:set-payload ><![CDATA[%dw 2.0
+if (vars.errorMessage."Contact Details".Location == "FOREST HILLS") p('email.forest.to')
+else if (vars.errorMessage."Contact Details".Location == "MADISON") p('email.madison.to')
+else p('email.to')]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+
+			<email:send doc:name="sendEmail" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]">
+				<email:to-addresses>
+					<email:to-address value="#[vars.locationAddress]" />
+				</email:to-addresses>
+				<email:body contentType="text/plain">
+					<email:content><![CDATA[#[vars.errorMesg]]]></email:content>
+				</email:body>
+			</email:send>
+		</when>
+
+		<otherwise>
+			<logger level="INFO" doc:name="defaultMessage" message="###########No errors##############" />
+			<ee:transform doc:name="successMessage">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 {
-	"message" : "Contact Updated Successfully" ,
-	"status" : "SUCCESS"
+	message: "Contact Updated Successfully",
+	status: "SUCCESS"
 }]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</otherwise>
-		</choice>
-	</sub-flow>
-	<!-- [STUDIO:"viva-ng-sf-inbound-papi-reprocessing-flow"]<flow name="viva-ng-sf-inbound-papi-reprocessing-flow" doc:id="8851d4b9-9a0d-41d4-843e-31463849bd9c" >
-		<scheduler doc:name="scheduler runs every 5 mins" doc:id="4b3b9ccd-456f-44b1-9213-e6d51f97125b" >
-			<scheduling-strategy >
-				<fixed-frequency frequency="5" timeUnit="MINUTES"/>
-			</scheduling-strategy>
-		</scheduler>
-		<vm:listener queueName="nextgenqueue" doc:name="Listener" doc:id="0fc1b13e-3d62-4cae-939d-57bc1013606f" config-ref="VM_Config" numberOfConsumers="1" timeout="60"/>
-		<try doc:name="Try" doc:id="4490a2a2-415c-4dcf-aee6-5213ddf9a122" >
-			<vm:consume doc:name="Consume" doc:id="5622407a-6bc6-47a5-b2d2-1e07a97229eb" config-ref="VM_Config" queueName="nextgenqueue" timeoutUnit="MINUTES"/>
-			<error-handler >
-				<on-error-continue enableNotifications="false" logException="false" doc:name="On Error Continue" doc:id="6157103b-17fc-47e6-982e-54d15179a56a" type="VM:EMPTY_QUEUE">
-				</on-error-continue>
-			</error-handler>
-		</try>
-		<choice doc:name="Choice" doc:id="0d24dc04-0df4-4b59-98d3-d0b29ea870b2">
-			<when expression="#[!isEmpty(payload)&#93;">
-				<ee:transform doc:name="Transform Message" doc:id="d3287a03-a597-4e88-9038-5013c7d75651">
-			<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
-output text/plain
-&#45;&#45;-
-payload&#93;&#93;></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-				<flow-ref doc:name="Flow Reference" doc:id="97f19f98-e1d1-49cc-beea-b28409a3c3bf" name="nextgen-sf-papi-impl" />
-			</when>
-		</choice>
-		<error-handler ref="error-handler" />
-	</flow> [STUDIO] -->
+				</ee:message>
+			</ee:transform>
+		</otherwise>
+	</choice>
+</sub-flow>
 </mule>

@@ -157,15 +157,15 @@ sizeOf(payload)]]></ee:set-variable>
             ]]></salesforce:salesforce-query>
         </salesforce:query>
 
-        <ee:transform doc:name="Format Provider Mapping">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
+<ee:transform doc:name="Format Provider Mapping">
+    <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 payload map {
     providerId: $.Id,
     Provider_for_Appointment__c: $.NextGen_Provider_for_Appointment__c 
-                                  default $.Name,
+                              default $.Name,
     First_Name: $.NextGen_First_Name__c 
                 default $.RelatedRecord.FirstName 
                 default "",
@@ -174,14 +174,10 @@ payload map {
                default $.Name,
     NPI: $.NPI__c default ""
 }]]></ee:set-payload>
-            </ee:message>
-            <ee:variables>
-                <ee:set-variable variableName="mappingCount"><![CDATA[%dw 2.0
-output application/java
----
-sizeOf(payload)]]></ee:set-variable>
-            </ee:variables>
-        </ee:transform>
+    </ee:message>
+    <ee:variables>        
+    </ee:variables>
+</ee:transform>
 <!-- Store final list in OSv2 under "ProviderMapping" -->
 
 <os:store doc:name="Store ProviderMapping" doc:id="9a0035d0-4ba4-4fc2-8576-12ef676dc59b" key="ProviderMapping" objectStore="MappingsObjectStore"/>
