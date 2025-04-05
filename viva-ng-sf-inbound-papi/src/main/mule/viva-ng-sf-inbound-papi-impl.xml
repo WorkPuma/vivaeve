@@ -368,13 +368,9 @@ stripPhone(vars.sfContactData.Phone[0])
             FROM Contact 
             WHERE HealthFusion_Patient_Record_ID__c = :hfId
         ]]></salesforce:salesforce-query>
-        <salesforce:parameters><![CDATA[
-#[output application/java
----
-{
-    "hfId": vars.sfContactData.HealthFusion_Patient_Record_ID__c[0] as String
-}]
-]]></salesforce:parameters>
+        <salesforce:parameters><![CDATA[#[{
+    "hfId": vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
+}]]]></salesforce:parameters>
     </salesforce:query>
     
     <!-- Process based on query results -->
@@ -949,14 +945,16 @@ output application/java
 payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
                         <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
 output application/java
-var pid = payload.Data.SIU_S14.PATIENT.PID
 ---
-// Try different PID fields in order of preference
-((pid."PID-04"[0]."CX-01")[0] default 
- (pid."PID-04"."CX-01"[0])[0] default
- (pid."PID-4"."CX-01"[0])[0] default
- (pid."PID-02"."CX-01")[0] default
- "HF" ++ ((pid."PID-03"[0]."CX-01")[0] default "")) as String
+// Handle the nested array structure properly
+if (payload.Data.SIU_S14.PATIENT.PID."PID-04" != null)
+    // First try standard path with proper array navigation
+    (flatten(payload.Data.SIU_S14.PATIENT.PID."PID-04")."CX-01"[0]) default
+    // Fall back to original HF ID prefix method with PID-03
+    ("HF" ++ (flatten(payload.Data.SIU_S14.PATIENT.PID."PID-03")."CX-01"[0] default ""))
+else
+    // Set a default value if both are null
+    "UNKNOWN_PATIENT_ID"
 ]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
@@ -1590,23 +1588,22 @@ output application/json
 	</sub-flow> [STUDIO] -->
 	<sub-flow name="salesforce_query_Sub_Flow" doc:id="2ca016e9-9df9-4cd4-a38a-5d9875448e5e">
     <!-- 1. Primary: HealthFusion Patient Record ID Lookup -->
-    <salesforce:query doc:name="Query by HealthFusion ID" doc:id="d9930eb6-4a4f-415f-b6ee-992a6c083de2"
-                      config-ref="Salesforce_Config"
-                      target="queryResponse">
-        <salesforce:salesforce-query>
-            <![CDATA[
-                SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c
-                FROM Contact
-                WHERE HealthFusion_Patient_Record_ID__c = :hfId
-            ]]>
-        </salesforce:salesforce-query>
-        <salesforce:parameters>
-            <![CDATA[#[{
-                "hfId": vars.hfId as String
-            }]]]>
-        </salesforce:parameters>
-    </salesforce:query>
-    <logger level="INFO" message="HealthFusion ID for query: #[%dw 2.0 output application/json --- {'value': vars.hfId, 'type': typeOf(vars.hfId), 'asString': vars.hfId as String}]" />
+    <salesforce:query doc:name="Query by HealthFusion ID" config-ref="Salesforce_Config" target="queryResponse">
+    <salesforce:salesforce-query>
+        <![CDATA[
+        SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c
+        FROM Contact
+        WHERE HealthFusion_Patient_Record_ID__c = :hfId
+        ]]>
+    </salesforce:salesforce-query>
+    <salesforce:parameters>
+        <![CDATA[#[{
+            "hfId": "'" ++ vars.hfId ++ "'"
+        }]]]>
+    </salesforce:parameters>
+</salesforce:query>
+    <logger level="INFO" message="Extracted HealthFusion ID: #[vars.hfId]" />
+    <logger level="INFO" message="SOQL parameter value: #[%dw 2.0 output application/json --- {hfId: vars.hfId as String}]" />
     <logger level="INFO" message="Executing Salesforce query with hfId: #[vars.hfId]" />
     <logger level="INFO" doc:name="SF Contact Response" doc:id="sf-contact-log" message="SF Contact Query for hfId: #[vars.hfId] returned count: #[sizeOf(vars.queryResponse)], hasData: #[!isEmpty(vars.queryResponse)]" />
     
@@ -1985,7 +1982,7 @@ output application/json
                     <ee:variables>
                         <ee:set-variable variableName="normalizedPhone"><![CDATA[%dw 2.0
 output application/java
-fun stripPhone(num) = if (num == null) null else num replace /[^\d]/ with ""
+fun stripPhone(num) = if (num == null) null else num replace /[^0-9]/ with ""
 ---
 stripPhone(payload.Phone[0])
 ]]></ee:set-variable>
@@ -2270,7 +2267,7 @@ output application/json
 		<ee:variables>
 			<ee:set-variable variableName="normalizedPhone"><![CDATA[%dw 2.0
 output application/java
-fun stripPhone(num) = if (num == null) null else num replace /[^\d]/ with ""
+fun stripPhone(num) = if (num == null) null else num replace /[^0-9]/ with ""
 ---
 stripPhone(vars.sfContactData.Phone[0])
 ]]></ee:set-variable>
