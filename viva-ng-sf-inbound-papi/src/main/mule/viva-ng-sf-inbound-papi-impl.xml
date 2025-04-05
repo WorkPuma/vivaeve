@@ -652,8 +652,10 @@ output application/java
 
      "Status": if(payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01" == "Booked") ("Scheduled") else if (payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01" == "NEW") ("Scheduled") else (payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01"),
      "AdditionalInformation": vars.appointmentType,
+     "ContactId": vars.queryResponse[0].Id,
        "ServiceTerritoryId": vars.locationId,
         "Service_Resource__c": vars.providerExtract,
+        "Provider__c": vars.providerExtract,  // Custom field to store the ServiceResource ID directly
 //        "HealthFusion_Patient_Record_ID__c":flatten(payload.Data.SIU_S12.PATIENT.PID."PID-04")."CX-01"[0]
        
 //        "Opportunity__c": vars.opportunity_c.Opportunity__c
@@ -671,6 +673,10 @@ output application/java
 output application/json
 ---
 vars.appRes.items.id[0]]]></ee:set-variable>
+                    <ee:set-variable variableName="serviceId"><![CDATA[%dw 2.0
+output application/json
+---
+vars.providerExtract]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
             <ee:transform doc:name="requiredPayloadForUpdation" doc:id="d79565b3-4206-4b4b-b328-6b931bb62b28">
@@ -684,8 +690,8 @@ output application/java
 }]]]></ee:set-payload>
                 </ee:message>
             </ee:transform>
-            <logger level="INFO" doc:name="Logger" doc:id="90a9a923-0e05-4d8f-a419-d322b91fecc3" message="UPDATING THE RESOURCEID TO THE ASSIGNED RESOURCE" />
-            <flow-ref doc:name="flow Call To Update the Appointment" doc:id="c119ca2b-c44b-4921-bf86-79f43a8281a8" name="appointment-update-Sub_Flow" />
+            <logger level="INFO" doc:name="Logger" doc:id="90a9a923-0e05-4d8f-a419-d322b91fecc3" message="CREATING ASSIGNED RESOURCE FOR THE APPOINTMENT" />
+            <flow-ref doc:name="Create AssignedResource" doc:id="create-assigned-resource-ref" name="create-assigned-resource-subflow" />
         </when>
 
         <!--  ========== SIU^S13 ========== -->
@@ -771,10 +777,12 @@ output application/java
      "NextGen_ID__c":payload.Data.SIU_S13.SCH."SCH-02"."EI-01",
     "Status": if(payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01" == "Rescheduled") ("Rescheduled by Provider") else (payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01"),
     "AdditionalInformation": vars.appointmentType,
+    "ContactId": vars.queryResponse[0].Id,
     "DurationType":  if(payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S13.SCH."SCH-10"."CE-01"),
 	
 //  "ServiceTerritoryId":  flatten(payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
       "Service_Resource__c": vars.providerExtract,
+      "Provider__c": vars.providerExtract,
       "ServiceTerritoryId": vars.locationId,
        "ActualDuration" : vars.duration,
        "AppointmentType ": vars.apType,
@@ -806,10 +814,12 @@ output application/java
      "NextGen_ID__c":payload.Data.SIU_S13.SCH."SCH-02"."EI-01"[0 to 14],
     "Status": if(payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01" == "Rescheduled") ("Rescheduled by Provider") else (payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01"),
     "AdditionalInformation": vars.appointmentType,
+    "ContactId": vars.queryResponse[0].Id,
     "DurationType":  if(payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S13.SCH."SCH-10"."CE-01"),
 	
 //  "ServiceTerritoryId":  flatten(payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
       "Service_Resource__c": vars.providerExtract,
+      "Provider__c": vars.providerExtract,
       "ServiceTerritoryId": vars.locationId,
        "ActualDuration" : vars.duration,
        "AppointmentType ": vars.apType,
@@ -840,10 +850,12 @@ output application/java
      "Id": vars.accResponse.Id[0],
     "Status": if(payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01" == "Rescheduled") ("Rescheduled by Provider") else (payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01"),
     "AdditionalInformation": vars.appointmentType,
+    "ContactId": vars.queryResponse[0].Id,
     "DurationType":  if(payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S13.SCH."SCH-10"."CE-01"),
 	
 //  "ServiceTerritoryId":  flatten(payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
       "Service_Resource__c": vars.providerExtract,
+      "Provider__c": vars.providerExtract,
       "ServiceTerritoryId": vars.locationId,
        "ActualDuration" : vars.duration,
        "AppointmentType ": vars.apType,
@@ -863,6 +875,21 @@ output application/java
                 <otherwise>
                     <logger level="INFO" doc:name="Logger" doc:id="359b54ce-0c57-4415-bc3b-040aa3b31aa3" message="NEXTGEN ID EXISTS" />
                     <flow-ref doc:name="callToUpdateAppointment" doc:id="66bf8695-56da-485d-8570-80ada65260ff" name="common-sf-appointment-upsert-flow" />
+<ee:transform doc:name="fetchingAppointmentId">
+    <ee:message></ee:message>
+    <ee:variables>
+        <ee:set-variable variableName="appointmentId"><![CDATA[%dw 2.0
+output application/json
+---
+vars.appRes.items.id[0]]]></ee:set-variable>
+        <ee:set-variable variableName="serviceId"><![CDATA[%dw 2.0
+output application/json
+---
+vars.providerExtract]]></ee:set-variable>
+    </ee:variables>
+</ee:transform>
+<logger level="INFO" doc:name="Logger" message="CREATING ASSIGNED RESOURCE FOR THE APPOINTMENT" />
+<flow-ref doc:name="Create AssignedResource" name="create-assigned-resource-subflow" />
                 </otherwise>
             </choice>
         </when>
@@ -908,17 +935,22 @@ var appType = vars.WorkTypeMapping
 output application/json
 var provider = vars.ProviderMapping
 ---
-(provider filter ($.NPI == flatten(payload.Data.SIU_S14.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
-                    <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
+(provider filter ($.NPI == flatten(payload.Data.SIU_S14.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].providerId
+]]></ee:set-variable>
+
+<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
 var location = vars.TerritoryMapping
 ---
-(location filter ($.LOCATION == payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
-                    <ee:set-variable variableName="duration"><![CDATA[%dw 2.0
+(location filter ($.LOCATION == payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]
+]]></ee:set-variable>
+
+<ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
-(appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].duration]]></ee:set-variable>
+(appType filter ($.NextGenField == payload.Data.SIU_S14.SCH."SCH-08"."CE_0277-01"))[0].duration
+]]></ee:set-variable>
                     <ee:set-variable variableName="apType"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
@@ -995,10 +1027,12 @@ output application/java
                  else
                    null,
     "AdditionalInformation": vars.appointmentType,
+    "ContactId": vars.queryResponse[0].Id,
     "DurationType": if(payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S14.SCH."SCH-10"."CE-01"),
 	
 //    "ServiceTerritoryId": flatten(payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
         "Service_Resource__c": vars.providerExtract,
+        "Provider__c": vars.providerExtract,
         "ServiceTerritoryId": vars.locationId,
         "ActualDuration" : vars.duration,
          "AppointmentType": vars.apType,
@@ -1042,10 +1076,12 @@ output application/java
                  else
                    null,
     "AdditionalInformation": vars.appointmentType,
+    "ContactId": vars.queryResponse[0].Id,
     "DurationType": if(payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S14.SCH."SCH-10"."CE-01"),
 	
 //    "ServiceTerritoryId": flatten(payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
         "Service_Resource__c": vars.providerExtract,
+        "Provider__c": vars.providerExtract,
         "ServiceTerritoryId": vars.locationId,
         "ActualDuration" : vars.duration,
          "AppointmentType": vars.apType,
@@ -1075,10 +1111,12 @@ output application/java
     "Id": vars.accResponse.Id[0],
 	"Status": if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01" == "CHECKED IN")("Checked In")  else if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"=="CHECKED OUT")("Checked Out") else (payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"),
     "AdditionalInformation": vars.appointmentType,
+    "ContactId": vars.queryResponse[0].Id,
     "DurationType": if(payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S14.SCH."SCH-10"."CE-01"),
 	
 //    "ServiceTerritoryId": flatten(payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
         "Service_Resource__c": vars.providerExtract,
+        "Provider__c": vars.providerExtract,
         "ServiceTerritoryId": vars.locationId,
         "ActualDuration" : vars.duration,
          "AppointmentType": vars.apType,
@@ -1096,6 +1134,21 @@ output application/java
                 <otherwise>
                     <logger level="INFO" doc:name="Logger" doc:id="5bf1949a-546d-4af2-aca6-43e0197db89b" message="NEXTGEN ID EXISTS" />
                     <flow-ref doc:name="callToUpdateAppointment" doc:id="c53f3321-a2b9-45c5-9199-6745309b1615" name="common-sf-appointment-upsert-flow" />
+<ee:transform doc:name="fetchingAppointmentId">
+    <ee:message></ee:message>
+    <ee:variables>
+        <ee:set-variable variableName="appointmentId"><![CDATA[%dw 2.0
+output application/json
+---
+vars.appRes.items.id[0]]]></ee:set-variable>
+        <ee:set-variable variableName="serviceId"><![CDATA[%dw 2.0
+output application/json
+---
+vars.providerExtract]]></ee:set-variable>
+    </ee:variables>
+</ee:transform>
+<logger level="INFO" doc:name="Logger" message="CREATING ASSIGNED RESOURCE FOR THE APPOINTMENT" />
+<flow-ref doc:name="Create AssignedResource" name="create-assigned-resource-subflow" />
                 </otherwise>
             </choice>
         </when>
@@ -1192,8 +1245,10 @@ output application/java
                  else
                    null,
     "AdditionalInformation": vars.appointmentType,
+    "ContactId": vars.queryResponse[0].Id,
 //	"ServiceTerritoryId": flatten(payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],  
         "Service_Resource__c": vars.providerExtract,
+        "Provider__c": vars.providerExtract,
         "ServiceTerritoryId": vars.locationId,
          "AppointmentType": vars.apType,
      "WorkTypeId" : vars.workTypeId,
@@ -1226,6 +1281,7 @@ output application/java
     "DurationType": payload.Data.SIU_S15.SCH."SCH-10"."CE-01",
 	"Status": if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "CANCELLED") ("Cancelled by Provider") else if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "NO SHOW") ("No Show") else  (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01") ,
     "AdditionalInformation": vars.appointmentType,
+    "ContactId": vars.queryResponse[0].Id,
     "ParentRecordId": if (isEmpty(vars.queryResponse)) 
                    null 
                  else if (vars.queryResponse[0].AccountId != null)
@@ -1236,6 +1292,7 @@ output application/java
                    null,
 //	"ServiceTerritoryId": flatten(payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],  
         "Service_Resource__c": vars.providerExtract,
+        "Provider__c": vars.providerExtract,
         "ServiceTerritoryId": vars.locationId,
          "AppointmentType": vars.apType,
      "WorkTypeId" : vars.workTypeId,
@@ -1267,8 +1324,10 @@ output application/java
     "DurationType": payload.Data.SIU_S15.SCH."SCH-10"."CE-01",
 	"Status": if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "CANCELLED") ("Cancelled by Provider") else if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "NO SHOW") ("No Show") else  (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01") ,
     "AdditionalInformation": vars.appointmentType,
+    "ContactId": vars.queryResponse[0].Id,
 //	"ServiceTerritoryId": flatten(payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],  
         "Service_Resource__c": vars.providerExtract,
+        "Provider__c": vars.providerExtract,
         "ServiceTerritoryId": vars.locationId,
          "AppointmentType": vars.apType,
      "WorkTypeId" : vars.workTypeId,
@@ -1288,6 +1347,21 @@ output application/java
                 <otherwise>
                     <logger level="INFO" doc:name="Logger" doc:id="c2895300-35d2-454b-a1ae-97a48b7f4ecc" message="NEXTGEN ID EXISTS" />
                     <flow-ref doc:name="callToUpdateAppointment" doc:id="bcff5c92-9c07-4e03-92c7-2331342bc657" name="common-sf-appointment-upsert-flow" />
+<ee:transform doc:name="fetchingAppointmentId">
+    <ee:message></ee:message>
+    <ee:variables>
+        <ee:set-variable variableName="appointmentId"><![CDATA[%dw 2.0
+output application/json
+---
+vars.appRes.items.id[0]]]></ee:set-variable>
+        <ee:set-variable variableName="serviceId"><![CDATA[%dw 2.0
+output application/json
+---
+vars.providerExtract]]></ee:set-variable>
+    </ee:variables>
+</ee:transform>
+<logger level="INFO" doc:name="Logger" message="CREATING ASSIGNED RESOURCE FOR THE APPOINTMENT" />
+<flow-ref doc:name="Create AssignedResource" name="create-assigned-resource-subflow" />
                 </otherwise>
             </choice>
         </when>
@@ -1586,7 +1660,7 @@ output application/json
 		</until-successful>
 		<logger level="INFO" doc:name="Logger" doc:id="b558f2e6-0f4d-4d02-b742-8c6de91425bf" message="#[%dw 2.0&#10;output application/json&#10;&#45;&#45;-&#10;payload&#93;" />
 	</sub-flow> [STUDIO] -->
-	<sub-flow name="salesforce_query_Sub_Flow" doc:id="2ca016e9-9df9-4cd4-a38a-5d9875448e5e">
+	<sub-flow name="salesforce_query_Sub_Flow" doc:id="f6553b00-d83a-464e-b7e0-fae8e95457a3">
     <!-- 1. Primary: HealthFusion Patient Record ID Lookup -->
     <salesforce:query doc:name="Query by HealthFusion ID" config-ref="Salesforce_Config" target="queryResponse">
     <salesforce:salesforce-query>
@@ -1605,13 +1679,14 @@ output application/json
     <logger level="INFO" message="Extracted HealthFusion ID: #[vars.hfId]" />
     <logger level="INFO" message="SOQL parameter value: #[%dw 2.0 output application/json --- {hfId: vars.hfId as String}]" />
     <logger level="INFO" message="Executing Salesforce query with hfId: #[vars.hfId]" />
-    <logger level="INFO" doc:name="SF Contact Response" doc:id="sf-contact-log" message="SF Contact Query for hfId: #[vars.hfId] returned count: #[sizeOf(vars.queryResponse)], hasData: #[!isEmpty(vars.queryResponse)]" />
+    <logger level="INFO" doc:name="SF Contact Response" doc:id="9bf97d32-ff04-4bc3-9399-d2ce4fe1cffd" message="SF Contact Query for hfId: #[vars.hfId] returned count: #[sizeOf(vars.queryResponse)], hasData: #[!isEmpty(vars.queryResponse)]" />
     
     <!-- 2. Fallback if HealthFusion ID lookup fails -->
     <choice doc:name="Contact Found?">
         <when expression="#[isEmpty(vars.queryResponse)]">
-            <logger level="ERROR" message="Contact not found by HealthFusion ID: #[vars.hfId]. Cannot proceed without Contact record." />
-            <!-- No fallback implementation yet -->
+            <logger level="INFO" message="Contact not found by HealthFusion ID: #[vars.hfId]. Attempting lookup by other identifiers." />
+            <!-- Call the existing fallback implementation -->
+            <flow-ref name="contact-lookup-by-identifiers" doc:name="Fallback Lookup by Identifiers" />
         </when>
         <otherwise>
             <!-- Proceed with found contact -->
@@ -1955,6 +2030,51 @@ output application/json
 			</otherwise>
 		</choice>
 	</sub-flow>
+		
+<sub-flow name="create-assigned-resource-subflow" doc:id="create-assigned-resource-id">
+    <logger level="INFO" doc:name="Logger" message="Creating AssignedResource for ServiceAppointment: #[vars.appointmentId] and ServiceResource: #[vars.serviceId]" />
+    
+    <try>
+        <ee:transform doc:name="Prepare AssignedResource">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+    "ServiceAppointmentId": vars.appointmentId,
+    "ServiceResourceId": vars.serviceId
+}]]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        
+        <salesforce:create doc:name="Create AssignedResource" doc:id="create-assigned-resource" config-ref="Salesforce_Config" type="AssignedResource">
+            <salesforce:records><![CDATA[#[payload]]]></salesforce:records>
+        </salesforce:create>
+        
+        <logger level="INFO" doc:name="Success Logger" message="Successfully created AssignedResource: #[payload]" />
+        
+        <error-handler>
+            <on-error-continue type="ANY">
+                <logger level="ERROR" doc:name="Error Logger" message="Failed to create AssignedResource: #[error.description]" />
+                
+                <ee:transform doc:name="Error Response">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "status": "ERROR",
+    "message": "Failed to associate provider with appointment: " ++ (error.description default "Unknown error"),
+    "appointmentId": vars.appointmentId,
+    "providerId": vars.serviceId
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+            </on-error-continue>
+        </error-handler>
+    </try>
+</sub-flow>
+
 <sub-flow name="contact-update-hfchartnumber-subflow" doc:id="982cd180-985c-4701-892d-9bb7cd740f2c">
     <logger level="INFO" doc:name="beforeInsert" message="##########Before Salesforce Upsert###################" />
     
@@ -2299,17 +2419,17 @@ LIMIT 1
 			<!-- Create new Account and Contact -->
 			<logger level="INFO" message="Contact not found by identifiers. Will create new Account and Contact." />
 			<ee:transform doc:name="Account Creation">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
+    <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
 [{
-"Name": vars.sfContactData.LastName[0] default "" + " Family",
+"Name": (vars.sfContactData.FirstName[0] default "") ++ " " ++ (vars.sfContactData.LastName[0] default ""),
 "Type": "Patient",
 "RecordTypeId": p('sf.account.recordtypeid')
 }]]]></ee:set-payload>
-				</ee:message>
-			</ee:transform>
+    </ee:message>
+</ee:transform>
 			<salesforce:create doc:name="Create Account" config-ref="Salesforce_Config" type="Account" target="accountResponse" />
 			<logger level="INFO" message="Account created: #[vars.accountResponse]" />
 			
