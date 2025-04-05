@@ -241,6 +241,7 @@ output application/java
            LastName: vars.sfContactData.LastName[0],
            Email: vars.sfContactData.Email[0],
            Phone: vars.sfContactData.Phone[0],
+           PhoneNumberFormatted__c: vars.sfContactData.Phone[0] replace /[^0-9]/ with "",
            MailingState: vars.sfContactData.MailingState[0],
            MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
            MailingCity: vars.sfContactData.MailingCity[0],
@@ -276,6 +277,7 @@ output application/java
                LastName: vars.sfContactData.LastName[0],
                Email: vars.sfContactData.Email[0],
                Phone: vars.sfContactData.Phone[0],
+               PhoneNumberFormatted__c: vars.sfContactData.Phone[0] replace /[^0-9]/ with "",
                MailingState: vars.sfContactData.MailingState[0],
                MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
                MailingCity: vars.sfContactData.MailingCity[0],
@@ -369,7 +371,7 @@ stripPhone(vars.sfContactData.Phone[0])
             WHERE HealthFusion_Patient_Record_ID__c = :hfId
         ]]></salesforce:salesforce-query>
         <salesforce:parameters><![CDATA[#[{
-    "hfId": vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
+    hfId: vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
 }]]]></salesforce:parameters>
     </salesforce:query>
     
@@ -378,22 +380,55 @@ stripPhone(vars.sfContactData.Phone[0])
         <choice doc:name="Found by HF ID?" doc:id="fcb84039-d730-4226-b01b-27300a32b6de">
             <when expression="#[isEmpty(vars.contactByHfId)]">
                 <!-- Not found by HF ID, try other identifiers -->
+                <!-- Normalize phone number -->
+                <ee:transform doc:name="Normalize Phone">
+                    <ee:message />
+                    <ee:variables>
+                        <ee:set-variable variableName="normalizedPhone"><![CDATA[%dw 2.0
+output application/java
+fun stripPhone(num) = if (num == null) null else num replace /[^0-9]/ with ""
+---
+stripPhone(vars.sfContactData[0].Phone)
+]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+
+                <!-- Add enhanced logging -->
+                <logger level="INFO" message="Attempting contact match with: Name=#[vars.sfContactData[0].FirstName] #[vars.sfContactData[0].LastName], Phone=#[vars.sfContactData[0].Phone], NormalizedPhone=#[vars.normalizedPhone]" />
+                <!-- Prepare Query Parameters -->
+                <ee:transform doc:name="Prepare Contact Query Parameters">
+                    <ee:message />
+                    <ee:variables>
+                        <ee:set-variable variableName="contactQueryParams"><![CDATA[%dw 2.0
+output application/java
+
+// Helper functions for null-safe string operations
+fun safeUpper(s) = if (s == null) "" else upper(s)
+fun safeLower(s) = if (s == null) "" else lower(s)
+
+---
+{
+    firstName: safeUpper(vars.sfContactData[0].FirstName),
+    lastName: safeUpper(vars.sfContactData[0].LastName),
+    email: safeLower(vars.sfContactData[0].Email),
+    phone: vars.normalizedPhone default "",
+    dob: vars.sfContactData[0].Date_of_Birth__c
+}]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+
                 <salesforce:query doc:name="Query by Name and Other Fields" doc:id="d141630a-4738-41af-8a02-4c421c977d98" config-ref="Salesforce_Config" target="contactByOtherFields">
                     <salesforce:salesforce-query><![CDATA[
-                        SELECT Id, AccountId, FirstName, LastName, Email, Phone, Date_of_Birth__c
+                        SELECT Id, AccountId, FirstName, LastName, Email, Phone, PhoneNumberFormatted__c, Date_of_Birth__c
                         FROM Contact 
-                        WHERE FirstName = :firstName 
+                        WHERE FirstName = :firstName
                         AND LastName = :lastName
-                        AND (Email = :email OR Phone = :phone OR Date_of_Birth__c = :dob)
+                        AND (Email = :email 
+                             OR PhoneNumberFormatted__c = :phone 
+                             OR Date_of_Birth__c = :dob)
                         LIMIT 1
                     ]]></salesforce:salesforce-query>
-                    <salesforce:parameters><![CDATA[#[{
-    "firstName": vars.sfContactData.FirstName[0],
-    "lastName": vars.sfContactData.LastName[0],
-    "email": vars.sfContactData.Email[0],
-    "phone": vars.unformattedPhone default vars.sfContactData.Phone[0],
-    "dob": vars.sfContactData.Date_of_Birth__c[0]
-}]]]></salesforce:parameters>
+                    <salesforce:parameters><![CDATA[#[vars.contactQueryParams]]]></salesforce:parameters>
                 </salesforce:query>
                 
                 <choice doc:name="Found by Other Fields?">
@@ -406,12 +441,13 @@ output application/java
 ---
 [{
     Id: vars.contactByOtherFields[0].Id,
-    HealthFusion_Patient_Record_ID__c: vars.sfContactData.HealthFusion_Patient_Record_ID__c[0],
+    HealthFusion_Patient_Record_ID__c: payload.Data.ADT_A08.PID."PID-04"."CX-01"[0],
     FirstName: vars.sfContactData.FirstName[0],
     LastName: vars.sfContactData.LastName[0],
     MiddleName: vars.sfContactData.MiddleName[0],
     Email: vars.sfContactData.Email[0],
     Phone: vars.sfContactData.Phone[0],
+    PhoneNumberFormatted__c: if (vars.normalizedPhone != null) vars.normalizedPhone else (vars.sfContactData.Phone[0] replace /[^0-9]/ with ""),
     MailingState: vars.sfContactData.MailingState[0],
     MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
     MailingCity: vars.sfContactData.MailingCity[0],
@@ -420,7 +456,8 @@ output application/java
     Patient_Race__c: vars.sfContactData.Patient_Race__c[0],
     Patient_Gender_2__c: vars.sfContactData.Patient_Gender_2__c[0],
     Date_of_Birth__c: vars.sfContactData.Date_of_Birth__c[0]
-}]]]></ee:set-payload>
+}]
+]]></ee:set-payload>
                             </ee:message>
                             <ee:variables>
                                 <ee:set-variable variableName="accountId"><![CDATA[%dw 2.0
@@ -450,6 +487,7 @@ output application/java
     MiddleName: vars.sfContactData.MiddleName[0],
     Email: vars.sfContactData.Email[0],
     Phone: vars.sfContactData.Phone[0],
+    PhoneNumberFormatted__c: if (vars.normalizedPhone != null) vars.normalizedPhone else (vars.sfContactData.Phone[0] replace /[^0-9]/ with ""),
     MailingState: vars.sfContactData.MailingState[0],
     MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
     MailingCity: vars.sfContactData.MailingCity[0],
@@ -462,8 +500,19 @@ output application/java
                             </ee:message>
                         </ee:transform>
                         
-                        <salesforce:create type="Contact" doc:name="Create New Contact" config-ref="Salesforce_Config" />
+                        <salesforce:create type="Contact" doc:name="Create New Contact" config-ref="Salesforce_Config" target="contactResponse" />
                         <logger level="INFO" message="Created new contact"/>
+                        <ee:transform doc:name="Set queryResponse with new IDs">
+                            <ee:variables>
+                                <ee:set-variable variableName="queryResponse"><![CDATA[%dw 2.0
+output application/java
+---
+[{
+    AccountId: vars.accountResponse.items.id[0],
+    Id: vars.contactResponse.items.id[0]
+}]]]></ee:set-variable>
+                            </ee:variables>
+                        </ee:transform>
                     </otherwise>
                 </choice>
             </when>
@@ -481,6 +530,7 @@ output application/java
     MiddleName: vars.sfContactData.MiddleName[0],
     Email: vars.sfContactData.Email[0],
     Phone: vars.sfContactData.Phone[0],
+    PhoneNumberFormatted__c: if (vars.normalizedPhone != null) vars.normalizedPhone else (vars.sfContactData.Phone[0] replace /[^0-9]/ with ""),
     MailingState: vars.sfContactData.MailingState[0],
     MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
     MailingCity: vars.sfContactData.MailingCity[0],
@@ -620,11 +670,11 @@ output application/java
 
 [{
   //  "LastModifiedDate" : payload.LastModifiedDate[0],   
-    "ActualStartTime": (payload.Data.SIU_S12.SCH."SCH-11"."TQ-04"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-    "SchedStartTime" : (payload.Data.SIU_S12.SCH."SCH-11"."TQ-04"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-   "ActualEndTime" : (payload.Data.SIU_S12.SCH."SCH-11"."TQ-05"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+    "ActualStartTime": safeDateTime(payload.Data.SIU_S12.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+    "SchedStartTime": safeDateTime(payload.Data.SIU_S12.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+   "ActualEndTime": safeDateTime(payload.Data.SIU_S12.SCH."SCH-11"."TQ-05"."TS-01"[0]),
 //     "Name": payload.Data.SIU_S12.SCH."SCH-06"."CE-01",
-     "SchedEndTime": (payload.Data.SIU_S12.SCH."SCH-11"."TQ-05"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "SchedEndTime": safeDateTime(payload.Data.SIU_S12.SCH."SCH-11"."TQ-05"."TS-01"[0]),
      "NextGen_ID__c": payload.Data.SIU_S12.SCH."SCH-02"."EI-01",
      
      "ParentRecordId": if (isEmpty(vars.queryResponse)) 
@@ -652,7 +702,7 @@ output application/java
 
      "Status": if(payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01" == "Booked") ("Scheduled") else if (payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01" == "NEW") ("Scheduled") else (payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01"),
      "AdditionalInformation": vars.appointmentType,
-     "ContactId": vars.queryResponse[0].Id,
+     "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
        "ServiceTerritoryId": vars.locationId,
         "Service_Resource__c": vars.providerExtract,
         "Provider__c": vars.providerExtract,  // Custom field to store the ServiceResource ID directly
@@ -770,14 +820,14 @@ output application/java
 ---
 [{
   //  "LastModifiedDate" : payload.LastModifiedDate[0],
-     "ActualStartTime":(payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-     "SchedEndTime": (payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "ActualStartTime": safeDateTime(payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+     "SchedEndTime": safeDateTime(payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]),
      "SchedStartTime": (payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0]   ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
       "ActualEndTime" : (payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
      "NextGen_ID__c":payload.Data.SIU_S13.SCH."SCH-02"."EI-01",
     "Status": if(payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01" == "Rescheduled") ("Rescheduled by Provider") else (payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01"),
     "AdditionalInformation": vars.appointmentType,
-    "ContactId": vars.queryResponse[0].Id,
+    "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
     "DurationType":  if(payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S13.SCH."SCH-10"."CE-01"),
 	
 //  "ServiceTerritoryId":  flatten(payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
@@ -807,14 +857,14 @@ output application/java
 ---
 [{
   //  "LastModifiedDate" : payload.LastModifiedDate[0],
-     "ActualStartTime":(payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-     "SchedEndTime": (payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "ActualStartTime": safeDateTime(payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+     "SchedEndTime": safeDateTime(payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]),
      "SchedStartTime": (payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0]   ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
       "ActualEndTime" : (payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
      "NextGen_ID__c":payload.Data.SIU_S13.SCH."SCH-02"."EI-01"[0 to 14],
     "Status": if(payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01" == "Rescheduled") ("Rescheduled by Provider") else (payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01"),
     "AdditionalInformation": vars.appointmentType,
-    "ContactId": vars.queryResponse[0].Id,
+    "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
     "DurationType":  if(payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S13.SCH."SCH-10"."CE-01"),
 	
 //  "ServiceTerritoryId":  flatten(payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
@@ -843,14 +893,14 @@ output application/java
 ---
 [{
   //  "LastModifiedDate" : payload.LastModifiedDate[0],
-     "ActualStartTime":(payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0] ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-     "SchedEndTime": (payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+     "ActualStartTime": safeDateTime(payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+     "SchedEndTime": safeDateTime(payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]),
      "SchedStartTime": (payload.Data.SIU_S13.SCH."SCH-11"."TQ-04"."TS-01"[0]   ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
       "ActualEndTime" : (payload.Data.SIU_S13.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
      "Id": vars.accResponse.Id[0],
     "Status": if(payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01" == "Rescheduled") ("Rescheduled by Provider") else (payload.Data.SIU_S13.SCH."SCH-25"."CE_0278-01"),
     "AdditionalInformation": vars.appointmentType,
-    "ContactId": vars.queryResponse[0].Id,
+    "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
     "DurationType":  if(payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S13.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S13.SCH."SCH-10"."CE-01"),
 	
 //  "ServiceTerritoryId":  flatten(payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
@@ -905,6 +955,7 @@ output application/json
 payload]]></ee:set-payload>
                 </ee:message>
             </ee:transform>
+            
             <!-- First log the parsed payload to understand structure -->
             <ee:transform doc:name="Extract PID structure">
                 <ee:message />
@@ -917,6 +968,49 @@ payload.Data.SIU_S14.PATIENT.PID]]></ee:set-variable>
             </ee:transform>
 
             <logger level="INFO" message="Debug SIU_S14 structure: #[vars.pidStructure]" />
+            
+            <!-- Set up sfContactData for SIU^S14 - NEW -->
+            <ee:transform doc:name="Set sfContactData for SIU^S14">
+                <ee:message />
+                <ee:variables>
+                    <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
+output application/java
+
+fun safeDOB(ts) = 
+    if (ts != null) 
+       (ts as Date {format: "yyyyMMdd"})
+    else 
+       null
+
+---
+[{
+    HealthFusion_Patient_Record_ID__c: vars.hfId,
+    FirstName: flatten(payload.Data.SIU_S14.PATIENT.PID."PID-05")."XPN-02"[0] default "",
+    LastName:  flatten(payload.Data.SIU_S14.PATIENT.PID."PID-05")."XPN-01"[0] default "",
+    MiddleName: payload.Data.SIU_S14.PATIENT.PID."PID-05"."XPN-03"[0],
+    Email:      payload.Data.SIU_S14.PATIENT.PID."PID-13"."XTN-04"[0],
+    Phone:      payload.Data.SIU_S14.PATIENT.PID."PID-13"."XTN-01"[0],
+    
+    MailingState:      payload.Data.SIU_S14.PATIENT.PID."PID-11"."XAD-04"[0],
+    MailingPostalCode: payload.Data.SIU_S14.PATIENT.PID."PID-11"."XAD-05"[0],
+    MailingCity:       payload.Data.SIU_S14.PATIENT.PID."PID-11"."XAD-03"[0],
+    MailingStreet:     payload.Data.SIU_S14.PATIENT.PID."PID-11"."XAD-01"[0],
+
+    Patient_Ethnicity__c: payload.Data.SIU_S14.PATIENT.PID."PID-22",
+    Patient_Race__c:      payload.Data.SIU_S14.PATIENT.PID."PID-10",
+
+    Patient_Gender_2__c: 
+      if (payload.Data.SIU_S14.PATIENT.PID."PID-08" == "M") "Male"
+      else if (payload.Data.SIU_S14.PATIENT.PID."PID-08" == "F") "Female"
+      else payload.Data.SIU_S14.PATIENT.PID."PID-08",
+
+    Date_of_Birth__c: safeDOB(payload.Data.SIU_S14.PATIENT.PID."PID-07"."TS-01"[0])
+}]
+]]></ee:set-variable>
+                </ee:variables>
+            </ee:transform>
+            
+            <logger level="INFO" message="Set sfContactData for SIU^S14: #[vars.sfContactData]" />
             
             <ee:transform doc:name="input_mappings" doc:id="a326c130-417a-4ade-8802-307a059236d8">
                 <ee:message />
@@ -1009,14 +1103,22 @@ else
                 <ee:variables>
                     <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
+
+// Helper function for safe date/time conversion with null checks
+fun safeDateTime(value) = 
+    if (value == null) 
+        null
+    else 
+        (value as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime) default null
+
 ---
 [{
 //	"Name": payload.Data.SIU_S14.SCH."SCH-06"."CE-01",
-	"ActualStartTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-     "SchedEndTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-     "SchedStartTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-      "ActualEndTime" : (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-    "NextGen_ID__c":payload.Data.SIU_S14.SCH."SCH-02"."EI-01",
+	"ActualStartTime": safeDateTime(payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+    "SchedEndTime": safeDateTime(payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]),
+    "SchedStartTime": safeDateTime(payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+    "ActualEndTime": safeDateTime(payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]),
+    "NextGen_ID__c": payload.Data.SIU_S14.SCH."SCH-02"."EI-01",
 	"Status": if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01" == "CHECKED IN")("Checked In")  else if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"=="CHECKED OUT")("Checked Out") else (payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"),
 	"ParentRecordId": if (isEmpty(vars.queryResponse)) 
                    null 
@@ -1027,7 +1129,7 @@ output application/java
                  else
                    null,
     "AdditionalInformation": vars.appointmentType,
-    "ContactId": vars.queryResponse[0].Id,
+    "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
     "DurationType": if(payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S14.SCH."SCH-10"."CE-01"),
 	
 //    "ServiceTerritoryId": flatten(payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
@@ -1058,13 +1160,21 @@ output application/java
                         <ee:variables>
                             <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
+
+// Helper function for safe date/time conversion with null checks
+fun safeDateTime(value) = 
+    if (value == null) 
+        null
+    else 
+        (value as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime) default null
+
 ---
 [{
 //	"Name": payload.Data.SIU_S14.SCH."SCH-06"."CE-01",
-	"ActualStartTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-     "SchedEndTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-     "SchedStartTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-      "ActualEndTime" : (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+	"ActualStartTime": safeDateTime(payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+    "SchedEndTime": safeDateTime(payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]),
+    "SchedStartTime": safeDateTime(payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+    "ActualEndTime": safeDateTime(payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]),
     "NextGen_ID__c":payload.Data.SIU_S14.SCH."SCH-02"."EI-01"[0 to 14],
 	"Status": if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01" == "CHECKED IN")("Checked In")  else if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"=="CHECKED OUT")("Checked Out") else (payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"),
 	"ParentRecordId": if (isEmpty(vars.queryResponse)) 
@@ -1076,7 +1186,7 @@ output application/java
                  else
                    null,
     "AdditionalInformation": vars.appointmentType,
-    "ContactId": vars.queryResponse[0].Id,
+    "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
     "DurationType": if(payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S14.SCH."SCH-10"."CE-01"),
 	
 //    "ServiceTerritoryId": flatten(payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
@@ -1101,17 +1211,25 @@ output application/java
                         <ee:variables>
                             <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
+
+// Helper function for safe date/time conversion with null checks
+fun safeDateTime(value) = 
+    if (value == null) 
+        null
+    else 
+        (value as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime) default null
+
 ---
 [{
 //	"Name": payload.Data.SIU_S14.SCH."SCH-06"."CE-01",
-	"ActualStartTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-     "SchedEndTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-     "SchedStartTime": (payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-      "ActualEndTime" : (payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+	"ActualStartTime": safeDateTime(payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+    "SchedEndTime": safeDateTime(payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]),
+    "SchedStartTime": safeDateTime(payload.Data.SIU_S14.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+    "ActualEndTime": safeDateTime(payload.Data.SIU_S14.SCH."SCH-11"."TQ-05"."TS-01"[0]),
     "Id": vars.accResponse.Id[0],
 	"Status": if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01" == "CHECKED IN")("Checked In")  else if(payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"=="CHECKED OUT")("Checked Out") else (payload.Data.SIU_S14.SCH."SCH-25"."CE_0278-01"),
     "AdditionalInformation": vars.appointmentType,
-    "ContactId": vars.queryResponse[0].Id,
+    "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
     "DurationType": if(payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S14.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S14.SCH."SCH-10"."CE-01"),
 	
 //    "ServiceTerritoryId": flatten(payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],
@@ -1229,8 +1347,8 @@ output application/java
 ---
 [{
 //	"Name": payload.Data.SIU_S15.SCH."SCH-06"."CE-01",
-	"ActualStartTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-     "SchedEndTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+	"ActualStartTime": safeDateTime(payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+     "SchedEndTime": safeDateTime(payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]),
      "SchedStartTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
       "ActualEndTime" : (payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
     "NextGen_ID__c":payload.Data.SIU_S15.SCH."SCH-02"."EI-01",
@@ -1245,7 +1363,7 @@ output application/java
                  else
                    null,
     "AdditionalInformation": vars.appointmentType,
-    "ContactId": vars.queryResponse[0].Id,
+    "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
 //	"ServiceTerritoryId": flatten(payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],  
         "Service_Resource__c": vars.providerExtract,
         "Provider__c": vars.providerExtract,
@@ -1273,15 +1391,15 @@ output application/java
 ---
 [{
 //	"Name": payload.Data.SIU_S15.SCH."SCH-06"."CE-01",
-	"ActualStartTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-     "SchedEndTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+	"ActualStartTime": safeDateTime(payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+     "SchedEndTime": safeDateTime(payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]),
      "SchedStartTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
       "ActualEndTime" : (payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
     "NextGen_ID__c":payload.Data.SIU_S15.SCH."SCH-02"."EI-01"[0 to 14],
     "DurationType": payload.Data.SIU_S15.SCH."SCH-10"."CE-01",
 	"Status": if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "CANCELLED") ("Cancelled by Provider") else if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "NO SHOW") ("No Show") else  (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01") ,
     "AdditionalInformation": vars.appointmentType,
-    "ContactId": vars.queryResponse[0].Id,
+    "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
     "ParentRecordId": if (isEmpty(vars.queryResponse)) 
                    null 
                  else if (vars.queryResponse[0].AccountId != null)
@@ -1316,15 +1434,15 @@ output application/java
 ---
 [{
 //	"Name": payload.Data.SIU_S15.SCH."SCH-06"."CE-01",
-	"ActualStartTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
-     "SchedEndTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
+	"ActualStartTime": safeDateTime(payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+     "SchedEndTime": safeDateTime(payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]),
      "SchedStartTime": (payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
       "ActualEndTime" : (payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]  ) as LocalDateTime{format:"yyyyMMddHHmmss"} as String{format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime,
     "Id": vars.accResponse.Id[0],
     "DurationType": payload.Data.SIU_S15.SCH."SCH-10"."CE-01",
 	"Status": if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "CANCELLED") ("Cancelled by Provider") else if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "NO SHOW") ("No Show") else  (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01") ,
     "AdditionalInformation": vars.appointmentType,
-    "ContactId": vars.queryResponse[0].Id,
+    "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
 //	"ServiceTerritoryId": flatten(payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],  
         "Service_Resource__c": vars.providerExtract,
         "Provider__c": vars.providerExtract,
@@ -1665,14 +1783,14 @@ output application/json
     <salesforce:query doc:name="Query by HealthFusion ID" config-ref="Salesforce_Config" target="queryResponse">
     <salesforce:salesforce-query>
         <![CDATA[
-        SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c
+        SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c, Email, Phone, PhoneNumberFormatted__c
         FROM Contact
         WHERE HealthFusion_Patient_Record_ID__c = :hfId
         ]]>
     </salesforce:salesforce-query>
     <salesforce:parameters>
         <![CDATA[#[{
-            "hfId": "'" ++ vars.hfId ++ "'"
+             hfId: "'" ++ vars.hfId ++ "'"
         }]]]>
     </salesforce:parameters>
 </salesforce:query>
@@ -1729,7 +1847,7 @@ output application/json
 		"Appointment Status": vars.appointmentFields.Status[0],
 		"Provider": vars.appointmentFields.Service_Resource__c[0],
 		"Location": vars.mailLocation,
-		"patientName": vars.queryResponse.FirstName[0] ++ " " ++  vars.queryResponse.MiddleName[0] ++ " " ++ vars.queryResponse.LastName[0] default " ",
+		"patientName": if(isEmpty(vars.queryResponse)) "Unknown Patient" else ((vars.queryResponse.FirstName[0] default "") ++ " " ++  (vars.queryResponse.MiddleName[0] default "") ++ " " ++ (vars.queryResponse.LastName[0] default "")),
         "statusCode": vars.appRes.items.statusCode[0],
         "errorMessage": vars.appres.items.message[0],
         "error Type": error.errorType
@@ -1901,7 +2019,7 @@ output application/json
 			<salesforce:parameters ><![CDATA[#[output application/java
 ---
 {
-	"Contact_Id__c" : payload.Contact_Id__c[0]
+	Contact_Id__c: payload.Contact_Id__c[0]
 }]]]></salesforce:parameters>
 		</salesforce:query>
 	</sub-flow>
@@ -1909,12 +2027,12 @@ output application/json
     <!-- First try to match by HealthFusion_Patient_Record_ID__c -->
     <salesforce:query doc:name="Query by Health Fusion ID" doc:id="517fc881-9b9c-4292-a3fb-9f296019a6c5" config-ref="Salesforce_Config" target="queryResByHFID">
         <salesforce:salesforce-query><![CDATA[
-    SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c, Email, Phone, HealthFusion_Patient_Record_ID__c 
+    SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c, Email, Phone, PhoneNumberFormatted__c, HealthFusion_Patient_Record_ID__c 
     FROM Contact 
     WHERE HealthFusion_Patient_Record_ID__c = :hfId
 ]]></salesforce:salesforce-query>
         <salesforce:parameters><![CDATA[#[{
-            "hfId": vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
+            hfId: vars.sfContactData.HealthFusion_Patient_Record_ID__c[0] as String
         }]]]></salesforce:parameters>
     </salesforce:query>
     
@@ -1930,7 +2048,7 @@ output application/json
 			<salesforce:parameters ><![CDATA[#[output application/java
 ---
 {
-	"NextGen_ID__c" : vars.appointmentFields.NextGen_ID__c[0]
+	NextGen_ID__c: vars.appointmentFields.NextGen_ID__c[0]
 }]]]></salesforce:parameters>
 		</salesforce:query>
 	</sub-flow>
@@ -1968,7 +2086,7 @@ output application/json
 		"Appointment Status": vars.appointmentFields.Status[0],
 		"Provider": vars.appointmentFields.Service_Resource__c[0],
 		"Location": vars.mailLocation,
-		"patientName": vars.queryResponse.FirstName[0] ++ " " ++  vars.queryResponse.MiddleName[0] ++ " " ++ vars.queryResponse.LastName[0] default " ",
+		"patientName": if(isEmpty(vars.queryResponse)) "Unknown Patient" else ((vars.queryResponse.FirstName[0] default "") ++ " " ++  (vars.queryResponse.MiddleName[0] default "") ++ " " ++ (vars.queryResponse.LastName[0] default "")),
         "statusCode": payload.items.statusCode[0],
         "errorMessage": payload.items.message[0],
         "error Type": error.errorType
@@ -2040,10 +2158,14 @@ output application/json
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
-[{
-    "ServiceAppointmentId": vars.appointmentId,
-    "ServiceResourceId": vars.serviceId
-}]]]></ee:set-payload>
+if (vars.appointmentId == null or vars.serviceId == null) 
+    // Skip creating AssignedResource if required IDs are missing
+    []
+else 
+    [{
+        "ServiceAppointmentId": vars.appointmentId,
+        "ServiceResourceId": vars.serviceId
+    }]]]></ee:set-payload>
             </ee:message>
         </ee:transform>
         
@@ -2087,7 +2209,7 @@ output application/json
         <salesforce:parameters><![CDATA[#[output application/java
 ---
 {
-    "hfId": payload.HealthFusion_Patient_Record_ID__c[0]
+    hfId: payload.HealthFusion_Patient_Record_ID__c[0]
 }]]]></salesforce:parameters>
     </salesforce:query>
     
@@ -2389,27 +2511,51 @@ output application/json
 output application/java
 fun stripPhone(num) = if (num == null) null else num replace /[^0-9]/ with ""
 ---
-stripPhone(vars.sfContactData.Phone[0])
+stripPhone(vars.sfContactData[0].Phone)
 ]]></ee:set-variable>
 		</ee:variables>
 	</ee:transform>
 	
+	<!-- Prepare Query Parameters -->
+	<ee:transform doc:name="Prepare Contact Query Parameters">
+		<ee:message />
+		<ee:variables>
+			<ee:set-variable variableName="contactQueryParams"><![CDATA[%dw 2.0
+output application/java
+
+// Helper functions for null-safe string operations
+fun safeUpper(s) = if (s == null) "" else upper(s)
+fun safeLower(s) = if (s == null) "" else lower(s)
+
+---
+{
+    firstName: safeUpper(vars.sfContactData[0].FirstName),
+    lastName: safeUpper(vars.sfContactData[0].LastName),
+    email: safeLower(vars.sfContactData[0].Email),
+    phone: vars.normalizedPhone default "",
+    dob: vars.sfContactData[0].Date_of_Birth__c
+}]]></ee:set-variable>
+		</ee:variables>
+	</ee:transform>
+
 	<!-- Query by Name + Identifier -->
 	<salesforce:query doc:name="Query by Name + Identifier" config-ref="Salesforce_Config" target="identifierMatch">
 		<salesforce:salesforce-query><![CDATA[
-SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c
+SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c, Email, Phone, PhoneNumberFormatted__c
 FROM Contact
 WHERE FirstName = :firstName
 AND LastName = :lastName
-AND (Email = :email OR Phone = :phone OR Date_of_Birth__c = :dob)
+AND (Email = :email 
+     OR PhoneNumberFormatted__c = :phone 
+     OR Date_of_Birth__c = :dob)
 LIMIT 1
 ]]></salesforce:salesforce-query>
-		<salesforce:parameters><![CDATA[#[{
-"firstName": vars.sfContactData.FirstName[0],
-"lastName": vars.sfContactData.LastName[0],
-"email": vars.sfContactData.Email[0],
-"phone": vars.normalizedPhone,
-"dob": vars.sfContactData.Date_of_Birth__c[0]
+<salesforce:parameters><![CDATA[#[{
+    firstName: "'" ++ vars.contactQueryParams.firstName ++ "'",
+    lastName: "'" ++ vars.contactQueryParams.lastName ++ "'",
+    email: "'" ++ vars.contactQueryParams.email ++ "'",
+    phone: "'" ++ vars.contactQueryParams.phone ++ "'",
+    dob: vars.contactQueryParams.dob as Date {format: "yyyy-MM-dd"}
 }]]]></salesforce:parameters>
 	</salesforce:query>
 	
@@ -2446,6 +2592,7 @@ output application/java
 "Date_of_Birth__c": vars.sfContactData.Date_of_Birth__c[0],
 "Email": vars.sfContactData.Email[0],
 "Phone": vars.sfContactData.Phone[0],
+"PhoneNumberFormatted__c": if (vars.normalizedPhone != null) vars.normalizedPhone else (vars.sfContactData.Phone[0] replace /[^0-9]/ with ""),
 "HealthFusion_Patient_Record_ID__c": vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
 }]]]></ee:set-payload>
 				</ee:message>

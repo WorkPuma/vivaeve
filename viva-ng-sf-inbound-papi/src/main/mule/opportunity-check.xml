@@ -19,9 +19,9 @@ payload&#93;&#93;></ee:set-variable>
 		</ee:transform>
 		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="628e5969-ce27-4b67-acfc-fdbccc939646" millisBetweenRetries="${sf.retryfrequency}">
 			<salesforce:query doc:name="Contact Query" doc:id="eb88c311-d9b5-4615-9546-69abbeb11a99" config-ref="Salesforce_Config" target="ContactOutput">
-				<salesforce:salesforce-query><![CDATA[select HealthFusion_Patient_Record_ID__c, Id , OwnerId, AccountId from Contact where HealthFusion_Patient_Record_ID__c = :hfId]]></salesforce:salesforce-query>
+				<salesforce:salesforce-query><![CDATA[SELECT HealthFusion_Patient_Record_ID__c, Id, OwnerId, AccountId, PhoneNumberFormatted__c FROM Contact WHERE HealthFusion_Patient_Record_ID__c = :hfId]]></salesforce:salesforce-query>
 				<salesforce:parameters><![CDATA[#[{
-    "hfId": flatten(vars.inputPayload.Data.SIU_S12.PATIENT.PID."PID-04")."CX-01"[0]
+    hfId: flatten(vars.inputPayload.Data.SIU_S12.PATIENT.PID."PID-04")."CX-01"[0]
 }]]]></salesforce:parameters>
 			</salesforce:query>
 		</until-successful>
