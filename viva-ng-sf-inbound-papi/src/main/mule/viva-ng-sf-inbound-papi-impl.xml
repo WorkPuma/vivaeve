@@ -241,7 +241,7 @@ output application/java
            LastName: vars.sfContactData.LastName[0],
            Email: vars.sfContactData.Email[0],
            Phone: vars.sfContactData.Phone[0],
-           PhoneNumberFormatted__c: vars.sfContactData.Phone[0] replace /[^0-9]/ with "",
+           //PhoneNumberFormatted__c: vars.sfContactData.Phone[0] replace /[^0-9]/ with "",
            MailingState: vars.sfContactData.MailingState[0],
            MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
            MailingCity: vars.sfContactData.MailingCity[0],
@@ -277,7 +277,7 @@ output application/java
                LastName: vars.sfContactData.LastName[0],
                Email: vars.sfContactData.Email[0],
                Phone: vars.sfContactData.Phone[0],
-               PhoneNumberFormatted__c: vars.sfContactData.Phone[0] replace /[^0-9]/ with "",
+               //PhoneNumberFormatted__c: vars.sfContactData.Phone[0] replace /[^0-9]/ with "",
                MailingState: vars.sfContactData.MailingState[0],
                MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
                MailingCity: vars.sfContactData.MailingCity[0],
@@ -371,7 +371,7 @@ stripPhone(vars.sfContactData.Phone[0])
             WHERE HealthFusion_Patient_Record_ID__c = :hfId
         ]]></salesforce:salesforce-query>
         <salesforce:parameters><![CDATA[#[{
-    hfId: vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
+    hfId: "'" ++ vars.hfId ++ "'"
 }]]]></salesforce:parameters>
     </salesforce:query>
     
@@ -428,7 +428,14 @@ fun safeLower(s) = if (s == null) "" else lower(s)
                              OR Date_of_Birth__c = :dob)
                         LIMIT 1
                     ]]></salesforce:salesforce-query>
-                    <salesforce:parameters><![CDATA[#[vars.contactQueryParams]]]></salesforce:parameters>
+                     <salesforce:parameters><![CDATA[#[{
+    firstName: "'" ++ vars.contactQueryParams.firstName ++ "'",
+    lastName: "'" ++ vars.contactQueryParams.lastName ++ "'",
+    email: "'" ++ vars.contactQueryParams.email ++ "'",
+    phone: "'" ++ vars.contactQueryParams.phone ++ "'",
+    dob: vars.contactQueryParams.dob as Date {format: "yyyy-MM-dd"}
+}]]]></salesforce:parameters>
+
                 </salesforce:query>
                 
                 <choice doc:name="Found by Other Fields?">
@@ -447,7 +454,7 @@ output application/java
     MiddleName: vars.sfContactData.MiddleName[0],
     Email: vars.sfContactData.Email[0],
     Phone: vars.sfContactData.Phone[0],
-    PhoneNumberFormatted__c: if (vars.normalizedPhone != null) vars.normalizedPhone else (vars.sfContactData.Phone[0] replace /[^0-9]/ with ""),
+    //PhoneNumberFormatted__c: if (vars.normalizedPhone != null) vars.normalizedPhone else (vars.sfContactData.Phone[0] replace /[^0-9]/ with ""),
     MailingState: vars.sfContactData.MailingState[0],
     MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
     MailingCity: vars.sfContactData.MailingCity[0],
@@ -487,7 +494,7 @@ output application/java
     MiddleName: vars.sfContactData.MiddleName[0],
     Email: vars.sfContactData.Email[0],
     Phone: vars.sfContactData.Phone[0],
-    PhoneNumberFormatted__c: if (vars.normalizedPhone != null) vars.normalizedPhone else (vars.sfContactData.Phone[0] replace /[^0-9]/ with ""),
+    //PhoneNumberFormatted__c: if (vars.normalizedPhone != null) vars.normalizedPhone else (vars.sfContactData.Phone[0] replace /[^0-9]/ with ""),
     MailingState: vars.sfContactData.MailingState[0],
     MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
     MailingCity: vars.sfContactData.MailingCity[0],
@@ -530,7 +537,7 @@ output application/java
     MiddleName: vars.sfContactData.MiddleName[0],
     Email: vars.sfContactData.Email[0],
     Phone: vars.sfContactData.Phone[0],
-    PhoneNumberFormatted__c: if (vars.normalizedPhone != null) vars.normalizedPhone else (vars.sfContactData.Phone[0] replace /[^0-9]/ with ""),
+    //PhoneNumberFormatted__c: if (vars.normalizedPhone != null) vars.normalizedPhone else (vars.sfContactData.Phone[0] replace /[^0-9]/ with ""),
     MailingState: vars.sfContactData.MailingState[0],
     MailingPostalCode: vars.sfContactData.MailingPostalCode[0],
     MailingCity: vars.sfContactData.MailingCity[0],
@@ -1101,16 +1108,12 @@ payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"
                         <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
 output application/java
 ---
-// Handle the nested array structure properly
-if (payload.Data.SIU_S14.PATIENT.PID."PID-04" != null)
-    // First try standard path with proper array navigation
-    (flatten(payload.Data.SIU_S14.PATIENT.PID."PID-04")."CX-01"[0]) default
-    // Fall back to original HF ID prefix method with PID-03
-    ("HF" ++ (flatten(payload.Data.SIU_S14.PATIENT.PID."PID-03")."CX-01"[0] default ""))
+if (payload.Data.SIU_S14.PATIENT.PID."PID-04" is Array) then
+    (flatten(payload.Data.SIU_S14.PATIENT.PID."PID-04")[0]."CX-01" default "UNKNOWN_PATIENT_ID")
 else
-    // Set a default value if both are null
-    "UNKNOWN_PATIENT_ID"
+    (payload.Data.SIU_S14.PATIENT.PID."PID-04" default "UNKNOWN_PATIENT_ID")
 ]]></ee:set-variable>
+
                 </ee:variables>
             </ee:transform>
             <logger level="INFO" message="Extracted HF ID for SIU_S14: #[vars.hfId]" />
@@ -1820,7 +1823,8 @@ output application/json
     </salesforce:salesforce-query>
     <salesforce:parameters>
         <![CDATA[#[{
-              hfId: "'" ++ (vars.hfId default "") ++ "'"
+              
+  hfId: "'" ++ vars.hfId ++ "'"
         }]]]>
     </salesforce:parameters>
 </salesforce:query>
@@ -2062,7 +2066,7 @@ output application/json
     WHERE HealthFusion_Patient_Record_ID__c = :hfId
 ]]></salesforce:salesforce-query>
         <salesforce:parameters><![CDATA[#[{
-            hfId: vars.sfContactData.HealthFusion_Patient_Record_ID__c[0] as String
+             hfId: "'" ++ vars.hfId ++ "'"
         }]]]></salesforce:parameters>
     </salesforce:query>
     
@@ -2269,13 +2273,14 @@ stripPhone(payload.Phone[0])
                         AND (Email = :email OR Phone = :phone OR Date_of_Birth__c = :dob)
                         LIMIT 1
                     ]]></salesforce:salesforce-query>
-                    <salesforce:parameters><![CDATA[#[{
-    "firstName": payload.FirstName[0],
-    "lastName": payload.LastName[0],
-    "email": payload.Email[0],
-    "phone": vars.normalizedPhone,
-    "dob": payload.Date_of_Birth__c[0]
+ <salesforce:parameters><![CDATA[#[{
+    firstName: "'" ++ vars.contactQueryParams.firstName ++ "'",
+    lastName: "'" ++ vars.contactQueryParams.lastName ++ "'",
+    email: "'" ++ vars.contactQueryParams.email ++ "'",
+    phone: "'" ++ vars.contactQueryParams.phone ++ "'",
+    dob: vars.contactQueryParams.dob as Date {format: "yyyy-MM-dd"}
 }]]]></salesforce:parameters>
+
                 </salesforce:query>
                 
                 <choice doc:name="Found by identifiers?">
@@ -2622,7 +2627,7 @@ output application/java
 "Date_of_Birth__c": vars.sfContactData.Date_of_Birth__c[0],
 "Email": vars.sfContactData.Email[0],
 "Phone": vars.sfContactData.Phone[0],
-"PhoneNumberFormatted__c": if (vars.normalizedPhone != null) vars.normalizedPhone else (vars.sfContactData.Phone[0] replace /[^0-9]/ with ""),
+//"PhoneNumberFormatted__c": if (vars.normalizedPhone != null) vars.normalizedPhone else (vars.sfContactData.Phone[0] replace /[^0-9]/ with ""),
 "HealthFusion_Patient_Record_ID__c": vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
 }]]]></ee:set-payload>
                 </ee:message>
