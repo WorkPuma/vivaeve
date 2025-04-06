@@ -155,9 +155,18 @@ fun checkADT(payload) = payload contains "SIU^S15"
 
         <!--  ========== ADT^A04 ========== -->
         <when expression="#[vars.checkConditionA04.result]">
-            <hl7:read doc:name="A04" doc:id="fa8aac9f-fadd-40c5-b122-c64daab95bcc" config-ref="HL7_EDI_Config_A04">
-                <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
-            </hl7:read>
+    <logger level="INFO" doc:name="A04 Entry Logger" doc:id="19d8fb50-d940-460b-abf2-a8415c8faddf" 
+            message="STARTED PROCESSING ADT^A04 MESSAGE" />
+                   
+            <try doc:name="A04 Processing Try" doc:id="a04-processing-try">
+                <hl7:read doc:name="A04" doc:id="fa8aac9f-fadd-40c5-b122-c64daab95bcc" config-ref="HL7_EDI_Config_A04">
+                    <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+                </hl7:read>
+                <logger level="INFO" doc:name="A04 Message ID Logger" 
+        message="Processing ADT^A04 message with ID: #[payload.Data.ADT_A04.MSH.'MSH-10']" />
+                
+                <logger level="INFO" doc:name="A04 Parse Logger" doc:id="a04-parse-logger" 
+                       message="A04 Message - Successfully parsed HL7 message. Message Type: #[payload.Data.ADT_A04.MSH.'MSH-9'.'CM_MSG-01' default 'UNKNOWN']^#[payload.Data.ADT_A04.MSH.'MSH-9'.'CM_MSG-02' default 'UNKNOWN']" />
             <ee:transform doc:name="jsonPayload" doc:id="cc41f729-058e-4078-ae5f-3d008ef63564">
                 <ee:message>
                     <ee:set-payload><![CDATA[%dw 2.0
@@ -166,6 +175,20 @@ output application/json
 payload]]></ee:set-payload>
                 </ee:message>
             </ee:transform>
+            
+            <ee:transform doc:name="Extract HF ID for A04" doc:id="a04-hfid-extract">
+                <ee:message />
+                <ee:variables>
+                    <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
+output application/java
+---
+flatten(payload.Data.ADT_A04.PID."PID-04")."CX-01"[0] default "UNKNOWN_PATIENT_ID"
+]]></ee:set-variable>
+                </ee:variables>
+            </ee:transform>
+
+            <logger level="INFO" doc:name="A04 HF ID Logger" doc:id="a04-hfid-logger" 
+                    message="A04 Message - Extracted HealthFusion ID: #[vars.hfId], Message ID: #[payload.Data.ADT_A04.MSH.'MSH-10']" />
 
             <!-- Example language field from a local JSON file -->
             <ee:transform doc:name="language_field" doc:id="6af659ac-be96-4100-ad09-9113fe48fa13">
@@ -211,17 +234,24 @@ output application/java
       "Patient_Ethnicity__c": payload.Data.ADT_A08.PID."PID-22",
       "Patient_Race__c": payload.Data.ADT_A08.PID."PID-10",
       "Patient_Gender_2__c": if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
-      "Date_of_Birth__c": if (payload.Data.ADT_A08.PID."PID-07"."TS-01" != null) 
-                     (payload.Data.ADT_A08.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) 
-                     else if (payload.Data.ADT_A08.PID."PID-07" != null)
-                     (payload.Data.ADT_A08.PID."PID-07" as String as Date {format: "yyyyMMdd"})
-                     else null
+      "Date_of_Birth__c": if (payload.Data.ADT_A04.PID."PID-07" == null) 
+                     null 
+                     else if (payload.Data.ADT_A04.PID."PID-07" is String)
+                     (payload.Data.ADT_A04.PID."PID-07" as Date {format: "yyyyMMdd"}) default null
+                     else
+                     (payload.Data.ADT_A04.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) default null
     }]]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
 
             <!-- Query existing Contact by name -->
-            <flow-ref doc:name="callToGetContactId" doc:id="91e68d3e-a92a-487a-9746-7ef4dd5c2f89" name="salesforce_queryaccoun_Sub_Flow" />
+            <logger level="INFO" doc:name="A04 Pre-Query Logger" doc:id="a04-pre-query-logger" 
+                   message="A04 Message - About to query Salesforce for contact with HF ID: #[vars.hfId]" />
+                   
+            <flow-ref doc:name="callToGetContactId" doc:id="91e68d3e-a92a-487a-9746-7ef4dd5c2f89" name="salesforce_query_Sub_Flow" />
+            
+            <logger level="INFO" doc:name="A04 Post-Query Logger" doc:id="a04-post-query-logger" 
+                   message="A04 Message - Query returned #[sizeOf(vars.queryResponse)] contact record(s). Found match: #[!isEmpty(vars.queryResponse)]" />
 
             <choice doc:name="Choice" doc:id="a2f8637e-3309-4b45-8bc4-4722e1a4160a">
     <when expression="#[isEmpty(vars.queryRes) or vars.queryRes.AccountId[0] == null]">
@@ -300,6 +330,30 @@ output application/java
             <flow-ref doc:name="callToUpsertFlow" 
                       doc:id="3798f12d-10f2-4859-a394-a987e6ab8aa1" 
                       name="common-sf-upsert-flow" />
+                      
+                <error-handler>
+                    <on-error-continue type="ANY" doc:name="A04 Error Handler" doc:id="a04-error-handler">
+                        <ee:transform doc:name="Error Response" doc:id="a04-error-response">
+                            <ee:message>
+                                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    status: "ERROR",
+    message: error.description default "An error occurred processing the A04 message",
+    errorType: error.errorType.identifier default "UNKNOWN",
+    messageId: payload.Data.ADT_A04.MSH.'MSH-10' default "UNKNOWN"
+}]]></ee:set-payload>
+                            </ee:message>
+                        </ee:transform>
+                        <logger level="ERROR" doc:name="A04 Error Logger" doc:id="a04-error-logger" 
+                               message="A04 Message Error - Type: #[error.errorType.identifier default 'UNKNOWN'], Description: #[error.description]" />
+                    </on-error-continue>
+                </error-handler>
+            </try>
+            
+            <logger level="INFO" doc:name="A04 Exit Logger" doc:id="a04-exit-logger" 
+                   message="COMPLETED PROCESSING ADT^A04 MESSAGE - Message ID: #[payload.Data.ADT_A04.MSH.'MSH-10' default 'UNKNOWN']" />
         </when>
 
         <!--  ========== ADT^A08 ========== -->
@@ -603,10 +657,19 @@ output application/json
 </when>
 
         <!--  ========== SIU^S12 ========== -->
-        <when expression="#[vars.checkConditionS12.result]">
-            <hl7:read doc:name="S12" doc:id="2e01c917-c001-4686-b1c5-651865169b86" config-ref="HL7_EDI_Config_S12">
-                <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
-            </hl7:read>
+      <when expression="#[vars.checkConditionS12.result]">
+    <logger level="INFO" doc:name="S12 Entry Logger" doc:id="ab693ac4-8e97-4a15-aa5e-89339c8c40a0" 
+            message="STARTED PROCESSING SIU^S12 MESSAGE" />
+            
+            
+            <try doc:name="S12 Processing Try" doc:id="s12-processing-try">
+                <hl7:read doc:name="S12" doc:id="2e01c917-c001-4686-b1c5-651865169b86" config-ref="HL7_EDI_Config_S12">
+                    <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+                </hl7:read>
+              <logger level="INFO" doc:name="S12 Message ID Logger" 
+        message="Processing SIU^S12 message with ID: #[payload.Data.SIU_S12.MSH.'MSH-10']" />  
+            <logger level="INFO" doc:name="S12 Parse Logger" doc:id="s12-parse-logger" 
+                message="S12 Message - Successfully parsed HL7 message. Message Type: #[payload.Data.SIU_S12.MSH.'MSH-9'.'CM_MSG-01' default 'UNKNOWN']^#[payload.Data.SIU_S12.MSH.'MSH-9'.'CM_MSG-02' default 'UNKNOWN']" />
             <ee:transform doc:name="jsonPayload" doc:id="9f506b30-d1bc-4324-a318-4c425904a7d6">
                 <ee:message>
                     <ee:set-payload><![CDATA[%dw 2.0
@@ -680,12 +743,22 @@ output application/java
 // "flatten" ensures we handle cases with or without ^ subcomponents.
 // "default 'NO_HF_ID'" ensures we never get null if it's completely missing.
 ---
-flatten(payload.Data.SIU_S12.PATIENT.PID."PID-04")."CX-01"[0] default "NO_HF_ID"
+flatten(payload.Data.SIU_S12.PATIENT.PID."PID-04")."CX-01"[0] default "UNKNOWN_PATIENT_ID"
 ]]></ee:set-variable>
 
                 </ee:variables>
             </ee:transform>
+            
+            <logger level="INFO" doc:name="S12 HF ID Logger" doc:id="s12-hfid-logger" 
+                    message="S12 Message - Extracted HealthFusion ID: #[vars.hfId], Message ID: #[payload.Data.SIU_S12.MSH.'MSH-10']" />
+                    
+            <logger level="INFO" doc:name="S12 Pre-Query Logger" doc:id="s12-pre-query-logger" 
+                    message="S12 Message - About to query Salesforce for contact with HF ID: #[vars.hfId]" />
+                    
             <flow-ref doc:name="call To Salesforce For ContactId" doc:id="878c0733-586e-4e6b-9474-ee97910fdd27" name="salesforce_query_Sub_Flow" />
+            
+            <logger level="INFO" doc:name="S12 Post-Query Logger" doc:id="s12-post-query-logger" 
+                    message="S12 Message - Query returned #[sizeOf(vars.queryResponse)] contact record(s). Found match: #[!isEmpty(vars.queryResponse)]" />
             <ee:transform doc:name="sfMappings" doc:id="54b87dce-db47-4d9c-bcc1-a91b35efba13">
     <ee:message />
     <ee:variables>
@@ -787,8 +860,36 @@ output application/java
 }]]]></ee:set-payload>
                 </ee:message>
             </ee:transform>
-            <logger level="INFO" doc:name="Logger" doc:id="90a9a923-0e05-4d8f-a419-d322b91fecc3" message="CREATING ASSIGNED RESOURCE FOR THE APPOINTMENT" />
-            <flow-ref doc:name="Create AssignedResource" doc:id="create-assigned-resource-ref" name="create-assigned-resource-subflow" />
+            <logger level="INFO" doc:name="S12 AssignedResource Logger" doc:id="s12-assigned-resource-logger" 
+                    message="S12 Message - Creating AssignedResource for appointment: #[vars.appointmentId] and provider: #[vars.serviceId]" />
+                    
+            <flow-ref doc:name="Create AssignedResource" doc:id="s12-assigned-resource-ref" name="create-assigned-resource-subflow" />
+            
+
+                    
+                <error-handler>
+                    <on-error-continue type="ANY" doc:name="S12 Error Handler" doc:id="s12-error-handler">
+                        <ee:transform doc:name="Error Response" doc:id="s12-error-response">
+                            <ee:message>
+                                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    status: "ERROR",
+    message: error.description default "An error occurred processing the S12 message",
+    errorType: error.errorType.identifier default "UNKNOWN",
+    messageId: payload.Data.SIU_S12.MSH.'MSH-10' default "UNKNOWN"
+}]]></ee:set-payload>
+                            </ee:message>
+                        </ee:transform>
+                        <logger level="ERROR" doc:name="S12 Error Logger" doc:id="s12-error-logger" 
+                               message="S12 Message Error - Type: #[error.errorType.identifier default 'UNKNOWN'], Description: #[error.description]" />
+                    </on-error-continue>
+                </error-handler>
+            </try>
+            
+            <logger level="INFO" doc:name="S12 Exit Logger" doc:id="s12-exit-logger" 
+                    message="COMPLETED PROCESSING SIU^S12 MESSAGE - Message ID: #[payload.Data.SIU_S12.MSH.'MSH-10' default 'UNKNOWN']" />
         </when>
 
         <!--  ========== SIU^S13 ========== -->
@@ -1313,9 +1414,18 @@ vars.providerExtract]]></ee:set-variable>
 
         <!--  ========== SIU^S15 ========== -->
         <when expression="#[vars.checkConditionS15.result]">
-            <hl7:read doc:name="S15" doc:id="fdc8444d-60ec-48b6-bdd2-cd0af7dfe562" config-ref="HL7_EDI_Config_S15">
-                <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
-            </hl7:read>
+    <logger level="INFO" doc:name="S15 Entry Logger" doc:id="f35a2856-a1dc-45db-af4b-597d62b2a525" 
+           message="STARTED PROCESSING SIU^S15 MESSAGE" />
+                   
+            <try doc:name="S15 Processing Try" doc:id="s15-processing-try">
+                <hl7:read doc:name="S15" doc:id="fdc8444d-60ec-48b6-bdd2-cd0af7dfe562" config-ref="HL7_EDI_Config_S15">
+                    <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+                </hl7:read> </try>
+                <logger level="INFO" doc:name="S15 Message ID Logger" 
+        message="Processing SIU^S15 message with ID: #[payload.Data.SIU_S15.MSH.'MSH-10']" />
+                
+                <logger level="INFO" doc:name="S15 Parse Logger" doc:id="s15-parse-logger" 
+                       message="S15 Message - Successfully parsed HL7 message. Message Type: #[payload.Data.SIU_S15.MSH.'MSH-9'.'CM_MSG-01' default 'UNKNOWN']^#[payload.Data.SIU_S15.MSH.'MSH-9'.'CM_MSG-02' default 'UNKNOWN']" />
             <ee:transform doc:name="jsonPayload" doc:id="090993d0-d843-4a84-adc5-8275d36c703f">
                 <ee:message>
                     <ee:set-payload><![CDATA[%dw 2.0
@@ -1377,14 +1487,36 @@ var appType = vars.WorkTypeMapping
 output application/java
 ---
 payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
+                        <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
+output application/java
+---
+flatten(payload.Data.SIU_S15.PATIENT.PID."PID-04")."CX-01"[0] default "UNKNOWN_PATIENT_ID"
+]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
-            <ee:transform doc:name="sfMappings" doc:id="1efee067-f78a-4ab2-81f7-51725442d82f">
-                <ee:message>
-                </ee:message>
-                <ee:variables>
-                    <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+            
+            <logger level="INFO" doc:name="S15 HF ID Logger" doc:id="s15-hfid-logger" 
+                    message="S15 Message - Extracted HealthFusion ID: #[vars.hfId], Message ID: #[payload.Data.SIU_S15.MSH.'MSH-10']" />
+                    
+            <logger level="INFO" doc:name="S15 Pre-Query Logger" doc:id="s15-pre-query-logger" 
+                   message="S15 Message - About to query Salesforce for contact with HF ID: #[vars.hfId]" />
+                   
+            <flow-ref doc:name="call To Salesforce For ContactId" doc:id="s15-salesforce-query-ref" name="salesforce_query_Sub_Flow" />
+            
+            <logger level="INFO" doc:name="S15 Post-Query Logger" doc:id="s15-post-query-logger" 
+                   message="S15 Message - Query returned #[sizeOf(vars.queryResponse)] contact record(s). Found match: #[!isEmpty(vars.queryResponse)]" />
+                   
+            <ee:transform doc:name="sfMappings" doc:id="066231b2-2b11-49ba-9e78-2443709e00f8">
+    <ee:message></ee:message>
+    <ee:variables>
+        <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
+// Add the safeDateTime function definition first
+fun safeDateTime(value) =
+    if (value == null or value == "") 
+       null
+    else 
+       (value as LocalDateTime {format: "yyyyMMddHHmmss"} as String {format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime) default null
 ---
 [{
 //	"Name": payload.Data.SIU_S15.SCH."SCH-06"."CE-01",
@@ -1419,9 +1551,10 @@ output application/java
         
          
 //        "Opportunity__c": vars.opportunity_c.opportunity__c
-}]]]></ee:set-variable>
-                </ee:variables>
-            </ee:transform>
+}]
+]]></ee:set-variable>
+    </ee:variables>
+</ee:transform>
             <choice doc:name="Choice" doc:id="01224c35-4faa-457f-b26a-7f9b68701e8e">
                 <when expression="#[false]">
                     <ee:transform doc:name="sfMappings" doc:id="a3c8b2d2-a980-4cca-b61e-7a33ddb176b4">
@@ -2192,12 +2325,13 @@ output application/json
 	</sub-flow>
 		
 <sub-flow name="create-assigned-resource-subflow" doc:id="create-assigned-resource-id">
-    <logger level="INFO" doc:name="Logger" message="Creating AssignedResource for ServiceAppointment: #[vars.appointmentId] and ServiceResource: #[vars.serviceId]" />
+    <logger level="INFO" doc:name="Entry Logger" doc:id="assigned-resource-entry-logger" 
+            message="STARTED CREATING ASSIGNEDRESOURCE - Appointment: #[vars.appointmentId], Resource: #[vars.serviceId]" />
     
-    <try>
-        <ee:transform doc:name="Prepare AssignedResource">
-    <ee:message>
-        <ee:set-payload><![CDATA[%dw 2.0
+    <try doc:name="Create AssignedResource Try" doc:id="create-assigned-resource-try">
+        <ee:transform doc:name="Prepare AssignedResource" doc:id="prepare-assigned-resource">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
 if (vars.appointmentId == null or vars.serviceId == null) 
@@ -2208,20 +2342,25 @@ else
         "ServiceAppointmentId": vars.appointmentId,
         "ServiceResourceId": vars.serviceId
     }]]]></ee:set-payload>
-    </ee:message>
-</ee:transform>
+            </ee:message>
+        </ee:transform>
+        
+        <logger level="INFO" doc:name="Pre-Create Logger" doc:id="assigned-resource-pre-create-logger" 
+                message="About to create AssignedResource with payload: #[payload]" />
         
         <salesforce:create doc:name="Create AssignedResource" doc:id="create-assigned-resource" config-ref="Salesforce_Config" type="AssignedResource">
             <salesforce:records><![CDATA[#[payload]]]></salesforce:records>
         </salesforce:create>
         
-        <logger level="INFO" doc:name="Success Logger" message="Successfully created AssignedResource: #[payload]" />
+        <logger level="INFO" doc:name="Success Logger" doc:id="assigned-resource-success-logger" 
+                message="Successfully created AssignedResource: #[payload]" />
         
         <error-handler>
-            <on-error-continue type="ANY">
-                <logger level="ERROR" doc:name="Error Logger" message="Failed to create AssignedResource: #[error.description]" />
+            <on-error-continue type="ANY" doc:name="Error Handler" doc:id="assigned-resource-error-handler">
+                <logger level="ERROR" doc:name="Error Logger" doc:id="assigned-resource-error-logger" 
+                        message="Failed to create AssignedResource: #[error.description]" />
                 
-                <ee:transform doc:name="Error Response">
+                <ee:transform doc:name="Error Response" doc:id="assigned-resource-error-response">
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -2237,6 +2376,8 @@ output application/json
             </on-error-continue>
         </error-handler>
     </try>
+    
+    
 </sub-flow>
 
 <sub-flow name="contact-update-hfchartnumber-subflow" doc:id="982cd180-985c-4701-892d-9bb7cd740f2c">
