@@ -614,12 +614,14 @@ var appType = vars.WorkTypeMapping
 output application/json
 var provider = vars.ProviderMapping
 ---
-(provider filter ($.NPI == flatten(payload.Data.SIU_S12.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
+(provider filter ($.NPI == flatten(payload.Data.SIU_S12.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].providerId
+]]></ee:set-variable>
                     <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
 var location = vars.TerritoryMapping
 ---
-(location filter ($.LOCATION == payload.Data.SIU_S12.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
+(location filter ($.LOCATION == payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]
+]]></ee:set-variable>
                     <ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
@@ -774,7 +776,8 @@ var appType = vars.WorkTypeMapping
 output application/json
 var provider = vars.ProviderMapping
 ---
-(provider filter ($.NPI == flatten(payload.Data.SIU_S13.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
+(provider filter ($.NPI == flatten(payload.Data.SIU_S13.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].providerId
+]]></ee:set-variable>
                     <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
 var location = vars.TerritoryMapping
@@ -1036,8 +1039,7 @@ var provider = vars.ProviderMapping
 output application/json
 var location = vars.TerritoryMapping
 ---
-(location filter ($.LOCATION == payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]
-]]></ee:set-variable>
+(location filter ($.LOCATION == payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
 
 <ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
@@ -1301,7 +1303,8 @@ var appType = vars.WorkTypeMapping
 output application/json
 var provider = vars.ProviderMapping
 ---
-(provider filter ($.NPI == flatten(payload.Data.SIU_S15.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].Provider_for_Appointment__c]]></ee:set-variable>
+(provider filter ($.NPI == flatten(payload.Data.SIU_S15.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].providerId
+]]></ee:set-variable>
                     <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
 var location = vars.TerritoryMapping
@@ -2154,8 +2157,8 @@ output application/json
     
     <try>
         <ee:transform doc:name="Prepare AssignedResource">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
+    <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
 if (vars.appointmentId == null or vars.serviceId == null) 
@@ -2166,8 +2169,8 @@ else
         "ServiceAppointmentId": vars.appointmentId,
         "ServiceResourceId": vars.serviceId
     }]]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+    </ee:message>
+</ee:transform>
         
         <salesforce:create doc:name="Create AssignedResource" doc:id="create-assigned-resource" config-ref="Salesforce_Config" type="AssignedResource">
             <salesforce:records><![CDATA[#[payload]]]></salesforce:records>
@@ -2502,25 +2505,25 @@ output application/json
 	</choice>
 </sub-flow>
 
-<sub-flow name="contact-lookup-by-identifiers" doc:id="fc845e10-e654-45bf-a8a9-f1e5ac9dcb4e">
-	<!-- Normalize phone number -->
-	<ee:transform doc:name="Normalize Phone">
-		<ee:message />
-		<ee:variables>
-			<ee:set-variable variableName="normalizedPhone"><![CDATA[%dw 2.0
+<sub-flow name="contact-lookup-by-identifiers" doc:id="b85b2bd0-445d-4a84-92d9-242aebdc169e">
+    <!-- Normalize phone number -->
+    <ee:transform doc:name="Normalize Phone">
+        <ee:message />
+        <ee:variables>
+            <ee:set-variable variableName="normalizedPhone"><![CDATA[%dw 2.0
 output application/java
 fun stripPhone(num) = if (num == null) null else num replace /[^0-9]/ with ""
 ---
 stripPhone(vars.sfContactData[0].Phone)
 ]]></ee:set-variable>
-		</ee:variables>
-	</ee:transform>
-	
-	<!-- Prepare Query Parameters -->
-	<ee:transform doc:name="Prepare Contact Query Parameters">
-		<ee:message />
-		<ee:variables>
-			<ee:set-variable variableName="contactQueryParams"><![CDATA[%dw 2.0
+        </ee:variables>
+    </ee:transform>
+    
+    <!-- Prepare Query Parameters -->
+    <ee:transform doc:name="Prepare Contact Query Parameters">
+        <ee:message />
+        <ee:variables>
+            <ee:set-variable variableName="contactQueryParams"><![CDATA[%dw 2.0
 output application/java
 
 // Helper functions for null-safe string operations
@@ -2535,13 +2538,13 @@ fun safeLower(s) = if (s == null) "" else lower(s)
     phone: vars.normalizedPhone default "",
     dob: vars.sfContactData[0].Date_of_Birth__c
 }]]></ee:set-variable>
-		</ee:variables>
-	</ee:transform>
+        </ee:variables>
+    </ee:transform>
 
-	<!-- Query by Name + Identifier -->
-	<salesforce:query doc:name="Query by Name + Identifier" config-ref="Salesforce_Config" target="identifierMatch">
-		<salesforce:salesforce-query><![CDATA[
-SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c, Email, Phone, PhoneNumberFormatted__c
+    <!-- Query by Name + Identifier -->
+    <salesforce:query doc:name="Query by Name + Identifier" config-ref="Salesforce_Config" target="identifierMatch">
+        <salesforce:salesforce-query><![CDATA[
+SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c, Email, Phone, PhoneNumberFormatted__c, HealthFusion_Patient_Record_ID__c
 FROM Contact
 WHERE FirstName = :firstName
 AND LastName = :lastName
@@ -2550,23 +2553,23 @@ AND (Email = :email
      OR Date_of_Birth__c = :dob)
 LIMIT 1
 ]]></salesforce:salesforce-query>
-<salesforce:parameters><![CDATA[#[{
+        <salesforce:parameters><![CDATA[#[{
     firstName: "'" ++ vars.contactQueryParams.firstName ++ "'",
     lastName: "'" ++ vars.contactQueryParams.lastName ++ "'",
     email: "'" ++ vars.contactQueryParams.email ++ "'",
     phone: "'" ++ vars.contactQueryParams.phone ++ "'",
     dob: vars.contactQueryParams.dob as Date {format: "yyyy-MM-dd"}
 }]]]></salesforce:parameters>
-	</salesforce:query>
-	
-	<!-- Check if contact found by identifiers -->
-	<choice doc:name="Found by Identifiers?">
-		<when expression="#[isEmpty(vars.identifierMatch)]">
-			<!-- Create new Account and Contact -->
-			<logger level="INFO" message="Contact not found by identifiers. Will create new Account and Contact." />
-			<ee:transform doc:name="Account Creation">
-    <ee:message>
-        <ee:set-payload><![CDATA[%dw 2.0
+    </salesforce:query>
+    
+    <!-- Check if contact found by identifiers -->
+    <choice doc:name="Found by Identifiers?">
+        <when expression="#[isEmpty(vars.identifierMatch)]">
+            <!-- Create new Account and Contact -->
+            <logger level="INFO" message="Contact not found by identifiers. Will create new Account and Contact." />
+            <ee:transform doc:name="Account Creation">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
 [{
@@ -2574,14 +2577,14 @@ output application/java
 "Type": "Patient",
 "RecordTypeId": p('sf.account.recordtypeid')
 }]]]></ee:set-payload>
-    </ee:message>
-</ee:transform>
-			<salesforce:create doc:name="Create Account" config-ref="Salesforce_Config" type="Account" target="accountResponse" />
-			<logger level="INFO" message="Account created: #[vars.accountResponse]" />
-			
-			<ee:transform doc:name="Contact Creation">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
+                </ee:message>
+            </ee:transform>
+            <salesforce:create doc:name="Create Account" config-ref="Salesforce_Config" type="Account" target="accountResponse" />
+            <logger level="INFO" message="Account created: #[vars.accountResponse]" />
+            
+            <ee:transform doc:name="Contact Creation">
+                <ee:message>
+                    <ee:set-payload><![CDATA[%dw 2.0
 output application/java
 ---
 [{
@@ -2595,15 +2598,15 @@ output application/java
 "PhoneNumberFormatted__c": if (vars.normalizedPhone != null) vars.normalizedPhone else (vars.sfContactData.Phone[0] replace /[^0-9]/ with ""),
 "HealthFusion_Patient_Record_ID__c": vars.sfContactData.HealthFusion_Patient_Record_ID__c[0]
 }]]]></ee:set-payload>
-				</ee:message>
-			</ee:transform>
-			<salesforce:create doc:name="Create Contact" config-ref="Salesforce_Config" type="Contact" target="contactResponse" />
-			<logger level="INFO" message="Contact created: #[vars.contactResponse]" />
-			
-			<ee:transform doc:name="Set Query Response">
-				<ee:message />
-				<ee:variables>
-					<ee:set-variable variableName="queryResponse"><![CDATA[%dw 2.0
+                </ee:message>
+            </ee:transform>
+            <salesforce:create doc:name="Create Contact" config-ref="Salesforce_Config" type="Contact" target="contactResponse" />
+            <logger level="INFO" message="Contact created: #[vars.contactResponse]" />
+            
+            <ee:transform doc:name="Set Query Response">
+                <ee:message />
+                <ee:variables>
+                    <ee:set-variable variableName="queryResponse"><![CDATA[%dw 2.0
 output application/java
 ---
 [{
@@ -2614,23 +2617,49 @@ output application/java
 "MiddleName": vars.sfContactData.MiddleName[0],
 "Date_of_Birth__c": vars.sfContactData.Date_of_Birth__c[0]
 }]]]></ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-		</when>
-		<otherwise>
-			<!-- Use found contact -->
-			<ee:transform doc:name="Set Query Response from Identifier Match">
-				<ee:message />
-				<ee:variables>
-					<ee:set-variable variableName="queryResponse"><![CDATA[%dw 2.0
+                </ee:variables>
+            </ee:transform>
+        </when>
+        <otherwise>
+            <!-- Update the found contact with HealthFusion ID if it doesn't have one -->
+            <logger level="INFO" message="Contact found by identifiers. Checking for HealthFusion ID update." />
+            
+            <!-- Add this new transform to check if HealthFusion ID needs to be updated -->
+            <choice doc:name="HF ID needs update?">
+    <when expression="#[vars.identifierMatch[0].HealthFusion_Patient_Record_ID__c == null and vars.hfId != null]">
+        <logger level="INFO" message="Updating found contact with HealthFusion ID: #[vars.hfId]"></logger>
+        <ee:transform doc:name="Prepare Contact Update">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+    Id: vars.identifierMatch[0].Id,
+    HealthFusion_Patient_Record_ID__c: vars.hfId
+}]]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <salesforce:update doc:name="Update Contact with HF ID" config-ref="Salesforce_Config" type="Contact"></salesforce:update>
+        <logger level="INFO" message="Updated contact with HealthFusion ID: #[vars.hfId]"></logger>
+    </when>
+    <otherwise>
+        <logger level="INFO" message="No HealthFusion ID update needed for contact: #[vars.identifierMatch[0].Id]"></logger>
+    </otherwise>
+</choice>
+            
+            <!-- Set the query response from the matched contact -->
+            <ee:transform doc:name="Set Query Response from Identifier Match">
+                <ee:message />
+                <ee:variables>
+                    <ee:set-variable variableName="queryResponse"><![CDATA[%dw 2.0
 output application/java
 ---
 vars.identifierMatch
 ]]></ee:set-variable>
-				</ee:variables>
-			</ee:transform>
-			<logger level="INFO" message="Contact found by identifiers: #[vars.queryResponse[0].Id]" />
-		</otherwise>
-	</choice>
+                </ee:variables>
+            </ee:transform>
+            <logger level="INFO" message="Contact found by identifiers: #[vars.queryResponse[0].Id]" />
+        </otherwise>
+    </choice>
 </sub-flow>
 </mule>
