@@ -658,63 +658,90 @@ output application/java
 payload.Data.SIU_S12.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
                         <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
 output application/java
+
+// "flatten" ensures we handle cases with or without ^ subcomponents.
+// "default 'NO_HF_ID'" ensures we never get null if it's completely missing.
 ---
-payload.Data.SIU_S12.PATIENT.PID."PID-04"."CX-01"[0]]]></ee:set-variable>
+flatten(payload.Data.SIU_S12.PATIENT.PID."PID-04")."CX-01"[0] default "NO_HF_ID"
+]]></ee:set-variable>
+
                 </ee:variables>
             </ee:transform>
             <flow-ref doc:name="call To Salesforce For ContactId" doc:id="878c0733-586e-4e6b-9474-ee97910fdd27" name="salesforce_query_Sub_Flow" />
-            <ee:transform doc:name="sfMappings" doc:id="fae4a407-3384-48b7-b9de-829d15aaf099">
-                <ee:message />
-                <ee:variables>
-                    <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+            <ee:transform doc:name="sfMappings" doc:id="54b87dce-db47-4d9c-bcc1-a91b35efba13">
+    <ee:message />
+    <ee:variables>
+        <!-- Determine the SCH-11 field type and extract the start and end times -->
+        <ee:set-variable variableName="sch11Field"><![CDATA[%dw 2.0
 output application/java
----
-
-[{
-  //  "LastModifiedDate" : payload.LastModifiedDate[0],   
-    "ActualStartTime": safeDateTime(payload.Data.SIU_S12.SCH."SCH-11"."TQ-04"."TS-01"[0]),
-    "SchedStartTime": safeDateTime(payload.Data.SIU_S12.SCH."SCH-11"."TQ-04"."TS-01"[0]),
-   "ActualEndTime": safeDateTime(payload.Data.SIU_S12.SCH."SCH-11"."TQ-05"."TS-01"[0]),
-//     "Name": payload.Data.SIU_S12.SCH."SCH-06"."CE-01",
-     "SchedEndTime": safeDateTime(payload.Data.SIU_S12.SCH."SCH-11"."TQ-05"."TS-01"[0]),
-     "NextGen_ID__c": payload.Data.SIU_S12.SCH."SCH-02"."EI-01",
-     
-     "ParentRecordId": if (isEmpty(vars.queryResponse)) 
-                   null 
-                 else if (vars.queryResponse[0].AccountId != null)
-                   vars.queryResponse[0].AccountId
-                 else if (!isEmpty(vars.contactAccount))
-                   vars.contactAccount[0].AccountId
-                 else
-                   null,
-     "DurationType": if(payload.Data.SIU_S12.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S12.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S12.SCH."SCH-10"."CE-01"),
-     
-     "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
-     "AppointmentType": vars.apType,
-     "WorkTypeId" : vars.workTypeId,
-//     "Work_Type_Group_Id": vars.workGroupId,
-     "Work_Type_Group__c": vars.workGroupId,
-     
-//     "AppointmentNumber":payload.Data.SIU_S12.SCH."SCH-02"."EI-01",
-     "ActualDuration" : vars.duration,
-     "Duration": vars.duration,
-	 "DurationType":if(payload.Data.SIU_S12.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S12.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S12.SCH."SCH-10"."CE-01"),
-    
-    
-
-     "Status": if(payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01" == "Booked") ("Scheduled") else if (payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01" == "NEW") ("Scheduled") else (payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01"),
-     "AdditionalInformation": vars.appointmentType,
-     "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
-       "ServiceTerritoryId": vars.locationId,
-        "Service_Resource__c": vars.providerExtract,
-        "Provider__c": vars.providerExtract,  // Custom field to store the ServiceResource ID directly
-//        "HealthFusion_Patient_Record_ID__c":flatten(payload.Data.SIU_S12.PATIENT.PID."PID-04")."CX-01"[0]
-       
-//        "Opportunity__c": vars.opportunity_c.Opportunity__c
-    }]
+--- 
+payload.Data.SIU_S12.SCH."SCH-11" default null
 ]]></ee:set-variable>
-                </ee:variables>
-            </ee:transform>
+        <ee:set-variable variableName="startTime"><![CDATA[%dw 2.0
+output application/java
+fun extractStart(field) =
+    if (field is String) then
+         (field splitBy "^")[3] default null
+    else if (field is Array) then
+         field[0]."TQ-04"."TS-01"[0] default null
+    else null
+---
+extractStart(vars.sch11Field)
+]]></ee:set-variable>
+        <ee:set-variable variableName="endTime"><![CDATA[%dw 2.0
+output application/java
+fun extractEnd(field) =
+    if (field is String) then
+         (field splitBy "^")[4] default null
+    else if (field is Array) then
+         field[0]."TQ-05"."TS-01"[0] default null
+    else null
+---
+extractEnd(vars.sch11Field)
+]]></ee:set-variable>
+        <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
+output application/java
+fun safeDateTime(value) =
+    if (value == null or value == "") 
+       null
+    else 
+       (value as LocalDateTime {format: "yyyyMMddHHmmss"} as String {format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime) default null
+---
+[{
+    "ActualStartTime": safeDateTime(vars.startTime),
+    "SchedStartTime": safeDateTime(vars.startTime),
+    "ActualEndTime": safeDateTime(vars.endTime),
+    "SchedEndTime": safeDateTime(vars.endTime),
+    "NextGen_ID__c": payload.Data.SIU_S12.SCH."SCH-02"."EI-01",
+    "ParentRecordId": if (isEmpty(vars.queryResponse)) 
+                         null 
+                     else if (vars.queryResponse[0].AccountId != null)
+                         vars.queryResponse[0].AccountId
+                     else if (!isEmpty(vars.contactAccount))
+                         vars.contactAccount[0].AccountId
+                     else null,
+    "DurationType": if(payload.Data.SIU_S12.SCH."SCH-10"."CE-01" == "MIN") "Minutes" 
+                    else if (payload.Data.SIU_S12.SCH."SCH-10"."CE-01" == "HRS") "Hours" 
+                    else payload.Data.SIU_S12.SCH."SCH-10"."CE-01",
+    "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
+    "AppointmentType": vars.apType,
+    "WorkTypeId": vars.workTypeId,
+    "Work_Type_Group__c": vars.workGroupId,
+    "ActualDuration": vars.duration,
+    "Duration": vars.duration,
+    "Status": if(payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01" == "Booked") "Scheduled"
+              else if (payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01" == "NEW") "Scheduled"
+              else payload.Data.SIU_S12.SCH."SCH-25"."CE_0278-01",
+    "AdditionalInformation": vars.appointmentType,
+    "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
+    "ServiceTerritoryId": vars.locationId,
+    "Service_Resource__c": vars.providerExtract,
+    "Provider__c": vars.providerExtract
+}]
+]]></ee:set-variable>
+    </ee:variables>
+</ee:transform>
+            
             <logger level="INFO" doc:name="Logger" doc:id="885db280-f954-443b-8818-eb89c9002c38" message="CREATING THE SERVICE APPOINTMENT" />
             <flow-ref doc:name="callToSFupsertSubFlow" doc:id="39aa9efa-4118-4697-82b1-f1771a972ad8" name="common-sf-appointment-upsert-flow" />
             <ee:transform doc:name="fetchingAppointmentId" doc:id="139964f7-2467-4448-9786-f927cf3a033f">
@@ -1793,7 +1820,7 @@ output application/json
     </salesforce:salesforce-query>
     <salesforce:parameters>
         <![CDATA[#[{
-             hfId: "'" ++ vars.hfId ++ "'"
+              hfId: "'" ++ (vars.hfId default "") ++ "'"
         }]]]>
     </salesforce:parameters>
 </salesforce:query>
