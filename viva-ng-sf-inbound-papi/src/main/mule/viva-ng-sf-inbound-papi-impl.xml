@@ -362,6 +362,17 @@ stripPhone(vars.sfContactData.Phone[0])
 ]]></ee:set-variable>
         </ee:variables>
     </ee:transform>
+    <!-- Extract HF ID for ADT^A08 -->
+<ee:transform doc:name="Extract HF ID for ADT^A08">
+    <ee:message />
+    <ee:variables>
+        <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
+output application/java
+---
+flatten(payload.Data.ADT_A08.PID."PID-04")."CX-01"[0] default "UNKNOWN_PATIENT_ID"
+]]></ee:set-variable>
+    </ee:variables>
+</ee:transform>
     
     <!-- Query for existing contact by HealthFusion ID -->
     <salesforce:query doc:name="Query Contact by HF ID" doc:id="589ecdf3-5260-47fa-bdc2-24ca7c43446b" config-ref="Salesforce_Config" target="contactByHfId">
@@ -1108,10 +1119,7 @@ payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"
                         <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
 output application/java
 ---
-if (payload.Data.SIU_S14.PATIENT.PID."PID-04" is Array) then
-    (flatten(payload.Data.SIU_S14.PATIENT.PID."PID-04")[0]."CX-01" default "UNKNOWN_PATIENT_ID")
-else
-    (payload.Data.SIU_S14.PATIENT.PID."PID-04" default "UNKNOWN_PATIENT_ID")
+flatten(payload.Data.SIU_S14.PATIENT.PID."PID-04")."CX-01"[0] default "UNKNOWN_PATIENT_ID"
 ]]></ee:set-variable>
 
                 </ee:variables>
