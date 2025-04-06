@@ -90,6 +90,14 @@ output application/json
     doc:name="MappingsLogger" 
     message="TerritoryMapping size: #[sizeOf(vars.TerritoryMapping)], WorkTypeMapping size: #[sizeOf(vars.WorkTypeMapping)], ProviderMapping size: #[sizeOf(vars.ProviderMapping)]" />
 
+<!-- Add this new logger to debug the actual TerritoryMapping contents -->
+<logger 
+    level="INFO"
+    doc:name="TerritoryMappingDebug"
+    message="TerritoryMapping Contents: #[%dw 2.0 output application/json --- vars.TerritoryMapping]" />
+    
+    
+
     <ee:transform doc:name="inputPayload" doc:id="50e635b0-00ee-492d-98d9-9b511b36fa73">
         <ee:message />
         <ee:variables>
@@ -150,6 +158,46 @@ fun checkADT(payload) = payload contains "SIU^S15"
 ]]></ee:set-variable>
         </ee:variables>
     </ee:transform>
+    
+    <!-- Generic location code extraction function -->
+<ee:transform doc:name="Extract NextGen Location Code - Generic" doc:id="5839e1fc-4c90-49c3-9cb4-dda953797696">
+    <ee:message />
+    <ee:variables>
+        <ee:set-variable variableName="genericLocationExtractor"><![CDATA[%dw 2.0
+output application/java
+
+fun getNextGenLocationCode(payload) =
+    // Extract location code based on message type
+    if (payload.Data.SIU_S12?)
+        (payload.Data.SIU_S12.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"[0] as String splitBy "^")[0]
+    else if (payload.Data.SIU_S13?)
+        (payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"[0] as String splitBy "^")[0]
+    else if (payload.Data.SIU_S14?)
+        (payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"[0] as String splitBy "^")[0]
+    else if (payload.Data.SIU_S15?)
+        (payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"[0] as String splitBy "^")[0]
+    else
+        null
+
+fun normalizeLocation(loc) = 
+    if (loc == null) 
+        ""
+    else 
+        upper(trim(loc)) replace '"' with ''
+
+fun mapLocationToTerritory(locationCode) =
+    ((vars.TerritoryMapping filter ((item) -> normalizeLocation(item.LOCATION) == normalizeLocation(locationCode)))[0]).Id
+---
+{
+    // This is a function library, not meant to set a variable
+    "status": "success"
+}
+]]></ee:set-variable>
+    </ee:variables>
+</ee:transform>
+    
+    
+    <logger level="INFO" doc:name="Generic Location Functions Loaded" message="Generic location mapping functions loaded for all message types" />
 
     <choice doc:name="Choice" doc:id="e7635a7d-c523-49c5-8363-825d3becb8a8">
 
@@ -697,18 +745,49 @@ var provider = vars.ProviderMapping
 ---
 (provider filter ($.NPI == flatten(payload.Data.SIU_S12.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].providerId
 ]]></ee:set-variable>
+                    <ee:set-variable variableName="nextGenLocationCode"><![CDATA[%dw 2.0
+output application/java
+---
+payload.Data.SIU_S12.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]
+]]></ee:set-variable>
                     <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
-var location = vars.TerritoryMapping
+var territoryMapping = vars.TerritoryMapping
 ---
-(location filter ($.LOCATION == payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]
+(territoryMapping filter ((item) -> 
+    contains(upper(item.LOCATION default ""), upper(vars.nextGenLocationCode default ""))
+))[0].Id
 ]]></ee:set-variable>
+                </ee:variables>
+            </ee:transform>
+            
+            <logger level="INFO" message="EXACT DATA: nextGenCode='#[vars.nextGenLocationCode]', codeType=#[typeOf(vars.nextGenLocationCode)], Territory[0]='#[vars.TerritoryMapping[0].LOCATION]', typeT=#[typeOf(vars.TerritoryMapping[0].LOCATION)]" />
+            
+<!-- Add the debug logger here -->
+<logger level="INFO" 
+        doc:name="Debug Location Comparison" 
+        message="Debug comparison: nextGenLocationCode=[#[vars.nextGenLocationCode]], type=#[typeOf(vars.nextGenLocationCode)], length=#[sizeOf(vars.nextGenLocationCode)], TerritoryMapping.LOCATION values=#[vars.TerritoryMapping.LOCATION]" />
+
+<!-- Your existing logger -->
+<logger level="INFO" doc:name="Location Mapping Result" doc:id="a8fe530e-8479-47d5-a070-c309d9d542ab"
+        message="Mapping NextGen location '#[vars.nextGenLocationCode]' to ServiceTerritoryId: #[vars.locationId default 'NOT FOUND']" />
+
+            <choice doc:name="Check Mapping Success" doc:id="s12-location-mapping-check">
+                <when expression="#[vars.locationId == null]">
+                    <logger level="WARN" doc:name="Location Mapping Warning" doc:id="s12-location-mapping-warning"
+                            message="WARNING: No ServiceTerritory mapping found for NextGen location: #[vars.nextGenLocationCode]" />
+                </when>
+            </choice>
+            
+            <ee:transform doc:name="Additional S12 Variables">
+                <ee:message />
+                <ee:variables>
                     <ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))[0].duration]]></ee:set-variable>
-<ee:set-variable variableName="apType"><![CDATA[%dw 2.0
+                    <ee:set-variable variableName="apType"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
 ---
@@ -924,11 +1003,35 @@ var provider = vars.ProviderMapping
 ---
 (provider filter ($.NPI == flatten(payload.Data.SIU_S13.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].providerId
 ]]></ee:set-variable>
+                    <ee:set-variable variableName="nextGenLocationCode"><![CDATA[%dw 2.0
+output application/java
+---
+payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]
+]]></ee:set-variable>
                     <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
-var location = vars.TerritoryMapping
+var territoryMapping = vars.TerritoryMapping
 ---
-(location filter ($.LOCATION == payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
+(territoryMapping filter ((item) -> 
+    contains(upper(item.LOCATION default ""), upper(vars.nextGenLocationCode default ""))
+))[0].Id
+]]></ee:set-variable>
+                </ee:variables>
+            </ee:transform>
+            
+            <logger level="INFO" doc:name="Location Mapping Result" doc:id="s13-location-mapping-logger"
+                    message="Mapping NextGen location '#[vars.nextGenLocationCode]' to ServiceTerritoryId: #[vars.locationId default 'NOT FOUND']" />
+
+            <choice doc:name="Check Mapping Success" doc:id="s13-location-mapping-check">
+                <when expression="#[vars.locationId == null]">
+                    <logger level="WARN" doc:name="Location Mapping Warning" doc:id="s13-location-mapping-warning"
+                            message="WARNING: No ServiceTerritory mapping found for NextGen location: #[vars.nextGenLocationCode]" />
+                </when>
+            </choice>
+            
+            <ee:transform doc:name="Additional S13 Variables">
+                <ee:message />
+                <ee:variables>
                     <ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
@@ -1453,11 +1556,35 @@ var provider = vars.ProviderMapping
 ---
 (provider filter ($.NPI == flatten(payload.Data.SIU_S15.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].providerId
 ]]></ee:set-variable>
+                    <ee:set-variable variableName="nextGenLocationCode"><![CDATA[%dw 2.0
+output application/java
+---
+payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]
+]]></ee:set-variable>
                     <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/json
-var location = vars.TerritoryMapping
+var territoryMapping = vars.TerritoryMapping
 ---
-(location filter ($.LOCATION == payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
+(territoryMapping filter ((item) -> 
+    contains(upper(item.LOCATION default ""), upper(vars.nextGenLocationCode default ""))
+))[0].Id
+]]></ee:set-variable>
+                </ee:variables>
+            </ee:transform>
+            
+            <logger level="INFO" doc:name="Location Mapping Result" doc:id="s15-location-mapping-logger"
+                    message="Mapping NextGen location '#[vars.nextGenLocationCode]' to ServiceTerritoryId: #[vars.locationId default 'NOT FOUND']" />
+
+            <choice doc:name="Check Mapping Success" doc:id="s15-location-mapping-check">
+                <when expression="#[vars.locationId == null]">
+                    <logger level="WARN" doc:name="Location Mapping Warning" doc:id="s15-location-mapping-warning"
+                            message="WARNING: No ServiceTerritory mapping found for NextGen location: #[vars.nextGenLocationCode]" />
+                </when>
+            </choice>
+            
+            <ee:transform doc:name="Additional S15 Variables">
+                <ee:message />
+                <ee:variables>
                     <ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
