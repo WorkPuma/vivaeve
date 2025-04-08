@@ -59,4 +59,12 @@ output application/json
 		<flow-ref doc:name="logSuccessResponseSent" doc:id="ee8e30c2-ebf2-45b7-a73a-ce395094fd37" name="mile-log:success-response-sent" />
 	</sub-flow>
 
+	<sub-flow name="mile-log:request-received" doc:id="mile-log-request-received">
+		<logger level="INFO" doc:name="Request Logger" message="#[vars.inputPayload]" />
+	</sub-flow>
+	
+	<sub-flow name="mile-log:success-response-sent" doc:id="mile-log-success-response-sent">
+		<logger level="INFO" doc:name="Response Logger" message="#[vars.inputPayload]" />
+	</sub-flow>
+
 </mule>
