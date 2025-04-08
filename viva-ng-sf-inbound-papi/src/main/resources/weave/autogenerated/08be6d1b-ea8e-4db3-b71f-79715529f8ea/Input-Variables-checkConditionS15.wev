@@ -1,4 +1,15 @@
 %dw 2.0
+output application/json
 
-type auto_08be6d1b_ea8e_4db3_b71f_79715529f8ea_Input_Variables_checkConditionS15 = Any
+fun safeString(value) = if (value == null or value == "") then null else value as String
 
+var result = {
+    "NextGen_ID__c": if ((payload.Data.SIU_S15.SCH."SCH-2" default "") != "")
+                         then safeString(payload.Data.SIU_S15.SCH."SCH-2")
+                         else if ((payload.Data.SIU_S15.SCH."SCH-3" default "") != "")
+                              then safeString(payload.Data.SIU_S15.SCH."SCH-3")
+                              else null
+}
+
+---
+result

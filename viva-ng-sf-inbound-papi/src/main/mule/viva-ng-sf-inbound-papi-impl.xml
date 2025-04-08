@@ -1727,7 +1727,9 @@ fun safeDateTime(value) =
     "ActualEndTime": safeDateTime(payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]),
     "NextGen_ID__c": if ((payload.Data.SIU_S15.SCH."SCH-2" default "") != "")
                      then (payload.Data.SIU_S15.SCH."SCH-2" as String)
-                     else (payload.Data.SIU_S15.SCH."SCH-3" as String),
+                     else if ((payload.Data.SIU_S15.SCH."SCH-3" default "") != "")
+                          then (payload.Data.SIU_S15.SCH."SCH-3" as String)
+                          else null,
     "DurationType": payload.Data.SIU_S15.SCH."SCH-10"."CE-01",
     "Status": if (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "CANCELLED") "Cancelled by Provider"
               else if (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "NO SHOW") "No Show"
