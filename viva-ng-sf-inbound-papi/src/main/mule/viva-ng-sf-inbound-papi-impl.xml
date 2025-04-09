@@ -36,7 +36,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 
 	
-    <vm:config name="VM_Config" doc:name="VM Config" doc:id="276c3221-53cd-4795-adbe-efe52026ad03">
+    <vm:config name="VM_Config" doc:name="VM Config" doc:id="78a0f61f-84a1-413c-9ef6-c5825ded67ce">
         <vm:connection>
             <reconnection>
                 <reconnect/>
@@ -48,8 +48,8 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
     </vm:config>
     
     
-<sub-flow name="nextgen-sf-papi-impl" doc:id="de950e1b-248f-45d8-a5d6-451e3ebbf7f9">
-    <logger level="INFO" doc:name="startLogger" doc:id="606e9409-ddb7-4da1-9a5c-99afff0c5d6e" 
+<sub-flow name="nextgen-sf-papi-impl" doc:id="65f70393-3fd6-4cf6-8877-61aaebc669f2">
+    <logger level="INFO" doc:name="startLogger" doc:id="0ede0645-30d0-48ee-b76a-ad0183034455" 
             message="#[%dw 2.0
 output application/json
 
@@ -68,19 +68,19 @@ output application/json
 <!-- Retrieve Mappings from Object Store V2 -->
 <os:retrieve 
     doc:name="Retrieve TerritoryMapping" 
-    doc:id="a3e861cc-30ef-4f68-9bf0-17cd825fb522"
+    doc:id="de5a38eb-ac7e-4b00-a2cc-7998a45384fd"
     key="TerritoryMapping"
     target="TerritoryMapping" objectStore="MappingsObjectStore"/>
 
 <os:retrieve 
     doc:name="Retrieve WorkTypeMapping"
-    doc:id="4cc4f607-4547-489b-9c23-ee992d45a6a8"
+    doc:id="43b0ff1f-2561-450f-91bb-9850fc0cd39d"
     key="WorkTypeMapping"
     target="WorkTypeMapping" objectStore="MappingsObjectStore"/>
 
 <os:retrieve 
     doc:name="Retrieve ProviderMapping"
-    doc:id="6c58e733-20b8-4a4a-a3d7-0bdc3f60d8d1"
+    doc:id="d5e030f2-74ea-49ff-8a99-72db5ab476f8"
     key="ProviderMapping"
     target="ProviderMapping" objectStore="MappingsObjectStore"/>
 
@@ -98,7 +98,7 @@ output application/json
     
     
 
-    <ee:transform doc:name="inputPayload" doc:id="76d56bf5-0209-4ba2-b772-f85ee9e61641">
+    <ee:transform doc:name="inputPayload" doc:id="f29fc0f0-6488-4790-9e09-14afa881bf2e">
         <ee:message />
         <ee:variables>
             <ee:set-variable variableName="inputPayload"><![CDATA[%dw 2.0
@@ -109,10 +109,10 @@ payload]]></ee:set-variable>
     </ee:transform>
 
     <logger level="INFO" doc:name="printInputPayload" 
-            doc:id="066e98ae-bbaf-46d2-a0d2-c26e02557894" 
+            doc:id="db4bee3e-b4e5-4e7f-bdd1-3020a0c9df28" 
             message="#[vars.inputPayload]"/>
 
-    <ee:transform doc:name="conditionCheck" doc:id="607ff181-d89a-458c-a580-272ad19d9ed7">
+    <ee:transform doc:name="conditionCheck" doc:id="9ca522a0-31f6-4279-918f-0a17ec7539a0">
         <ee:message />
         <ee:variables>
             <ee:set-variable variableName="checkConditionA04"><![CDATA[%dw 2.0
@@ -160,7 +160,7 @@ fun checkADT(payload) = payload contains "SIU^S15"
     </ee:transform>
     
     <!-- Generic location code extraction function -->
-<ee:transform doc:name="Extract NextGen Location Code - Generic" doc:id="5052f59e-9b5b-4a87-b66f-7a2b11087460">
+<ee:transform doc:name="Extract NextGen Location Code - Generic" doc:id="8207e48a-fabe-4499-aea9-51179653260b">
     <ee:message />
     <ee:variables>
         <ee:set-variable variableName="genericLocationExtractor"><![CDATA[%dw 2.0
@@ -199,23 +199,23 @@ fun mapLocationToTerritory(locationCode) =
     
     <logger level="INFO" doc:name="Generic Location Functions Loaded" message="Generic location mapping functions loaded for all message types" />
 
-    <choice doc:name="Choice" doc:id="360bb225-43c7-4c59-b0b8-81f1049a9d64">
+    <choice doc:name="Choice" doc:id="786bffa8-cdd4-407f-b4f3-2b8435b41c7d">
 
         <!--  ========== ADT^A04 ========== -->
         <when expression="#[vars.checkConditionA04.result]">
-    <logger level="INFO" doc:name="A04 Entry Logger" doc:id="c3328381-597b-4427-8e2e-07dea573ab3a" 
+    <logger level="INFO" doc:name="A04 Entry Logger" doc:id="b9bab1c7-91d0-4dea-8e2f-a3d2516462de" 
             message="STARTED PROCESSING ADT^A04 MESSAGE" />
                    
-            <try doc:name="A04 Processing Try" doc:id="93b9c4a4-7a49-411d-89b1-1e57d2d9df73">
-                <hl7:read doc:name="A04" doc:id="2b3e1c95-008e-4c24-bf3d-e1897e24a6d2" config-ref="HL7_EDI_Config_A04">
+            <try doc:name="A04 Processing Try" doc:id="8baa96ec-5e45-4eee-a94e-a71d2c9a371c">
+                <hl7:read doc:name="A04" doc:id="3ee17f1e-5b95-4f8f-a1c9-39ead36c3805" config-ref="HL7_EDI_Config_A04">
                     <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
                 </hl7:read>
                 <logger level="INFO" doc:name="A04 Message ID Logger" 
         message="Processing ADT^A04 message with ID: #[payload.Data.ADT_A04.MSH.'MSH-10']" />
                 
-                <logger level="INFO" doc:name="A04 Parse Logger" doc:id="9d63fd93-d66a-4f35-9792-6187e71bcc25" 
+                <logger level="INFO" doc:name="A04 Parse Logger" doc:id="448bf7df-2938-4a0a-9c52-7033fd4d5fdc" 
                        message="A04 Message - Successfully parsed HL7 message. Message Type: #[payload.Data.ADT_A04.MSH.'MSH-9'.'CM_MSG-01' default 'UNKNOWN']^#[payload.Data.ADT_A04.MSH.'MSH-9'.'CM_MSG-02' default 'UNKNOWN']" />
-            <ee:transform doc:name="jsonPayload" doc:id="c6308a87-b222-42b0-984a-cc429b438407">
+            <ee:transform doc:name="jsonPayload" doc:id="b381ca6d-510d-4a69-b8bc-400b17cfb523">
                 <ee:message>
                     <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -224,7 +224,7 @@ payload]]></ee:set-payload>
                 </ee:message>
             </ee:transform>
             
-            <ee:transform doc:name="Extract HF ID for A04" doc:id="a09ee28e-2931-42a7-9d32-5edfb64b38b3">
+            <ee:transform doc:name="Extract HF ID for A04" doc:id="62de53ef-de31-44d2-a046-499647d5b2b5">
                 <ee:message />
                 <ee:variables>
                     <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
@@ -235,11 +235,11 @@ flatten(payload.Data.ADT_A04.PID."PID-04")."CX-01"[0] default "UNKNOWN_PATIENT_I
                 </ee:variables>
             </ee:transform>
 
-            <logger level="INFO" doc:name="A04 HF ID Logger" doc:id="c106d314-4049-4dba-a302-62b68fcf2c1b" 
+            <logger level="INFO" doc:name="A04 HF ID Logger" doc:id="ff409fa9-75d4-4442-8594-f9629836731f" 
                     message="A04 Message - Extracted HealthFusion ID: #[vars.hfId], Message ID: #[payload.Data.ADT_A04.MSH.'MSH-10']" />
 
             <!-- Example language field from a local JSON file -->
-            <ee:transform doc:name="language_field" doc:id="ca4de396-b587-4755-806d-41206e89f7d4">
+            <ee:transform doc:name="language_field" doc:id="04117ca6-f5fa-49d8-bc8a-110c5bb6fb56">
                 <ee:variables>
                     <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
 output application/json
@@ -251,7 +251,7 @@ var language =  readUrl("classpath://Language_Preferred__c.json","application/js
             </ee:transform>
 
             <!-- Prepare SF payloads for Account + Contact -->
-            <ee:transform doc:name="sfMappings" doc:id="d9a1875f-13a6-41c0-95e4-4c69e53a48de">
+            <ee:transform doc:name="sfMappings" doc:id="871ebe3b-9475-4865-9ab7-47a8a1b549fa">
                 <ee:message/>
                 <ee:variables>
                     <ee:set-variable variableName="accountCreate"><![CDATA[%dw 2.0
@@ -293,21 +293,21 @@ output application/java
             </ee:transform>
 
             <!-- Query existing Contact by name -->
-            <logger level="INFO" doc:name="A04 Pre-Query Logger" doc:id="63df7b57-f700-4d82-8feb-b1ed3cbb2cb6" 
+            <logger level="INFO" doc:name="A04 Pre-Query Logger" doc:id="52bb5999-495a-4665-a84d-9bb9d38aa7dc" 
                    message="A04 Message - About to query Salesforce for contact with HF ID: #[vars.hfId]" />
                    
-            <flow-ref doc:name="callToGetContactId" doc:id="c6ebafee-45c8-41c3-a998-3e3d779a34e7" name="salesforce_query_Sub_Flow" />
+            <flow-ref doc:name="callToGetContactId" doc:id="a9b2d6a5-e4cb-4b70-a466-68ead5990b33" name="salesforce_query_Sub_Flow" />
             
-            <logger level="INFO" doc:name="A04 Post-Query Logger" doc:id="33c49eba-5e24-4978-bdb2-dd9fe8218751" 
+            <logger level="INFO" doc:name="A04 Post-Query Logger" doc:id="a2938efe-0fee-4a38-8239-c2b2757b9e6b" 
                    message="A04 Message - Query returned #[sizeOf(vars.queryResponse)] contact record(s). Found match: #[!isEmpty(vars.queryResponse)]" />
 
-            <choice doc:name="Choice" doc:id="8f247049-351c-4be2-a754-da6a529fd48f">
+            <choice doc:name="Choice" doc:id="d1539c05-b678-4e67-a625-8d1b81326ea1">
     <when expression="#[isEmpty(vars.queryRes) or vars.queryRes.AccountId[0] == null]">
         <flow-ref doc:name="flow reference to createAccount" 
-                  doc:id="0b746c65-2d1a-4abc-937e-8be750eb0933" 
+                  doc:id="d16eb37b-fe73-4244-bc3c-dc70171404cf" 
                   name="createAccount" />
 
-        <ee:transform doc:name="transformedSfData" doc:id="7456b7b6-313d-47b9-9ef3-ce469b332c60">
+        <ee:transform doc:name="transformedSfData" doc:id="1c7d1918-2af9-4ac9-97c2-d9374f40f624">
     <ee:message/>
     <ee:variables>
         <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
@@ -334,16 +334,16 @@ output application/java
 </ee:transform>
 <logger level="INFO" 
         doc:name="Logger" 
-        doc:id="4c9788eb-6aeb-4713-9572-f90871b47248" 
+        doc:id="162828f6-b7c6-48b2-8635-4acfa0bdebf3" 
         message="USING EXISTING ACCOUNT"/>
 </when>
 <otherwise>
     <logger level="INFO" 
             doc:name="Logger" 
-            doc:id="392cddfb-369d-4f09-aa15-64db479670e5" 
+            doc:id="566c10f6-cc60-4194-9f59-08c59131707d" 
             message="EXISTING ACCOUNT LOGIC"/>
     <ee:transform doc:name="requiredSfMappings" 
-                 doc:id="c0d3a955-f21c-4b19-bd75-262b3bb5329c">
+                 doc:id="4a24a265-5fef-40ee-ad90-16d9260bb583">
         <ee:message/>
         <ee:variables>
             <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
@@ -369,19 +369,19 @@ output application/java
         </ee:variables>
     </ee:transform>
     <logger level="INFO" doc:name="Logger" 
-            doc:id="a1ade421-058f-4df1-bb9d-54487c4ddd4e" 
+            doc:id="36dbaa3b-af41-4221-97b8-a782309fd545" 
             message="USING EXISTING CONTACT" />
 </otherwise>
 </choice>
 
             <!-- Upsert the contact record -->
             <flow-ref doc:name="callToUpsertFlow" 
-                      doc:id="5d71d472-b0d9-42d1-a8cb-1c77633b0f79" 
+                      doc:id="2904e6af-5426-4212-b49b-1277d8c645ed" 
                       name="common-sf-upsert-flow" />
                       
                 <error-handler>
-                    <on-error-continue type="ANY" doc:name="A04 Error Handler" doc:id="c701b80b-0380-48fc-8f95-5a3bd55fe3fa">
-                        <ee:transform doc:name="Error Response" doc:id="ba802efe-7a7f-42e7-8ddd-48b2354e2a45">
+                    <on-error-continue type="ANY" doc:name="A04 Error Handler" doc:id="1baaff6b-3b06-4253-8f3e-76428c60e3b1">
+                        <ee:transform doc:name="Error Response" doc:id="25551f11-5899-4a6b-88a0-4f2ce754f476">
                             <ee:message>
                                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -394,23 +394,23 @@ output application/json
 }]]></ee:set-payload>
                             </ee:message>
                         </ee:transform>
-                        <logger level="ERROR" doc:name="A04 Error Logger" doc:id="489dc9d6-9e90-4c83-be20-81be7d47ad96" 
+                        <logger level="ERROR" doc:name="A04 Error Logger" doc:id="f89e49a6-ef26-4ca6-b1f1-2ff03b2cc238" 
                                message="A04 Message Error - Type: #[error.errorType.identifier default 'UNKNOWN'], Description: #[error.description]" />
                     </on-error-continue>
                 </error-handler>
             </try>
             
-            <logger level="INFO" doc:name="A04 Exit Logger" doc:id="9cbd9d2c-d95e-4214-88bb-112d4eb831a0" 
+            <logger level="INFO" doc:name="A04 Exit Logger" doc:id="719d8acf-1796-4c5c-9f68-04cfee920e51" 
                    message="COMPLETED PROCESSING ADT^A04 MESSAGE - Message ID: #[payload.Data.ADT_A04.MSH.'MSH-10' default 'UNKNOWN']" />
         </when>
 
         <!--  ========== ADT^A08 ========== -->
         <when expression="#[vars.checkConditionA08.result]">
-    <hl7:read doc:name="A08" doc:id="39f51b4b-fa56-482a-82e4-9e5b98c24e61" config-ref="HL7_EDI_Config_A08">
+    <hl7:read doc:name="A08" doc:id="220e2379-72cf-4026-8de0-971f48c957b5" config-ref="HL7_EDI_Config_A08">
         <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
     </hl7:read>
     
-    <ee:transform doc:name="jsonPayload" doc:id="1f5c644a-7fd3-44b4-80df-04762d472bf4">
+    <ee:transform doc:name="jsonPayload" doc:id="5527f271-e911-40f5-974d-3c0ea13b0385">
         <ee:message>
             <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -419,7 +419,7 @@ payload]]></ee:set-payload>
         </ee:message>
     </ee:transform>
     
-    <ee:transform doc:name="Extract Contact Fields" doc:id="cc2a4c37-fc2e-464b-8182-d55d735a171f">
+    <ee:transform doc:name="Extract Contact Fields" doc:id="e7221e77-3519-4f58-a9b9-a9cc3f6d5c5b">
         <ee:message />
         <ee:variables>
             <ee:set-variable variableName="sfContactData"><![CDATA[%dw 2.0
@@ -477,7 +477,7 @@ flatten(payload.Data.ADT_A08.PID."PID-04")."CX-01"[0] default "UNKNOWN_PATIENT_I
 </ee:transform>
     
     <!-- Query for existing contact by HealthFusion ID -->
-    <salesforce:query doc:name="Query Contact by HF ID" doc:id="22523034-c00e-4e2d-95cc-f8006e9526fd" config-ref="Salesforce_Config" target="contactByHfId">
+    <salesforce:query doc:name="Query Contact by HF ID" doc:id="6b5ac5f4-855e-4291-a2f9-7fcd6cdbc804" config-ref="Salesforce_Config" target="contactByHfId">
         <salesforce:salesforce-query><![CDATA[
             SELECT Id, AccountId, FirstName, LastName, Email, Phone, Date_of_Birth__c
             FROM Contact 
@@ -490,7 +490,7 @@ flatten(payload.Data.ADT_A08.PID."PID-04")."CX-01"[0] default "UNKNOWN_PATIENT_I
     
     <!-- Process based on query results -->
     <try>
-        <choice doc:name="Found by HF ID?" doc:id="99372c90-3727-42e9-a724-f19f189397a8">
+        <choice doc:name="Found by HF ID?" doc:id="c50c6cf1-8767-40d1-9fc2-54c5f95d7922">
             <when expression="#[isEmpty(vars.contactByHfId)]">
                 <!-- Not found by HF ID, try other identifiers -->
                 <!-- Normalize phone number -->
@@ -530,29 +530,29 @@ fun safeLower(s) = if (s == null) "" else lower(s)
                     </ee:variables>
                 </ee:transform>
 
-                <salesforce:query doc:name="Query by Name and Other Fields" config-ref="Salesforce_Config" target="contactByOtherFields">
-    <salesforce:salesforce-query><![CDATA[
-        SELECT Id, AccountId, FirstName, LastName, Email, Phone, PhoneNumberFormatted__c, Date_of_Birth__c
-        FROM Contact 
-        WHERE FirstName = :firstName
-          AND LastName = :lastName
-          AND (Email = :email 
-               OR PhoneNumberFormatted__c = :phone 
-               OR Date_of_Birth__c = :dob)
-        LIMIT 1
-    ]]></salesforce:salesforce-query>
-    <salesforce:parameters><![CDATA[#[{
+                <salesforce:query doc:name="Query by Name and Other Fields" doc:id="72148184-659b-42ff-a0f2-2f58f3702987" config-ref="Salesforce_Config" target="contactByOtherFields">
+                    <salesforce:salesforce-query><![CDATA[
+                        SELECT Id, AccountId, FirstName, LastName, Email, Phone, PhoneNumberFormatted__c, Date_of_Birth__c
+                        FROM Contact 
+                        WHERE FirstName = :firstName
+                        AND LastName = :lastName
+                        AND (Email = :email 
+                             OR PhoneNumberFormatted__c = :phone 
+                             OR Date_of_Birth__c = :dob)
+                        LIMIT 1
+                    ]]></salesforce:salesforce-query>
+                     <salesforce:parameters><![CDATA[#[{
     firstName: "'" ++ vars.contactQueryParams.firstName ++ "'",
     lastName: "'" ++ vars.contactQueryParams.lastName ++ "'",
     email: "'" ++ vars.contactQueryParams.email ++ "'",
     phone: "'" ++ vars.contactQueryParams.phone ++ "'",
-    dob: if (vars.contactQueryParams.dob != null)
-             vars.contactQueryParams.dob as Date {format: "yyyy-MM-dd"}
-         else 
-             null
+    dob: if (vars.contactQueryParams.dob != null) 
+        vars.contactQueryParams.dob as Date {format: "yyyy-MM-dd"} 
+     else 
+        null
 }]]]></salesforce:parameters>
-</salesforce:query>
 
+                </salesforce:query>
                 
                 <choice doc:name="Found by Other Fields?">
                     <when expression="#[!isEmpty(vars.contactByOtherFields)]">
@@ -709,19 +709,19 @@ output application/json
 
         <!--  ========== SIU^S12 ========== -->
       <when expression="#[vars.checkConditionS12.result]">
-    <logger level="INFO" doc:name="S12 Entry Logger" doc:id="fbf40f51-7655-482c-b488-61ec41e4aefa" 
+    <logger level="INFO" doc:name="S12 Entry Logger" doc:id="d9093753-c634-4f58-b03e-0875e9d88b53" 
             message="STARTED PROCESSING SIU^S12 MESSAGE" />
             
             
-            <try doc:name="S12 Processing Try" doc:id="90cbbd2c-4627-4374-a293-1c3a78a15a58">
-                <hl7:read doc:name="S12" doc:id="8dfc619e-7154-4838-afbd-0f9e8f069b2d" config-ref="HL7_EDI_Config_S12">
+            <try doc:name="S12 Processing Try" doc:id="ce3550c5-a3ab-4f3f-b03e-e947ecbf6fa2">
+                <hl7:read doc:name="S12" doc:id="f4e9d02d-382b-4b31-bb68-bd509e5ead88" config-ref="HL7_EDI_Config_S12">
                     <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
                 </hl7:read>
               <logger level="INFO" doc:name="S12 Message ID Logger" 
         message="Processing SIU^S12 message with ID: #[payload.Data.SIU_S12.MSH.'MSH-10']" />  
-            <logger level="INFO" doc:name="S12 Parse Logger" doc:id="779a44d7-c754-464b-a583-cc7ee1502482" 
+            <logger level="INFO" doc:name="S12 Parse Logger" doc:id="f833c65e-d9b2-4404-9d13-d128fff3c52e" 
                 message="S12 Message - Successfully parsed HL7 message. Message Type: #[payload.Data.SIU_S12.MSH.'MSH-9'.'CM_MSG-01' default 'UNKNOWN']^#[payload.Data.SIU_S12.MSH.'MSH-9'.'CM_MSG-02' default 'UNKNOWN']" />
-            <ee:transform doc:name="jsonPayload" doc:id="1858b680-b368-4bb0-b8d6-52cac4c5ec30">
+            <ee:transform doc:name="jsonPayload" doc:id="253fe08d-b724-40f4-87c5-f9737155b651">
                 <ee:message>
                     <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -729,7 +729,7 @@ output application/json
 payload]]></ee:set-payload>
                 </ee:message>
             </ee:transform>
-            <ee:transform doc:name="input_mappings" doc:id="9f2d3a1d-65ad-4fe4-b494-fcfb72fe82fa">
+            <ee:transform doc:name="input_mappings" doc:id="29a80fc0-a21d-4150-9a29-858bff099d32">
                 <ee:message />
                 <ee:variables>
                     <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
@@ -831,12 +831,12 @@ output application/java
         message="Debug comparison: nextGenLocationCode=[#[vars.nextGenLocationCode]], type=#[typeOf(vars.nextGenLocationCode)], length=#[sizeOf(vars.nextGenLocationCode)], TerritoryMapping.LOCATION values=#[vars.TerritoryMapping.LOCATION]" />
 
 <!-- Your existing logger -->
-<logger level="INFO" doc:name="Location Mapping Result" doc:id="2a9ace77-0251-409f-bfdf-c5126598f287"
+<logger level="INFO" doc:name="Location Mapping Result" doc:id="e13c606b-7f6a-458e-ba23-6f2a998671df"
         message="Mapping NextGen location '#[vars.nextGenLocationCode]' to ServiceTerritoryId: #[vars.locationId default 'NOT FOUND']" />
 
-            <choice doc:name="Check Mapping Success" doc:id="e4eed238-8a74-41c5-862a-dab24f041710">
+            <choice doc:name="Check Mapping Success" doc:id="c0dbfbaf-d64f-4db6-a2a8-2aed9f1d6d5c">
                 <when expression="#[vars.locationId == null]">
-                    <logger level="WARN" doc:name="Location Mapping Warning" doc:id="3985d295-819a-4f1f-8c1b-7e4baa048419"
+                    <logger level="WARN" doc:name="Location Mapping Warning" doc:id="6199822a-47e6-45af-92b9-2c79fd3238bf"
                             message="WARNING: No ServiceTerritory mapping found for NextGen location: #[vars.nextGenLocationCode]" />
                 </when>
             </choice>
@@ -895,17 +895,17 @@ flatten(payload.Data.SIU_S12.PATIENT.PID."PID-04")."CX-01"[0] default "UNKNOWN_P
         doc:name="Debug Location Code" 
         message='Location code extracted: #[vars.nextGenLocationCode]' />
             
-            <logger level="INFO" doc:name="S12 HF ID Logger" doc:id="af63ac55-732d-4749-9931-dba257c94f77" 
+            <logger level="INFO" doc:name="S12 HF ID Logger" doc:id="4c168453-60c4-4ca8-822f-c557a6617fc0" 
                     message="S12 Message - Extracted HealthFusion ID: #[vars.hfId], Message ID: #[payload.Data.SIU_S12.MSH.'MSH-10']" />
                     
-            <logger level="INFO" doc:name="S12 Pre-Query Logger" doc:id="f2352703-0e41-495d-9d18-1f8cd1a28449" 
+            <logger level="INFO" doc:name="S12 Pre-Query Logger" doc:id="c7d5a4cd-ef5e-44b4-b981-b835e8840d65" 
                     message="S12 Message - About to query Salesforce for contact with HF ID: #[vars.hfId]" />
                     
-            <flow-ref doc:name="call To Salesforce For ContactId" doc:id="7fefe053-0845-4f35-8717-bdc87a609fab" name="salesforce_query_Sub_Flow" />
+            <flow-ref doc:name="call To Salesforce For ContactId" doc:id="9fa4e0d5-8cbf-465a-a898-98b71c5ad77d" name="salesforce_query_Sub_Flow" />
             
-            <logger level="INFO" doc:name="S12 Post-Query Logger" doc:id="75306b71-68b1-4ed5-b61d-a4f76ad89e84" 
+            <logger level="INFO" doc:name="S12 Post-Query Logger" doc:id="b05c67f0-f415-4a24-9e94-df747c3f9397" 
                     message="S12 Message - Query returned #[sizeOf(vars.queryResponse)] contact record(s). Found match: #[!isEmpty(vars.queryResponse)]" />
-            <ee:transform doc:name="sfMappings" doc:id="a742eefb-1c67-47c1-b217-7b969c38835c">
+            <ee:transform doc:name="sfMappings" doc:id="11c01ed9-71a4-4387-b7f4-b7a64d7caacc">
     <ee:message />
     <ee:variables>
         <!-- Determine the SCH-11 field type and extract the start and end times -->
@@ -979,9 +979,9 @@ fun safeDateTime(value) =
     </ee:variables>
 </ee:transform>
             
-            <logger level="INFO" doc:name="Logger" doc:id="5f18b263-24ad-4da2-ad79-0440a67d0168" message="CREATING THE SERVICE APPOINTMENT" />
-            <flow-ref doc:name="callToSFupsertSubFlow" doc:id="3b7168bd-7832-4856-8bf7-fd0670177e15" name="common-sf-appointment-upsert-flow" />
-            <ee:transform doc:name="fetchingAppointmentId" doc:id="42bece6f-3e4b-45a0-83b6-f6d509b49097">
+            <logger level="INFO" doc:name="Logger" doc:id="94e9dd7c-8b17-41da-a072-87a04be743e1" message="CREATING THE SERVICE APPOINTMENT" />
+            <flow-ref doc:name="callToSFupsertSubFlow" doc:id="d081f599-3579-49f4-a27a-44df8bbdb759" name="common-sf-appointment-upsert-flow" />
+            <ee:transform doc:name="fetchingAppointmentId" doc:id="acf4f53d-6b79-4fab-8f09-0f4b1638c72a">
                 <ee:message>
                 </ee:message>
                 <ee:variables>
@@ -995,7 +995,7 @@ output application/json
 vars.providerExtract]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
-            <ee:transform doc:name="requiredPayloadForUpdation" doc:id="e540ddc6-5c62-49af-95e3-1963450d18ff">
+            <ee:transform doc:name="requiredPayloadForUpdation" doc:id="f02fa65e-465c-4792-beae-aa078dafbd87">
                 <ee:message>
                     <ee:set-payload><![CDATA[%dw 2.0
 output application/java
@@ -1006,16 +1006,16 @@ output application/java
 }]]]></ee:set-payload>
                 </ee:message>
             </ee:transform>
-            <logger level="INFO" doc:name="S12 AssignedResource Logger" doc:id="6104496c-d6e0-4e21-b6dd-4e40c9fbdc08" 
+            <logger level="INFO" doc:name="S12 AssignedResource Logger" doc:id="b53087c2-1e46-459d-8cd2-5c2f67617903" 
                     message="S12 Message - Creating AssignedResource for appointment: #[vars.appointmentId] and provider: #[vars.serviceId]" />
                     
-            <flow-ref doc:name="Create AssignedResource" doc:id="f50d245d-bca3-4fd5-8cd7-543bfa1f8af8" name="create-assigned-resource-subflow" />
+            <flow-ref doc:name="Create AssignedResource" doc:id="d0636b5d-5d40-4d4e-93b5-11af2e753274" name="create-assigned-resource-subflow" />
             
 
                     
                 <error-handler>
-                    <on-error-continue type="ANY" doc:name="S12 Error Handler" doc:id="aee16773-138a-41d5-a52e-26d43e4ed39c">
-                        <ee:transform doc:name="Error Response" doc:id="d0c47320-8a6b-4499-8860-d49b432f75a4">
+                    <on-error-continue type="ANY" doc:name="S12 Error Handler" doc:id="1ea42942-135d-408c-855b-1c7af6951a16">
+                        <ee:transform doc:name="Error Response" doc:id="03237163-5925-416e-8e7c-62d1ce41fd29">
                             <ee:message>
                                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -1028,22 +1028,22 @@ output application/json
 }]]></ee:set-payload>
                             </ee:message>
                         </ee:transform>
-                        <logger level="ERROR" doc:name="S12 Error Logger" doc:id="7cd9be3e-2f58-4966-a850-5b06dffc8866" 
+                        <logger level="ERROR" doc:name="S12 Error Logger" doc:id="9cf8b268-3b0f-4e92-af9e-06c57d483dec" 
                                message="S12 Message Error - Type: #[error.errorType.identifier default 'UNKNOWN'], Description: #[error.description]" />
                     </on-error-continue>
                 </error-handler>
             </try>
             
-            <logger level="INFO" doc:name="S12 Exit Logger" doc:id="eb1e8564-c4e0-43bd-bc0b-bd622fe2ce02" 
+            <logger level="INFO" doc:name="S12 Exit Logger" doc:id="f4880aea-2f01-4879-b89a-1ecbe89824a4" 
                     message="COMPLETED PROCESSING SIU^S12 MESSAGE - Message ID: #[payload.Data.SIU_S12.MSH.'MSH-10' default 'UNKNOWN']" />
         </when>
 
         <!--  ========== SIU^S13 ========== -->
         <when expression="#[vars.checkConditionS13.result]">
-            <hl7:read doc:name="S13" doc:id="8d334d44-ea65-4b3d-8a96-5443988ae413" config-ref="HL7_EDI_Config_S13">
+            <hl7:read doc:name="S13" doc:id="9b4c40a5-e7c4-4e8d-af34-a7ee6844ff5f" config-ref="HL7_EDI_Config_S13">
                 <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
             </hl7:read>
-            <ee:transform doc:name="jsonPayload" doc:id="d65ce8a3-be56-4372-9ef5-864951894fa4">
+            <ee:transform doc:name="jsonPayload" doc:id="14188392-e06d-4d5d-ab95-47d1668cd5f3">
                 <ee:message>
                     <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -1051,7 +1051,7 @@ output application/json
 payload]]></ee:set-payload>
                 </ee:message>
             </ee:transform>
-            <ee:transform doc:name="input_mappings" doc:id="2ee6eb1a-e9a7-494f-8f60-57954562c01a">
+            <ee:transform doc:name="input_mappings" doc:id="ed7e702f-4c66-4f2c-8303-7f0191d9b9c0">
                 <ee:message />
                 <ee:variables>
                     <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
@@ -1086,12 +1086,12 @@ var territoryMapping = vars.TerritoryMapping
                 </ee:variables>
             </ee:transform>
             
-            <logger level="INFO" doc:name="Location Mapping Result" doc:id="11bd68d0-a1af-42e9-937a-63f2f65975e6"
+            <logger level="INFO" doc:name="Location Mapping Result" doc:id="f4fee348-110c-4253-9ec2-47cc83f24518"
                     message="Mapping NextGen location '#[vars.nextGenLocationCode]' to ServiceTerritoryId: #[vars.locationId default 'NOT FOUND']" />
 
-            <choice doc:name="Check Mapping Success" doc:id="c8651659-73d1-4de8-bc96-03b5c6b39cd7">
+            <choice doc:name="Check Mapping Success" doc:id="fc695ec7-8881-4f50-8bf6-ffb7144db199">
                 <when expression="#[vars.locationId == null]">
-                    <logger level="WARN" doc:name="Location Mapping Warning" doc:id="5b7e5560-d6cd-4bd0-b582-33bd85b76a5b"
+                    <logger level="WARN" doc:name="Location Mapping Warning" doc:id="9ae65d44-6345-4192-acdb-34f48315240c"
                             message="WARNING: No ServiceTerritory mapping found for NextGen location: #[vars.nextGenLocationCode]" />
                 </when>
             </choice>
@@ -1130,7 +1130,7 @@ output application/java
 payload.Data.SIU_S13.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
-            <ee:transform doc:name="sfMappings" doc:id="48e6faa5-d5b2-4807-a1cf-3fa1925f07bd">
+            <ee:transform doc:name="sfMappings" doc:id="bedb7729-a24d-4a19-8e1b-150ead478a24">
                 <ee:message>
                 </ee:message>
                 <ee:variables>
@@ -1166,9 +1166,9 @@ output application/java
 ]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
-            <choice doc:name="Choice" doc:id="71a2c43e-a756-4bbf-b94f-c0837521b05d">
+            <choice doc:name="Choice" doc:id="2c487561-28c9-438a-a202-3fc4742de368">
                 <when expression="#[false]">
-                    <ee:transform doc:name="sfMappings" doc:id="7e293686-19b7-484c-8f13-17aa57b0a387">
+                    <ee:transform doc:name="sfMappings" doc:id="f73aa229-b974-4a83-8738-9b88826e5887">
                         <ee:message />
                         <ee:variables>
                             <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
@@ -1203,8 +1203,8 @@ output application/java
 ]]></ee:set-variable>
                         </ee:variables>
                     </ee:transform>
-                    <flow-ref doc:name="callToQueryAppointmnetId" doc:id="b9b9905d-b225-4d77-892f-fdd62f9e4f2e" name="salesforce-appointmnet-querySub_Flow" />
-                    <ee:transform doc:name="sfMappings" doc:id="a5a766b7-85d2-4c32-8591-90d94e869e1f">
+                    <flow-ref doc:name="callToQueryAppointmnetId" doc:id="f984b276-149b-4bce-ae90-dcc8d01b4461" name="salesforce-appointmnet-querySub_Flow" />
+                    <ee:transform doc:name="sfMappings" doc:id="14f3d623-2689-453c-997b-069898bb3c76">
                         <ee:message />
                         <ee:variables>
                             <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
@@ -1239,11 +1239,11 @@ output application/java
 ]]></ee:set-variable>
                         </ee:variables>
                     </ee:transform>
-                    <flow-ref doc:name="callToUpdateAppointment" doc:id="91a7d2d0-d2ad-4ee5-a831-6e9c6faf34bb" name="sf-appointment-update-flow" />
+                    <flow-ref doc:name="callToUpdateAppointment" doc:id="5cf9f60b-b6ed-4a79-8e1b-e2c2b249d91a" name="sf-appointment-update-flow" />
                 </when>
                 <otherwise>
-                    <logger level="INFO" doc:name="Logger" doc:id="08fcf7d1-396e-4f91-8649-621428392af5" message="NEXTGEN ID EXISTS" />
-                    <flow-ref doc:name="callToUpdateAppointment" doc:id="8059aa0a-fa83-4e12-8407-e3365acd19b7" name="common-sf-appointment-upsert-flow" />
+                    <logger level="INFO" doc:name="Logger" doc:id="e04c53b6-f7fc-4389-a262-f95e936d01fa" message="NEXTGEN ID EXISTS" />
+                    <flow-ref doc:name="callToUpdateAppointment" doc:id="bcec16c6-5be0-47f6-891c-b08a2a8cdf64" name="common-sf-appointment-upsert-flow" />
 <ee:transform doc:name="fetchingAppointmentId">
     <ee:message></ee:message>
     <ee:variables>
@@ -1265,8 +1265,8 @@ vars.providerExtract]]></ee:set-variable>
 
         <!--  ========== SIU^S14 ========== -->
         <when expression="#[vars.checkConditionS14.result]">
-            <hl7:read doc:name="S14" doc:id="d9f0a4f3-e01f-4fe3-b049-69eb6916b3d3" config-ref="HL7_EDI_Config_S14" />
-            <ee:transform doc:name="jsonPayload" doc:id="845be519-b79d-4d23-8bb6-027a70eb2fce">
+            <hl7:read doc:name="S14" doc:id="f5aa0e44-58a6-450d-bb5f-b8bc299df5b6" config-ref="HL7_EDI_Config_S14" />
+            <ee:transform doc:name="jsonPayload" doc:id="c82cbdbe-1692-42ce-91b4-8c566eb43aae">
                 <ee:message>
                     <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -1331,7 +1331,7 @@ fun safeDOB(ts) =
             
             <logger level="INFO" message="Set sfContactData for SIU^S14: #[vars.sfContactData]" />
             
-            <ee:transform doc:name="input_mappings" doc:id="f099f273-a95f-4fb0-802b-a789ab655985">
+            <ee:transform doc:name="input_mappings" doc:id="6ca62d2a-ddce-40a6-8d15-5afcd810d1cc">
                 <ee:message />
                 <ee:variables>
                     <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
@@ -1351,18 +1351,11 @@ var provider = vars.ProviderMapping
 (provider filter ($.NPI == flatten(payload.Data.SIU_S14.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].providerId
 ]]></ee:set-variable>
 
-<ee:set-variable variableName="nextGenLocationCode"><![CDATA[%dw 2.0
-output application/java
-var rawLocation = payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-01"[0]
----
-rawLocation as String {format: "plain"}
-]]></ee:set-variable>
-
 <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
-output application/java
+output application/json
+var location = vars.TerritoryMapping
 ---
-(vars.TerritoryMapping filter ((item) -> item.LOCATION == vars.nextGenLocationCode))[0].Id
-]]></ee:set-variable>
+(location filter ($.LOCATION == payload.Data.SIU_S14.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0])).Id[0]]]></ee:set-variable>
 
 <ee:set-variable variableName="duration"><![CDATA[%dw 2.0
 output application/json
@@ -1415,7 +1408,7 @@ flatten(payload.Data.SIU_S14.PATIENT.PID."PID-04")."CX-01"[0] default "UNKNOWN_P
             <logger level="INFO" message="PID fields available: #[vars.pidStructure]" />
             <logger level="INFO" message="queryResponse results: #[%dw 2.0 output application/json --- {'isEmpty': isEmpty(vars.queryResponse), 'count': sizeOf(vars.queryResponse), 'accountId': (vars.queryResponse[0].AccountId default 'null'), 'contactId': (vars.queryResponse[0].Id default 'null')}]" />
             
-            <ee:transform doc:name="sfMappings" doc:id="1ef3492f-cc90-4d50-a5af-c29fa9e2de3a">
+            <ee:transform doc:name="sfMappings" doc:id="0e56349c-2d0a-4133-9843-2341a0b67d19">
                 <ee:message>
                 </ee:message>
                 <ee:variables>
@@ -1469,10 +1462,10 @@ fun safeDateTime(value) =
             <!-- Add detailed logging of query results -->
             <logger level="INFO" message="queryResponse contents: #[%dw 2.0 output application/json --- {'count': sizeOf(vars.queryResponse), 'content': vars.queryResponse}]" />
             
-            <choice doc:name="Choice" doc:id="2e9fda96-c76e-4bba-b979-48d4406af3ba">
+            <choice doc:name="Choice" doc:id="57a1cf76-2d9b-4264-b2c4-feef764759ea">
                 <when expression="#[isEmpty(vars.queryResponse)]">
                     <logger level="ERROR" message="Contact not found for HealthFusion ID: #[vars.hfId]. Cannot create ServiceAppointment without ParentRecordId." />
-                    <ee:transform doc:name="Transform Message" doc:id="b42e3563-04c1-4a13-a2f0-286175bfd85f">
+                    <ee:transform doc:name="Transform Message" doc:id="247d1c9f-17cf-4bc3-b269-e9b84c8e59e1">
                         <ee:message>
                         </ee:message>
                         <ee:variables>
@@ -1522,8 +1515,8 @@ fun safeDateTime(value) =
 }]]]></ee:set-variable>
                         </ee:variables>
                     </ee:transform>
-                    <flow-ref doc:name="callToQueryAppointmnetId" doc:id="646e1b4c-b855-4b77-96e7-ee0bcf5423ca" name="salesforce-appointmnet-querySub_Flow" />
-                    <ee:transform doc:name="Transform Message" doc:id="7396d79a-7085-4456-a4fa-b1ae4b8c14db">
+                    <flow-ref doc:name="callToQueryAppointmnetId" doc:id="72fdb94c-b769-4e45-9f9a-9fc3f46b4912" name="salesforce-appointmnet-querySub_Flow" />
+                    <ee:transform doc:name="Transform Message" doc:id="41a522f6-f9ca-41ee-9b82-360baa11f9ba">
                         <ee:message>
                         </ee:message>
                         <ee:variables>
@@ -1565,11 +1558,11 @@ fun safeDateTime(value) =
 }]]]></ee:set-variable>
                         </ee:variables>
                     </ee:transform>
-                    <flow-ref doc:name="callToUpdateAppointment" doc:id="d4872b4c-d9a2-47c4-a9dd-2c6a65e3873c" name="sf-appointment-update-flow" />
+                    <flow-ref doc:name="callToUpdateAppointment" doc:id="9a7ae7e0-20db-4312-9519-a2199d8441ed" name="sf-appointment-update-flow" />
                 </when>
                 <otherwise>
-                    <logger level="INFO" doc:name="Logger" doc:id="71009baa-3ba8-4406-aedc-4dfbdf946ed0" message="NEXTGEN ID EXISTS" />
-                    <flow-ref doc:name="callToUpdateAppointment" doc:id="314a06c4-00e2-43a8-a234-e83674e379f3" name="common-sf-appointment-upsert-flow" />
+                    <logger level="INFO" doc:name="Logger" doc:id="0f43885d-2304-48fd-8877-d598228f3fc3" message="NEXTGEN ID EXISTS" />
+                    <flow-ref doc:name="callToUpdateAppointment" doc:id="7b8875d4-b325-49ec-9b94-443f99db546c" name="common-sf-appointment-upsert-flow" />
 <ee:transform doc:name="fetchingAppointmentId">
     <ee:message></ee:message>
     <ee:variables>
@@ -1591,19 +1584,19 @@ vars.providerExtract]]></ee:set-variable>
 
         <!--  ========== SIU^S15 ========== -->
         <when expression="#[vars.checkConditionS15.result]">
-    <logger level="INFO" doc:name="S15 Entry Logger" doc:id="f1b86cdb-228e-4e59-bd6e-58f999591ac4" 
+    <logger level="INFO" doc:name="S15 Entry Logger" doc:id="92ec52c8-6b17-478e-a9e0-c94f6a94f6f4" 
            message="STARTED PROCESSING SIU^S15 MESSAGE" />
                    
-            <try doc:name="S15 Processing Try" doc:id="6b563929-12a8-40fe-986b-c5c8e856b651">
-                <hl7:read doc:name="S15" doc:id="67741644-496a-49a1-bb2b-04fddf9b9b9f" config-ref="HL7_EDI_Config_S15">
+            <try doc:name="S15 Processing Try" doc:id="1e965fa0-91e8-4335-a5fb-c2a3cc921038">
+                <hl7:read doc:name="S15" doc:id="54f637cf-876a-4dd2-9fe8-fac9b7427047" config-ref="HL7_EDI_Config_S15">
                     <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
                 </hl7:read> </try>
                 <logger level="INFO" doc:name="S15 Message ID Logger" 
         message="Processing SIU^S15 message with ID: #[payload.Data.SIU_S15.MSH.'MSH-10']" />
                 
-                <logger level="INFO" doc:name="S15 Parse Logger" doc:id="74c18b21-4c4a-4948-b688-418f0112b136" 
+                <logger level="INFO" doc:name="S15 Parse Logger" doc:id="17968549-6244-4c5c-843d-915b7dad281b" 
                        message="S15 Message - Successfully parsed HL7 message. Message Type: #[payload.Data.SIU_S15.MSH.'MSH-9'.'CM_MSG-01' default 'UNKNOWN']^#[payload.Data.SIU_S15.MSH.'MSH-9'.'CM_MSG-02' default 'UNKNOWN']" />
-            <ee:transform doc:name="jsonPayload" doc:id="ad398e95-749a-4989-a44b-ecf3c513df10">
+            <ee:transform doc:name="jsonPayload" doc:id="1459f7a7-b6f7-4a1f-b13d-2cbeea1d82bf">
                 <ee:message>
                     <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -1611,7 +1604,7 @@ output application/json
 payload]]></ee:set-payload>
                 </ee:message>
             </ee:transform>
-            <ee:transform doc:name="input_mappings" doc:id="c9aa58d9-67d9-43db-b959-7e3ac63f662f">
+            <ee:transform doc:name="input_mappings" doc:id="a54e6338-d0b5-4b88-989e-68adf2f83535">
                 <ee:message />
                 <ee:variables>
                     <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
@@ -1630,16 +1623,28 @@ var provider = vars.ProviderMapping
 ---
 (provider filter ($.NPI == flatten(payload.Data.SIU_S15.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].providerId
 ]]></ee:set-variable>
-                    
+                    <ee:set-variable variableName="nextGenLocationCode"><![CDATA[%dw 2.0
+output application/java
+---
+payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]
+]]></ee:set-variable>
+                    <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
+output application/json
+var territoryMapping = vars.TerritoryMapping
+---
+(territoryMapping filter ((item) -> 
+    contains(upper(item.LOCATION default ""), upper(vars.nextGenLocationCode default ""))
+))[0].Id
+]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
             
-            <logger level="INFO" doc:name="Location Mapping Result" doc:id="6ecf3c02-be05-4acd-8629-78cbc464c1f6"
+            <logger level="INFO" doc:name="Location Mapping Result" doc:id="e8a490e0-855d-47c5-b9c5-5ba716893562"
                     message="Mapping NextGen location '#[vars.nextGenLocationCode]' to ServiceTerritoryId: #[vars.locationId default 'NOT FOUND']" />
 
-            <choice doc:name="Check Mapping Success" doc:id="5f63d65b-3096-4302-8f83-3735c8b6df8f">
+            <choice doc:name="Check Mapping Success" doc:id="3907143f-827b-4272-9bd1-1f10425ca244">
                 <when expression="#[vars.locationId == null]">
-                    <logger level="WARN" doc:name="Location Mapping Warning" doc:id="fd062ef0-8fa8-4644-88ea-4b9a24cf24b5"
+                    <logger level="WARN" doc:name="Location Mapping Warning" doc:id="7a29443a-3b41-4d92-b287-3fd428e2f752"
                             message="WARNING: No ServiceTerritory mapping found for NextGen location: #[vars.nextGenLocationCode]" />
                 </when>
             </choice>
@@ -1672,22 +1677,10 @@ output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
-                        <!-- Extract location code using PL-01 as in S12 -->
-<!-- Extract location code using PL-01 (correct path) -->
-<ee:set-variable variableName="nextGenLocationCode"><![CDATA[%dw 2.0
-output application/java
-var rawLocation = payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-01"[0]
----
-rawLocation as String {format: "plain"}
-]]></ee:set-variable>
-
-<!-- Map to territory using direct equality as in S12 -->
-<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
+                        <ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
 output application/java
 ---
-(vars.TerritoryMapping filter ((item) -> item.LOCATION == vars.nextGenLocationCode))[0].Id
-]]></ee:set-variable>
-
+payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
                         <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
 output application/java
 ---
@@ -1696,74 +1689,69 @@ flatten(payload.Data.SIU_S15.PATIENT.PID."PID-04")."CX-01"[0] default "UNKNOWN_P
                 </ee:variables>
             </ee:transform>
             
-            <logger level="INFO" doc:name="S15 HF ID Logger" doc:id="c54d94c3-be7e-451f-9d01-c5796a0528f3" 
+            <logger level="INFO" doc:name="S15 HF ID Logger" doc:id="55ed6c00-d539-4870-800d-8186b1f21163" 
                     message="S15 Message - Extracted HealthFusion ID: #[vars.hfId], Message ID: #[payload.Data.SIU_S15.MSH.'MSH-10']" />
                     
-            <logger level="INFO" doc:name="S15 Pre-Query Logger" doc:id="b0ec4234-8a63-4454-ad74-a166a9dc27eb" 
+            <logger level="INFO" doc:name="S15 Pre-Query Logger" doc:id="74d68b06-66c5-4ea3-92f0-e1f0cd2273eb" 
                    message="S15 Message - About to query Salesforce for contact with HF ID: #[vars.hfId]" />
                    
-            <flow-ref doc:name="call To Salesforce For ContactId" doc:id="bce1274b-4dab-48b2-adbb-9b55ef8cd548" name="salesforce_query_Sub_Flow" />
+            <flow-ref doc:name="call To Salesforce For ContactId" doc:id="42a59c7b-7e12-4db0-a27f-7ecdfe59f60b" name="salesforce_query_Sub_Flow" />
             
-            <logger level="INFO" doc:name="S15 Post-Query Logger" doc:id="62f018ec-59ce-4349-bbbf-d52bef5a850a" 
+            <logger level="INFO" doc:name="S15 Post-Query Logger" doc:id="59229a01-26bb-41b6-8cb3-297e7950cf67" 
                    message="S15 Message - Query returned #[sizeOf(vars.queryResponse)] contact record(s). Found match: #[!isEmpty(vars.queryResponse)]" />
                    
-            <ee:transform doc:name="sfMappings" doc:id="1af09af1-8f51-418c-b523-19332d2a5214">
+            <ee:transform doc:name="sfMappings" doc:id="5f3038da-3006-433f-b102-2a0f26a023a2">
     <ee:message></ee:message>
     <ee:variables>
         <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
 output application/java
+// Add the safeDateTime function definition first
 fun safeDateTime(value) =
     if (value == null or value == "") 
        null
     else 
-       (value as LocalDateTime {format:"yyyyMMddHHmmss"} 
-            as String {format:"yyyy-MM-dd\'T\'HH:mm:ss-05:00"} 
-            as DateTime) default null
+       (value as LocalDateTime {format: "yyyyMMddHHmmss"} as String {format: "yyyy-MM-dd'T'HH:mm:ss-05:00"} as DateTime) default null
 ---
 [{
-    "ActualStartTime": safeDateTime(payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]),
-    "SchedEndTime": safeDateTime(payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]),
+//	"Name": payload.Data.SIU_S15.SCH."SCH-06"."CE-01",
+	"ActualStartTime": safeDateTime(payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]),
+     "SchedEndTime": safeDateTime(payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]),
     "SchedStartTime": safeDateTime(payload.Data.SIU_S15.SCH."SCH-11"."TQ-04"."TS-01"[0]),
-    "ActualEndTime": safeDateTime(payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]),
-    "NextGen_ID__c": if ((payload.Data.SIU_S15.SCH."SCH-2" default "") != "")
-                     then (payload.Data.SIU_S15.SCH."SCH-2" as String)
-                     else if ((payload.Data.SIU_S15.SCH."SCH-3" default "") != "")
-                          then (payload.Data.SIU_S15.SCH."SCH-3" as String)
-                          else null,
+	"ActualEndTime": safeDateTime(payload.Data.SIU_S15.SCH."SCH-11"."TQ-05"."TS-01"[0]),
+    "NextGen_ID__c":payload.Data.SIU_S15.SCH."SCH-02"."EI-01",
     "DurationType": payload.Data.SIU_S15.SCH."SCH-10"."CE-01",
-    "Status": if (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "CANCELLED") "Cancelled by Provider"
-              else if (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "NO SHOW") "No Show"
-              else payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01",
-    "ParentRecordId": if (isEmpty(vars.queryResponse)) 
-                        null 
-                     else if (vars.queryResponse[0].AccountId != null)
-                        vars.queryResponse[0].AccountId
-                     else if (!isEmpty(vars.contactAccount))
-                        vars.contactAccount[0].AccountId
-                     else 
-                        null,
+	"Status": if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "CANCELLED") ("Cancelled by Provider") else if(payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01" == "NO SHOW") ("No Show") else  (payload.Data.SIU_S15.SCH."SCH-25"."CE_0278-01") ,
+	 "ParentRecordId": if (isEmpty(vars.queryResponse)) 
+                   null 
+                 else if (vars.queryResponse[0].AccountId != null)
+                   vars.queryResponse[0].AccountId
+                 else if (!isEmpty(vars.contactAccount))
+                   vars.contactAccount[0].AccountId
+                 else
+                   null,
     "AdditionalInformation": vars.appointmentType,
     "ContactId": if (isEmpty(vars.queryResponse)) null else vars.queryResponse[0].Id,
-    "Service_Resource__c": vars.providerExtract,
-    "Provider__c": vars.providerExtract,
-    "ServiceTerritoryId": vars.locationId,
-    "AppointmentType": vars.apType,
-    "WorkTypeId": vars.workTypeId,
-    "Work_Type_Group__c": vars.workGroupId,
-    "ActualDuration": vars.duration,
-    "Duration": vars.duration,
-    "DurationType": if (payload.Data.SIU_S15.SCH."SCH-10"."CE-01" == "MIN") "Minutes"
-                    else if (payload.Data.SIU_S15.SCH."SCH-10"."CE-01" == "HRS") "Hours"
-                    else payload.Data.SIU_S15.SCH."SCH-10"."CE-01"
-}]
+//	"ServiceTerritoryId": flatten(payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE).AIL."AIL-03"."PL-04"."HD-01"[0],  
+        "Service_Resource__c": vars.providerExtract,
+        "Provider__c": vars.providerExtract,
+        "ServiceTerritoryId": vars.locationId,
+         "AppointmentType": vars.apType,
+     "WorkTypeId" : vars.workTypeId,
+//     "Work_Type_Group_Id": vars.workGroupId,
+     "Work_Type_Group__c": vars.workGroupId,
+     "ActualDuration" : vars.duration,
+     "Duration": vars.duration,
+     "DurationType": if(payload.Data.SIU_S15.SCH."SCH-10"."CE-01" == "MIN") ("Minutes") else if (payload.Data.SIU_S15.SCH."SCH-10"."CE-01" == "HRS") ("Hours") else (payload.Data.SIU_S15.SCH."SCH-10"."CE-01"),
         
-
+         
+//        "Opportunity__c": vars.opportunity_c.opportunity__c
+}]
 ]]></ee:set-variable>
     </ee:variables>
 </ee:transform>
-            <choice doc:name="Choice" doc:id="68639885-a857-4ff0-9939-56a31a309876">
+            <choice doc:name="Choice" doc:id="f876edeb-12a3-4986-a24b-0aad9a169792">
                 <when expression="#[false]">
-                    <ee:transform doc:name="sfMappings" doc:id="725f7e06-515e-4e3e-9b48-63f5f20dde0f">
+                    <ee:transform doc:name="sfMappings" doc:id="5343adb9-067a-47ea-b4f6-5f90b40270ce">
                         <ee:message />
                         <ee:variables>
                             <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
@@ -1805,8 +1793,8 @@ output application/java
 }]]]></ee:set-variable>
                         </ee:variables>
                     </ee:transform>
-                    <flow-ref doc:name="callToQueryAppointmnetId" doc:id="4c84ea78-fd7b-450f-9cf6-8d1a48d0e600" name="salesforce-appointmnet-querySub_Flow" />
-                    <ee:transform doc:name="sfMappings" doc:id="dfbb5662-34c4-4e73-9113-438d6ffce398">
+                    <flow-ref doc:name="callToQueryAppointmnetId" doc:id="4a159711-d061-431b-841f-3fd9f8dc5a92" name="salesforce-appointmnet-querySub_Flow" />
+                    <ee:transform doc:name="sfMappings" doc:id="30e72dee-6197-4e84-bf0e-7f5da4d69f6d">
                         <ee:message />
                         <ee:variables>
                             <ee:set-variable variableName="appointmentFields"><![CDATA[%dw 2.0
@@ -1840,11 +1828,11 @@ output application/java
 }]]]></ee:set-variable>
                         </ee:variables>
                     </ee:transform>
-                    <flow-ref doc:name="callToUpdateAppointment" doc:id="cf0aa9f8-edcf-4971-85b2-c03cbf156edb" name="sf-appointment-update-flow" />
+                    <flow-ref doc:name="callToUpdateAppointment" doc:id="690bd03d-455b-4b43-a89f-89cf1c8a7412" name="sf-appointment-update-flow" />
                 </when>
                 <otherwise>
-                    <logger level="INFO" doc:name="Logger" doc:id="1f6d3fba-f0ff-49ee-9175-1989aaf2564f" message="NEXTGEN ID EXISTS" />
-                    <flow-ref doc:name="callToUpdateAppointment" doc:id="a4dff7d3-9fec-47f7-9c00-5ee11096b797" name="common-sf-appointment-upsert-flow" />
+                    <logger level="INFO" doc:name="Logger" doc:id="bff47b65-a639-4987-a699-46f131231a89" message="NEXTGEN ID EXISTS" />
+                    <flow-ref doc:name="callToUpdateAppointment" doc:id="cd4170ff-1dfa-4c97-9f5c-5f45609a421c" name="common-sf-appointment-upsert-flow" />
 <ee:transform doc:name="fetchingAppointmentId">
     <ee:message></ee:message>
     <ee:variables>
@@ -1865,7 +1853,7 @@ vars.providerExtract]]></ee:set-variable>
         </when>
 
         <otherwise>
-            <ee:transform doc:name="defaultCase" doc:id="55157217-6169-4006-a3d6-961c8e6f620c">
+            <ee:transform doc:name="defaultCase" doc:id="dfa0b932-caf0-403b-8479-6c1ba97055d1">
                 <ee:message>
                     <ee:set-payload><![CDATA["Invalid Message"]]></ee:set-payload>
                 </ee:message>
@@ -1873,7 +1861,7 @@ vars.providerExtract]]></ee:set-variable>
         </otherwise>
     </choice>
 
-<logger level="INFO" doc:name="endLogger" doc:id="d7d07fd4-ef26-4879-8877-2ff53481fbba" 
+<logger level="INFO" doc:name="endLogger" doc:id="b2e10172-a943-4229-a2df-52e7e773d156" 
             message="#[%dw 2.0
 output application/json
 
@@ -1891,17 +1879,17 @@ output application/json
 </sub-flow>
 
 
-	<sub-flow name="common-sf-upsert-flow" doc:id="850daaf6-a0fa-4a07-b9c1-e26ce7c6a59a" >
-		<logger level="INFO" doc:name="beforeInsert" doc:id="fd8432fd-3b8a-4d69-ad17-0a932fc519f0" message="##########Before Salesforce Upsert###################" />
-		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="d18c8ac8-6454-409d-8b83-fef21e811636" millisBetweenRetries="${sf.retryfrequency}">
-			<salesforce:upsert objectType="Contact" doc:name="Update/Insert" doc:id="40470953-18a0-479a-a90b-261ae05d24dc" config-ref="Salesforce_Config" externalIdFieldName="HealthFusion_Patient_Record_ID__c">
+	<sub-flow name="common-sf-upsert-flow" doc:id="3fd22d1b-c174-4eda-b846-73e8b79d532c" >
+		<logger level="INFO" doc:name="beforeInsert" doc:id="0e540123-78fd-4ecf-a084-e8a2d0ce1f73" message="##########Before Salesforce Upsert###################" />
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="49d39f7d-0512-4e5e-9b14-ebf8a450e640" millisBetweenRetries="${sf.retryfrequency}">
+			<salesforce:upsert objectType="Contact" doc:name="Update/Insert" doc:id="066525fc-23b0-4ce6-ae7c-fbc30e692299" config-ref="Salesforce_Config" externalIdFieldName="HealthFusion_Patient_Record_ID__c">
 				<salesforce:records ><![CDATA[#[vars.sfContactData]]]></salesforce:records>
 			</salesforce:upsert>
 			</until-successful>
-		<logger level="INFO" doc:name="afterInsert" doc:id="15869b6f-0e8e-4241-ba5a-118dd3dd87d4" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
-		<choice doc:name="Choice" doc:id="9032366e-b1bf-4dc3-8948-9c8f6d64f659" >
+		<logger level="INFO" doc:name="afterInsert" doc:id="4c1cee45-4297-478e-bf4f-e3c6e08bdd07" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
+		<choice doc:name="Choice" doc:id="7cdd9f7c-3c8f-4ccf-90d7-a1f324d557cf" >
 			<when expression="#[payload.successful== false]">
-				<ee:transform doc:name="errorDetails" doc:id="9699ac1b-34cf-46c5-8645-cff1592b515a" >
+				<ee:transform doc:name="errorDetails" doc:id="4d46355b-610c-4f10-a641-8113704f7baf" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -1939,7 +1927,7 @@ output application/json
 "Contact Creation Error" ++ " " ++ vars.sfContactData.FirstName[0]++ " " ++ vars.sfContactData.MiddleName[0] ++ " " ++ vars.sfContactData.LastName[0] default " "]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<ee:transform doc:name="Transform Message" doc:id="e52b3f50-4746-4ab0-af57-05b25c16b559">
+				<ee:transform doc:name="Transform Message" doc:id="fa8f9465-d3bd-48b8-9453-a701b3b683b3">
 					<ee:message>
 					</ee:message>
 					<ee:variables >
@@ -1964,7 +1952,7 @@ output application/json
 if (vars.errorMessage."Contact Details".Location == "FOREST HILLS") p('email.forest.to') else if (vars.errorMessage."Contact Details".Location == "MADISON") p('email.madison.to') else p('email.to') ]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<email:send doc:name="sendEmail" doc:id="83bb4aaf-7939-4970-b3c1-8f3bf86dbac4" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
+				<email:send doc:name="sendEmail" doc:id="9d538c6d-c5aa-4acf-9859-37d689f6aa36" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
 					<email:to-addresses >
 						<email:to-address value="#[vars.locationAddress]" />
 					</email:to-addresses>
@@ -1974,8 +1962,8 @@ if (vars.errorMessage."Contact Details".Location == "FOREST HILLS") p('email.for
 				</email:send>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="defaultMessage" doc:id="2b7323f1-338b-42dc-aa79-275b89527e7d" message="###########No errors##############"/>
-				<ee:transform doc:name="successMessage" doc:id="887b3255-b022-41e8-9ed1-994a2111f2d6" >
+				<logger level="INFO" doc:name="defaultMessage" doc:id="70ba4bb0-00d0-4f85-a139-e8e47116f148" message="###########No errors##############"/>
+				<ee:transform doc:name="successMessage" doc:id="9c9c1fec-adb0-459b-8b85-566537935849" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -1989,16 +1977,16 @@ output application/json
 			</otherwise>
 		</choice>
 	</sub-flow>
-	<!-- [STUDIO:"common-sf-composite-flow"]<sub-flow name="common-sf-composite-flow" doc:id="7d723900-d080-44bd-9459-6d4dc2f792b9" >
-		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="3ad2929d-a754-441c-b8cc-cad878caf1ed" millisBetweenRetries="${sf.retryfrequency}">
-			<salesforce-composite:execute-composite-batch doc:name="Execute composite batch" doc:id="0253bedc-76ed-4754-ad48-d3b53fca9503" config-ref="Salesforce_Composite_Config">
+	<!-- [STUDIO:"common-sf-composite-flow"]<sub-flow name="common-sf-composite-flow" doc:id="d631e63e-8555-4a81-b3c5-64f1d702d90e" >
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="d8c15906-9685-44a1-9b3a-f477c3eede68" millisBetweenRetries="${sf.retryfrequency}">
+			<salesforce-composite:execute-composite-batch doc:name="Execute composite batch" doc:id="3e3425a3-0215-4841-aab3-58b90f2dd2a4" config-ref="Salesforce_Composite_Config">
 			<salesforce-composite:sub-requests><![CDATA[#[payload.batchRequests&#93;&#93;&#93;></salesforce-composite:sub-requests>
 		</salesforce-composite:execute-composite-batch>
-			<logger level="INFO" doc:name="afterUpsert" doc:id="f1c7aa1d-00cd-433e-9927-dafd0914892d" message="#[%dw 2.0&#10;output application/json&#10;&#45;&#45;-&#10;payload&#93;"/>
+			<logger level="INFO" doc:name="afterUpsert" doc:id="26ddc957-ab32-4b83-914c-6f3c26800f4c" message="#[%dw 2.0&#10;output application/json&#10;&#45;&#45;-&#10;payload&#93;"/>
 		</until-successful>
-		<choice doc:name="Choice" doc:id="effafdb0-220f-4798-8953-69df7e69339e">
+		<choice doc:name="Choice" doc:id="60cbd05f-1d87-4ebc-acfb-e6b7cf4241ab">
 				<when expression="#[payload.hasErrors == true&#93;">
-					<ee:transform doc:name="errorDetails" doc:id="4aaf113a-7ed6-4bcb-9d01-f5b370bc3aa9">
+					<ee:transform doc:name="errorDetails" doc:id="dce22ed0-be2c-4db8-9afd-ccf815850edc">
 						<ee:message>
 						</ee:message>
 						<ee:variables>
@@ -2033,7 +2021,7 @@ output application/json
 &#93;&#93;></ee:set-variable>
 						</ee:variables>
 					</ee:transform>
-					<email:send doc:name="sendEmail" doc:id="79a83c15-2af6-475e-a672-4a12e9015d26" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java &#45;&#45;- vars.subject&#93;">
+					<email:send doc:name="sendEmail" doc:id="257bc9e0-85ca-409b-87e3-ae2f97d6a72d" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java &#45;&#45;- vars.subject&#93;">
 						<email:to-addresses>
 							<email:to-address value="${email.to}" />
 						</email:to-addresses>
@@ -2043,22 +2031,22 @@ output application/json
 					</email:send>
 				</when>
 				<otherwise>
-					<logger level="INFO" doc:name="defaultMessage" doc:id="5469551b-dc46-4efa-b23c-64a6d3140b1a" message="##########No errors############" />
+					<logger level="INFO" doc:name="defaultMessage" doc:id="c086ed29-9197-443e-8c24-aeb7f945b882" message="##########No errors############" />
 				</otherwise>
 			</choice>
 	</sub-flow> [STUDIO] -->
-	<sub-flow name="createAccount" doc:id="415f840c-a9bc-41c7-8d20-0ede6dd94a55" >
-		<logger level="INFO" doc:name="Logger" doc:id="027c0fa6-bf4e-4e05-8579-89ef1937c311" message="BEFORE CREATING THE ACCOUNT"/>
-		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="e6c18575-3284-4ce7-a6ec-186ee9cc591b" millisBetweenRetries="${sf.retryfrequency}">
-			<salesforce:create doc:name="Create" doc:id="efda101e-5752-46b2-bb41-ff66c0afdfc5" config-ref="Salesforce_Config" type="Account" target="accountResponse">
+	<sub-flow name="createAccount" doc:id="ca3a48cc-fbd2-4888-a246-9a6a806d529e" >
+		<logger level="INFO" doc:name="Logger" doc:id="e5376ab1-c317-4e49-b579-7e9422aa43b0" message="BEFORE CREATING THE ACCOUNT"/>
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="0f753a85-edd4-4aa9-800e-3cd3a8559354" millisBetweenRetries="${sf.retryfrequency}">
+			<salesforce:create doc:name="Create" doc:id="89b2c4bb-a810-43ef-ac68-d092cfe1c202" config-ref="Salesforce_Config" type="Account" target="accountResponse">
 				<reconnect />
 				<salesforce:records ><![CDATA[#[vars.accountCreate]]]></salesforce:records>
 			</salesforce:create>
 		</until-successful>
-		<logger level="INFO" doc:name="Logger" doc:id="40a99b68-2534-411b-8e4b-d1387e8946cf" message="#[%dw 2.0&#10;output application/json&#10;---&#10;vars.accountResponse]"/>
-		<choice doc:name="Choice" doc:id="a5ac7aab-7e75-4bb9-a70c-e02bc060d921" >
+		<logger level="INFO" doc:name="Logger" doc:id="a5b9c4e6-9eea-46d4-b958-238c61ea076d" message="#[%dw 2.0&#10;output application/json&#10;---&#10;vars.accountResponse]"/>
+		<choice doc:name="Choice" doc:id="8378dcf2-b8c0-427c-988e-b1419ec0d625" >
 			<when expression="#[vars.accountResponse.successful== false]" >
-				<ee:transform doc:name="errorDetails" doc:id="c3b4c484-24e1-4908-b64b-a617b39463e9" >
+				<ee:transform doc:name="errorDetails" doc:id="a1e7f828-5e12-40bd-81b1-43587444df78" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -2096,7 +2084,7 @@ output application/json
 "Account Creation Error" ++ " " ++ vars.sfContactData.FirstName[0]++ " " ++ vars.sfContactData.MiddleName[0] ++ " " ++ vars.sfContactData.LastName[0] default " "]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<ee:transform doc:name="emailDetails" doc:id="c23731cc-df3c-4f01-aed7-4f21de990613">
+				<ee:transform doc:name="emailDetails" doc:id="4a5c7a77-5f89-4820-b7a1-a38b367ff2ad">
 					<ee:message>
 					</ee:message>
 					<ee:variables >
@@ -2124,7 +2112,7 @@ output text/plain
 ]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<email:send doc:name="sendEmail" doc:id="b6b65297-83cf-4565-b679-1ac358fa4e7b" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]">
+				<email:send doc:name="sendEmail" doc:id="71089f02-d189-4403-89f4-02302467aeea" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]">
 					<email:to-addresses>
 						<email:to-address value="#[vars.locationAddress]" />
 					</email:to-addresses>
@@ -2134,8 +2122,8 @@ output text/plain
 				</email:send>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="defaultMessage" doc:id="cdc37a37-bd77-4a22-b6a1-a4797dac6c0f" message="###########No errors##############" />
-				<ee:transform doc:name="successMessage" doc:id="45d3db34-340c-4849-9295-2b780950e0a9">
+				<logger level="INFO" doc:name="defaultMessage" doc:id="5b2aeaa6-728c-4377-8bc6-3d65f56a0770" message="###########No errors##############" />
+				<ee:transform doc:name="successMessage" doc:id="175374e2-778b-4c7f-b8f6-616e828216c2">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -2146,19 +2134,19 @@ output application/json
 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
-				<logger level="INFO" doc:name="Logger" doc:id="205751ad-2a53-469b-80b0-2586f55f2e05" message="ACCOUNT CREATED SUCCUESSFULLY " />
+				<logger level="INFO" doc:name="Logger" doc:id="da209436-db85-46dc-8cf9-5a8109e55db6" message="ACCOUNT CREATED SUCCUESSFULLY " />
 			</otherwise>
 		</choice>
 	</sub-flow>
-	<!-- [STUDIO:"createAppointment"]<sub-flow name="createAppointment" doc:id="eebfeeaf-30e4-49f2-95bd-7e69d629888a" >
-		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="e5015ad8-d33b-49c1-88f7-1ca5c7620e51" millisBetweenRetries="${sf.retryfrequency}" >
-			<salesforce:upsert doc:name="Upsert" doc:id="412fab27-75d6-4371-8ddd-97843c14a6d7" config-ref="Salesforce_Config" objectType="ServiceAppointment" externalIdFieldName="NextGen_ID__c">
+	<!-- [STUDIO:"createAppointment"]<sub-flow name="createAppointment" doc:id="ca09f167-8e7f-4b93-89b9-2caf82e367ee" >
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="1abd13bd-cacf-423e-98e3-8658ad91fe27" millisBetweenRetries="${sf.retryfrequency}" >
+			<salesforce:upsert doc:name="Upsert" doc:id="911f7ef4-57af-4e94-837d-dbd14eb53738" config-ref="Salesforce_Config" objectType="ServiceAppointment" externalIdFieldName="NextGen_ID__c">
 				<salesforce:records ><![CDATA[#[vars.appointmentFields&#93;&#93;&#93;></salesforce:records>
 			</salesforce:upsert>
 		</until-successful>
-		<logger level="INFO" doc:name="Logger" doc:id="f8ed3a65-dc3f-495d-97cb-7b66d131dbac" message="#[%dw 2.0&#10;output application/json&#10;&#45;&#45;-&#10;payload&#93;" />
+		<logger level="INFO" doc:name="Logger" doc:id="e5fd2aef-d929-4b7e-836d-24bbc7d5fc6f" message="#[%dw 2.0&#10;output application/json&#10;&#45;&#45;-&#10;payload&#93;" />
 	</sub-flow> [STUDIO] -->
-	<sub-flow name="salesforce_query_Sub_Flow" doc:id="087129d5-0ea7-4951-a3fe-19fe77302a48">
+	<sub-flow name="salesforce_query_Sub_Flow" doc:id="36e65843-9818-43e8-816c-a20d26fa2b8b">
     <!-- 1. Primary: HealthFusion Patient Record ID Lookup -->
     <salesforce:query doc:name="Query by HealthFusion ID" config-ref="Salesforce_Config" target="queryResponse">
     <salesforce:salesforce-query>
@@ -2178,7 +2166,7 @@ output application/json
     <logger level="INFO" message="Extracted HealthFusion ID: #[vars.hfId]" />
     <logger level="INFO" message="SOQL parameter value: #[%dw 2.0 output application/json --- {hfId: vars.hfId as String}]" />
     <logger level="INFO" message="Executing Salesforce query with hfId: #[vars.hfId]" />
-    <logger level="INFO" doc:name="SF Contact Response" doc:id="fe003456-c138-4069-9f36-c7067cde751b" message="SF Contact Query for hfId: #[vars.hfId] returned count: #[sizeOf(vars.queryResponse)], hasData: #[!isEmpty(vars.queryResponse)]" />
+    <logger level="INFO" doc:name="SF Contact Response" doc:id="3d4d3bc0-106a-49a5-a208-bcd116d00af9" message="SF Contact Query for hfId: #[vars.hfId] returned count: #[sizeOf(vars.queryResponse)], hasData: #[!isEmpty(vars.queryResponse)]" />
     
     <!-- 2. Fallback if HealthFusion ID lookup fails -->
     <choice doc:name="Contact Found?">
@@ -2194,17 +2182,17 @@ output application/json
     </choice>
 </sub-flow>
 
-	<sub-flow name="common-sf-appointment-upsert-flow" doc:id="6497ef61-487c-4805-9c86-5d3d57ca8468" >
-		<logger level="INFO" doc:name="beforeInsert" doc:id="1837cebd-1c4d-4fb8-9786-bdeb5ce28004" message="##########Before Salesforce Upsert###################" />
-		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="2282b13e-af10-48d7-91b1-169cce48203e" millisBetweenRetries="${sf.retryfrequency}">
-			<salesforce:upsert objectType="ServiceAppointment" externalIdFieldName="NextGen_ID__c" doc:name="Update/Insert" doc:id="149b570b-a301-42ed-811f-13945d9a5904" config-ref="Salesforce_Config" target="appRes">
+	<sub-flow name="common-sf-appointment-upsert-flow" doc:id="7130146b-74a2-49d1-b4a5-fc8e858705e5" >
+		<logger level="INFO" doc:name="beforeInsert" doc:id="0416886f-b1a7-43ff-a83a-d4cb87f4dcf8" message="##########Before Salesforce Upsert###################" />
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="ac507fb1-4393-4409-a23b-60399b7d7eaa" millisBetweenRetries="${sf.retryfrequency}">
+			<salesforce:upsert objectType="ServiceAppointment" externalIdFieldName="NextGen_ID__c" doc:name="Update/Insert" doc:id="77cd7bce-0d20-4f9e-81d9-4185626c40fe" config-ref="Salesforce_Config" target="appRes">
 				<salesforce:records><![CDATA[#[vars.appointmentFields]]]></salesforce:records>
 			</salesforce:upsert>
 		</until-successful>
-		<logger level="INFO" doc:name="afterInsert" doc:id="f5dd96f4-55a0-499c-bead-95422ab68078" message="#[%dw 2.0&#10;output application/json&#10;---&#10;vars.appRes]" />
-		<choice doc:name="Choice" doc:id="c436b551-a2d7-4500-83a1-7458521839ab" >
+		<logger level="INFO" doc:name="afterInsert" doc:id="1a142ad5-7c39-48a8-8870-9885042de4ae" message="#[%dw 2.0&#10;output application/json&#10;---&#10;vars.appRes]" />
+		<choice doc:name="Choice" doc:id="2f9abe57-90f1-4bc3-93c2-3590f3aa895d" >
 			<when expression="#[payload.successful== false]" >
-				<ee:transform doc:name="errorDetails" doc:id="7d80d5b5-42c0-406b-a36b-90aaa0dfc7e7" >
+				<ee:transform doc:name="errorDetails" doc:id="f229b707-071e-43e0-868e-67c0ef9439c6" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -2240,7 +2228,7 @@ output application/json
 "Appointment Creation Error"  ++ vars.queryResponse.FirstName[0] ++ " " ++ vars.queryResponse.MiddleName[0] ++ " " ++ vars.queryResponse.LastName[0] default " "]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<ee:transform doc:name="emailAddress" doc:id="c1f69228-e4a7-4943-8456-1506a01c7e09">
+				<ee:transform doc:name="emailAddress" doc:id="9f7f7e3d-c1ac-43b2-a3d3-a4748213af27">
 					<ee:message>
 					</ee:message>
 					<ee:variables >
@@ -2266,7 +2254,7 @@ if (vars.errorMessage."Error Details".Location == "FOREST HILLS") p('email.fores
  ]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<email:send doc:name="sendEmail" doc:id="3aa6838f-0073-4677-8562-732b976a42c6" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
+				<email:send doc:name="sendEmail" doc:id="13ee8860-056b-4170-b35f-65f5d008d5b8" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
 					<email:to-addresses >
 						<email:to-address value="#[vars.locationAddress]" />
 					</email:to-addresses>
@@ -2276,8 +2264,8 @@ if (vars.errorMessage."Error Details".Location == "FOREST HILLS") p('email.fores
 				</email:send>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="defaultMessage" doc:id="4b0cdd61-6f5d-473e-8a50-9843a89b9672" message="###########No errors##############" />
-				<ee:transform doc:name="successMessage" doc:id="2e1865bb-1eed-46fe-b38a-947a3aa2ac20" >
+				<logger level="INFO" doc:name="defaultMessage" doc:id="25b70c84-f7f1-40f1-8c22-6b8abc6f4cc3" message="###########No errors##############" />
+				<ee:transform doc:name="successMessage" doc:id="c24d1e22-43b5-45f3-b79a-ee48b1f63a97" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -2291,23 +2279,23 @@ output application/json
 			</otherwise>
 		</choice>
 	</sub-flow>
-	<sub-flow name="appointment-update-Sub_Flow" doc:id="b8a1733f-a273-4476-9f13-d7f56ab540f7" >
-		<logger level="INFO" doc:name="Logger" doc:id="10896c4d-f5b4-4418-810a-f03212272136" message="########before Appointment Update##########"/>
-		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="ad7cc01a-42a4-4de4-a1ce-3b671a3fad1c" millisBetweenRetries="${sf.retryfrequency}">
-			<salesforce:upsert objectType="AssignedResource" externalIdFieldName="Id" doc:name="Upsert" doc:id="7da456f3-240f-4336-9acd-b65aa7bcd8df" config-ref="Salesforce_Config" />
+	<sub-flow name="appointment-update-Sub_Flow" doc:id="758875b4-270c-482b-ac22-e92b2b6e1c44" >
+		<logger level="INFO" doc:name="Logger" doc:id="899c292f-0df1-4b53-abde-a05ccc67196a" message="########before Appointment Update##########"/>
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="7680b299-650e-4f18-8be0-740e3c416658" millisBetweenRetries="${sf.retryfrequency}">
+			<salesforce:upsert objectType="AssignedResource" externalIdFieldName="Id" doc:name="Upsert" doc:id="a90f8272-5802-4762-9d71-2643d5e760c1" config-ref="Salesforce_Config" />
 			</until-successful>
-		<logger level="INFO" doc:name="Logger" doc:id="c8223305-c027-4a13-8c4b-44273bb49265" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="3c6d825e-5e28-48c8-ad73-08b7ef5a28c2" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]"/>
 	</sub-flow>
-	<sub-flow name="common-sf-update-flow" doc:id="ac92bf35-6307-4b22-87f6-93e1d78618fd" >
-		<logger level="INFO" doc:name="beforeInsert" doc:id="da49c8ca-7691-48c2-857a-1d540daf31af" message="##########Before Salesforce Upsert###################" />
-		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="d4cdab35-f85c-42bf-a020-1a748a6b96da" millisBetweenRetries="${sf.retryfrequency}" >
-			<salesforce:upsert objectType="Contact" externalIdFieldName="Id" doc:name="Update/Insert" doc:id="98f9ecd2-9c41-4964-9521-1d2c66e9162d" config-ref="Salesforce_Config">
+	<sub-flow name="common-sf-update-flow" doc:id="361535f9-0121-42d7-8a2d-a88af80be815" >
+		<logger level="INFO" doc:name="beforeInsert" doc:id="e7fc188e-9252-4b37-8525-b19bebdb2459" message="##########Before Salesforce Upsert###################" />
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="828ae1c5-7909-421b-b416-223eae7efe1e" millisBetweenRetries="${sf.retryfrequency}" >
+			<salesforce:upsert objectType="Contact" externalIdFieldName="Id" doc:name="Update/Insert" doc:id="c001ca38-b460-4fdd-8166-5e17097ade2a" config-ref="Salesforce_Config">
 			</salesforce:upsert>
 		</until-successful>
-		<logger level="INFO" doc:name="afterInsert" doc:id="336f75f8-6414-4844-baa4-ddcf7e63b0bb" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
-		<choice doc:name="Choice" doc:id="27e11483-fe16-4977-902b-1ae2131a28e7" >
+		<logger level="INFO" doc:name="afterInsert" doc:id="cc1033a9-889a-4f6e-88b3-6ff431e31527" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
+		<choice doc:name="Choice" doc:id="f471f4a3-e238-4747-860f-d0ce706f3ab8" >
 			<when expression="#[payload.successful== false]" >
-				<ee:transform doc:name="errorDetails" doc:id="06885030-32f8-4a18-b703-93ed857bc28f" >
+				<ee:transform doc:name="errorDetails" doc:id="6db50c6e-25fa-4416-b078-d6dcd15ad47a" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -2345,7 +2333,7 @@ output application/json
 "Contact Updation Error" ++ " " ++ vars.sfContactData.FirstName[0]++ " " ++ vars.sfContactData.MiddleName[0] ++ " " ++ vars.sfContactData.LastName[0] default " "]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<ee:transform doc:name="Transform Message" doc:id="d7e1a8e5-7533-4192-90fd-c690052545cc">
+				<ee:transform doc:name="Transform Message" doc:id="21b26997-b928-40af-8a7a-0f96a7957271">
 					<ee:message />
 					<ee:variables>
 						<ee:set-variable variableName="errorMesg"><![CDATA[%dw 2.0
@@ -2369,7 +2357,7 @@ output application/json
 if (vars.errorMessage."Contact Details".Location == "FOREST HILLS") p('email.forest.to') else if (vars.errorMessage."Contact Details".Location == "MADISON") p('email.madison.to') else p('email.to') ]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<email:send doc:name="sendEmail" doc:id="e15fbbfd-aeb3-4aa1-bb6d-6394d76f1c85" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
+				<email:send doc:name="sendEmail" doc:id="10de3973-34f7-4690-9201-34b518665860" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
 					<email:to-addresses >
 						<email:to-address value="#[vars.locationAddress]" />
 					</email:to-addresses>
@@ -2379,8 +2367,8 @@ if (vars.errorMessage."Contact Details".Location == "FOREST HILLS") p('email.for
 				</email:send>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="defaultMessage" doc:id="80773f8a-419d-4ae8-8cb4-a55585b2247b" message="###########No errors##############" />
-				<ee:transform doc:name="successMessage" doc:id="0df517ce-d70b-454c-b453-0708597fbcc5" >
+				<logger level="INFO" doc:name="defaultMessage" doc:id="693bde21-adab-4495-8d1b-528c571aedd2" message="###########No errors##############" />
+				<ee:transform doc:name="successMessage" doc:id="33179537-bad3-449e-8fa8-7753d6336967" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -2394,8 +2382,8 @@ output application/json
 			</otherwise>
 		</choice>
 	</sub-flow>
-	<sub-flow name="salesforce_querycontact_Sub_Flow" doc:id="007e8f7e-922f-4d1e-80b4-5a173213be6f" >
-		<salesforce:query doc:name="Query" doc:id="cc2df797-b8ae-4fcd-9481-67335b4ad1bd" config-ref="Salesforce_Config" target="contactResponse" >
+	<sub-flow name="salesforce_querycontact_Sub_Flow" doc:id="a232ae02-2afd-40a9-baa0-da82910067f0" >
+		<salesforce:query doc:name="Query" doc:id="70876478-3efc-4f80-b3f3-ce2d4313591e" config-ref="Salesforce_Config" target="contactResponse" >
 			<salesforce:salesforce-query><![CDATA[select Id from Contact where Contact_Id__c = :Contact_Id__c]]></salesforce:salesforce-query>
 			<salesforce:parameters ><![CDATA[#[output application/java
 ---
@@ -2404,9 +2392,9 @@ output application/json
 }]]]></salesforce:parameters>
 		</salesforce:query>
 	</sub-flow>
-	<sub-flow name="salesforce_queryaccoun_Sub_Flow" doc:id="a9fb81ac-f79a-4883-889e-fcdfba2553e1">
+	<sub-flow name="salesforce_queryaccoun_Sub_Flow" doc:id="e7636de9-2232-4cef-be04-fb88fd0fd256">
     <!-- First try to match by HealthFusion_Patient_Record_ID__c -->
-    <salesforce:query doc:name="Query by Health Fusion ID" doc:id="eb531529-27f1-4751-a241-a723cfc08294" config-ref="Salesforce_Config" target="queryResByHFID">
+    <salesforce:query doc:name="Query by Health Fusion ID" doc:id="d6ea0fef-37a5-48bf-b5c9-018be772d81b" config-ref="Salesforce_Config" target="queryResByHFID">
         <salesforce:salesforce-query><![CDATA[
     SELECT Id, AccountId, FirstName, LastName, MiddleName, Date_of_Birth__c, Email, Phone, PhoneNumberFormatted__c, HealthFusion_Patient_Record_ID__c 
     FROM Contact 
@@ -2423,8 +2411,8 @@ output application/json
     
     <logger level="INFO" message="Contact Match Result: #[!isEmpty(vars.queryResByHFID)]" />
 </sub-flow>
-	<sub-flow name="salesforce-appointmnet-querySub_Flow" doc:id="77be7e87-f563-4650-8d22-fccefcc27cb6" >
-		<salesforce:query doc:name="Query" doc:id="d25cc978-b47b-445a-bd3b-ffa8fd846017" config-ref="Salesforce_Config" target="accResponse">
+	<sub-flow name="salesforce-appointmnet-querySub_Flow" doc:id="79b4607f-7d89-4421-a390-599e3edefc92" >
+		<salesforce:query doc:name="Query" doc:id="978070c1-4daf-4d1b-a8b5-215adc30401a" config-ref="Salesforce_Config" target="accResponse">
 			<salesforce:salesforce-query><![CDATA[select Id from ServiceAppointment where NextGen_ID__c = :NextGen_ID__c]]></salesforce:salesforce-query>
 			<salesforce:parameters ><![CDATA[#[output application/java
 ---
@@ -2433,17 +2421,17 @@ output application/json
 }]]]></salesforce:parameters>
 		</salesforce:query>
 	</sub-flow>
-	<sub-flow name="sf-appointment-update-flow" doc:id="404e2184-3820-470c-acbc-9c7fb9b0591e" >
-		<logger level="INFO" doc:name="beforeInsert" doc:id="96738952-9f42-4183-ba27-25058da4e884" message="##########Before Salesforce Upsert###################" />
-		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="3d4b57be-c162-4a3a-8d5d-4744ac7764c5" millisBetweenRetries="${sf.retryfrequency}" >
-			<salesforce:upsert objectType="ServiceAppointment" externalIdFieldName="Id" doc:name="Update/Insert" doc:id="55ee1f66-50ce-48b6-b118-28365011f098" config-ref="Salesforce_Config">
+	<sub-flow name="sf-appointment-update-flow" doc:id="9c3e59c6-814d-4b0d-bfd2-74dd0f44b039" >
+		<logger level="INFO" doc:name="beforeInsert" doc:id="74399420-f0c0-4498-8eb4-fccc6b832736" message="##########Before Salesforce Upsert###################" />
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="0a665aaa-238f-4033-a00b-b5626c4c8ee3" millisBetweenRetries="${sf.retryfrequency}" >
+			<salesforce:upsert objectType="ServiceAppointment" externalIdFieldName="Id" doc:name="Update/Insert" doc:id="87ab915f-4def-45d5-83a8-30e9840145e6" config-ref="Salesforce_Config">
 				<salesforce:records><![CDATA[#[vars.appointmentFields]]]></salesforce:records>
 			</salesforce:upsert>
 		</until-successful>
-		<logger level="INFO" doc:name="afterInsert" doc:id="b9c28ac5-2319-4c7c-989f-646444e74409" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
-		<choice doc:name="Choice" doc:id="f999723b-a541-4c34-a926-bf409e0ebe95" >
+		<logger level="INFO" doc:name="afterInsert" doc:id="6165fd9b-29d0-488f-bcfa-e8a603f1514c" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
+		<choice doc:name="Choice" doc:id="86b60dbd-7b5d-45f0-a1fb-9479c412dd86" >
 			<when expression="#[payload.successful== false]" >
-				<ee:transform doc:name="errorDetails" doc:id="5af662ba-424f-418c-b5ed-d0956037d465" >
+				<ee:transform doc:name="errorDetails" doc:id="0bd7c508-8896-4a9f-91a9-caa9cd0c6148" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -2479,7 +2467,7 @@ output application/json
 "Appointment Updation Error"  ++ vars.queryResponse.FirstName[0] ++ " " ++ vars.queryResponse.MiddleName[0] ++ " " ++ vars.queryResponse.LastName[0] default " "]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<ee:transform doc:name="emailAddress" doc:id="c2e1bb52-571d-4797-b747-4b82d7271d83">
+				<ee:transform doc:name="emailAddress" doc:id="e8b6f06f-2a31-45a3-88c2-006b1dc7454f">
 					<ee:message />
 					<ee:variables>
 						<ee:set-variable variableName="errorMesg"><![CDATA[%dw 2.0
@@ -2504,7 +2492,7 @@ if (vars.errorMessage."Error Details".Location == "FOREST HILLS") p('email.fores
  ]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<email:send doc:name="sendEmail" doc:id="6c8b99b3-d76a-4f31-83fe-5f374db8b78a" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
+				<email:send doc:name="sendEmail" doc:id="2ec31c35-b039-4a5f-8f7f-7b8b8cebc24a" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
 					<email:to-addresses >
 						<email:to-address value="#[vars.locationAddress]" />
 					</email:to-addresses>
@@ -2514,8 +2502,8 @@ if (vars.errorMessage."Error Details".Location == "FOREST HILLS") p('email.fores
 				</email:send>
 			</when>
 			<otherwise >
-				<logger level="INFO" doc:name="defaultMessage" doc:id="14eaadc5-2aa8-4e47-a260-ba3b5aaefdde" message="###########No errors##############" />
-				<ee:transform doc:name="successMessage" doc:id="d63cece4-1929-4f76-bd9c-0198cac28bc9" >
+				<logger level="INFO" doc:name="defaultMessage" doc:id="9ec4ad35-a4df-4dcb-85c2-c95ed1aace0a" message="###########No errors##############" />
+				<ee:transform doc:name="successMessage" doc:id="0560c911-367d-4555-8d90-6005ff2ccec0" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
@@ -2530,12 +2518,12 @@ output application/json
 		</choice>
 	</sub-flow>
 		
-<sub-flow name="create-assigned-resource-subflow" doc:id="830a8a03-d8df-4e3b-9d15-f04748ca9416">
-    <logger level="INFO" doc:name="Entry Logger" doc:id="1d76f5f6-e303-4eed-bf31-e69856b46d03" 
+<sub-flow name="create-assigned-resource-subflow" doc:id="4c917fed-424a-4599-af17-fd66c74d0e53">
+    <logger level="INFO" doc:name="Entry Logger" doc:id="70db2c41-e153-4445-9d13-b6050532bb68" 
             message="STARTED CREATING ASSIGNEDRESOURCE - Appointment: #[vars.appointmentId], Resource: #[vars.serviceId]" />
     
-    <try doc:name="Create AssignedResource Try" doc:id="52fdf8de-d054-4b16-a233-d100b0b8c20f">
-        <ee:transform doc:name="Prepare AssignedResource" doc:id="3f7238dc-f8e1-4a8a-9d55-2d49701e5599">
+    <try doc:name="Create AssignedResource Try" doc:id="2500a4c7-751c-42d9-910b-79862165a31c">
+        <ee:transform doc:name="Prepare AssignedResource" doc:id="750be6f8-ec83-4bb9-9927-b2e15b81c968">
             <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/java
@@ -2551,22 +2539,22 @@ else
             </ee:message>
         </ee:transform>
         
-        <logger level="INFO" doc:name="Pre-Create Logger" doc:id="843cf2c3-371e-4341-b0e0-e19fd0b9a861" 
+        <logger level="INFO" doc:name="Pre-Create Logger" doc:id="d290a8f4-dcff-4936-a0f9-dff97e382b4c" 
                 message="About to create AssignedResource with payload: #[payload]" />
         
-        <salesforce:create doc:name="Create AssignedResource" doc:id="48f819c3-eda2-4581-9a4d-026d0b84efc6" config-ref="Salesforce_Config" type="AssignedResource">
+        <salesforce:create doc:name="Create AssignedResource" doc:id="71db26bb-693b-4ed6-b430-d538c2b7719d" config-ref="Salesforce_Config" type="AssignedResource">
             <salesforce:records><![CDATA[#[payload]]]></salesforce:records>
         </salesforce:create>
         
-        <logger level="INFO" doc:name="Success Logger" doc:id="c6876dab-393d-4124-a1c5-1834a8e31dba" 
+        <logger level="INFO" doc:name="Success Logger" doc:id="4f0b95ab-e77a-4312-8f88-6b7c8908e509" 
                 message="Successfully created AssignedResource: #[payload]" />
         
         <error-handler>
-            <on-error-continue type="ANY" doc:name="Error Handler" doc:id="8e03c963-93a4-4644-916b-c4a6b2c8a4d6">
-                <logger level="ERROR" doc:name="Error Logger" doc:id="ca074567-4a66-45fe-98ce-05deef8aeadc" 
+            <on-error-continue type="ANY" doc:name="Error Handler" doc:id="599cbba9-050c-4f62-8a79-8f68d4217882">
+                <logger level="ERROR" doc:name="Error Logger" doc:id="bff02bba-4376-45a2-9a9e-bb56d8533399" 
                         message="Failed to create AssignedResource: #[error.description]" />
                 
-                <ee:transform doc:name="Error Response" doc:id="c0f0fe42-5262-4e40-929f-a73430a49d75">
+                <ee:transform doc:name="Error Response" doc:id="13eb0f2b-640e-4a8b-832d-ce25d39b3a08">
                     <ee:message>
                         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
@@ -2586,7 +2574,7 @@ output application/json
     
 </sub-flow>
 
-<sub-flow name="contact-update-hfchartnumber-subflow" doc:id="bdd8220f-9ae1-49bc-a492-bd9b82b0c894">
+<sub-flow name="contact-update-hfchartnumber-subflow" doc:id="0ef55002-92d4-45eb-a1f2-e1ad25b8e2fb">
     <logger level="INFO" doc:name="beforeInsert" message="##########Before Salesforce Upsert###################" />
     
     <!-- First try to find by HF ID -->
@@ -2633,10 +2621,10 @@ stripPhone(payload.Phone[0])
     lastName: "'" ++ vars.contactQueryParams.lastName ++ "'",
     email: "'" ++ vars.contactQueryParams.email ++ "'",
     phone: "'" ++ vars.contactQueryParams.phone ++ "'",
-    dob: if (vars.contactQueryParams.dob != null)
-             vars.contactQueryParams.dob as Date {format: "yyyy-MM-dd"}
-         else 
-             null
+    dob: if (vars.contactQueryParams.dob != null) 
+        vars.contactQueryParams.dob as Date {format: "yyyy-MM-dd"} 
+     else 
+        null
 }]]]></salesforce:parameters>
 
                 </salesforce:query>
@@ -2795,7 +2783,7 @@ output application/json
         </error-handler>
     </try>
 </sub-flow>
-		<sub-flow name="contact-update-response-handler" doc:id="1256d28d-1661-4753-ab1c-0233d8b6b13c">
+		<sub-flow name="contact-update-response-handler" doc:id="75bffd29-6fc2-472a-8058-fec003c4d605">
 	<choice doc:name="Choice">
 		<when expression="#[payload.successful == false]">
 			<ee:transform doc:name="errorDetails">
@@ -2895,7 +2883,7 @@ output application/json
 	</choice>
 </sub-flow>
 
-<sub-flow name="contact-lookup-by-identifiers" doc:id="9ad710db-6b3b-4938-abb0-022d686a1a4c">
+<sub-flow name="contact-lookup-by-identifiers" doc:id="7a38b3b9-1962-46d0-9c7a-481560df3832">
     <!-- Normalize phone number -->
     <ee:transform doc:name="Normalize Phone">
         <ee:message />
@@ -2948,10 +2936,10 @@ LIMIT 1
     lastName: "'" ++ vars.contactQueryParams.lastName ++ "'",
     email: "'" ++ vars.contactQueryParams.email ++ "'",
     phone: "'" ++ vars.contactQueryParams.phone ++ "'",
-    dob: if (vars.contactQueryParams.dob != null)
-             vars.contactQueryParams.dob as Date {format: "yyyy-MM-dd"}
-         else 
-             null
+    dob: if (vars.contactQueryParams.dob != null) 
+        vars.contactQueryParams.dob as Date {format: "yyyy-MM-dd"} 
+     else 
+        null
 }]]]></salesforce:parameters>
     </salesforce:query>
     
