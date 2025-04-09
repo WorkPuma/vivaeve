@@ -1592,6 +1592,12 @@ payload.Data.SIU_S15.SCH."SCH-02"."EI-01"
                 
                 <logger level="INFO" doc:name="S15 Parse Logger" doc:id="17968549-6244-4c5c-843d-915b7dad281b" 
                        message="S15 Message - Successfully parsed HL7 message. Message Type: #[payload.Data.SIU_S15.MSH.'MSH-9'.'CM_MSG-01' default 'UNKNOWN']^#[payload.Data.SIU_S15.MSH.'MSH-9'.'CM_MSG-02' default 'UNKNOWN']" />
+                       
+                       <logger level="INFO"
+        message="Raw Location before set: #[payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL.'AIL-03']"
+        doc:name="Log Raw Location"/>
+                       
+                       
             <ee:transform doc:name="jsonPayload" doc:id="1459f7a7-b6f7-4a1f-b13d-2cbeea1d82bf">
                 <ee:message>
                     <ee:set-payload><![CDATA[%dw 2.0
@@ -1619,18 +1625,31 @@ var provider = vars.ProviderMapping
 ---
 (provider filter ($.NPI == flatten(payload.Data.SIU_S15.RESOURCES.PERSONNEL_RESOURCE).AIP."AIP-03"."XCN-01"[0]))[0].providerId
 ]]></ee:set-variable>
-                    <ee:set-variable variableName="nextGenLocationCode"><![CDATA[%dw 2.0
+
+
+
+<ee:set-variable variableName="nextGenLocationCode">
+    <![CDATA[
+    %dw 2.0
+    output application/java
+    var rawLocationArray = payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"
+    var rawLocation = rawLocationArray[0]."PL-01"
+    ---
+    rawLocation as String {format: "plain"}
+    ]]>
+</ee:set-variable>
+
+<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
 output application/java
 ---
-payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]
+(vars.TerritoryMapping filter ((item) -> item.LOCATION == vars.nextGenLocationCode))[0].Id
 ]]></ee:set-variable>
-                    <ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
-output application/json
-var territoryMapping = vars.TerritoryMapping
+
+
+<ee:set-variable variableName="locationId"><![CDATA[%dw 2.0
+output application/java
 ---
-(territoryMapping filter ((item) -> 
-    contains(upper(item.LOCATION default ""), upper(vars.nextGenLocationCode default ""))
-))[0].Id
+(vars.TerritoryMapping filter ((item) -> item.LOCATION == vars.nextGenLocationCode))[0].Id
 ]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
@@ -1673,11 +1692,7 @@ output application/json
 var appType = vars.WorkTypeMapping
 ---
 (appType filter ($.NextGenField == payload.Data.SIU_S15.SCH."SCH-08"."CE_0277-01"))[0].Work_Type_Group_Id]]></ee:set-variable>
-                        <ee:set-variable variableName="mailLocation"><![CDATA[%dw 2.0
-output application/java
----
-payload.Data.SIU_S15.RESOURCES.LOCATION_RESOURCE[0].AIL."AIL-03"."PL-04"."HD-01"[0]]]></ee:set-variable>
-                        <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
+                                             <ee:set-variable variableName="hfId"><![CDATA[%dw 2.0
 output application/java
 ---
 flatten(payload.Data.SIU_S15.PATIENT.PID."PID-04")."CX-01"[0] default "UNKNOWN_PATIENT_ID"
