@@ -1917,7 +1917,10 @@ output application/json
 				<salesforce:records ><![CDATA[#[vars.sfContactData]]]></salesforce:records>
 			</salesforce:upsert>
 			</until-successful>
-		<logger level="INFO" doc:name="afterInsert" doc:id="4c1cee45-4297-478e-bf4f-e3c6e08bdd07" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
+		<logger level="INFO" doc:name="afterInsert" doc:id="4c1cee45-4297-478e-bf4f-e3c6e08bdd07" message="#[%dw 2.0
+output application/json
+---
+payload]" />
 		<choice doc:name="Choice" doc:id="7cdd9f7c-3c8f-4ccf-90d7-a1f324d557cf" >
 			<when expression="#[payload.successful== false]">
 				<ee:transform doc:name="errorDetails" doc:id="4d46355b-610c-4f10-a641-8113704f7baf" >
@@ -2074,7 +2077,10 @@ output application/json
 				<salesforce:records ><![CDATA[#[vars.accountCreate]]]></salesforce:records>
 			</salesforce:create>
 		</until-successful>
-		<logger level="INFO" doc:name="Logger" doc:id="a5b9c4e6-9eea-46d4-b958-238c61ea076d" message="#[%dw 2.0&#10;output application/json&#10;---&#10;vars.accountResponse]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="a5b9c4e6-9eea-46d4-b958-238c61ea076d" message="#[%dw 2.0
+output application/json
+---
+vars.accountResponse]"/>
 		<choice doc:name="Choice" doc:id="8378dcf2-b8c0-427c-988e-b1419ec0d625" >
 			<when expression="#[vars.accountResponse.successful== false]" >
 				<ee:transform doc:name="errorDetails" doc:id="a1e7f828-5e12-40bd-81b1-43587444df78" >
@@ -2227,7 +2233,10 @@ output application/json
         </salesforce:upsert>
     </until-successful>
     
-		<logger level="INFO" doc:name="afterInsert" doc:id="1a142ad5-7c39-48a8-8870-9885042de4ae" message="#[%dw 2.0&#10;output application/json&#10;---&#10;vars.appRes]" />
+		<logger level="INFO" doc:name="afterInsert" doc:id="1a142ad5-7c39-48a8-8870-9885042de4ae" message="#[%dw 2.0
+output application/json
+---
+vars.appRes]" />
 		<choice doc:name="Choice" doc:id="2f9abe57-90f1-4bc3-93c2-3590f3aa895d" >
 			<when expression="#[payload.successful== false]" >
 				<ee:transform doc:name="errorDetails" doc:id="f229b707-071e-43e0-868e-67c0ef9439c6" >
@@ -2322,7 +2331,10 @@ output application/json
 		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="7680b299-650e-4f18-8be0-740e3c416658" millisBetweenRetries="${sf.retryfrequency}">
 			<salesforce:upsert objectType="AssignedResource" externalIdFieldName="Id" doc:name="Upsert" doc:id="a90f8272-5802-4762-9d71-2643d5e760c1" config-ref="Salesforce_Config" />
 			</until-successful>
-		<logger level="INFO" doc:name="Logger" doc:id="3c6d825e-5e28-48c8-ad73-08b7ef5a28c2" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="3c6d825e-5e28-48c8-ad73-08b7ef5a28c2" message="#[%dw 2.0
+output application/json
+---
+payload]"/>
 	</sub-flow>
 	<sub-flow name="common-sf-update-flow" doc:id="361535f9-0121-42d7-8a2d-a88af80be815" >
 		<logger level="INFO" doc:name="beforeInsert" doc:id="e7fc188e-9252-4b37-8525-b19bebdb2459" message="##########Before Salesforce Upsert###################" />
@@ -2330,7 +2342,10 @@ output application/json
 			<salesforce:upsert objectType="Contact" externalIdFieldName="Id" doc:name="Update/Insert" doc:id="c001ca38-b460-4fdd-8166-5e17097ade2a" config-ref="Salesforce_Config">
 			</salesforce:upsert>
 		</until-successful>
-		<logger level="INFO" doc:name="afterInsert" doc:id="cc1033a9-889a-4f6e-88b3-6ff431e31527" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
+		<logger level="INFO" doc:name="afterInsert" doc:id="cc1033a9-889a-4f6e-88b3-6ff431e31527" message="#[%dw 2.0
+output application/json
+---
+payload]" />
 		<choice doc:name="Choice" doc:id="f471f4a3-e238-4747-860f-d0ce706f3ab8" >
 			<when expression="#[payload.successful== false]" >
 				<ee:transform doc:name="errorDetails" doc:id="6db50c6e-25fa-4416-b078-d6dcd15ad47a" >
@@ -2466,7 +2481,10 @@ output application/json
 				<salesforce:records><![CDATA[#[vars.appointmentFields]]]></salesforce:records>
 			</salesforce:upsert>
 		</until-successful>
-		<logger level="INFO" doc:name="afterInsert" doc:id="6165fd9b-29d0-488f-bcfa-e8a603f1514c" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]" />
+		<logger level="INFO" doc:name="afterInsert" doc:id="6165fd9b-29d0-488f-bcfa-e8a603f1514c" message="#[%dw 2.0
+output application/json
+---
+payload]" />
 		<choice doc:name="Choice" doc:id="86b60dbd-7b5d-45f0-a1fb-9479c412dd86" >
 			<when expression="#[payload.successful== false]" >
 				<ee:transform doc:name="errorDetails" doc:id="0bd7c508-8896-4a9f-91a9-caa9cd0c6148" >
