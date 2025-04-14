@@ -204,10 +204,10 @@ fun mapLocationToTerritory(locationCode) =
         <!--  ========== ADT^A04 ========== -->
         <when expression="#[vars.checkConditionA04.result]">
     <logger level="INFO"
-            doc:name="A04 Entry Logger"
-            doc:id="b48cf1d8-a559-4b05-990c-bf40460cf762"
-            category="com.vivaeve.hl7.a04.flow"
-            message="STARTED PROCESSING ADT^A04 MESSAGE - ID: #[(payload contains 'MSH') and ((payload splitBy '|')[9] default 'UNKNOWN') or 'UNKNOWN'], CorrelationId: #[vars.correlationId default 'NONE']" />
+       doc:name="A04 Entry Logger"
+       doc:id="18aa8a0e-6142-4584-9e4b-81bba951015e"
+       category="com.vivaeve.hl7.a04.flow"
+       message="STARTED PROCESSING ADT^A04 MESSAGE - ID: #[if (payload contains 'MSH') ((payload splitBy '|')[9] default 'UNKNOWN') else 'UNKNOWN'], CorrelationId: #[vars.correlationId default 'NONE']" />
                    
             <try doc:name="A04 Processing Try" doc:id="8baa96ec-5e45-4eee-a94e-a71d2c9a371c">
                 <hl7:read doc:name="A04" doc:id="3ee17f1e-5b95-4f8f-a1c9-39ead36c3805" config-ref="HL7_EDI_Config_A04">
@@ -226,16 +226,21 @@ fun mapLocationToTerritory(locationCode) =
                         
                 <!-- Message Structure Logger -->
                 <logger level="DEBUG"
-                        doc:name="A04 Structure Logger"
-                        category="com.vivaeve.hl7.a04.structure"
-                        message="#[%dw 2.0 output application/json --- {
-                            messageType: payload.Data.ADT_A04.MSH.'MSH-9'.'CM_MSG-01' + '^' + payload.Data.ADT_A04.MSH.'MSH-9'.'CM_MSG-02',
-                            messageId: payload.Data.ADT_A04.MSH.'MSH-10',
-                            sendingApp: payload.Data.ADT_A04.MSH.'MSH-3',
-                            receivingApp: payload.Data.ADT_A04.MSH.'MSH-5',
-                            timestamp: payload.Data.ADT_A04.MSH.'MSH-7',
-                            correlationId: vars.correlationId default 'NONE'
-                        }]" />
+       doc:name="A04 Structure Logger"
+       category="com.vivaeve.hl7.a04.structure"
+       message="#[%dw 2.0 
+output application/json 
+---
+{
+    messageType: (payload.Data.ADT_A04.MSH.'MSH-9'.'CM_MSG-01' default 'UNKNOWN') 
+               ++ '^' ++ 
+               (payload.Data.ADT_A04.MSH.'MSH-9'.'CM_MSG-02' default 'UNKNOWN'),
+    messageId: payload.Data.ADT_A04.MSH.'MSH-10' default 'UNKNOWN',
+    sendingApp: payload.Data.ADT_A04.MSH.'MSH-3' default 'UNKNOWN',
+    receivingApp: payload.Data.ADT_A04.MSH.'MSH-5' default 'UNKNOWN',
+    timestamp: payload.Data.ADT_A04.MSH.'MSH-7' default 'UNKNOWN',
+    correlationId: vars.correlationId default 'NONE'
+}]"/>
             <ee:transform doc:name="jsonPayload" doc:id="b381ca6d-510d-4a69-b8bc-400b17cfb523">
                 <ee:message>
                     <ee:set-payload><![CDATA[%dw 2.0
