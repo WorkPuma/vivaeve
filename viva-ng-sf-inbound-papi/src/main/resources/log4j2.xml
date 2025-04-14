@@ -1,34 +1,87 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Configuration>
-
-    <!--These are some of the loggers you can enable. 
-        There are several more you can find in the documentation. 
-        Besides this log4j configuration, you can also use Java VM environment variables
-        to enable other logs like network (-Djavax.net.debug=ssl or all) and 
-        Garbage Collector (-XX:+PrintGC). These will be append to the console, so you will 
-        see them in the mule_ee.log file. -->
-
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
     <Appenders>
-        <RollingFile name="file" fileName="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}prowess-app-template-main.log"
-                 filePattern="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}prowess-app-template-main-%i.log">
-            <PatternLayout pattern="%-5p %d [%t] [processor: %X{processorPath}; event: %X{correlationId}] %c: %m%n"/>
-            <SizeBasedTriggeringPolicy size="10 MB"/>
+        <RollingFile name="file"
+                     fileName="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}viva-ng-sf-inbound-papi.log"
+                     filePattern="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}viva-ng-sf-inbound-papi-%i.log">
+            <PatternLayout pattern="%-5p %d [%t] [event: %X{correlationId}] %c: %m%n" />
+            <SizeBasedTriggeringPolicy size="10 MB" />
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
     </Appenders>
-
     <Loggers>
-        <!-- Http Logger shows wire traffic on DEBUG -->
-        <!--AsyncLogger name="org.mule.service.http.impl.service.HttpMessageLogger" level="DEBUG"/-->
+        <!-- Base application logging -->
+        <AsyncLogger name="com.vivaeve" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.hl7" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.salesforce" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.errors" level="WARN"/>
+        
+        <!-- Fine-grained control for HL7 message types -->
+        <!-- ADT^A04 - Patient Registration -->
+        <AsyncLogger name="com.vivaeve.hl7.a04" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.hl7.a04.flow" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.hl7.a04.structure" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.a04.fields" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.a04.demographics" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.a04.mapping" level="DEBUG"/>
+        
+        <!-- ADT^A08 - Patient Update -->
+        <AsyncLogger name="com.vivaeve.hl7.a08" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.hl7.a08.flow" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.hl7.a08.structure" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.a08.fields" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.a08.demographics" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.a08.mapping" level="DEBUG"/>
+        
+        <!-- SIU^S12 - Appointment Booking -->
+        <AsyncLogger name="com.vivaeve.hl7.s12" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.hl7.s12.flow" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.hl7.s12.structure" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.s12.fields" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.s12.appointment" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.s12.mapping" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.s12.resources" level="DEBUG"/>
+        
+        <!-- SIU^S13 - Appointment Rescheduling -->
+        <AsyncLogger name="com.vivaeve.hl7.s13" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.hl7.s13.flow" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.hl7.s13.structure" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.s13.fields" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.s13.appointment" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.s13.mapping" level="DEBUG"/>
+        
+        <!-- SIU^S14 - Appointment Status Change -->
+        <AsyncLogger name="com.vivaeve.hl7.s14" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.hl7.s14.flow" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.hl7.s14.structure" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.s14.fields" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.s14.appointment" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.s14.mapping" level="DEBUG"/>
+        
+        <!-- SIU^S15 - Appointment Cancellation -->
+        <AsyncLogger name="com.vivaeve.hl7.s15" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.hl7.s15.flow" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.hl7.s15.structure" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.s15.fields" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.s15.appointment" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.hl7.s15.mapping" level="DEBUG"/>
+        
+        <!-- Salesforce operations logging -->
+        <AsyncLogger name="com.vivaeve.salesforce.operations" level="INFO"/>
+        <AsyncLogger name="com.vivaeve.salesforce.queries" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.salesforce.upserts" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.salesforce.creates" level="DEBUG"/>
+        <AsyncLogger name="com.vivaeve.salesforce.updates" level="DEBUG"/>
+        
+        <!-- Mule internal logging -->
         <AsyncLogger name="org.mule.service.http" level="WARN"/>
         <AsyncLogger name="org.mule.extension.http" level="WARN"/>
-
-        <!-- Mule logger -->
         <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="INFO"/>
-
-        <AsyncRoot level="INFO">
-            <AppenderRef ref="file"/>
+        <AsyncLogger name="org.mule" level="WARN"/>
+        <AsyncLogger name="com.mulesoft" level="WARN"/>
+        
+        <AsyncRoot level="WARN">
+            <AppenderRef ref="file" />
         </AsyncRoot>
     </Loggers>
-
 </Configuration>

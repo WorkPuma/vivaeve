@@ -203,18 +203,39 @@ fun mapLocationToTerritory(locationCode) =
 
         <!--  ========== ADT^A04 ========== -->
         <when expression="#[vars.checkConditionA04.result]">
-    <logger level="INFO" doc:name="A04 Entry Logger" doc:id="b9bab1c7-91d0-4dea-8e2f-a3d2516462de" 
-            message="STARTED PROCESSING ADT^A04 MESSAGE" />
+    <logger level="INFO"
+            doc:name="A04 Entry Logger"
+            doc:id="b9bab1c7-91d0-4dea-8e2f-a3d2516462de"
+            category="com.vivaeve.hl7.a04.flow"
+            message="STARTED PROCESSING ADT^A04 MESSAGE - ID: #[(payload contains 'MSH') and ((payload splitBy '|')[9] default 'UNKNOWN') or 'UNKNOWN'], CorrelationId: #[vars.correlationId default 'NONE']" />
                    
             <try doc:name="A04 Processing Try" doc:id="8baa96ec-5e45-4eee-a94e-a71d2c9a371c">
                 <hl7:read doc:name="A04" doc:id="3ee17f1e-5b95-4f8f-a1c9-39ead36c3805" config-ref="HL7_EDI_Config_A04">
                     <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
                 </hl7:read>
-                <logger level="INFO" doc:name="A04 Message ID Logger" 
-        message="Processing ADT^A04 message with ID: #[payload.Data.ADT_A04.MSH.'MSH-10']" />
+                <logger level="INFO"
+                        doc:name="A04 Message ID Logger"
+                        category="com.vivaeve.hl7.a04.flow"
+                        message="Processing ADT^A04 message with ID: #[payload.Data.ADT_A04.MSH.'MSH-10']" />
                 
-                <logger level="INFO" doc:name="A04 Parse Logger" doc:id="448bf7df-2938-4a0a-9c52-7033fd4d5fdc" 
-                       message="A04 Message - Successfully parsed HL7 message. Message Type: #[payload.Data.ADT_A04.MSH.'MSH-9'.'CM_MSG-01' default 'UNKNOWN']^#[payload.Data.ADT_A04.MSH.'MSH-9'.'CM_MSG-02' default 'UNKNOWN']" />
+                <logger level="INFO"
+                        doc:name="A04 Parse Logger"
+                        doc:id="448bf7df-2938-4a0a-9c52-7033fd4d5fdc"
+                        category="com.vivaeve.hl7.a04.flow"
+                        message="A04 Message - Successfully parsed HL7 message. Message Type: #[payload.Data.ADT_A04.MSH.'MSH-9'.'CM_MSG-01' default 'UNKNOWN']^#[payload.Data.ADT_A04.MSH.'MSH-9'.'CM_MSG-02' default 'UNKNOWN']" />
+                        
+                <!-- Message Structure Logger -->
+                <logger level="DEBUG"
+                        doc:name="A04 Structure Logger"
+                        category="com.vivaeve.hl7.a04.structure"
+                        message="#[%dw 2.0 output application/json --- {
+                            messageType: payload.Data.ADT_A04.MSH.'MSH-9'.'CM_MSG-01' + '^' + payload.Data.ADT_A04.MSH.'MSH-9'.'CM_MSG-02',
+                            messageId: payload.Data.ADT_A04.MSH.'MSH-10',
+                            sendingApp: payload.Data.ADT_A04.MSH.'MSH-3',
+                            receivingApp: payload.Data.ADT_A04.MSH.'MSH-5',
+                            timestamp: payload.Data.ADT_A04.MSH.'MSH-7',
+                            correlationId: vars.correlationId default 'NONE'
+                        }]" />
             <ee:transform doc:name="jsonPayload" doc:id="b381ca6d-510d-4a69-b8bc-400b17cfb523">
                 <ee:message>
                     <ee:set-payload><![CDATA[%dw 2.0
@@ -235,7 +256,39 @@ flatten(payload.Data.ADT_A04.PID."PID-04")."CX-01"[0] default "UNKNOWN_PATIENT_I
                 </ee:variables>
             </ee:transform>
 
-            <logger level="INFO" doc:name="A04 HF ID Logger" doc:id="ff409fa9-75d4-4442-8594-f9629836731f" 
+            <!-- Patient Demographics Logger -->
+            <logger level="DEBUG"
+                    doc:name="A04 Patient Demographics Logger"
+                    doc:id="ad12c870-8945-4e12-b4ca-9b829d1de45d"
+                    category="com.vivaeve.hl7.a04.demographics"
+                    message="#[%dw 2.0 output application/json --- {
+                        patientName: {
+                            firstName: flatten(payload.Data.ADT_A04.PID.'PID-05').'XPN-02'[0],
+                            lastName: flatten(payload.Data.ADT_A04.PID.'PID-05').'XPN-01'[0],
+                            middleName: payload.Data.ADT_A04.PID.'PID-05'.'XPN-03'[0]
+                        },
+                        demographics: {
+                            gender: payload.Data.ADT_A04.PID.'PID-08',
+                            dob: payload.Data.ADT_A04.PID.'PID-07'.'TS-01',
+                            race: payload.Data.ADT_A04.PID.'PID-10',
+                            ethnicity: payload.Data.ADT_A04.PID.'PID-22'
+                        },
+                        contact: {
+                            phone: payload.Data.ADT_A04.PID.'PID-13'.'XTN-01'[0],
+                            email: payload.Data.ADT_A04.PID.'PID-13'.'XTN-04'[0]
+                        },
+                        address: {
+                            street: payload.Data.ADT_A04.PID.'PID-11'.'XAD-01'[0],
+                            city: payload.Data.ADT_A04.PID.'PID-11'.'XAD-03'[0],
+                            state: payload.Data.ADT_A04.PID.'PID-11'.'XAD-04'[0],
+                            zip: payload.Data.ADT_A04.PID.'PID-11'.'XAD-05'[0]
+                        }
+                    }]" />
+
+            <logger level="INFO"
+                    doc:name="A04 HF ID Logger"
+                    doc:id="ff409fa9-75d4-4442-8594-f9629836731f"
+                    category="com.vivaeve.hl7.a04.fields"
                     message="A04 Message - Extracted HealthFusion ID: #[vars.hfId], Message ID: #[payload.Data.ADT_A04.MSH.'MSH-10']" />
 
             <!-- Example language field from a local JSON file -->
@@ -292,9 +345,29 @@ output application/java
                 </ee:variables>
             </ee:transform>
 
+            <!-- SF Mapping Logger -->
+            <logger level="DEBUG"
+                    doc:name="A04 SF Mapping Logger"
+                    category="com.vivaeve.hl7.a04.mapping"
+                    message="#[%dw 2.0 output application/json --- {
+                        mappingType: 'Salesforce Objects',
+                        account: vars.accountCreate[0],
+                        contact: vars.sfContactData[0]
+                    }]" />
+
             <!-- Query existing Contact by name -->
-            <logger level="INFO" doc:name="A04 Pre-Query Logger" doc:id="52bb5999-495a-4665-a84d-9bb9d38aa7dc" 
-                   message="A04 Message - About to query Salesforce for contact with HF ID: #[vars.hfId]" />
+            <logger level="INFO"
+                    doc:name="A04 Pre-Query Logger"
+                    doc:id="52bb5999-495a-4665-a84d-9bb9d38aa7dc"
+                    category="com.vivaeve.salesforce.operations"
+                    message="#[%dw 2.0 output application/json --- {
+                        operation: 'Query Contact',
+                        state: 'PRE',
+                        correlationId: vars.correlationId default 'NONE',
+                        messageId: payload.Data.ADT_A04.MSH.'MSH-10' default 'UNKNOWN',
+                        key: 'HealthFusion_Patient_Record_ID__c',
+                        value: vars.hfId default 'UNKNOWN'
+                    }]" />
                    
             <flow-ref doc:name="callToGetContactId" doc:id="a9b2d6a5-e4cb-4b70-a466-68ead5990b33" name="salesforce_query_Sub_Flow" />
             
@@ -406,10 +479,39 @@ output application/json
 
         <!--  ========== ADT^A08 ========== -->
         <when expression="#[vars.checkConditionA08.result]">
-    <hl7:read doc:name="A08" doc:id="220e2379-72cf-4026-8de0-971f48c957b5" config-ref="HL7_EDI_Config_A08">
-        <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
-    </hl7:read>
-    
+    <logger level="INFO"
+            doc:name="A08 Entry Logger"
+            doc:id="a08-entry-logger-id"
+            category="com.vivaeve.hl7.a08.flow"
+            message="STARTED PROCESSING ADT^A08 MESSAGE - ID: #[(payload contains 'MSH') and ((payload splitBy '|')[9] default 'UNKNOWN') or 'UNKNOWN'], CorrelationId: #[vars.correlationId default 'NONE']" />
+            
+    <try doc:name="A08 Processing Try" doc:id="a08-processing-try-id">
+        <hl7:read doc:name="A08" doc:id="220e2379-72cf-4026-8de0-971f48c957b5" config-ref="HL7_EDI_Config_A08">
+            <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
+        </hl7:read>
+        
+        <logger level="INFO"
+                doc:name="A08 Message ID Logger"
+                category="com.vivaeve.hl7.a08.flow"
+                message="Processing ADT^A08 message with ID: #[payload.Data.ADT_A08.MSH.'MSH-10']" />
+                
+        <logger level="INFO"
+                doc:name="A08 Parse Logger"
+                category="com.vivaeve.hl7.a08.flow"
+                message="A08 Message - Successfully parsed HL7 message. Message Type: #[payload.Data.ADT_A08.MSH.'MSH-9'.'CM_MSG-01' default 'UNKNOWN']^#[payload.Data.ADT_A08.MSH.'MSH-9'.'CM_MSG-02' default 'UNKNOWN']" />
+    <!-- Message Structure Logger -->
+    <logger level="DEBUG"
+            doc:name="A08 Structure Logger"
+            category="com.vivaeve.hl7.a08.structure"
+            message="#[%dw 2.0 output application/json --- {
+                messageType: payload.Data.ADT_A08.MSH.'MSH-9'.'CM_MSG-01' + '^' + payload.Data.ADT_A08.MSH.'MSH-9'.'CM_MSG-02',
+                messageId: payload.Data.ADT_A08.MSH.'MSH-10',
+                sendingApp: payload.Data.ADT_A08.MSH.'MSH-3',
+                receivingApp: payload.Data.ADT_A08.MSH.'MSH-5',
+                timestamp: payload.Data.ADT_A08.MSH.'MSH-7',
+                correlationId: vars.correlationId default 'NONE'
+            }]" /></try>
+            
     <ee:transform doc:name="jsonPayload" doc:id="5527f271-e911-40f5-974d-3c0ea13b0385">
         <ee:message>
             <ee:set-payload><![CDATA[%dw 2.0
@@ -465,6 +567,34 @@ stripPhone(vars.sfContactData.Phone[0])
         </ee:variables>
     </ee:transform>
     <!-- Extract HF ID for ADT^A08 -->
+<!-- Patient Demographics Logger -->
+<logger level="DEBUG"
+        doc:name="A08 Patient Demographics Logger"
+        category="com.vivaeve.hl7.a08.demographics"
+        message="#[%dw 2.0 output application/json --- {
+            patientName: {
+                firstName: flatten(payload.Data.ADT_A08.PID.'PID-05').'XPN-02'[0],
+                lastName: flatten(payload.Data.ADT_A08.PID.'PID-05').'XPN-01'[0],
+                middleName: payload.Data.ADT_A08.PID.'PID-05'.'XPN-03'[0]
+            },
+            demographics: {
+                gender: payload.Data.ADT_A08.PID.'PID-08',
+                dob: payload.Data.ADT_A08.PID.'PID-07'.'TS-01',
+                race: payload.Data.ADT_A08.PID.'PID-10',
+                ethnicity: payload.Data.ADT_A08.PID.'PID-22'
+            },
+            contact: {
+                phone: payload.Data.ADT_A08.PID.'PID-13'.'XTN-01'[0],
+                email: payload.Data.ADT_A08.PID.'PID-13'.'XTN-04'[0]
+            },
+            address: {
+                street: payload.Data.ADT_A08.PID.'PID-11'.'XAD-01'[0],
+                city: payload.Data.ADT_A08.PID.'PID-11'.'XAD-03'[0],
+                state: payload.Data.ADT_A08.PID.'PID-11'.'XAD-04'[0],
+                zip: payload.Data.ADT_A08.PID.'PID-11'.'XAD-05'[0]
+            }
+        }]" />
+
 <ee:transform doc:name="Extract HF ID for ADT^A08">
     <ee:message />
     <ee:variables>
@@ -475,7 +605,24 @@ flatten(payload.Data.ADT_A08.PID."PID-04")."CX-01"[0] default "UNKNOWN_PATIENT_I
 ]]></ee:set-variable>
     </ee:variables>
 </ee:transform>
-    
+
+<logger level="INFO"
+        doc:name="A08 HF ID Logger"
+        category="com.vivaeve.hl7.a08.fields"
+        message="A08 Message - Extracted HealthFusion ID: #[vars.hfId], Message ID: #[payload.Data.ADT_A08.MSH.'MSH-10']" />
+    <!-- Pre-Salesforce Query Logger -->
+    <logger level="INFO"
+            doc:name="A08 Pre-Query Logger"
+            category="com.vivaeve.salesforce.operations"
+            message="#[%dw 2.0 output application/json --- {
+                operation: 'Query Contact by HF ID',
+                state: 'PRE',
+                correlationId: vars.correlationId default 'NONE',
+                messageId: payload.Data.ADT_A08.MSH.'MSH-10' default 'UNKNOWN',
+                key: 'HealthFusion_Patient_Record_ID__c',
+                value: vars.hfId default 'UNKNOWN'
+            }]" />
+            
     <!-- Query for existing contact by HealthFusion ID -->
     <salesforce:query doc:name="Query Contact by HF ID" doc:id="6b5ac5f4-855e-4291-a2f9-7fcd6cdbc804" config-ref="Salesforce_Config" target="contactByHfId">
         <salesforce:salesforce-query><![CDATA[
@@ -488,6 +635,20 @@ flatten(payload.Data.ADT_A08.PID."PID-04")."CX-01"[0] default "UNKNOWN_PATIENT_I
 }]]]></salesforce:parameters>
     </salesforce:query>
     
+<!-- Post-Salesforce Query Logger -->
+<logger level="INFO"
+doc:name="A08 Post-Query Logger"
+category="com.vivaeve.salesforce.operations"
+message="#[%dw 2.0 output application/json --- {
+operation: 'Query Contact by HF ID',
+state: 'POST',
+correlationId: vars.correlationId default 'NONE',
+messageId: payload.Data.ADT_A08.MSH.'MSH-10' default 'UNKNOWN',
+recordCount: sizeOf(vars.contactByHfId default []),
+status: if (sizeOf(vars.contactByHfId default []) > 0) 'SUCCESS' else 'NO_RESULTS'
+}]" />
+
+
     <!-- Process based on query results -->
     <try>
         <choice doc:name="Found by HF ID?" doc:id="c50c6cf1-8767-40d1-9fc2-54c5f95d7922">
@@ -505,7 +666,19 @@ stripPhone(vars.sfContactData[0].Phone)
 ]]></ee:set-variable>
                     </ee:variables>
                 </ee:transform>
-
+                
+                <!-- Pre-Update Logger -->
+                <logger level="INFO"
+                        doc:name="A08 Pre-Update Logger"
+                        category="com.vivaeve.salesforce.operations"
+                        message="#[%dw 2.0 output application/json --- {
+                            operation: 'Update Existing Contact',
+                            state: 'PRE',
+                            correlationId: vars.correlationId default 'NONE',
+                            messageId: payload.Data.ADT_A08.MSH.'MSH-10' default 'UNKNOWN',
+                            contactId: payload[0].Id default 'UNKNOWN'
+                        }]" />
+                
                 <!-- Add enhanced logging -->
                 <logger level="INFO" message="Attempting contact match with: Name=#[vars.sfContactData[0].FirstName] #[vars.sfContactData[0].LastName], Phone=#[vars.sfContactData[0].Phone], NormalizedPhone=#[vars.normalizedPhone]" />
                 <!-- Prepare Query Parameters -->
@@ -530,6 +703,24 @@ fun safeLower(s) = if (s == null) "" else lower(s)
                     </ee:variables>
                 </ee:transform>
 
+                <!-- Pre-Secondary Query Logger -->
+                <logger level="INFO"
+                        doc:name="A08 Pre-Secondary Query Logger"
+                        category="com.vivaeve.salesforce.operations"
+                        message="#[%dw 2.0 output application/json --- {
+                            operation: 'Query Contact by Other Fields',
+                            state: 'PRE',
+                            correlationId: vars.correlationId default 'NONE',
+                            messageId: payload.Data.ADT_A08.MSH.'MSH-10' default 'UNKNOWN',
+                            searchParams: {
+                                firstName: vars.contactQueryParams.firstName,
+                                lastName: vars.contactQueryParams.lastName,
+                                email: vars.contactQueryParams.email,
+                                phone: vars.contactQueryParams.phone,
+                                dob: vars.contactQueryParams.dob
+                            }
+                        }]" />
+
                 <salesforce:query doc:name="Query by Name and Other Fields" doc:id="72148184-659b-42ff-a0f2-2f58f3702987" config-ref="Salesforce_Config" target="contactByOtherFields">
                     <salesforce:salesforce-query><![CDATA[
                         SELECT Id, AccountId, FirstName, LastName, Email, Phone, PhoneNumberFormatted__c, Date_of_Birth__c
@@ -553,6 +744,19 @@ fun safeLower(s) = if (s == null) "" else lower(s)
 }]]]></salesforce:parameters>
 
                 </salesforce:query>
+                
+<!-- Post-Secondary Query Logger -->
+<logger level="INFO"
+doc:name="A08 Post-Secondary Query Logger"
+category="com.vivaeve.salesforce.operations"
+message="#[%dw 2.0 output application/json --- {
+operation: 'Query Contact by Other Fields',
+state: 'POST',
+correlationId: vars.correlationId default 'NONE',
+messageId: payload.Data.ADT_A08.MSH.'MSH-10' default 'UNKNOWN',
+recordCount: sizeOf(vars.contactByOtherFields default []),
+status: if (sizeOf(vars.contactByOtherFields default []) > 0) 'SUCCESS' else 'NO_RESULTS'
+}]" />
                 
                 <choice doc:name="Found by Other Fields?">
                     <when expression="#[!isEmpty(vars.contactByOtherFields)]">
@@ -591,11 +795,50 @@ vars.contactByOtherFields[0].AccountId]]></ee:set-variable>
                         </ee:transform>
                         
                         <salesforce:update type="Contact" doc:name="Update Existing Contact" config-ref="Salesforce_Config" />
+                        
+<!-- Post-Update Logger -->
+<logger level="INFO"
+doc:name="A08 Post-Update Logger - Other Fields"
+category="com.vivaeve.salesforce.operations"
+message="#[%dw 2.0 output application/json --- {
+operation: 'Update Existing Contact',
+state: 'POST',
+correlationId: vars.correlationId default 'NONE',
+messageId: payload.Data.ADT_A08.MSH.'MSH-10' default 'UNKNOWN',
+recordId: payload[0].Id default 'UNKNOWN',
+status: if (payload.successful default false) 'SUCCESS' else 'FAILURE'
+}]" />
+                                
                         <logger level="INFO" message="Updated existing contact by name + other fields"/>
                     </when>
                     <otherwise>
                         <!-- Create new account and contact -->
+                        <!-- Pre-Account Creation Logger -->
+                        <logger level="INFO"
+                                doc:name="A08 Pre-Account Create Logger"
+                                category="com.vivaeve.salesforce.operations"
+                                message="#[%dw 2.0 output application/json --- {
+                                    operation: 'Create Account',
+                                    state: 'PRE',
+                                    correlationId: vars.correlationId default 'NONE',
+                                    messageId: payload.Data.ADT_A08.MSH.'MSH-10' default 'UNKNOWN',
+                                    patientName: vars.sfContactData[0].FirstName + ' ' + vars.sfContactData[0].LastName
+                                }]" />
+                                
                         <flow-ref doc:name="Create Account" name="createAccount" />
+                        
+<!-- Post-Account Creation Logger -->
+<logger level="INFO"
+doc:name="A08 Post-Account Create Logger"
+category="com.vivaeve.salesforce.operations"
+message="#[%dw 2.0 output application/json --- {
+operation: 'Create Account',
+state: 'POST',
+correlationId: vars.correlationId default 'NONE',
+messageId: payload.Data.ADT_A08.MSH.'MSH-10' default 'UNKNOWN',
+accountId: vars.accountResponse.items.id[0] default 'UNKNOWN',
+status: if (vars.accountResponse.successful default false) 'SUCCESS' else 'FAILURE'
+}]" />
                         
                         <ee:transform doc:name="Prepare Contact with AccountId">
                             <ee:message>
@@ -623,7 +866,33 @@ output application/java
                             </ee:message>
                         </ee:transform>
                         
+                        <!-- Pre-Contact Create Logger -->
+                        <logger level="INFO"
+                                doc:name="A08 Pre-Contact Create Logger"
+                                category="com.vivaeve.salesforce.operations"
+                                message="#[%dw 2.0 output application/json --- {
+                                    operation: 'Create New Contact',
+                                    state: 'PRE',
+                                    correlationId: vars.correlationId default 'NONE',
+                                    messageId: payload.Data.ADT_A08.MSH.'MSH-10' default 'UNKNOWN',
+                                    hfId: vars.sfContactData[0].HealthFusion_Patient_Record_ID__c,
+                                    accountId: vars.accountResponse.items.id[0] default 'UNKNOWN'
+                                }]" />
+                                
                         <salesforce:create type="Contact" doc:name="Create New Contact" config-ref="Salesforce_Config" target="contactResponse" />
+                        
+<!-- Post-Contact Create Logger -->
+<logger level="INFO"
+doc:name="A08 Post-Contact Create Logger"
+category="com.vivaeve.salesforce.operations"
+message="#[%dw 2.0 output application/json --- {
+operation: 'Create New Contact',
+state: 'POST',
+correlationId: vars.correlationId default 'NONE',
+messageId: payload.Data.ADT_A08.MSH.'MSH-10' default 'UNKNOWN',
+contactId: vars.contactResponse.items.id[0] default 'UNKNOWN',
+status: if (vars.contactResponse.successful default false) 'SUCCESS' else 'FAILURE'
+}]" />
                         <logger level="INFO" message="Created new contact"/>
                         <ee:transform doc:name="Set queryResponse with new IDs">
                             <ee:variables>
@@ -667,6 +936,19 @@ output application/java
                 </ee:transform>
                 
                 <salesforce:update type="Contact" doc:name="Update Contact" config-ref="Salesforce_Config" />
+                
+<!-- Post-Update Logger -->
+<logger level="INFO"
+doc:name="A08 Post-Update Logger - HF ID"
+category="com.vivaeve.salesforce.operations"
+message="#[%dw 2.0 output application/json --- {
+operation: 'Update Contact by HF ID',
+state: 'POST',
+correlationId: vars.correlationId default 'NONE',
+messageId: payload.Data.ADT_A08.MSH.'MSH-10' default 'UNKNOWN',
+recordId: payload[0].Id default 'UNKNOWN',
+status: if (payload.successful default false) 'SUCCESS' else 'FAILURE'
+}]" />
                 <logger level="INFO" message="Updated existing contact by HF ID"/>
             </otherwise>
         </choice>
@@ -702,11 +984,24 @@ output application/json
                     </ee:message>
                 </ee:transform>
                 <logger level="ERROR" message="ADT^A08 Processing Error: #[error.description]" />
+                
+                <!-- Enhanced Error Logger -->
+                <logger level="ERROR"
+                        doc:name="A08 Error Logger"
+                        category="com.vivaeve.errors"
+                        message="#[%dw 2.0 output application/json --- {
+                            errorType: error.errorType.identifier default 'UNKNOWN',
+                            messageType: 'ADT^A08',
+                            correlationId: vars.correlationId default 'NONE',
+                            messageId: payload.Data.ADT_A08.MSH.'MSH-10' default 'UNKNOWN',
+                            operation: error.errorType.namespace default 'UNKNOWN',
+                            description: error.description default 'Unknown error',
+                            detailedDescription: error.detailedDescription default null
+                        }]" />
             </on-error-continue>
         </error-handler>
     </try>
 </when>
-
         <!--  ========== SIU^S12 ========== -->
       <when expression="#[vars.checkConditionS12.result]">
     <logger level="INFO" doc:name="S12 Entry Logger" doc:id="d9093753-c634-4f58-b03e-0875e9d88b53" 
@@ -766,14 +1061,14 @@ output application/java
                 </ee:variables>
             </ee:transform>
             
-            <logger level="INFO" 
-        doc:name="Debug Territory ID" 
-        message='Territory ID debug: #[%dw 2.0 output application/json --- {
-            "locationCode": vars.nextGenLocationCode,
-            "matchedTerritoryId": vars.locationId,
-            "rawFilter": (vars.TerritoryMapping filter ((item) -> item.LOCATION == vars.nextGenLocationCode))[0].Id,
-            "matchedTerritoryName": (vars.TerritoryMapping filter ((item) -> item.LOCATION == vars.nextGenLocationCode))[0].Name
-        }]' />
+            <logger level="INFO"
+        doc:name="Debug Territory ID"
+        message="Territory ID debug: #[%dw 2.0 output application/json --- {
+            &quot;locationCode&quot;: vars.nextGenLocationCode,
+            &quot;matchedTerritoryId&quot;: vars.locationId,
+            &quot;rawFilter&quot;: (vars.TerritoryMapping filter ((item) -> item.LOCATION == vars.nextGenLocationCode))[0].Id,
+            &quot;matchedTerritoryName&quot;: (vars.TerritoryMapping filter ((item) -> item.LOCATION == vars.nextGenLocationCode))[0].Name
+        }]" />
             
             <logger level="INFO" 
         doc:name="Debug Territory Match" 
@@ -1564,7 +1859,7 @@ vars.providerExtract]]></ee:set-variable>
             <try doc:name="S15 Processing Try" doc:id="1e965fa0-91e8-4335-a5fb-c2a3cc921038">
                 <hl7:read doc:name="S15" doc:id="54f637cf-876a-4dd2-9fe8-fac9b7427047" config-ref="HL7_EDI_Config_S15">
                     <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
-                </hl7:read> </try>
+                </hl7:read>
                 <logger level="INFO" 
         doc:name="Initial SCH-02 Logger" 
         message="INITIAL SCH-02 VALUE: #[payload.Data.SIU_S15.SCH.'SCH-02']" 
@@ -1881,6 +2176,7 @@ vars.providerExtract]]></ee:set-variable>
 <flow-ref doc:name="Create AssignedResource" name="create-assigned-resource-subflow" />
                 </otherwise>
             </choice>
+        </try>
         </when>
 
         <otherwise>
@@ -2602,12 +2898,12 @@ else
             <salesforce:records><![CDATA[#[payload]]]></salesforce:records>
         </salesforce:create>
         
-        <logger level="INFO" doc:name="Success Logger" doc:id="4f0b95ab-e77a-4312-8f88-6b7c8908e509" 
+        <logger level="INFO" doc:name="Success Logger" doc:id="4f0b95ab-e77a-4312-8f88-6b7c8908e509"
                 message="Successfully created AssignedResource: #[payload]" />
-        
+
         <error-handler>
             <on-error-continue type="ANY" doc:name="Error Handler" doc:id="599cbba9-050c-4f62-8a79-8f68d4217882">
-                <logger level="ERROR" doc:name="Error Logger" doc:id="bff02bba-4376-45a2-9a9e-bb56d8533399" 
+                <logger level="ERROR" doc:name="Error Logger" doc:id="bff02bba-4376-45a2-9a9e-bb56d8533399"
                         message="Failed to create AssignedResource: #[error.description]" />
                 
                 <ee:transform doc:name="Error Response" doc:id="13eb0f2b-640e-4a8b-832d-ce25d39b3a08">
@@ -2626,7 +2922,6 @@ output application/json
             </on-error-continue>
         </error-handler>
     </try>
-    
     
 </sub-flow>
 
