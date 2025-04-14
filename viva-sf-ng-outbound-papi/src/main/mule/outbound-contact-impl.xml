@@ -218,12 +218,12 @@ output application/json
 						message="TerritoryMapping size: #[sizeOf(vars.TerritoryMapping)], WorkTypeMapping size: #[sizeOf(vars.WorkTypeMapping)], ProviderMapping size: #[sizeOf(vars.ProviderMapping)]" />
 						
 					<error-handler>
-						<on-error-continue type="OS:STORE_NOT_FOUND">
-							<logger level="ERROR" 
+						<on-error-propagate type="OS:KEY_NOT_FOUND">
+							<logger level="ERROR"
 									doc:name="Contact Object Store Error Logger"
 									message="Required contact mapping not found in Object Store. Please ensure mappings are properly loaded. Error: #[error.description]" />
 							<!-- Continue processing with empty mappings -->
-						</on-error-continue>
+						</on-error-propagate>
 					</error-handler>
 				</try>
 				
