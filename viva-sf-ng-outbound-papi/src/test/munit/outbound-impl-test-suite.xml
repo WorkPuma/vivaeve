@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="   http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd   http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd   http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="outbound-impl-test-suite.xml"/>
+	<munit:test description="Test" doc:id="3d73d793-c6f8-4986-b62d-f4738a100f62" name="outboundContactImplementationFlowTest-a04">
+		<munit:behavior>
+			<munit-tools:mock-when doc:id="d612dee3-f60f-42e9-97c6-c324683e65b2" doc:name="sfReplayListener" processor="salesforce:replay-channel-listener">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="Replay channel listener"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="72348164-7a72-4c67-aa80-81ce1cd8d89b"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="de47d298-8439-4ac1-91ad-1f2153aaed7c" doc:name="sendEmail" processor="email:send">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="sendEmail"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="b9f99b8a-dc6f-4c6f-8eac-033f51ce376a"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="185d983f-f022-4774-83ac-eb90f9b3aaaf" doc:name="contactQuery" processor="salesforce:query">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="contactQuery"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="da86cc1e-1327-4d73-9aaf-318bde972d58"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="c50e44ef-af18-4576-a93d-a22f64f787ef" doc:name="httpRequest" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="87ffaa36-32c0-4024-955f-6e4b0ab4097f"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<munit:set-event doc:id="f080cd3d-15c9-4602-8ec1-84b8e0244eb7" doc:name="Set Event">
+				<munit:payload value="#[output application/json&#10;---&#10;readUrl('classpath://mUnitFiles/a04Payload.dwl')]"/>
+			</munit:set-event>
+			<flow-ref doc:id="19846e24-2f81-4bf1-ac11-cf9f645d46ba" doc:name="Flow-ref to outboundContactImplementationFlow" name="outboundContactImplementationFlow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:id="0039691f-c728-417c-a1bb-0392a2e2c2aa" doc:name="Assert that" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test description="Test" doc:id="20cf36f0-1732-48c6-9e79-7176385ba6d4" name="outboundContactImplementationFlowTest-a08">
+		<munit:behavior>
+			<munit-tools:mock-when doc:id="70e36379-0ec1-49c0-a6e6-8d553987869c" doc:name="sfReplayListener" processor="salesforce:replay-channel-listener">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="Replay channel listener"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="72348164-7a72-4c67-aa80-81ce1cd8d89b"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload value="#[output application/json&#10;---&#10;readUrl('classpath://mUnitFiles/a08Payload.dwl')]"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="4a162a52-5566-45e5-852f-9eb44a3667e1" doc:name="sendEmail" processor="email:send">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="sendEmail"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="b9f99b8a-dc6f-4c6f-8eac-033f51ce376a"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="ec776377-3c57-4265-8496-7ea506bb2db7" doc:name="contactQuery" processor="salesforce:query">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="contactQuery"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="da86cc1e-1327-4d73-9aaf-318bde972d58"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="06a54441-3078-4058-8fb2-0b3cd28bf22a" doc:name="httpRequest" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="87ffaa36-32c0-4024-955f-6e4b0ab4097f"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<munit:set-event doc:id="c2c9c50c-2310-4f3e-8ce1-9b44db76d6ae" doc:name="Set Event">
+				<munit:payload value="#[output application/json&#10;---&#10;readUrl('classpath://mUnitFiles/a08Payload.dwl')]"/>
+				<munit:variables>
+					<munit:variable key="queryData" value="#[readUrl('classpath://mUnitFiles/queryPayload.dwl')]"/>
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:id="147a3ec6-4aee-4415-b5b4-a6cc30b6f326" doc:name="Flow-ref to outboundContactImplementationFlow" name="outboundContactImplementationFlow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:id="5c1c98d6-8c1e-4391-934f-edba85cf29e0" doc:name="Assert that" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test description="Test" doc:id="58cd745e-95da-43a6-818d-14e3e833a9ce" name="outboundContactImplementationFlowTest-defaultCase">
+		<munit:behavior>
+			<munit-tools:mock-when doc:id="a82189e0-93ba-4651-b463-2e264c30ef79" doc:name="sfReplayListener" processor="salesforce:replay-channel-listener">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="Replay channel listener"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="72348164-7a72-4c67-aa80-81ce1cd8d89b"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="f148ad13-4561-4a53-b79d-c3d18a2ba150" doc:name="sendEmail" processor="email:send">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="sendEmail"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="b9f99b8a-dc6f-4c6f-8eac-033f51ce376a"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="2e35504f-ed9f-4b62-abfb-7f78658bd5bf" doc:name="contactQuery" processor="salesforce:query">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="contactQuery"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="da86cc1e-1327-4d73-9aaf-318bde972d58"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="a8d0095c-4b32-44ea-8318-c5130eadc115" doc:name="httpRequest" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="87ffaa36-32c0-4024-955f-6e4b0ab4097f"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<munit:set-event doc:id="e88baa3a-5d47-4e8d-b57c-d1db6a169c82" doc:name="Set Event">
+				<munit:payload value="#[output application/json&#10;---&#10;{&#10;  &quot;data&quot;: {&#10;    &quot;schema&quot;: &quot;7WeyOMbAjZXlAoPC6NFG4w&quot;,&#10;    &quot;payload&quot;: {&#10;      &quot;LastModifiedDate&quot;: &quot;2024-07-02T08:28:26.000Z&quot;,&#10;      &quot;pi__score__c&quot;: 1184.0,&#10;      &quot;Insurance_Last_Verified_by_Id__c&quot;: &quot;00550000007AJKNAA4&quot;,&#10;       &quot;Name&quot;: {&#10;        &quot;FirstName&quot;: &quot;shalee&quot;,&#10;        &quot;LastName&quot;: &quot;Jackson&quot;&#10;      },&#10;      &quot;ChangeEventHeader&quot;: {&#10;        &quot;commitNumber&quot;: 1719908906839613442,&#10;        &quot;commitUser&quot;: &quot;005Rj000005UEfQIAU&quot;,&#10;        &quot;sequenceNumber&quot;: 1,&#10;        &quot;entityName&quot;: &quot;Contact&quot;,&#10;        &quot;changeType&quot;: &quot;UPDATE&quot;,&#10;        &quot;changedFields&quot;: [&#10;          &quot;LastModifiedDate&quot;,&#10;          &quot;LastModifiedById&quot;,&#10;          &quot;pi__score__c&quot;,&#10;          &quot;Insurance_Last_Verified_by_Id__c&quot;,&#10;          &quot;Name.FirstName&quot;,&#10;          &quot;Name.LastName&quot;&#10;        ],&#10;        &quot;changeOrigin&quot;: &quot;com/salesforce/api/soap/61.0;client=Pardot/&quot;,&#10;        &quot;transactionKey&quot;: &quot;00001441-202e-826c-e582-7292ed6af7b5&quot;,&#10;        &quot;commitTimestamp&quot;: 1719908906000,&#10;        &quot;recordIds&quot;: [&#10;          &quot;003Rj00000Buj14IAB&quot;&#10;        ]&#10;      },&#10;      &quot;LastModifiedById&quot;: &quot;00550000007AJKNAA4&quot;&#10;    },&#10;    &quot;event&quot;: {&#10;      &quot;replayId&quot;: 1435286&#10;    }&#10;  },&#10;  &quot;channel&quot;: &quot;/data/ContactChangeEvent&quot;&#10;}]"/>
+				<munit:variables>
+					<munit:variable key="queryData" value="#[readUrl('classpath://mUnitFiles/queryPayload.dwl')]"/>
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:id="4072a074-f404-4f24-b539-9bd2e72b01f1" doc:name="Flow-ref to outboundContactImplementationFlow" name="outboundContactImplementationFlow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:id="37f51d9b-45f7-48bc-939e-286bca8a9b66" doc:name="Assert that" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test description="Test" doc:id="92231be7-d87a-41dc-b0a7-48821cad3315" name="outboundAppointmentImplementationFlowTest-s13">
+		<munit:behavior>
+			<munit-tools:mock-when doc:id="1da5283f-8bde-4fdc-ab77-28ce78574724" doc:name="sfReplayChannelListener" processor="salesforce:replay-channel-listener">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="Replay channel listener"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="4dc1a9eb-e600-46f3-bb50-ae41d7539121"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="e850f443-fe1f-4a01-a805-7281ab0ad16c" doc:name="territoryFieldQuery" processor="salesforce:query">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="queryForTerritoryField"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="c6823964-cedb-468d-bba2-084b4ab4f405"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="0911b4d2-3a51-43b1-b9af-6bb1a723a746" doc:name="contactQueryData" processor="salesforce:query">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="contactQuery"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="004d318f-26b4-4f04-ba84-073f35f9a923"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="fa1da61f-8fa0-472d-8de3-1e5545b42adf" doc:name="httpRequest" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="callToSapi"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="87ffaa36-32c0-4024-955f-6e4b0ab4097f"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<munit:set-event doc:id="f960d432-a9c4-49dd-80d9-1dd1f8cbb256" doc:name="Set Event">
+				<munit:payload mediaType="application/dw" value="#[output application/json&#10;---&#10;readUrl('classpath://mUnitFiles/s13Payload.dwl')]"/>
+				<munit:variables>
+					<munit:variable key="queryData" value="#[readUrl('classpath://mUnitFiles/queryPayload.dwl')]"/>
+					<munit:variable key="territoryField" value="#[[{&quot;Name&quot; : &quot;Forest Hills&quot;, &quot;Id&quot; : &quot;a1BRj000000eab3MAA&quot;}]]"/>
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:id="4c5e5679-e41e-4362-bd9d-c4c41f147526" doc:name="Flow-ref to outboundAppointmentImplementationFlow" name="outboundAppointmentImplementationFlow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:id="f2a01597-ab99-442a-bba6-b7a3cbb6802a" doc:name="Assert that" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test description="Test" doc:id="ea4151dd-000b-40cd-912f-01028533cc88" name="outboundAppointmentImplementationFlowTest-s14">
+		<munit:behavior>
+			<munit-tools:mock-when doc:id="5c4abeea-b1ce-45e8-827f-cc41664b66d6" doc:name="sfReplayChannelListener" processor="salesforce:replay-channel-listener">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="Replay channel listener"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="4dc1a9eb-e600-46f3-bb50-ae41d7539121"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="9d8f370e-635e-4f4e-bef8-227bb9a9e984" doc:name="territoryFieldQuery" processor="salesforce:query">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="queryForTerritoryField"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="c6823964-cedb-468d-bba2-084b4ab4f405"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="7821397f-4d63-4381-b1ae-7a325d003671" doc:name="contactQueryData" processor="salesforce:query">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="contactQuery"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="004d318f-26b4-4f04-ba84-073f35f9a923"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="fbfc2f00-7f3f-44df-b2f6-dbe166b7ca83" doc:name="httpRequest" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="callToSapi"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="87ffaa36-32c0-4024-955f-6e4b0ab4097f"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<munit:set-event doc:id="349aaf62-856a-41bf-8a0a-7f263f32fbc3" doc:name="Set Event">
+				<munit:payload mediaType="application/dw" value="#[output application/json&#10;---&#10;readUrl('classpath://mUnitFiles/s14Payload.dwl')]"/>
+				<munit:variables>
+					<munit:variable key="queryData" value="#[readUrl('classpath://mUnitFiles/queryPayload.dwl')]"/>
+					<munit:variable key="territoryField" value="#[[{&quot;Name&quot; : &quot;Forest Hills&quot;, &quot;Id&quot; : &quot;a1BRj000000eab3MAA&quot;}]]"/>
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:id="ffc3d0ba-75d8-4ca8-b5e6-123d4c7c2f02" doc:name="Flow-ref to outboundAppointmentImplementationFlow" name="outboundAppointmentImplementationFlow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:id="8f802a0a-384e-4e61-b2b8-555cab2ef209" doc:name="Assert that" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test description="Test" doc:id="5dd87b77-92f1-40df-9448-11b002c227e3" name="outboundAppointmentImplementationFlowTest-s12">
+		<munit:behavior>
+			<munit-tools:mock-when doc:id="d59e06e2-84bb-4082-a2a5-c3103feaff04" doc:name="sfReplayChannelListener" processor="salesforce:replay-channel-listener">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="Replay channel listener"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="4dc1a9eb-e600-46f3-bb50-ae41d7539121"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="e33a8b44-8307-4d07-b87e-5b5855bdbcaa" doc:name="territoryFieldQuery" processor="salesforce:query">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="queryForTerritoryField"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="c6823964-cedb-468d-bba2-084b4ab4f405"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="dba5398a-8520-49e8-90ba-2dbe47391d8c" doc:name="contactQueryData" processor="salesforce:query">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="contactQuery"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="004d318f-26b4-4f04-ba84-073f35f9a923"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="d319ad5a-ac11-4e5a-b632-8ea234dc0d4b" doc:name="httpRequest" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="callToSapi"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="87ffaa36-32c0-4024-955f-6e4b0ab4097f"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<munit:set-event doc:id="ff3c4ecf-b7e9-490e-a774-01b117845d09" doc:name="Set Event">
+				<munit:payload mediaType="application/dw" value="#[output application/json&#10;---&#10;readUrl('classpath://mUnitFiles/s12Payload.dwl')]"/>
+				<munit:variables>
+					<munit:variable key="queryData" value="#[readUrl('classpath://mUnitFiles/queryPayload.dwl')]"/>
+					<munit:variable key="territoryField" value="#[[{&quot;Name&quot; : &quot;Forest Hills&quot;, &quot;Id&quot; : &quot;a1BRj000000eab3MAA&quot;}]]"/>
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:id="cb9538e5-41a2-4bc5-a894-c585aab3913d" doc:name="Flow-ref to outboundAppointmentImplementationFlow" name="outboundAppointmentImplementationFlow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:id="a4004b8a-2314-4313-9036-4ad4114259b4" doc:name="Assert that" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test description="Test" doc:id="1481725f-99e2-4960-8748-844b2ddcf83b" name="outboundAppointmentImplementationFlowTest-s15">
+		<munit:behavior>
+			<munit-tools:mock-when doc:id="d88c6717-9e99-4946-a645-5d7abe60955d" doc:name="sfReplayChannelListener" processor="salesforce:replay-channel-listener">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="Replay channel listener"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="4dc1a9eb-e600-46f3-bb50-ae41d7539121"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="7327ea0d-119e-4024-864b-21cbb8950e78" doc:name="territoryFieldQuery" processor="salesforce:query">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="queryForTerritoryField"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="c6823964-cedb-468d-bba2-084b4ab4f405"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="d85be227-e07a-49cd-bfef-2fc2a728bceb" doc:name="contactQueryData" processor="salesforce:query">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="contactQuery"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="004d318f-26b4-4f04-ba84-073f35f9a923"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="3f8f05a6-e127-4bef-8be0-59b7ab359bc2" doc:name="httpRequest" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="callToSapi"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="87ffaa36-32c0-4024-955f-6e4b0ab4097f"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<munit:set-event doc:id="7ab41479-295d-41f4-8b33-55c282078ea8" doc:name="Set Event">
+				<munit:payload mediaType="application/dw" value="#[output application/json&#10;---&#10;readUrl('classpath://mUnitFiles/s15Payload.dwl')]"/>
+				<munit:variables>
+					<munit:variable key="queryData" value="#[readUrl('classpath://mUnitFiles/queryPayload.dwl')]"/>
+					<munit:variable key="territoryField" value="#[[{&quot;Name&quot; : &quot;Forest Hills&quot;, &quot;Id&quot; : &quot;a1BRj000000eab3MAA&quot;}]]"/>
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:id="3227ec6b-c8dc-4f5d-8eac-874db1095365" doc:name="Flow-ref to outboundAppointmentImplementationFlow" name="outboundAppointmentImplementationFlow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:id="49c549df-fe7c-454a-b782-826338134654" doc:name="Assert that" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test description="Test" doc:id="30ac033a-2b24-451d-8d0c-609f7ef0625f" name="outboundAppointmentImplementationFlowTest-defaultCase">
+		<munit:behavior>
+			<munit-tools:mock-when doc:id="77a4020c-bfea-4a6a-95ef-40ce78f81a43" doc:name="sfReplayChannelListener" processor="salesforce:replay-channel-listener">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="Replay channel listener"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="4dc1a9eb-e600-46f3-bb50-ae41d7539121"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="5665a5d2-4fb7-488f-95c8-09798ec6342f" doc:name="territoryFieldQuery" processor="salesforce:query">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="queryForTerritoryField"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="c6823964-cedb-468d-bba2-084b4ab4f405"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="54b28558-d028-48a8-a166-e8b3c55ae139" doc:name="contactQueryData" processor="salesforce:query">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="contactQuery"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="004d318f-26b4-4f04-ba84-073f35f9a923"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="ea1ae77b-c2fd-4d58-8a07-3e64879738bc" doc:name="httpRequest" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="callToSapi"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="87ffaa36-32c0-4024-955f-6e4b0ab4097f"/>
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<munit:set-event doc:id="ec6f061f-8b9c-4ed8-857b-ae4eb4ef567b" doc:name="Set Event">
+				<munit:payload mediaType="application/dw" value="#[output application/json&#10;---&#10;{&#10;  &quot;data&quot;: {&#10;    &quot;schema&quot;: &quot;nTowGbw-ipH4sznrGpeohg&quot;,&#10;    &quot;payload&quot;: {&#10;      &quot;LastModifiedDate&quot;: &quot;2024-09-03T09:56:05.000Z&quot;,&#10;      &quot;ServiceTerritoryId&quot;: &quot;0HhRj0000000B8LKAU&quot;,&#10;      &quot;Status&quot;: &quot;Cancelled by Provider&quot;,&#10;      &quot;ActualDuration&quot;: 0.0,&#10;      &quot;ActualEndTime&quot;: &quot;2024-09-03T09:54:00.000Z&quot;,&#10;      &quot;CancellationReason&quot;: &quot;Personal Emergency&quot;,&#10;      &quot;ContactId&quot;: &quot;003Rj00000FEgK0IAL&quot;,&#10;      &quot;StatusCategory&quot;: &quot;Canceled&quot;,&#10;      &quot;AdditionalInformation&quot;: &quot;Fibroid 3. MRI Review&quot;,&#10;      &quot;Service_Resource__c&quot;: &quot;James Gohar&quot;,&#10;      &quot;ActualStartTime&quot;: &quot;2024-09-03T09:54:00.000Z&quot;,&#10;      &quot;ChangeEventHeader&quot;: {&#10;        &quot;commitNumber&quot;: 1725357365187780609,&#10;        &quot;commitUser&quot;: &quot;005Rj000005UEfQIAU&quot;,&#10;        &quot;sequenceNumber&quot;: 1,&#10;        &quot;entityName&quot;: &quot;ServiceAppointment&quot;,&#10;        &quot;changeType&quot;: &quot;UPDATE&quot;,&#10;        &quot;changedFields&quot;: [&#10;          &quot;LastModifiedDate&quot;,&#10;          &quot;ContactId&quot;,&#10;          &quot;Status&quot;,&#10;          &quot;ActualStartTime&quot;,&#10;          &quot;ActualEndTime&quot;,&#10;          &quot;ActualDuration&quot;,&#10;          &quot;ServiceTerritoryId&quot;,&#10;          &quot;StatusCategory&quot;,&#10;          &quot;CancellationReason&quot;,&#10;          &quot;AdditionalInformation&quot;,&#10;          &quot;Service_Resource__c&quot;&#10;        ],&#10;        &quot;changeOrigin&quot;: &quot;&quot;,&#10;        &quot;transactionKey&quot;: &quot;0000a62a-5497-10e0-dbe3-e99b71589a49&quot;,&#10;        &quot;commitTimestamp&quot;: 1725357365000,&#10;        &quot;recordIds&quot;: [&#10;          &quot;08pRj000005kYAHIA2&quot;&#10;        ]&#10;      }&#10;    },&#10;    &quot;event&quot;: {&#10;      &quot;replayId&quot;: 2142496&#10;    }&#10;  },&#10;  &quot;channel&quot;: &quot;/data/ServiceAppointmentChangeEvent&quot;&#10;}]"/>
+				<munit:variables>
+					<munit:variable key="queryData" value="#[readUrl('classpath://mUnitFiles/queryPayload.dwl')]"/>
+					<munit:variable key="territoryField" value="#[[{&quot;Name&quot; : &quot;Forest Hills&quot;, &quot;Id&quot; : &quot;a1BRj000000eab3MAA&quot;}]]"/>
+				</munit:variables>
+			</munit:set-event>
+			<flow-ref doc:id="826cc8be-ecc8-4fe7-9889-a3fcfdf4ce0b" doc:name="Flow-ref to outboundAppointmentImplementationFlow" name="outboundAppointmentImplementationFlow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:id="b1f3dbc6-561a-459c-a7dc-0c2b262bf092" doc:name="Assert that" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>
