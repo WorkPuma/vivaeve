@@ -480,11 +480,11 @@ output application/json
         <!--  ========== ADT^A08 ========== -->
         <when expression="#[vars.checkConditionA08.result]">
     <logger level="INFO"
-            doc:name="A08 Entry Logger"
-            doc:id="a08-entry-logger-id"
-            category="com.vivaeve.hl7.a08.flow"
-            message="STARTED PROCESSING ADT^A08 MESSAGE - ID: #[(payload contains 'MSH') and ((payload splitBy '|')[9] default 'UNKNOWN') or 'UNKNOWN'], CorrelationId: #[vars.correlationId default 'NONE']" />
-            
+        doc:name="A08 Entry Logger"
+        doc:id="23df9a79-1967-4f6d-8bed-7d0443658f8d"
+        category="com.vivaeve.hl7.a08.flow"
+        message="STARTED PROCESSING ADT^A08 MESSAGE - CorrelationId: #[vars.correlationId default 'NONE']" />
+        
     <try doc:name="A08 Processing Try" doc:id="a08-processing-try-id">
         <hl7:read doc:name="A08" doc:id="220e2379-72cf-4026-8de0-971f48c957b5" config-ref="HL7_EDI_Config_A08">
             <hl7:read-content><![CDATA[#[vars.inputPayload]]]></hl7:read-content>
@@ -501,16 +501,18 @@ output application/json
                 message="A08 Message - Successfully parsed HL7 message. Message Type: #[payload.Data.ADT_A08.MSH.'MSH-9'.'CM_MSG-01' default 'UNKNOWN']^#[payload.Data.ADT_A08.MSH.'MSH-9'.'CM_MSG-02' default 'UNKNOWN']" />
     <!-- Message Structure Logger -->
     <logger level="DEBUG"
-            doc:name="A08 Structure Logger"
-            category="com.vivaeve.hl7.a08.structure"
-            message="#[%dw 2.0 output application/json --- {
-                messageType: payload.Data.ADT_A08.MSH.'MSH-9'.'CM_MSG-01' + '^' + payload.Data.ADT_A08.MSH.'MSH-9'.'CM_MSG-02',
-                messageId: payload.Data.ADT_A08.MSH.'MSH-10',
-                sendingApp: payload.Data.ADT_A08.MSH.'MSH-3',
-                receivingApp: payload.Data.ADT_A08.MSH.'MSH-5',
-                timestamp: payload.Data.ADT_A08.MSH.'MSH-7',
-                correlationId: vars.correlationId default 'NONE'
-            }]" /></try>
+        doc:name="A08 Structure Logger"
+        category="com.vivaeve.hl7.a08.structure"
+        message="#[%dw 2.0 output application/json --- {
+            messageType: (payload.Data.ADT_A08.MSH.'MSH-9'.'CM_MSG-01' default 'UNKNOWN') 
+                         ++ '^' ++ 
+                         (payload.Data.ADT_A08.MSH.'MSH-9'.'CM_MSG-02' default 'UNKNOWN'),
+            messageId: payload.Data.ADT_A08.MSH.'MSH-10' default 'UNKNOWN',
+            sendingApp: payload.Data.ADT_A08.MSH.'MSH-3' default 'UNKNOWN',
+            receivingApp: payload.Data.ADT_A08.MSH.'MSH-5' default 'UNKNOWN',
+            timestamp: payload.Data.ADT_A08.MSH.'MSH-7' default 'UNKNOWN',
+            correlationId: vars.correlationId default 'NONE'
+        }]" /></try>
             
     <ee:transform doc:name="jsonPayload" doc:id="5527f271-e911-40f5-974d-3c0ea13b0385">
         <ee:message>
