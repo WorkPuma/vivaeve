@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
 	xmlns:email="http://www.mulesoft.org/schema/mule/email"
 	xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7"
 	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
@@ -17,7 +18,8 @@ http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
-http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 
 	<!-- This configuration uses default algorithm (AES) and mode (CBC) -->
 	
@@ -65,6 +67,18 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 			readTimeout="30000"
 			connectionTimeout="30000" />
 	</salesforce:sfdc-config>
+	
+	<!-- Object Store Configuration for Mappings -->
+	<os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="object-store-config-id">
+		<os:connection />
+	</os:config>
+
+	<os:object-store name="MappingsObjectStore" 
+		doc:name="Object Store" 
+		doc:id="mappings-object-store-id"
+		config-ref="ObjectStore_Config"
+		persistent="true" />
+		
 	<hl7:config name="HL7_EDI_Config_A04" doc:name="HL7 EDI Config" doc:id="b775032e-115f-42d0-afbb-a8ad857ff3b4" subcompSeparator="&amp;">
 		<hl7:schemas >
 			<hl7:schema value="${hl7.A04schema}" />

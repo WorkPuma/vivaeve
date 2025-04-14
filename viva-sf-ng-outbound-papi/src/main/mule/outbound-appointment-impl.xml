@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7"
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd
-http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 	<flow name="outboundAppointmentImplementationFlow" doc:id="13ea4868-57e2-445d-a553-cd4417a81304" >
 		<salesforce:replay-channel-listener doc:name="Replay channel listener" doc:id="4dc1a9eb-e600-46f3-bb50-ae41d7539121" config-ref="Salesforce_Config" streamingChannel="/data/ServiceAppointmentChangeEvent" replayOption="FROM_LAST_REPLAY_ID" cacheEventsInMemory="true"/>
 		<ee:transform doc:name="inputPayload" doc:id="8d3bda74-584f-46d5-af6b-20aff68c3f3e">
@@ -99,6 +101,45 @@ output application/json
 		<!-- 1. Log entry to appointment sub-flow -->
 		<logger level="INFO" doc:name="1. Appointment Sub-Flow Entry"
 				message="APPOINTMENT SUB-FLOW ENTRY - CorrelationId: #[vars.correlationId default 'NONE'], AppointmentId: #[payload.data.payload.ChangeEventHeader.recordIds[0]], Status: #[payload.data.payload.Status default 'null']"/>
+		
+		<!-- Retrieve Mappings from Object Store V2 -->
+		<try doc:name="Try Object Store Retrieval" doc:id="try-object-store-retrieval">
+			<os:retrieve 
+				doc:name="Retrieve TerritoryMapping" 
+				doc:id="de5a38eb-ac7e-4b00-a2cc-7998a45384fd"
+				key="TerritoryMapping"
+				target="TerritoryMapping" 
+				objectStore="MappingsObjectStore"/>
+
+			<os:retrieve 
+				doc:name="Retrieve WorkTypeMapping"
+				doc:id="43b0ff1f-2561-450f-91bb-9850fc0cd39d"
+				key="WorkTypeMapping"
+				target="WorkTypeMapping" 
+				objectStore="MappingsObjectStore"/>
+
+			<os:retrieve 
+				doc:name="Retrieve ProviderMapping"
+				doc:id="d5e030f2-74ea-49ff-8a99-72db5ab476f8"
+				key="ProviderMapping"
+				target="ProviderMapping" 
+				objectStore="MappingsObjectStore"/>
+
+			<!-- Log the sizes of each retrieved mapping -->
+			<logger 
+				level="INFO" 
+				doc:name="MappingsLogger" 
+				message="TerritoryMapping size: #[sizeOf(vars.TerritoryMapping)], WorkTypeMapping size: #[sizeOf(vars.WorkTypeMapping)], ProviderMapping size: #[sizeOf(vars.ProviderMapping)]" />
+				
+			<error-handler>
+				<on-error-continue type="OS:STORE_NOT_FOUND">
+					<logger level="ERROR" 
+							doc:name="Object Store Error Logger"
+							message="Required mapping not found in Object Store. Please ensure mappings are properly loaded. Error: #[error.description]" />
+					<!-- Continue processing with empty mappings -->
+				</on-error-continue>
+			</error-handler>
+		</try>
 				
 		<ee:transform doc:name="requiredVariables" doc:id="521a3855-a474-4032-8df9-ff4b6f2125b7">
 			<ee:message>
@@ -106,19 +147,39 @@ output application/json
 			<ee:variables>
 				<ee:set-variable variableName="appLocation"><![CDATA[%dw 2.0
 output application/json
-var locationField = readUrl("classpath://LocationExtract.json","application/json")
 ---
-//(locationField filter ($.Id == payload.data.payload.ServiceTerritoryId))[0].LOCATION
 if(payload.data.payload.ServiceTerritoryId?)
-(locationField filter ($.Id == payload.data.payload.ServiceTerritoryId))[0].LOCATION else
-(locationField filter ($.Id ~= vars.updateFields.ServiceTerritoryId[0]))[0].LOCATION]]></ee:set-variable>
-				<ee:set-variable resource="dwl/variables/app-location-id.dwl" variableName="appLocationId" />
-				<ee:set-variable resource="dwl/variables/app-provider-first-name.dwl" variableName="providerFirstName" />
-				<ee:set-variable resource="dwl/variables/app-provider-last-name.dwl" variableName="providerLastName" />
-				<ee:set-variable resource="dwl/variables/app-provider-id.dwl" variableName="providerId" />
+  ((vars.TerritoryMapping default []) filter ((item) -> item.Id == payload.data.payload.ServiceTerritoryId))[0].LOCATION default "Unknown Location"
+else
+  ((vars.TerritoryMapping default []) filter ((item) -> item.Id ~= vars.updateFields.ServiceTerritoryId[0]))[0].LOCATION default "Unknown Location"]]></ee:set-variable>
+				<ee:set-variable variableName="appLocationId"><![CDATA[%dw 2.0
+output application/json
+---
+if(payload.data.payload.ServiceTerritoryId?)
+  ((vars.TerritoryMapping default []) filter ((item) -> item.Id == payload.data.payload.ServiceTerritoryId))[0].Id default ""
+else
+  ((vars.TerritoryMapping default []) filter ((item) -> item.Id ~= vars.updateFields.ServiceTerritoryId[0]))[0].Id default ""]]></ee:set-variable>
+				<ee:set-variable variableName="providerFirstName"><![CDATA[%dw 2.0
+output application/json
+---
+((vars.ProviderMapping default []) filter ((item) -> item.providerId == vars.updateFields.Service_Resource__c[0])).firstName[0] default ""]]></ee:set-variable>
+				<ee:set-variable variableName="providerLastName"><![CDATA[%dw 2.0
+output application/json
+---
+((vars.ProviderMapping default []) filter ((item) -> item.providerId == vars.updateFields.Service_Resource__c[0])).lastName[0] default ""]]></ee:set-variable>
+				<ee:set-variable variableName="providerId"><![CDATA[%dw 2.0
+output application/json
+---
+((vars.ProviderMapping default []) filter ((item) -> item.providerId == vars.updateFields.Service_Resource__c[0])).NPI[0] default ""]]></ee:set-variable>
 				<ee:set-variable resource="dwl/variables/app-language-field.dwl" variableName="languageField" />
-				<ee:set-variable resource="dwl/variables/appintment-type-var.dwl" variableName="appointmentType" />
-				<ee:set-variable resource="dwl/variables/app-duration-var.dwl" variableName="duration" />
+				<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
+output application/json
+---
+((vars.WorkTypeMapping default []) filter ((item) -> item.WorkTypeId == vars.updateFields.WorkTypeId[0])).NextGenField[0] default ""]]></ee:set-variable>
+				<ee:set-variable variableName="duration"><![CDATA[%dw 2.0
+output application/json
+---
+((vars.WorkTypeMapping default []) filter ((item) -> item.WorkTypeId == vars.updateFields.WorkTypeId[0])).duration[0] default ""]]></ee:set-variable>
 				<ee:set-variable variableName="scheduledEndTime" ><![CDATA[%dw 2.0
 output application/json
 var schedEndTime = if ((payload.data.payload.SchedEndTime != null) and (payload.data.payload.SchedEndTime?))

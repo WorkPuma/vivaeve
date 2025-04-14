@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:sap="http://www.mulesoft.org/schema/mule/sap" xmlns:email="http://www.mulesoft.org/schema/mule/email"
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:sap="http://www.mulesoft.org/schema/mule/sap" xmlns:email="http://www.mulesoft.org/schema/mule/email"
 	xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
@@ -8,7 +9,8 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
-http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd">
+http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 	<flow name="outboundContactImplementationFlow" doc:id="f640b450-687e-4eb3-bc13-a42f198e21b3" >
 		<salesforce:replay-channel-listener streamingChannel="/data/ContactChangeEvent" replayOption="FROM_LAST_REPLAY_ID" doc:name="Replay channel listener" doc:id="72348164-7a72-4c67-aa80-81ce1cd8d89b" config-ref="Salesforce_Config" cacheEventsInMemory="true"/>
 		<logger level="INFO" doc:name="inputPayloadLogger" doc:id="941802cd-ded1-497a-a3ef-b1c7946281d1" message="#[%dw 2.0
@@ -149,62 +151,6 @@ output application/json
 ]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message" doc:id="da581829-c332-444a-9264-d483b841c36c" >
-			<ee:message >
-			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="textBody" ><![CDATA[%dw 2.0
-output text/plain
-&#45;&#45;-
-"Hello: " ++ vars.userEmailVar[0&#93;.Username ++ "
-Message: This email is to notify you that the following critical fields have been updated for a Contact in Salesforce.
-
-Contact Details:
-  - Modified Time: " ++ (now() as String) ++ "
-  - ContactId: " ++ (payload.data.payload.ChangeEventHeader.recordIds[0&#93; as String {class: "null"} default "N/A") ++ "
-  - Updated Details: " ++ 
-    (
-      (
-        [
-          if (payload.data.payload.ChangeEventHeader.changedFields contains "Name.FirstName") 
-            "The following contact First Name is updated to: " ++ payload.data.payload.Name.FirstName
-          else 
-            null,
-          if (payload.data.payload.ChangeEventHeader.changedFields contains "Name.LastName") 
-            "The following contact Last Name is updated to: " ++ payload.data.payload.Name.LastName
-          else 
-            null,
-          if (payload.data.payload.ChangeEventHeader.changedFields contains "Date_of_Birth__c") 
-            "The following contact Date of Birth is updated to: " ++ payload.data.payload.Date_of_Birth__c as String
-          else 
-            null
-        &#93; 
-        filter $ != null
-      ) joinBy "\n    "
-    ) ++ "
-
-UserID: " ++ (payload.data.payload.ChangeEventHeader.commitUser as String {class: "null"} default "N/A") ++ "
-Note: If this update was intentional, no further action is required. Otherwise, please review the change and ensure its accuracy."
-&#93;&#93;></ee:set-variable>
-				<ee:set-variable variableName="textErrorBody" ><![CDATA[%dw 2.0
-output text/plain
-&#45;&#45;-
-"Hello: " ++ vars.errorBody.Hello ++ "
-Message: " ++ vars.errorBody.Message ++ "
-
-Contact Details:
-  - Timestamp: " ++ (vars.errorBody.'Contact Details'.Timestamp as String {class: "null"} default "N/A") ++ "
-  - ContactId: " ++ (vars.errorBody.'Contact Details'.ContactId as String {class: "null"} default "N/A") ++ "
-  - Contact Full Name: " ++ (vars.errorBody.'Contact Details'.'Contact Full Name' as String {class: "null"} default "N/A") ++ "
-  - Date of Birth: " ++ (vars.errorBody.'Contact Details'.'Date of Birth' as String {class: "null"} default "N/A") ++ "
-  - Email: " ++ (vars.errorBody.'Contact Details'.Email as String {class: "null"} default "N/A") ++ "
-  - Phone: " ++ (vars.errorBody.'Contact Details'.Phone as String {class: "null"} default "N/A") ++ "
-  - Address: " ++ (vars.errorBody.'Contact Details'.Address filter $ != null joinBy ", " default "N/A") ++ "
-  - UserID: " ++ (vars.errorBody.'Contact Details'.UserID as String {class: "null"} default "N/A") ++ "
-  - Context: " ++ (vars.errorBody.'Contact Details'.Context as String {class: "null"} default "N/A")
-&#93;&#93;></ee:set-variable>
-			</ee:variables>
-		</ee:transform> [STUDIO] -->
 		<choice doc:name="Choice" doc:id="79245701-43c0-4bff-954c-03b3ea9af723" >
 			<when expression='#[(payload.data.payload.ChangeEventHeader.changedFields contains "Name.FirstName") or (payload.data.payload.ChangeEventHeader.changedFields contains "Name.LastName") or (payload.data.payload.ChangeEventHeader.changedFields contains "Date_of_Birth__c")]'>
 				<email:send doc:name="sendEmail" doc:id="b9f99b8a-dc6f-4c6f-8eac-033f51ce376a" config-ref="Email_SMTP" fromAddress="${smtp.fromaddress}" subject='#[vars.subject]'>
@@ -224,7 +170,7 @@ Contact Details:
 		</choice>
 		<error-handler ref="error-handler" />
 	
-</flow>
+	</flow>
 	<sub-flow name="outboundContactSubFlow" doc:id="93f5a7d7-6778-4b32-9e92-f748e0a45d5f" >
 		<choice doc:name="Choice" doc:id="fa003cae-e090-4072-96d7-1b67314d9a33" >
 			<when expression='#[(payload.data.payload.ChangeEventHeader.commitUser == "0051T000007nKdNQAU" or
@@ -242,13 +188,61 @@ Contact Details:
 				<logger level="INFO" doc:name="1. Valid Test Patient"
 				        message="VALID TEST PATIENT - UserId: #[payload.data.payload.ChangeEventHeader.commitUser], Name: #[vars.queryData[0].FirstName default ''] #[vars.queryData[0].LastName default '']"/>
 				
+				<!-- Retrieve Mappings from Object Store V2 -->
+				<try doc:name="Try Object Store Retrieval" doc:id="try-contact-object-store-retrieval">
+					<os:retrieve 
+						doc:name="Retrieve TerritoryMapping" 
+						doc:id="contact-de5a38eb-ac7e-4b00-a2cc-7998a45384fd"
+						key="TerritoryMapping"
+						target="TerritoryMapping" 
+						objectStore="MappingsObjectStore"/>
+
+					<os:retrieve 
+						doc:name="Retrieve WorkTypeMapping"
+						doc:id="contact-43b0ff1f-2561-450f-91bb-9850fc0cd39d"
+						key="WorkTypeMapping"
+						target="WorkTypeMapping" 
+						objectStore="MappingsObjectStore"/>
+
+					<os:retrieve 
+						doc:name="Retrieve ProviderMapping"
+						doc:id="contact-d5e030f2-74ea-49ff-8a99-72db5ab476f8"
+						key="ProviderMapping"
+						target="ProviderMapping" 
+						objectStore="MappingsObjectStore"/>
+
+					<!-- Log the sizes of each retrieved mapping -->
+					<logger 
+						level="INFO" 
+						doc:name="Contact MappingsLogger" 
+						message="TerritoryMapping size: #[sizeOf(vars.TerritoryMapping)], WorkTypeMapping size: #[sizeOf(vars.WorkTypeMapping)], ProviderMapping size: #[sizeOf(vars.ProviderMapping)]" />
+						
+					<error-handler>
+						<on-error-continue type="OS:STORE_NOT_FOUND">
+							<logger level="ERROR" 
+									doc:name="Contact Object Store Error Logger"
+									message="Required contact mapping not found in Object Store. Please ensure mappings are properly loaded. Error: #[error.description]" />
+							<!-- Continue processing with empty mappings -->
+						</on-error-continue>
+					</error-handler>
+				</try>
+				
 				<ee:transform doc:name="inputPayload" doc:id="726b9428-3195-464d-93e9-2d42d545e5ff" >
 					<ee:message />
 					<ee:variables >
 						<ee:set-variable resource="dwl/variables/language-field-var.dwl" variableName="languageField" />
-						<ee:set-variable resource="dwl/variables/provider-id-var.dwl" variableName="providerId" />
-						<ee:set-variable resource="dwl/variables/contact-create-check-var.dwl" variableName="checkConditionCreate" />
-						<ee:set-variable resource="dwl/variables/contact-update-check-var.dwl" variableName="checkConditionUpdate" />
+						<ee:set-variable variableName="providerId"><![CDATA[%dw 2.0
+output application/json
+---
+((vars.ProviderMapping default []) filter ((item) -> item.providerId == payload.data.payload.ProviderId)).NPI[0] default ""]]></ee:set-variable>
+						<ee:set-variable variableName="checkConditionCreate"><![CDATA[%dw 2.0
+output application/json
+---
+if (!isEmpty(payload.data.payload.ChangeEventHeader.entityName) and (!isEmpty(payload.data.payload.ChangeEventHeader.changeType))) (payload.data.payload.ChangeEventHeader.entityName ~= "Contact" and payload.data.payload.ChangeEventHeader.changeType ~= "CREATE") else false]]></ee:set-variable>
+						<ee:set-variable variableName="checkConditionUpdate"><![CDATA[%dw 2.0
+output application/json
+---
+if (!isEmpty(payload.data.payload.ChangeEventHeader.entityName) and (!isEmpty(payload.data.payload.ChangeEventHeader.changeType))) (payload.data.payload.ChangeEventHeader.entityName ~= "Contact" and payload.data.payload.ChangeEventHeader.changeType ~= "UPDATE") else false]]></ee:set-variable>
 						<ee:set-variable variableName="eventType" ><![CDATA["REGISTRATION"]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
