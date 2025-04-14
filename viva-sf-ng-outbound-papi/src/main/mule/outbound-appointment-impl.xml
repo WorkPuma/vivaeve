@@ -82,12 +82,14 @@ output application/json
 		</salesforce:query>
 		<choice doc:name="Choice" doc:id="bf1063e1-f83a-4917-b1eb-055f97cd8e3f" >
 			<when expression='#[(payload.data.payload.ChangeEventHeader.commitUser == "0051T000007nKdNQAU" or
-    payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B87d5QAB" or
-    payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B88cXQAR" or payload.data.payload.ChangeEventHeader.commitUser == "005Rj000000hxuTIAQ"
-  ) and
-  (
-  (vars.queryData[0].FirstName != null and (vars.queryData[0].FirstName == "TEST")) and
-  (vars.queryData[0].LastName != null and (vars.queryData[0].LastName contains "PATIENT"))
+		  payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B87d5QAB" or
+		  payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B88cXQAR" or
+		  payload.data.payload.ChangeEventHeader.commitUser == "005Rj000000hxuTIAQ" or
+		  payload.data.payload.ChangeEventHeader.commitUser == "005Rj00000Fzk3mIAB"
+		) and
+		(
+		(vars.queryData[0].FirstName != null and (vars.queryData[0].FirstName == "TEST")) and
+		(vars.queryData[0].LastName != null and (vars.queryData[0].LastName contains "PATIENT"))
   )]'>
 				<flow-ref doc:name="callingSubFlow" doc:id="65301612-ff0b-42a4-bb34-04dfe9abe3a3" name="outboundAppointmentSubFlow" />
 			</when>

@@ -58,12 +58,13 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 	<tls:key-store type="jks" path="${tls.path}" alias="${tls.alias}" keyPassword="${tls.keypassword}" password="${tls.password}" />
 	
 	</tls:context> -->
-	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="0230c83a-a376-4b77-a057-05ad51d3f79a" >
-    <salesforce:basic-connection 
-        username="${sf.username}" 
-        password="${secure::sf.password}" 
-        url="https://vivaeve--devchris.sandbox.my.salesforce.com"
-        connectionTimeout="30000" />
+<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config">
+  <salesforce:oauth-user-pass-connection 
+      consumerKey="${sf.consumer.key}" 
+      consumerSecret="${sf.client.secret}" 
+      username="${sf.username}" 
+      password="${sf.password}"
+      tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
 </salesforce:sfdc-config>
 	
 	<!-- Object Store Configuration for Mappings -->

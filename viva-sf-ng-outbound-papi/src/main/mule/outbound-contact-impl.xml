@@ -174,13 +174,15 @@ output application/json
 	<sub-flow name="outboundContactSubFlow" doc:id="93f5a7d7-6778-4b32-9e92-f748e0a45d5f" >
 		<choice doc:name="Choice" doc:id="fa003cae-e090-4072-96d7-1b67314d9a33" >
 			<when expression='#[(payload.data.payload.ChangeEventHeader.commitUser == "0051T000007nKdNQAU" or
-    payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B87d5QAB" or
-    payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B88cXQAR" or payload.data.payload.ChangeEventHeader.commitUser == "005Rj000000hxuTIAQ"
-  ) and
-  (
-    (payload.data.payload.Name.FirstName != null and (payload.data.payload.Name.FirstName == "TEST")) and
-    (payload.data.payload.Name.LastName != null and (payload.data.payload.Name.LastName contains "PATIENT")) or 
-    (vars.queryData[0].FirstName != null and (vars.queryData[0].FirstName == "TEST")) and
+			 payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B87d5QAB" or
+			 payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B88cXQAR" or
+			 payload.data.payload.ChangeEventHeader.commitUser == "005Rj000000hxuTIAQ" or
+			 payload.data.payload.ChangeEventHeader.commitUser == "005Rj00000Fzk3mIAB"
+		) and
+		(
+			 (payload.data.payload.Name.FirstName != null and (payload.data.payload.Name.FirstName == "TEST")) and
+			 (payload.data.payload.Name.LastName != null and (payload.data.payload.Name.LastName contains "PATIENT")) or
+			 (vars.queryData[0].FirstName != null and (vars.queryData[0].FirstName == "TEST")) and
     (vars.queryData[0].LastName != null and (vars.queryData[0].LastName contains "PATIENT"))
   )]' >
 			    
