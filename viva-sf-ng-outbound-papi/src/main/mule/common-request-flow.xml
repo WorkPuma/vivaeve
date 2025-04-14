@@ -45,16 +45,49 @@ payload
 					message="HL7 SEGMENTS TRANSFORMED - Message type: #[(vars.hl7Payload scan /MSH\|([^\|]*\|){8}([^\|]*)/)[0][2] default 'unknown'], Segments: PID=#[(vars.hl7Payload contains 'PID|')], SCH=#[(vars.hl7Payload contains 'SCH|')], AIL=#[(vars.hl7Payload contains 'AIL|')], AIP=#[(vars.hl7Payload contains 'AIP|')]"/>
 			
 			<!-- 4. Log specific PID segment details for address issue analysis -->
-			<logger level="INFO" doc:name="4. PID Address Analysis"
-					message="#[%dw 2.0 output application/json --- {
-					  'MSH': (vars.hl7Payload scan /MSH\|([^\r\n]*)/)[0],
-					  'PID': (vars.hl7Payload scan /PID\|([^\r\n]*)/)[0],
-					  'PID_11_analysis': {
-						'has_PID11': (vars.hl7Payload contains 'PID-11'),
-						'address_raw': (vars.hl7Payload scan /PID\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|([^\|]*)/)[0][1] default 'not found',
-						'contains_newline': ((vars.hl7Payload scan /PID\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|([^\|]*)/)[0][1] default '') contains '\\X0A\\'
-					  }
-					}]"/>
+<ee:transform doc:name="PID Analysis Transform">
+    <ee:message />
+    <ee:variables>
+        <ee:set-variable variableName="mshSegment"><![CDATA[%dw 2.0
+output application/java
+---
+(vars.hl7Payload scan /MSH\|([^\r\n]*)/)[0][0] default "Not found"
+]]></ee:set-variable>
+        <ee:set-variable variableName="pidSegment"><![CDATA[%dw 2.0
+output application/java
+---
+(vars.hl7Payload scan /PID\|([^\r\n]*)/)[0][0] default "Not found"
+]]></ee:set-variable>
+        <ee:set-variable variableName="hasPid11"><![CDATA[%dw 2.0
+output application/java
+---
+vars.hl7Payload contains "PID-11"
+]]></ee:set-variable>
+        <ee:set-variable variableName="addressRaw"><![CDATA[%dw 2.0
+output application/java
+---
+(vars.hl7Payload scan /PID\|([^\|]*\|){10}([^\|]*)/)[0][2] default "not found"
+]]></ee:set-variable>
+        <ee:set-variable variableName="containsNewline"><![CDATA[%dw 2.0
+output application/java
+---
+((vars.hl7Payload scan /PID\|([^\|]*\|){10}([^\|]*)/)[0][2] default "") contains "\\X0A\\"
+]]></ee:set-variable>
+    </ee:variables>
+</ee:transform>
+<logger level="INFO" doc:name="4. PID Address Analysis"
+        message="#[%dw 2.0 
+output application/json 
+---
+{
+  'MSH': vars.mshSegment,
+  'PID': vars.pidSegment,
+  'PID_11_analysis': {
+    'has_PID11': vars.hasPid11,
+    'address_raw': vars.addressRaw,
+    'contains_newline': vars.containsNewline
+  }
+}]"/>
 			
 			<!-- 5. Log before deciding whether to send or not -->
 			<logger level="INFO" doc:name="5. Pre-Send Decision"

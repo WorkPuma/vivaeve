@@ -296,7 +296,7 @@ Contact Details:
 				
 				<!-- 10. Log after sending to NextGen -->
 				<logger level="INFO" doc:name="10. Contact Flow Response"
-				        message="CONTACT FLOW RESPONSE - Status: #[payload contains 'Error' ? 'ERROR' : 'SUCCESS'], Message: #[payload]"/>
+        message="CONTACT FLOW RESPONSE - Status: #[if (payload contains 'Error') 'ERROR' else 'SUCCESS'], Message: #[payload]"/>
 				        
 				<logger level="INFO" doc:name="outputPayloadLogger" doc:id="eb975a97-ba9a-4a62-88e4-c92cc607d82f" message="#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	correlationId : correlationId,&#10;	eventTimestamp : now(),&#10;	applicationName: Mule::p('app.name'),&#10;	flowName: flow.name default &quot;implementation-flows&quot;,&#10;	environment: upper(Mule::p('mule.env')),&#10;	source: Mule::p('source'),&#10;	target:  Mule::p('target'),&#10;	message: &quot;response sent to viva-sf-ng-outbound-sapi&quot;&#10;}]" />
 				<logger level="INFO" doc:name="outputPayload" doc:id="17899e6e-7e02-41ae-bed9-9fa1826c3663" message="#[payload]"/>
