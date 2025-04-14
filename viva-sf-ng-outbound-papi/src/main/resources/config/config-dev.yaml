@@ -16,13 +16,13 @@ https:
 
 
 sf:
-  username: "integrations@vivaeve.com"
+  username: "cgainus@cokergroup.com.devchris"
 
 smtp:
   host: "smtp.gmail.com"
   port: "587"
   user: "viva.eve.notify@gmail.com"
-  toaddress: "mrudhula.eerisetti@prowesssoft.com"
+  toaddress: "cgainus@cokergroup.com"
   fromaddress: "viva.eve.notify@gmail.com"
 
 mshsegment:
