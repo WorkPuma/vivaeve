@@ -205,7 +205,7 @@ fun mapLocationToTerritory(locationCode) =
         <when expression="#[vars.checkConditionA04.result]">
     <logger level="INFO"
             doc:name="A04 Entry Logger"
-            doc:id="b9bab1c7-91d0-4dea-8e2f-a3d2516462de"
+            doc:id="b48cf1d8-a559-4b05-990c-bf40460cf762"
             category="com.vivaeve.hl7.a04.flow"
             message="STARTED PROCESSING ADT^A04 MESSAGE - ID: #[(payload contains 'MSH') and ((payload splitBy '|')[9] default 'UNKNOWN') or 'UNKNOWN'], CorrelationId: #[vars.correlationId default 'NONE']" />
                    
