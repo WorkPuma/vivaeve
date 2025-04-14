@@ -57,7 +57,13 @@ http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/cu
 	
 	</tls:context> -->
 	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="8f1cc1ec-0d0d-4961-a51b-93dc97031ba0" >
-		<salesforce:basic-connection username="${sf.username}" password="${secure::sf.password}" />
+		<salesforce:basic-connection 
+			username="${sf.username}" 
+			password="${secure::sf.password}" 
+			url="https://vivaeve--devchris.sandbox.my.salesforce.com"
+			authenticationMethod="BASIC_AUTH"
+			readTimeout="30000"
+			connectionTimeout="30000" />
 	</salesforce:sfdc-config>
 	<hl7:config name="HL7_EDI_Config_A04" doc:name="HL7 EDI Config" doc:id="b775032e-115f-42d0-afbb-a8ad857ff3b4" subcompSeparator="&amp;">
 		<hl7:schemas >

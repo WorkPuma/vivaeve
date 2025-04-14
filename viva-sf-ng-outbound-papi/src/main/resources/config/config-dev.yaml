@@ -17,6 +17,8 @@ https:
 
 sf:
   username: "cgainus@cokergroup.com.devchris"
+  # Enhanced domain sandbox URL is configured in global-config.xml:
+  # https://vivaeve--devchris.sandbox.my.salesforce.com
 
 smtp:
   host: "smtp.gmail.com"

@@ -11,7 +11,20 @@ http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/em
 http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd">
 	<flow name="outboundContactImplementationFlow" doc:id="f640b450-687e-4eb3-bc13-a42f198e21b3" >
 		<salesforce:replay-channel-listener streamingChannel="/data/ContactChangeEvent" replayOption="FROM_LAST_REPLAY_ID" doc:name="Replay channel listener" doc:id="72348164-7a72-4c67-aa80-81ce1cd8d89b" config-ref="Salesforce_Config" cacheEventsInMemory="true"/>
-		<logger level="INFO" doc:name="inputPayloadLogger" doc:id="941802cd-ded1-497a-a3ef-b1c7946281d1" message="#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	correlationId : correlationId,&#10;	eventTimestamp : now(),&#10;	applicationName: Mule::p('application.name'),&#10;	flowName: flow.name default &quot;implementation-flow&quot;,&#10;	environment: upper(p('mule.env')),&#10;	source: Mule::p('source'),&#10;	target: Mule::p('target'),&#10;	message: &quot;request received from salesforce&quot;,&#10;	inputPayload: payload&#10;}]" />
+		<logger level="INFO" doc:name="inputPayloadLogger" doc:id="941802cd-ded1-497a-a3ef-b1c7946281d1" message="#[%dw 2.0
+output application/json
+---
+{
+	correlationId : correlationId,
+	eventTimestamp : now(),
+	applicationName: Mule::p('application.name'),
+	flowName: flow.name default &quot;implementation-flow&quot;,
+	environment: upper(p('mule.env')),
+	source: Mule::p('source'),
+	target: Mule::p('target'),
+	message: &quot;request received from salesforce&quot;,
+	inputPayload: payload
+}]" />
 		<salesforce:query doc:name="contactQuery" doc:id="da86cc1e-1327-4d73-9aaf-318bde972d58" config-ref="Salesforce_Config" target="queryData">
 					<salesforce:salesforce-query><![CDATA[SELECT Id, Contact_Id__c, FirstName, LastName, MiddleName, Marital_Status__c, Language_Preferred__c, Patient_Gender_2__c, HF_Chart_Number__c, Email, Phone, MailingCountry, MailingState, MailingPostalCode, MailingCity, MailingStreet, Patient_Ethnicity__c, Patient_Race__c, Patient_Gender__c, Date_of_Birth__c,HealthFusion_Patient_Record_ID__c FROM Contact WHERE Id = ':Id']]></salesforce:salesforce-query>
 					<salesforce:parameters><![CDATA[#[output application/java
@@ -214,7 +227,16 @@ Contact Details:
 </flow>
 	<sub-flow name="outboundContactSubFlow" doc:id="93f5a7d7-6778-4b32-9e92-f748e0a45d5f" >
 		<choice doc:name="Choice" doc:id="fa003cae-e090-4072-96d7-1b67314d9a33" >
-			<when expression='#[(payload.data.payload.ChangeEventHeader.commitUser == "0051T000007nKdNQAU" or&#10;    payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B87d5QAB" or&#10;    payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B88cXQAR" or payload.data.payload.ChangeEventHeader.commitUser == "005Rj000000hxuTIAQ"&#10;  ) and&#10;  (&#10;    (payload.data.payload.Name.FirstName != null and (payload.data.payload.Name.FirstName == "TEST")) and&#10;    (payload.data.payload.Name.LastName != null and (payload.data.payload.Name.LastName contains "PATIENT")) or &#10;    (vars.queryData[0].FirstName != null and (vars.queryData[0].FirstName == "TEST")) and&#10;    (vars.queryData[0].LastName != null and (vars.queryData[0].LastName contains "PATIENT"))&#10;  )]' >
+			<when expression='#[(payload.data.payload.ChangeEventHeader.commitUser == "0051T000007nKdNQAU" or
+    payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B87d5QAB" or
+    payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B88cXQAR" or payload.data.payload.ChangeEventHeader.commitUser == "005Rj000000hxuTIAQ"
+  ) and
+  (
+    (payload.data.payload.Name.FirstName != null and (payload.data.payload.Name.FirstName == "TEST")) and
+    (payload.data.payload.Name.LastName != null and (payload.data.payload.Name.LastName contains "PATIENT")) or 
+    (vars.queryData[0].FirstName != null and (vars.queryData[0].FirstName == "TEST")) and
+    (vars.queryData[0].LastName != null and (vars.queryData[0].LastName contains "PATIENT"))
+  )]' >
 			    
 			    <!-- 1. Log user and patient validation -->
 				<logger level="INFO" doc:name="1. Valid Test Patient"
@@ -298,7 +320,19 @@ Contact Details:
 				<logger level="INFO" doc:name="10. Contact Flow Response"
         message="CONTACT FLOW RESPONSE - Status: #[if (payload contains 'Error') 'ERROR' else 'SUCCESS'], Message: #[payload]"/>
 				        
-				<logger level="INFO" doc:name="outputPayloadLogger" doc:id="eb975a97-ba9a-4a62-88e4-c92cc607d82f" message="#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	correlationId : correlationId,&#10;	eventTimestamp : now(),&#10;	applicationName: Mule::p('app.name'),&#10;	flowName: flow.name default &quot;implementation-flows&quot;,&#10;	environment: upper(Mule::p('mule.env')),&#10;	source: Mule::p('source'),&#10;	target:  Mule::p('target'),&#10;	message: &quot;response sent to viva-sf-ng-outbound-sapi&quot;&#10;}]" />
+				<logger level="INFO" doc:name="outputPayloadLogger" doc:id="eb975a97-ba9a-4a62-88e4-c92cc607d82f" message="#[%dw 2.0
+output application/json
+---
+{
+	correlationId : correlationId,
+	eventTimestamp : now(),
+	applicationName: Mule::p('app.name'),
+	flowName: flow.name default &quot;implementation-flows&quot;,
+	environment: upper(Mule::p('mule.env')),
+	source: Mule::p('source'),
+	target:  Mule::p('target'),
+	message: &quot;response sent to viva-sf-ng-outbound-sapi&quot;
+}]" />
 				<logger level="INFO" doc:name="outputPayload" doc:id="17899e6e-7e02-41ae-bed9-9fa1826c3663" message="#[payload]"/>
 			</when>
 			<otherwise>
