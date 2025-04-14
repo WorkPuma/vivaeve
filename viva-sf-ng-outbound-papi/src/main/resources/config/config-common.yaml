@@ -18,4 +18,8 @@ milestone:
   successResponseReceived: "SuccessResponseReceived"
   successResponseSent: "SuccessResponseSent"
   
+# Default toggle setting - false means just log, don't send
+nextgen:
+  send:
+    enabled: "false"
 

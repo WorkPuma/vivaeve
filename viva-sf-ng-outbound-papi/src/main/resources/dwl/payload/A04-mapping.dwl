@@ -170,11 +170,18 @@ output application/json
                 "PID-12": "+1",
                 "PID-11": [
                     {
-					    "XAD-05": if ((payload.data.payload.MailingAddress.PostalCode) != null and (payload.data.payload.MailingAddress.PostalCode?)) payload.data.payload.MailingAddress.PostalCode else ("11375"),
-						"XAD-04": if ((payload.data.payload.MailingAddress.State) != null and (payload.data.payload.MailingAddress.State?)) payload.data.payload.MailingAddress.State else ("NY"),
+        "XAD-05": if ((payload.data.payload.MailingAddress.PostalCode) != null and (payload.data.payload.MailingAddress.PostalCode?)) payload.data.payload.MailingAddress.PostalCode else ("11375"),
+     "XAD-04": if ((payload.data.payload.MailingAddress.State) != null and (payload.data.payload.MailingAddress.State?)) payload.data.payload.MailingAddress.State else ("NY"),
                         "XAD-06": if ((payload.data.payload.MailingAddress.Country) != null and (payload.data.payload.MailingAddress.Country?)) payload.data.payload.MailingAddress.Country else ("USA"),
                         "XAD-03": if ((payload.data.payload.MailingAddress.City) != null and (payload.data.payload.MailingAddress.City?)) payload.data.payload.MailingAddress.City else ("Forest Hills"),
-						"XAD-01": if ((payload.data.payload.MailingAddress.Street) != null and (payload.data.payload.MailingAddress.Street?)) payload.data.payload.MailingAddress.Street else ("63rd Road")
+                        // Split address field on newlines and use first line for street
+     "XAD-01": if ((payload.data.payload.MailingAddress.Street) != null and (payload.data.payload.MailingAddress.Street?))
+                                (payload.data.payload.MailingAddress.Street splitBy("\n"))[0]
+                                else ("63rd Road"),
+                       // Use second line of address for other designation (if exists)
+                       ("XAD-02": if ((payload.data.payload.MailingAddress.Street) != null and (payload.data.payload.MailingAddress.Street?) and (sizeOf(payload.data.payload.MailingAddress.Street splitBy("\n")) > 1))
+                                 (payload.data.payload.MailingAddress.Street splitBy("\n"))[1]
+                                 else null)
                     }
                 ],
                 "PID-22": if ((payload.data.payload.Patient_Ethnicity__c) != null and (payload.data.payload.Patient_Ethnicity__c?)) payload.data.payload.Patient_Ethnicity__c else ("White"),

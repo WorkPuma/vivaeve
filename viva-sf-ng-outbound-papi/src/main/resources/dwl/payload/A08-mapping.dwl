@@ -170,11 +170,18 @@ output application/json
                 "PID-12": "+1",
                 "PID-11": [
                     {
-			          "XAD-05": if ((vars.queryData[0].MailingPostalCode) != null and (vars.queryData[0].MailingPostalCode?)) vars.queryData[0].MailingPostalCode else ("11375"),
+            "XAD-05": if ((vars.queryData[0].MailingPostalCode) != null and (vars.queryData[0].MailingPostalCode?)) vars.queryData[0].MailingPostalCode else ("11375"),
                       "XAD-04":  if ((vars.queryData[0].MailingState) != null and (vars.queryData[0].MailingState?)) vars.queryData[0].MailingState else ("NY"),
                       "XAD-06": if ((vars.queryData[0].MailingCountry) != null and (vars.queryData[0].MailingCountry?)) vars.queryData[0].MailingCountry else ("USA"),
                       "XAD-03": if ((vars.queryData[0].MailingCity) != null and (vars.queryData[0].MailingCity?)) vars.queryData[0].MailingCity else ("Forest Hills"),
-                      "XAD-01":  if ((vars.queryData[0].MailingStreet) != null and (vars.queryData[0].MailingStreet?)) vars.queryData[0].MailingStreet else ("63rd Road")
+                      // Split address field on newlines and use first line for street
+                      "XAD-01": if ((vars.queryData[0].MailingStreet) != null and (vars.queryData[0].MailingStreet?))
+                               (vars.queryData[0].MailingStreet splitBy("\n"))[0]
+                               else ("63rd Road"),
+                      // Use second line of address for other designation (if exists)
+                      ("XAD-02": if ((vars.queryData[0].MailingStreet) != null and (vars.queryData[0].MailingStreet?) and (sizeOf(vars.queryData[0].MailingStreet splitBy("\n")) > 1))
+                                (vars.queryData[0].MailingStreet splitBy("\n"))[1]
+                                else null)
                     }
                 ],
                         "PID-22": if ((vars.queryData[0].Patient_Ethnicity__c) != null and (vars.queryData[0].Patient_Ethnicity__c?)) vars.queryData[0].Patient_Ethnicity__c else ("White"),

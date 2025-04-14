@@ -8,38 +8,99 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd">
 	<sub-flow name="commonRequestFlow" doc:id="51fb3c62-0787-4c96-959f-506b8432d17f" >
 		<try doc:name="Try" doc:id="60d50a3d-f06f-47a3-ba08-f2385dfc1fc0" >
+			<!-- 1. Log the raw input payload -->
+			<logger level="INFO" doc:name="1. Raw Input Payload"
+					message="RAW INPUT PAYLOAD - CorrelationId: #[vars.correlationId default 'NONE'], EventType: #[vars.eventType default 'UNKNOWN'], Raw Size: #[sizeOf(payload)]"/>
+			
 			<ee:transform doc:name="transformedPayload" doc:id="7ece1d42-70e6-4391-84e2-e7d3bfcb6836">
-			<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
 output text/plain
 ---
 payload replace "\r" with ""]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
+				</ee:message>
+			</ee:transform>
+			
+			<!-- 2. Log after carriage return replacement -->
+			<logger level="INFO" doc:name="2. After CR Replacement"
+					message="AFTER CR REPLACEMENT - Changed Size: #[sizeOf(payload)]"/>
+			
 			<ee:transform doc:name="HL7Message" doc:id="823441a1-59b5-43cf-8384-157c70bd26e3">
-			<ee:message>
-			</ee:message>
+				<ee:message>
+				</ee:message>
 				<ee:variables >
 					<ee:set-variable variableName="hl7Payload" ><![CDATA[%dw 2.0
 output text/plain
 ---
 payload
-    replace "SCH|" with ",SCH|"
-    replace "PID|" with ",PID|"
-    replace "AIL|" with ",AIL|"
-    replace "AIP|" with ",AIP|" replace   "," with "\n"]]></ee:set-variable>
+	   replace "SCH|" with ",SCH|"
+	   replace "PID|" with ",PID|"
+	   replace "AIL|" with ",AIL|"
+	   replace "AIP|" with ",AIP|" replace   "," with "\n"]]></ee:set-variable>
 				</ee:variables>
-		</ee:transform>
-			<http:request method="POST" doc:name="callToSapi" doc:id="87ffaa36-32c0-4024-955f-6e4b0ab4097f" config-ref="HTTP_Request_configuration" path="${request.path}" outputMimeType="text/plain" sendBodyMode="ALWAYS" responseTimeout="60000">
-			<http:body><![CDATA[#[output text/plain
+			</ee:transform>
+			
+			<!-- 3. Log after HL7 segment transformation -->
+			<logger level="INFO" doc:name="3. HL7 Segment Transformation"
+					message="HL7 SEGMENTS TRANSFORMED - Message type: #[(vars.hl7Payload scan /MSH\|([^\|]*\|){8}([^\|]*)/)[0][2] default 'unknown'], Segments: PID=#[(vars.hl7Payload contains 'PID|')], SCH=#[(vars.hl7Payload contains 'SCH|')], AIL=#[(vars.hl7Payload contains 'AIL|')], AIP=#[(vars.hl7Payload contains 'AIP|')]"/>
+			
+			<!-- 4. Log specific PID segment details for address issue analysis -->
+			<logger level="INFO" doc:name="4. PID Address Analysis"
+					message="#[%dw 2.0 output application/json --- {
+					  'MSH': (vars.hl7Payload scan /MSH\|([^\r\n]*)/)[0],
+					  'PID': (vars.hl7Payload scan /PID\|([^\r\n]*)/)[0],
+					  'PID_11_analysis': {
+						'has_PID11': (vars.hl7Payload contains 'PID-11'),
+						'address_raw': (vars.hl7Payload scan /PID\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|([^\|]*)/)[0][1] default 'not found',
+						'contains_newline': ((vars.hl7Payload scan /PID\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|[^\|]*\|([^\|]*)/)[0][1] default '') contains '\\X0A\\'
+					  }
+					}]"/>
+			
+			<!-- 5. Log before deciding whether to send or not -->
+			<logger level="INFO" doc:name="5. Pre-Send Decision"
+					message="HL7 MESSAGE READY FOR SENDING - Send enabled: ${nextgen.send.enabled}, EventType: #[vars.eventType], Size: #[sizeOf(vars.hl7Payload)], Message snippet: #[%dw 2.0 output application/json --- substring(vars.hl7Payload, 0, 200) ++ '...']"/>
+			
+			<!-- 6. Toggle implementation -->
+			<choice doc:name="Send or Just Log">
+				<when expression="#[p('nextgen.send.enabled') == 'true']">
+					<logger level="INFO" doc:name="6a. Sending to NextGen"
+							message="SENDING TO NEXTGEN - Host: ${request.host}, Port: ${request.port}, Path: ${request.path}"/>
+							
+					<http:request method="POST" doc:name="callToSapi" doc:id="87ffaa36-32c0-4024-955f-6e4b0ab4097f" config-ref="HTTP_Request_configuration" path="${request.path}" outputMimeType="text/plain" sendBodyMode="ALWAYS" responseTimeout="60000">
+						<http:body><![CDATA[#[output text/plain
 ---
 vars.hl7Payload]]]></http:body>
-			<http:headers><![CDATA[#[output application/java
+						<http:headers><![CDATA[#[output application/java
 ---
 {
 	"eventtype" : vars.eventType
 }]]]></http:headers>
-		</http:request>
+					</http:request>
+					
+					<!-- 7a. Log after successful send -->
+					<logger level="INFO" doc:name="7a. NextGen Response"
+							message="NEXTGEN RESPONSE - Status: #[attributes.statusCode default 'UNKNOWN'], Body: #[payload]"/>
+				</when>
+				<otherwise>
+					<!-- 6b. Log when sending is disabled -->
+					<logger level="INFO" doc:name="6b. Message Not Sent - Logging Only"
+							message="HL7 MESSAGE NOT SENT (sending disabled) - Complete HL7 Message: #[vars.hl7Payload]"/>
+							
+					<ee:transform doc:name="Create Mock Response">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output text/plain
+---
+"Message Logged Only - Mock Response (${mule.env} environment with nextgen.send.enabled=${nextgen.send.enabled})"]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					
+					<!-- 7b. Log mock response -->
+					<logger level="INFO" doc:name="7b. Mock Response"
+							message="MOCK RESPONSE CREATED: #[payload]"/>
+				</otherwise>
+			</choice>
+			
 			<error-handler >
 				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="2b510989-6581-4b8b-bd6b-aab47ce67cd4" type="HTTP:CONNECTIVITY,HTTP:GATEWAY_TIMEOUT">
 					<logger level="INFO" doc:name="Logger" doc:id="e509bf28-5c40-4248-a413-9a2af8a68de3" message="message sending to queue"/>
@@ -60,6 +121,10 @@ vars.hl7Payload]]></ee:set-payload>
 				</on-error-continue>
 			</error-handler>
 		</try>
+		
+		<!-- 8. Final logging -->
+		<logger level="INFO" doc:name="8. Common Flow Exit"
+				message="COMMON FLOW EXIT - CorrelationId: #[vars.correlationId default 'NONE'], EventType: #[vars.eventType default 'UNKNOWN'], Success: #[not (payload contains 'Error')]"/>
 	</sub-flow>
 	<flow name="reprocessingFlow" doc:id="e9de60db-fbde-4b95-8d39-1ec1099bf0e4" >
 		<scheduler doc:name="Scheduler" doc:id="7afd4158-9039-4b73-abd3-c7981aae23be" >

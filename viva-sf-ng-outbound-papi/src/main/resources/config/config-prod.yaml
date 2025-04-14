@@ -1,5 +1,5 @@
 api:
-  autodiscoveryId: "123456"  
+  autodiscoveryId: "123456"
 
 http:
   host: "0.0.0.0"
@@ -41,6 +41,11 @@ mshsegment:
   MSH-09-MSG-01-ADT: "ADT"
   MSH-09-MSG-02-A04: "A04"
   MSH-09-MSG-02-A08: "A08"
+
+# Override default toggle settings in production to actually send messages
+nextgen:
+  send:
+    enabled: "true"
 
 hl7:
   A04schema: "/hl7/v2_3/ADT_A04.esl"

@@ -48,7 +48,20 @@ else "entityName and changeType values doesn't exist"]]></ee:set-variable>
 				<ee:set-variable variableName="eventType" ><![CDATA["Appointment"]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-		<logger level="INFO" doc:name="inputPayloadLogger" doc:id="1f44b47e-f58a-49c9-bd9f-3ae4e5594091" message="#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	correlationId : vars.correlationId,&#10;	eventTimestamp : now(),&#10;	applicationName: Mule::p('application.name'),&#10;	flowName: flow.name default &quot;implementation-flow&quot;,&#10;	environment: upper(Mule::p('mule.env')),&#10;	source: Mule::p('source'),&#10;	target: Mule::p('target'),&#10;	message: &quot;request received from salesforce&quot;,&#10;	inputPayload: payload&#10;}]" />
+		<logger level="INFO" doc:name="inputPayloadLogger" doc:id="1f44b47e-f58a-49c9-bd9f-3ae4e5594091" message="#[%dw 2.0
+output application/json
+---
+{
+	correlationId : vars.correlationId,
+	eventTimestamp : now(),
+	applicationName: Mule::p('application.name'),
+	flowName: flow.name default &quot;implementation-flow&quot;,
+	environment: upper(Mule::p('mule.env')),
+	source: Mule::p('source'),
+	target: Mule::p('target'),
+	message: &quot;request received from salesforce&quot;,
+	inputPayload: payload
+}]" />
 		<salesforce:query doc:name="serviceAppReqFields" doc:id="c6823964-cedb-468d-bba2-084b4ab4f405" config-ref="Salesforce_Config" target="updateFields">
 			<salesforce:salesforce-query><![CDATA[SELECT Id,AdditionalInformation,Service_Resource__c,NextGen_ID__c,ServiceTerritoryId,ContactId,SchedStartTime,SchedEndTime from ServiceAppointment WHERE Id = ':Id']]></salesforce:salesforce-query>
 			<salesforce:parameters><![CDATA[#[output application/java
@@ -66,7 +79,14 @@ else "entityName and changeType values doesn't exist"]]></ee:set-variable>
 }]]]></salesforce:parameters>
 		</salesforce:query>
 		<choice doc:name="Choice" doc:id="bf1063e1-f83a-4917-b1eb-055f97cd8e3f" >
-			<when expression='#[(payload.data.payload.ChangeEventHeader.commitUser == "0051T000007nKdNQAU" or&#10;    payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B87d5QAB" or&#10;    payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B88cXQAR" or payload.data.payload.ChangeEventHeader.commitUser == "005Rj000000hxuTIAQ"&#10;  ) and&#10;  (&#10;  (vars.queryData[0].FirstName != null and (vars.queryData[0].FirstName == "TEST")) and&#10;  (vars.queryData[0].LastName != null and (vars.queryData[0].LastName contains "PATIENT"))&#10;  )]'>
+			<when expression='#[(payload.data.payload.ChangeEventHeader.commitUser == "0051T000007nKdNQAU" or
+    payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B87d5QAB" or
+    payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B88cXQAR" or payload.data.payload.ChangeEventHeader.commitUser == "005Rj000000hxuTIAQ"
+  ) and
+  (
+  (vars.queryData[0].FirstName != null and (vars.queryData[0].FirstName == "TEST")) and
+  (vars.queryData[0].LastName != null and (vars.queryData[0].LastName contains "PATIENT"))
+  )]'>
 				<flow-ref doc:name="callingSubFlow" doc:id="65301612-ff0b-42a4-bb34-04dfe9abe3a3" name="outboundAppointmentSubFlow" />
 			</when>
 			<otherwise >
@@ -76,11 +96,15 @@ else "entityName and changeType values doesn't exist"]]></ee:set-variable>
 		<error-handler ref="error-handler" />
 	</flow>
 	<sub-flow name="outboundAppointmentSubFlow" doc:id="39192b0d-75cf-44a2-a68e-9769d3c0aaf5" >
+		<!-- 1. Log entry to appointment sub-flow -->
+		<logger level="INFO" doc:name="1. Appointment Sub-Flow Entry"
+				message="APPOINTMENT SUB-FLOW ENTRY - CorrelationId: #[vars.correlationId default 'NONE'], AppointmentId: #[payload.data.payload.ChangeEventHeader.recordIds[0]], Status: #[payload.data.payload.Status default 'null']"/>
+				
 		<ee:transform doc:name="requiredVariables" doc:id="521a3855-a474-4032-8df9-ff4b6f2125b7">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
-						<ee:set-variable variableName="appLocation"><![CDATA[%dw 2.0
+				<ee:set-variable variableName="appLocation"><![CDATA[%dw 2.0
 output application/json
 var locationField = readUrl("classpath://LocationExtract.json","application/json")
 ---
@@ -98,20 +122,24 @@ if(payload.data.payload.ServiceTerritoryId?)
 				<ee:set-variable variableName="scheduledEndTime" ><![CDATA[%dw 2.0
 output application/json
 var schedEndTime = if ((payload.data.payload.SchedEndTime != null) and (payload.data.payload.SchedEndTime?))
-                    (payload.data.payload.SchedEndTime as DateTime)
-                    else (vars.updateFields.SchedEndTime[0] as DateTime)
+	                   (payload.data.payload.SchedEndTime as DateTime)
+	                   else (vars.updateFields.SchedEndTime[0] as DateTime)
 ---
 (schedEndTime - |PT5H|) as String {format: "yyyyMMddHHmmss"}
 ]]></ee:set-variable>
 				<ee:set-variable variableName="scheduledStartTime" ><![CDATA[%dw 2.0
 output application/json
 var schedStartTime = if ((payload.data.payload.SchedStartTime != null) and (payload.data.payload.SchedStartTime?))
-                    (payload.data.payload.SchedStartTime as DateTime)
-                    else (vars.updateFields.SchedStartTime[0] as DateTime)
+	                   (payload.data.payload.SchedStartTime as DateTime)
+	                   else (vars.updateFields.SchedStartTime[0] as DateTime)
 ---
 (schedStartTime - |PT5H|) as String {format: "yyyyMMddHHmmss"}]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+		
+		<!-- 2. Log variables after setup -->
+		<logger level="INFO" doc:name="2. Appointment Variables"
+				message="APPOINTMENT VARIABLES - Location: #[vars.appLocation default 'null'], LocationId: #[vars.appLocationId default 'null'], Provider: #[vars.providerFirstName default ''] #[vars.providerLastName default ''], Start: #[vars.scheduledStartTime], End: #[vars.scheduledEndTime]"/>
 		<salesforce:query doc:name="userEmailQuery" doc:id="3c495d47-57eb-4330-bfe0-be457dcc5dac" config-ref="Salesforce_Config" target="userEmailVar">
 					<salesforce:salesforce-query><![CDATA[SELECT Id, Email, Username FROM User WHERE Id = ':Id']]></salesforce:salesforce-query>
 					<salesforce:parameters><![CDATA[#[output application/java
@@ -217,7 +245,19 @@ output application/json
 				<logger level="INFO" doc:name="defaultCase" doc:id="0e88816a-3bdf-4d60-af1f-b8e287ff10b2" message='"invaild SIU type"' />
 			</otherwise>
 		</choice>
-		<logger level="INFO" doc:name="outputPayloadLogger" doc:id="e6aa0e76-3732-48ff-9ee1-74516b852419" message="#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	correlationId : vars.correlationId,&#10;	eventTimestamp : now(),&#10;	applicationName: Mule::p('app.name'),&#10;	flowName: flow.name default &quot;implementation-flows&quot;,&#10;	environment: upper(Mule::p('mule.env')),&#10;	source: Mule::p('source'),&#10;	target:  Mule::p('target'),&#10;	message: &quot;response sent to viva-sf-ng-outbound-sapi&quot;&#10;}]" />
+		<logger level="INFO" doc:name="outputPayloadLogger" doc:id="e6aa0e76-3732-48ff-9ee1-74516b852419" message="#[%dw 2.0
+output application/json
+---
+{
+	correlationId : vars.correlationId,
+	eventTimestamp : now(),
+	applicationName: Mule::p('app.name'),
+	flowName: flow.name default &quot;implementation-flows&quot;,
+	environment: upper(Mule::p('mule.env')),
+	source: Mule::p('source'),
+	target:  Mule::p('target'),
+	message: &quot;response sent to viva-sf-ng-outbound-sapi&quot;
+}]" />
 		<logger level="INFO" doc:name="outputPayload" doc:id="a58b94dc-56be-419f-af25-f8a97c2d0258" message="#[payload]"/>
 	</sub-flow>
 </mule>
