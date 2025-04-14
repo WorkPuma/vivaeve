@@ -176,44 +176,11 @@ output application/json
 		<logger level="INFO" doc:name="1. Valid Patient"
 				message="PROCESSING PATIENT - UserId: #[payload.data.payload.ChangeEventHeader.commitUser], Name: #[vars.queryData[0].FirstName default ''] #[vars.queryData[0].LastName default '']"/>
 		
-		<!-- Retrieve Mappings from Object Store V2 -->
-		<try doc:name="Try Object Store Retrieval" doc:id="try-contact-object-store-retrieval">
-			<os:retrieve
-				doc:name="Retrieve TerritoryMapping"
-				doc:id="contact-de5a38eb-ac7e-4b00-a2cc-7998a45384fd"
-				key="TerritoryMapping"
-				target="TerritoryMapping"
-				objectStore="MappingsObjectStore"/>
-
-			<os:retrieve
-				doc:name="Retrieve WorkTypeMapping"
-				doc:id="contact-43b0ff1f-2561-450f-91bb-9850fc0cd39d"
-				key="WorkTypeMapping"
-				target="WorkTypeMapping"
-				objectStore="MappingsObjectStore"/>
-
-			<os:retrieve
-				doc:name="Retrieve ProviderMapping"
-				doc:id="contact-d5e030f2-74ea-49ff-8a99-72db5ab476f8"
-				key="ProviderMapping"
-				target="ProviderMapping"
-				objectStore="MappingsObjectStore"/>
-
-			<!-- Log the sizes of each retrieved mapping -->
-			<logger
-				level="INFO"
-				doc:name="Contact MappingsLogger"
-				message="TerritoryMapping size: #[sizeOf(vars.TerritoryMapping)], WorkTypeMapping size: #[sizeOf(vars.WorkTypeMapping)], ProviderMapping size: #[sizeOf(vars.ProviderMapping)]" />
-				
-			<error-handler>
-				<on-error-propagate type="OS:KEY_NOT_FOUND">
-					<logger level="ERROR"
-							doc:name="Contact Object Store Error Logger"
-							message="Required contact mapping not found in Object Store. Please ensure mappings are properly loaded. Error: #[error.description]" />
-					<!-- Continue processing with empty mappings -->
-				</on-error-propagate>
-			</error-handler>
-		</try>
+		<!-- ADT Configuration Logger -->
+		<logger
+			level="INFO"
+			doc:name="ADT Configuration Logger"
+			message="ADT message configuration: No Object Store mappings required for ADT^A04/A08 messages per NextGen specification." />
 		
 		<ee:transform doc:name="inputPayload" doc:id="726b9428-3195-464d-93e9-2d42d545e5ff" >
 			<ee:message />
@@ -222,7 +189,7 @@ output application/json
 				<ee:set-variable variableName="providerId"><![CDATA[%dw 2.0
 output application/json
 ---
-((vars.ProviderMapping default []) filter ((item) -> item.providerId == payload.data.payload.ProviderId)).NPI[0] default ""]]></ee:set-variable>
+""]]></ee:set-variable>
 				<ee:set-variable variableName="checkConditionCreate"><![CDATA[%dw 2.0
 output application/json
 ---
@@ -237,7 +204,7 @@ if (!isEmpty(payload.data.payload.ChangeEventHeader.entityName) and (!isEmpty(pa
 		
 		<!-- 2. Log variable setup completion -->
 		<logger level="INFO" doc:name="2. Variables Setup"
-				message="CONTACT VARIABLES - HF ID: #[vars.hfId default 'null'], Language: #[vars.languageField default 'null'], Event Type: #[vars.eventType], Create?: #[vars.checkConditionCreate], Update?: #[vars.checkConditionUpdate]"/>
+				message="CONTACT VARIABLES - Language: #[vars.languageField default 'null'], Event Type: #[vars.eventType], Create?: #[vars.checkConditionCreate], Update?: #[vars.checkConditionUpdate]"/>
 		
 		<!-- 3. Log address fields specifically for debugging -->
 		<logger level="INFO" doc:name="3. Address Fields Analysis"
@@ -297,6 +264,27 @@ if (!isEmpty(payload.data.payload.ChangeEventHeader.entityName) and (!isEmpty(pa
 				<logger level="INFO" doc:name="defaultCase" doc:id="c5a189df-1b6c-4499-b654-f540d37e45c9" message='"invaild ADT type"' />
 			</otherwise>
 		</choice>
+		
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" type="ANY">
+				<ee:transform doc:name="Format Error Response">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status": "ERROR",
+	"message": "Error processing ADT message: " + (error.description default "Unknown error"),
+	"errorType": error.errorType.identifier default "UNKNOWN",
+	"timestamp": now()
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="ERROR"
+						doc:name="ADT Processing Error Logger"
+						message="ADT MESSAGE ERROR - Type: #[error.errorType.identifier default 'UNKNOWN'], Description: #[error.description default 'Unknown error']" />
+			</on-error-continue>
+		</error-handler>
 		
 		<!-- 10. Log after sending to NextGen -->
 		<logger level="INFO" doc:name="10. Contact Flow Response"
