@@ -80,23 +80,7 @@ output application/json
 	Id :  if ((payload.data.payload.ContactId) != null and (payload.data.payload.ContactId?)) payload.data.payload.ContactId else vars.updateFields.ContactId[0]
 }]]]></salesforce:parameters>
 		</salesforce:query>
-		<choice doc:name="Choice" doc:id="bf1063e1-f83a-4917-b1eb-055f97cd8e3f" >
-			<when expression='#[(payload.data.payload.ChangeEventHeader.commitUser == "0051T000007nKdNQAU" or
-		  payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B87d5QAB" or
-		  payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B88cXQAR" or
-		  payload.data.payload.ChangeEventHeader.commitUser == "005Rj000000hxuTIAQ" or
-		  payload.data.payload.ChangeEventHeader.commitUser == "005Rj00000Fzk3mIAB"
-		) and
-		(
-		(vars.queryData[0].FirstName != null and (vars.queryData[0].FirstName == "TEST")) and
-		(vars.queryData[0].LastName != null and (vars.queryData[0].LastName contains "PATIENT"))
-  )]'>
-				<flow-ref doc:name="callingSubFlow" doc:id="65301612-ff0b-42a4-bb34-04dfe9abe3a3" name="outboundAppointmentSubFlow" />
-			</when>
-			<otherwise >
-				<logger level="INFO" doc:name="defaultCase" doc:id="fbd0dcbd-cea5-4501-8258-a93bcb465c22" message='"Invalid User"'/>
-			</otherwise>
-		</choice>
+		<flow-ref doc:name="callingSubFlow" doc:id="65301612-ff0b-42a4-bb34-04dfe9abe3a3" name="outboundAppointmentSubFlow" />
 		<error-handler ref="error-handler" />
 	</flow>
 	<sub-flow name="outboundAppointmentSubFlow" doc:id="39192b0d-75cf-44a2-a68e-9769d3c0aaf5" >

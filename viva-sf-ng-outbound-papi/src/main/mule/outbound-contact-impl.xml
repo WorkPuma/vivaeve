@@ -172,151 +172,137 @@ output application/json
 	
 	</flow>
 	<sub-flow name="outboundContactSubFlow" doc:id="93f5a7d7-6778-4b32-9e92-f748e0a45d5f" >
-		<choice doc:name="Choice" doc:id="fa003cae-e090-4072-96d7-1b67314d9a33" >
-			<when expression='#[(payload.data.payload.ChangeEventHeader.commitUser == "0051T000007nKdNQAU" or
-			 payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B87d5QAB" or
-			 payload.data.payload.ChangeEventHeader.commitUser == "0051T00000B88cXQAR" or
-			 payload.data.payload.ChangeEventHeader.commitUser == "005Rj000000hxuTIAQ" or
-			 payload.data.payload.ChangeEventHeader.commitUser == "005Rj00000Fzk3mIAB"
-		) and
-		(
-			 (payload.data.payload.Name.FirstName != null and (payload.data.payload.Name.FirstName == "TEST")) and
-			 (payload.data.payload.Name.LastName != null and (payload.data.payload.Name.LastName contains "PATIENT")) or
-			 (vars.queryData[0].FirstName != null and (vars.queryData[0].FirstName == "TEST")) and
-    (vars.queryData[0].LastName != null and (vars.queryData[0].LastName contains "PATIENT"))
-  )]' >
-			    
-			    <!-- 1. Log user and patient validation -->
-				<logger level="INFO" doc:name="1. Valid Test Patient"
-				        message="VALID TEST PATIENT - UserId: #[payload.data.payload.ChangeEventHeader.commitUser], Name: #[vars.queryData[0].FirstName default ''] #[vars.queryData[0].LastName default '']"/>
+		<!-- 1. Log user and patient validation - Filter removed -->
+		<logger level="INFO" doc:name="1. Valid Patient"
+				message="PROCESSING PATIENT - UserId: #[payload.data.payload.ChangeEventHeader.commitUser], Name: #[vars.queryData[0].FirstName default ''] #[vars.queryData[0].LastName default '']"/>
+		
+		<!-- Retrieve Mappings from Object Store V2 -->
+		<try doc:name="Try Object Store Retrieval" doc:id="try-contact-object-store-retrieval">
+			<os:retrieve
+				doc:name="Retrieve TerritoryMapping"
+				doc:id="contact-de5a38eb-ac7e-4b00-a2cc-7998a45384fd"
+				key="TerritoryMapping"
+				target="TerritoryMapping"
+				objectStore="MappingsObjectStore"/>
+
+			<os:retrieve
+				doc:name="Retrieve WorkTypeMapping"
+				doc:id="contact-43b0ff1f-2561-450f-91bb-9850fc0cd39d"
+				key="WorkTypeMapping"
+				target="WorkTypeMapping"
+				objectStore="MappingsObjectStore"/>
+
+			<os:retrieve
+				doc:name="Retrieve ProviderMapping"
+				doc:id="contact-d5e030f2-74ea-49ff-8a99-72db5ab476f8"
+				key="ProviderMapping"
+				target="ProviderMapping"
+				objectStore="MappingsObjectStore"/>
+
+			<!-- Log the sizes of each retrieved mapping -->
+			<logger
+				level="INFO"
+				doc:name="Contact MappingsLogger"
+				message="TerritoryMapping size: #[sizeOf(vars.TerritoryMapping)], WorkTypeMapping size: #[sizeOf(vars.WorkTypeMapping)], ProviderMapping size: #[sizeOf(vars.ProviderMapping)]" />
 				
-				<!-- Retrieve Mappings from Object Store V2 -->
-				<try doc:name="Try Object Store Retrieval" doc:id="try-contact-object-store-retrieval">
-					<os:retrieve 
-						doc:name="Retrieve TerritoryMapping" 
-						doc:id="contact-de5a38eb-ac7e-4b00-a2cc-7998a45384fd"
-						key="TerritoryMapping"
-						target="TerritoryMapping" 
-						objectStore="MappingsObjectStore"/>
-
-					<os:retrieve 
-						doc:name="Retrieve WorkTypeMapping"
-						doc:id="contact-43b0ff1f-2561-450f-91bb-9850fc0cd39d"
-						key="WorkTypeMapping"
-						target="WorkTypeMapping" 
-						objectStore="MappingsObjectStore"/>
-
-					<os:retrieve 
-						doc:name="Retrieve ProviderMapping"
-						doc:id="contact-d5e030f2-74ea-49ff-8a99-72db5ab476f8"
-						key="ProviderMapping"
-						target="ProviderMapping" 
-						objectStore="MappingsObjectStore"/>
-
-					<!-- Log the sizes of each retrieved mapping -->
-					<logger 
-						level="INFO" 
-						doc:name="Contact MappingsLogger" 
-						message="TerritoryMapping size: #[sizeOf(vars.TerritoryMapping)], WorkTypeMapping size: #[sizeOf(vars.WorkTypeMapping)], ProviderMapping size: #[sizeOf(vars.ProviderMapping)]" />
-						
-					<error-handler>
-						<on-error-propagate type="OS:KEY_NOT_FOUND">
-							<logger level="ERROR"
-									doc:name="Contact Object Store Error Logger"
-									message="Required contact mapping not found in Object Store. Please ensure mappings are properly loaded. Error: #[error.description]" />
-							<!-- Continue processing with empty mappings -->
-						</on-error-propagate>
-					</error-handler>
-				</try>
-				
-				<ee:transform doc:name="inputPayload" doc:id="726b9428-3195-464d-93e9-2d42d545e5ff" >
-					<ee:message />
-					<ee:variables >
-						<ee:set-variable resource="dwl/variables/language-field-var.dwl" variableName="languageField" />
-						<ee:set-variable variableName="providerId"><![CDATA[%dw 2.0
+			<error-handler>
+				<on-error-propagate type="OS:KEY_NOT_FOUND">
+					<logger level="ERROR"
+							doc:name="Contact Object Store Error Logger"
+							message="Required contact mapping not found in Object Store. Please ensure mappings are properly loaded. Error: #[error.description]" />
+					<!-- Continue processing with empty mappings -->
+				</on-error-propagate>
+			</error-handler>
+		</try>
+		
+		<ee:transform doc:name="inputPayload" doc:id="726b9428-3195-464d-93e9-2d42d545e5ff" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable resource="dwl/variables/language-field-var.dwl" variableName="languageField" />
+				<ee:set-variable variableName="providerId"><![CDATA[%dw 2.0
 output application/json
 ---
 ((vars.ProviderMapping default []) filter ((item) -> item.providerId == payload.data.payload.ProviderId)).NPI[0] default ""]]></ee:set-variable>
-						<ee:set-variable variableName="checkConditionCreate"><![CDATA[%dw 2.0
+				<ee:set-variable variableName="checkConditionCreate"><![CDATA[%dw 2.0
 output application/json
 ---
 if (!isEmpty(payload.data.payload.ChangeEventHeader.entityName) and (!isEmpty(payload.data.payload.ChangeEventHeader.changeType))) (payload.data.payload.ChangeEventHeader.entityName ~= "Contact" and payload.data.payload.ChangeEventHeader.changeType ~= "CREATE") else false]]></ee:set-variable>
-						<ee:set-variable variableName="checkConditionUpdate"><![CDATA[%dw 2.0
+				<ee:set-variable variableName="checkConditionUpdate"><![CDATA[%dw 2.0
 output application/json
 ---
 if (!isEmpty(payload.data.payload.ChangeEventHeader.entityName) and (!isEmpty(payload.data.payload.ChangeEventHeader.changeType))) (payload.data.payload.ChangeEventHeader.entityName ~= "Contact" and payload.data.payload.ChangeEventHeader.changeType ~= "UPDATE") else false]]></ee:set-variable>
-						<ee:set-variable variableName="eventType" ><![CDATA["REGISTRATION"]]></ee:set-variable>
-					</ee:variables>
+				<ee:set-variable variableName="eventType" ><![CDATA["REGISTRATION"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		
+		<!-- 2. Log variable setup completion -->
+		<logger level="INFO" doc:name="2. Variables Setup"
+				message="CONTACT VARIABLES - HF ID: #[vars.hfId default 'null'], Language: #[vars.languageField default 'null'], Event Type: #[vars.eventType], Create?: #[vars.checkConditionCreate], Update?: #[vars.checkConditionUpdate]"/>
+		
+		<!-- 3. Log address fields specifically for debugging -->
+		<logger level="INFO" doc:name="3. Address Fields Analysis"
+				message="ADDRESS FIELD ANALYSIS - MailingStreet: #[vars.queryData[0].MailingStreet default 'null'], Contains newline in JSON: #[write(vars.queryData[0].MailingStreet,'application/json') contains '\\n'], Contains newline raw: #[vars.queryData[0].MailingStreet contains '\n'], Raw: #[write(vars.queryData[0].MailingStreet,'application/json')]"/>
+		
+		<logger level="INFO" doc:name="Logger" doc:id="2db58453-a42f-4217-82f4-07e59c0d9081" message="id is valid processing HL7 message"/>
+		
+		<choice doc:name="Choice" doc:id="5e5ddc9e-fad0-4893-96f0-8bb9170582c6" >
+			<when expression="#[vars.checkConditionCreate]" >
+				<!-- 4. Log before A04 mapping -->
+				<logger level="INFO" doc:name="4. Pre-A04 Mapping"
+						message="CREATING A04 MESSAGE - Contact ID: #[vars.queryData[0].Id default 'null'], HF ID: #[vars.queryData[0].HealthFusion_Patient_Record_ID__c default 'null']"/>
+						
+				<ee:transform doc:name="A04 mapping" doc:id="1d78613e-75c1-4c46-89c3-8d4bb0514104" >
+					<ee:message >
+						<ee:set-payload resource="dwl/payload/A04-mapping.dwl" />
+					</ee:message>
 				</ee:transform>
 				
-				<!-- 2. Log variable setup completion -->
-				<logger level="INFO" doc:name="2. Variables Setup"
-				        message="CONTACT VARIABLES - HF ID: #[vars.hfId default 'null'], Language: #[vars.languageField default 'null'], Event Type: #[vars.eventType], Create?: #[vars.checkConditionCreate], Update?: #[vars.checkConditionUpdate]"/>
-				
-				<!-- 3. Log address fields specifically for debugging -->
-				<logger level="INFO" doc:name="3. Address Fields Analysis"
-				        message="ADDRESS FIELD ANALYSIS - MailingStreet: #[vars.queryData[0].MailingStreet default 'null'], Contains newline in JSON: #[write(vars.queryData[0].MailingStreet,'application/json') contains '\\n'], Contains newline raw: #[vars.queryData[0].MailingStreet contains '\n'], Raw: #[write(vars.queryData[0].MailingStreet,'application/json')]"/>
-				
-				<logger level="INFO" doc:name="Logger" doc:id="2db58453-a42f-4217-82f4-07e59c0d9081" message="id is valid processing HL7 message"/>
-				
-				<choice doc:name="Choice" doc:id="5e5ddc9e-fad0-4893-96f0-8bb9170582c6" >
-					<when expression="#[vars.checkConditionCreate]" >
-					    <!-- 4. Log before A04 mapping -->
-						<logger level="INFO" doc:name="4. Pre-A04 Mapping"
-						        message="CREATING A04 MESSAGE - Contact ID: #[vars.queryData[0].Id default 'null'], HF ID: #[vars.queryData[0].HealthFusion_Patient_Record_ID__c default 'null']"/>
-						        
-						<ee:transform doc:name="A04 mapping" doc:id="1d78613e-75c1-4c46-89c3-8d4bb0514104" >
-							<ee:message >
-								<ee:set-payload resource="dwl/payload/A04-mapping.dwl" />
-							</ee:message>
-						</ee:transform>
+				<!-- 5. Log transformed payload for A04 -->
+				<logger level="INFO" doc:name="5. A04 Transformed Payload"
+						message="A04 TRANSFORMED - Payload preview: #[%dw 2.0 output application/json --- substring(payload, 0, 200) ++ '...']"/>
 						
-						<!-- 5. Log transformed payload for A04 -->
-						<logger level="INFO" doc:name="5. A04 Transformed Payload"
-						        message="A04 TRANSFORMED - Payload preview: #[%dw 2.0 output application/json --- substring(payload, 0, 200) ++ '...']"/>
-						        
-						<hl7:write doc:name="A04" doc:id="ac17b6d7-5171-4e2c-a38a-7f920e067a04" config-ref="HL7_EDI_Config_A04" />
-						
-						<!-- 6. Log after HL7 write -->
-						<logger level="INFO" doc:name="6. Post-HL7 Write A04"
-						        message="A04 HL7 MESSAGE - Type: ADT^A04, Size: #[sizeOf(payload)]"/>
-						        
-						<flow-ref doc:name="callToRequestFlow" doc:id="dc0350f6-d2de-41ac-a513-7f896508bb21" name="commonRequestFlow" />
-					</when>
-					<when expression="#[vars.checkConditionUpdate]" >
-					    <!-- 7. Log before A08 mapping -->
-						<logger level="INFO" doc:name="7. Pre-A08 Mapping"
-						        message="CREATING A08 MESSAGE - Contact ID: #[vars.queryData[0].Id default 'null'], HF ID: #[vars.queryData[0].HealthFusion_Patient_Record_ID__c default 'null']"/>
-						        
-						<ee:transform doc:name="A08 mapping" doc:id="b3b25c25-6741-4563-b1c6-c96633f0d8b8" >
-							<ee:message >
-								<ee:set-payload resource="dwl/payload/A08-mapping.dwl" />
-							</ee:message>
-						</ee:transform>
-						
-						<!-- 8. Log transformed payload for A08 -->
-						<logger level="INFO" doc:name="8. A08 Transformed Payload"
-						        message="A08 TRANSFORMED - Payload preview: #[%dw 2.0 output application/json --- substring(payload, 0, 200) ++ '...']"/>
-						        
-						<hl7:write doc:name="A08" doc:id="cab0abba-1aa0-4936-8ddf-44e3ef698350" config-ref="HL7_EDI_Config_A08" >
-						</hl7:write>
-						
-						<!-- 9. Log after HL7 write -->
-						<logger level="INFO" doc:name="9. Post-HL7 Write A08"
-						        message="A08 HL7 MESSAGE - Type: ADT^A08, Size: #[sizeOf(payload)]"/>
-						        
-						<flow-ref doc:name="callToRequestFlow" doc:id="ef9e4ee8-018c-4630-91a0-3133ec4044e7" name="commonRequestFlow" />
-					</when>
-					<otherwise>
-						<logger level="INFO" doc:name="defaultCase" doc:id="c5a189df-1b6c-4499-b654-f540d37e45c9" message='"invaild ADT type"' />
-					</otherwise>
-				</choice>
+				<hl7:write doc:name="A04" doc:id="ac17b6d7-5171-4e2c-a38a-7f920e067a04" config-ref="HL7_EDI_Config_A04" />
 				
-				<!-- 10. Log after sending to NextGen -->
-				<logger level="INFO" doc:name="10. Contact Flow Response"
-        message="CONTACT FLOW RESPONSE - Status: #[if (payload contains 'Error') 'ERROR' else 'SUCCESS'], Message: #[payload]"/>
-				        
-				<logger level="INFO" doc:name="outputPayloadLogger" doc:id="eb975a97-ba9a-4a62-88e4-c92cc607d82f" message="#[%dw 2.0
+				<!-- 6. Log after HL7 write -->
+				<logger level="INFO" doc:name="6. Post-HL7 Write A04"
+						message="A04 HL7 MESSAGE - Type: ADT^A04, Size: #[sizeOf(payload)]"/>
+						
+				<flow-ref doc:name="callToRequestFlow" doc:id="dc0350f6-d2de-41ac-a513-7f896508bb21" name="commonRequestFlow" />
+			</when>
+			<when expression="#[vars.checkConditionUpdate]" >
+				<!-- 7. Log before A08 mapping -->
+				<logger level="INFO" doc:name="7. Pre-A08 Mapping"
+						message="CREATING A08 MESSAGE - Contact ID: #[vars.queryData[0].Id default 'null'], HF ID: #[vars.queryData[0].HealthFusion_Patient_Record_ID__c default 'null']"/>
+						
+				<ee:transform doc:name="A08 mapping" doc:id="b3b25c25-6741-4563-b1c6-c96633f0d8b8" >
+					<ee:message >
+						<ee:set-payload resource="dwl/payload/A08-mapping.dwl" />
+					</ee:message>
+				</ee:transform>
+				
+				<!-- 8. Log transformed payload for A08 -->
+				<logger level="INFO" doc:name="8. A08 Transformed Payload"
+						message="A08 TRANSFORMED - Payload preview: #[%dw 2.0 output application/json --- substring(payload, 0, 200) ++ '...']"/>
+						
+				<hl7:write doc:name="A08" doc:id="cab0abba-1aa0-4936-8ddf-44e3ef698350" config-ref="HL7_EDI_Config_A08" >
+				</hl7:write>
+				
+				<!-- 9. Log after HL7 write -->
+				<logger level="INFO" doc:name="9. Post-HL7 Write A08"
+						message="A08 HL7 MESSAGE - Type: ADT^A08, Size: #[sizeOf(payload)]"/>
+						
+				<flow-ref doc:name="callToRequestFlow" doc:id="ef9e4ee8-018c-4630-91a0-3133ec4044e7" name="commonRequestFlow" />
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="defaultCase" doc:id="c5a189df-1b6c-4499-b654-f540d37e45c9" message='"invaild ADT type"' />
+			</otherwise>
+		</choice>
+		
+		<!-- 10. Log after sending to NextGen -->
+		<logger level="INFO" doc:name="10. Contact Flow Response"
+		      message="CONTACT FLOW RESPONSE - Status: #[if (payload contains 'Error') 'ERROR' else 'SUCCESS'], Message: #[payload]"/>
+				
+		<logger level="INFO" doc:name="outputPayloadLogger" doc:id="eb975a97-ba9a-4a62-88e4-c92cc607d82f" message="#[%dw 2.0
 output application/json
 ---
 {
@@ -329,12 +315,7 @@ output application/json
 	target:  Mule::p('target'),
 	message: &quot;response sent to viva-sf-ng-outbound-sapi&quot;
 }]" />
-				<logger level="INFO" doc:name="outputPayload" doc:id="17899e6e-7e02-41ae-bed9-9fa1826c3663" message="#[payload]"/>
-			</when>
-			<otherwise>
-				<logger level="INFO" doc:name="defaultCase" doc:id="051efe4a-e830-4d3c-9920-c1ff3b2010ae" message='"Invalid User"' />
-			</otherwise>
-		</choice>
+		<logger level="INFO" doc:name="outputPayload" doc:id="17899e6e-7e02-41ae-bed9-9fa1826c3663" message="#[payload]"/>
 	</sub-flow>
 
 </mule>
