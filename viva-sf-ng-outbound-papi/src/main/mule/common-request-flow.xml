@@ -91,7 +91,7 @@ output application/json
 			
 			<!-- 5. Log before deciding whether to send or not -->
 			<logger level="INFO" doc:name="5. Pre-Send Decision"
-					message="HL7 MESSAGE READY FOR SENDING - Send enabled: ${nextgen.send.enabled}, EventType: #[vars.eventType], Size: #[sizeOf(vars.hl7Payload)], Message snippet: #[%dw 2.0 output application/json --- substring(vars.hl7Payload, 0, 200) ++ '...']"/>
+					message="HL7 MESSAGE READY FOR SENDING - Send enabled: ${nextgen.send.enabled}, EventType: #[vars.eventType], Size: #[sizeOf(vars.hl7Payload)], Message snippet: #[%dw 2.0 output application/json --- (vars.hl7Payload[0 to 199] default vars.hl7Payload) ++ '...']"/>
 			
 			<!-- 6. Toggle implementation -->
 			<choice doc:name="Send or Just Log">

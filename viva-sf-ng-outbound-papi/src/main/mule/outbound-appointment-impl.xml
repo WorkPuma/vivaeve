@@ -132,16 +132,16 @@ var workTypeId = vars.updateFields[0].WorkTypeId
 ((vars.WorkTypeMapping default []) filter ((item) -> item.WorkTypeId == workTypeId))[0].NextGenField default ""
 ]]></ee:set-variable>
 				<ee:set-variable variableName="scheduledStartTime"><![CDATA[%dw 2.0
-output application/json
+output application/java
 var startTime = vars.updateFields[0].SchedStartTime as DateTime
 ---
-(startTime - |PT5H|) as String {format: "yyyyMMddHHmmss"}
+startTime - |PT5H|
 ]]></ee:set-variable>
 				<ee:set-variable variableName="scheduledEndTime"><![CDATA[%dw 2.0
-output application/json
+output application/java
 var endTime = vars.updateFields[0].SchedEndTime as DateTime
 ---
-(endTime - |PT5H|) as String {format: "yyyyMMddHHmmss"}
+endTime - |PT5H|
 ]]></ee:set-variable>
 				<ee:set-variable variableName="nextGenID"><![CDATA[%dw 2.0
 output application/java
@@ -155,6 +155,33 @@ vars.nextGenID != null and vars.nextGenID != ""
 ]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+		<ee:transform doc:name="Set SIU Type Variables">
+		  <ee:message/>
+		  <ee:variables>
+		    <ee:set-variable variableName="checkConditionAppCreate">
+		      <![CDATA[%dw 2.0
+output application/java
+---
+(vars.updateFields[0].Status default "") == "Scheduled"
+		      ]]>
+		    </ee:set-variable>
+		    <ee:set-variable variableName="checkConditionAppCancel">
+		      <![CDATA[%dw 2.0
+output application/java
+---
+[
+		"Cancelled by Patient",
+		"Cancelled by Provider",
+		"Rescheduled by Patient",
+		"Rescheduled by Provider",
+		"No Show"
+] contains (vars.updateFields[0].Status default "")
+		      ]]>
+		    </ee:set-variable>
+		  </ee:variables>
+		</ee:transform>
+		<logger level="INFO"
+		      message="HL7 SIU mapping: Create = #[vars.checkConditionAppCreate], Cancel = #[vars.checkConditionAppCancel], Status = #[vars.updateFields[0].Status]"/>
 		<logger level="INFO" doc:name="Log Provider First/Last Name"
 			message="#[%dw 2.0
 output application/json
@@ -301,46 +328,6 @@ output application/json
 		hasAIP: payload contains 'AIP|'
 }]"/>
 				<flow-ref doc:name="callToRequestFlow" doc:id="bca1aaa7-bcf0-4a6f-b8ae-a6d675c664ee" name="commonRequestFlow" />
-			</when>
-			<when expression="#[vars.checkConditionAppRes]">
-				<ee:transform doc:name="s13Mapping" doc:id="8d0f1e99-1263-464e-a5fa-503be90e03b2">
-					<ee:message>
-						<ee:set-payload resource="dwl/payload/s13-mapping.dwl" />
-					</ee:message>
-				</ee:transform>
-				<hl7:write doc:name="S13" doc:id="965a136d-7e8f-4ad4-865d-278a1aa961b6" config-ref="HL7_EDI_Config_S13" />
-				<logger level="INFO" doc:name="HL7MessageLogger_S13" message="#[payload]"/>
-				<logger level="INFO" doc:name="HL7SegmentAnalysis_S13" message="#[%dw 2.0
-output application/json
----
-{
-		hasMSH: payload contains 'MSH|',
-		hasPID: payload contains 'PID|',
-		hasSCH: payload contains 'SCH|',
-		hasAIL: payload contains 'AIL|',
-		hasAIP: payload contains 'AIP|'
-}]"/>
-				<flow-ref doc:name="callToRequestFlow" doc:id="fddaec02-45c8-4cc5-bdc4-2c75777db633" name="commonRequestFlow" />
-			</when>
-			<when expression="#[vars.checkConditionAppModify]">
-				<ee:transform doc:name="s14Mapping" doc:id="ac19ff27-dd34-4fe5-83e4-e17dd710a4e1">
-					<ee:message>
-						<ee:set-payload resource="dwl/payload/s14-mapping.dwl" />
-					</ee:message>
-				</ee:transform>
-				<hl7:write doc:name="S14" doc:id="2fbe6f43-402b-4bfd-81ee-9e6f94627837" config-ref="HL7_EDI_Config_S14" />
-				<logger level="INFO" doc:name="HL7MessageLogger_S14" message="#[payload]"/>
-				<logger level="INFO" doc:name="HL7SegmentAnalysis_S14" message="#[%dw 2.0
-output application/json
----
-{
-		hasMSH: payload contains 'MSH|',
-		hasPID: payload contains 'PID|',
-		hasSCH: payload contains 'SCH|',
-		hasAIL: payload contains 'AIL|',
-		hasAIP: payload contains 'AIP|'
-}]"/>
-				<flow-ref doc:name="callToRequestFlow" doc:id="7aad052c-c28a-47d9-a76d-4de4bc823a6b" name="commonRequestFlow" />
 			</when>
 			<when expression="#[vars.checkConditionAppCancel]">
 				<ee:transform doc:name="s15Mapping" doc:id="abb48d7d-c6e7-48f3-b987-3bfe83aa54b5">
