@@ -23,16 +23,6 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 			<os:retrieve doc:name="Retrieve TerritoryMapping" key="TerritoryMapping" target="TerritoryMapping" objectStore="MappingsObjectStore"/>
 			<os:retrieve doc:name="Retrieve WorkTypeMapping" key="WorkTypeMapping" target="WorkTypeMapping" objectStore="MappingsObjectStore"/>
 			<os:retrieve doc:name="Retrieve ProviderMapping" key="ProviderMapping" target="ProviderMapping" objectStore="MappingsObjectStore"/>
-			<logger level="INFO" doc:name="Log All ObjectStore Mappings"
-			  message="#[%dw 2.0
-			    output application/json
-			    ---
-			    {
-			      territoryMapping: vars.TerritoryMapping,
-			      workTypeMapping: vars.WorkTypeMapping,
-			      providerMapping: vars.ProviderMapping
-			    }
-			  ]"/>
 			<logger level="INFO" doc:name="MappingsLogger"
 				message="TerritoryMapping size: #[sizeOf(vars.TerritoryMapping)], WorkTypeMapping size: #[sizeOf(vars.WorkTypeMapping)], ProviderMapping size: #[sizeOf(vars.ProviderMapping)]" />
 			<error-handler>

@@ -30,7 +30,7 @@ output application/json
 	inputPayload: payload
 }]" />
 		<salesforce:query doc:name="contactQuery" doc:id="da86cc1e-1327-4d73-9aaf-318bde972d58" config-ref="Salesforce_Config" target="queryData">
-					<salesforce:salesforce-query><![CDATA[SELECT Id, Contact_Id__c, FirstName, LastName, MiddleName, Marital_Status__c, Language_Preferred__c, Patient_Gender_2__c, HF_Chart_Number__c, Email, Phone, MailingCountry, MailingState, MailingPostalCode, MailingCity, MailingStreet, Patient_Ethnicity__c, Patient_Race__c, Patient_Gender__c, Date_of_Birth__c,HealthFusion_Patient_Record_ID__c FROM Contact WHERE Id = ':Id']]></salesforce:salesforce-query>
+					<salesforce:salesforce-query><![CDATA[SELECT Id, Contact_Id__c, FirstName, LastName, MiddleName, Marital_Status__c, Language_Preferred__c, Patient_Gender_2__c, HF_Chart_Number__c, Email, Phone, MailingCountry, MailingState, MailingPostalCode, MailingCity, MailingStreet, Patient_Ethnicity__c, Patient_Race__c, Patient_Gender__c, Date_of_Birth__c, HealthFusion_Patient_Record_ID__c, RecordType.DeveloperName FROM Contact WHERE Id = ':Id']]></salesforce:salesforce-query>
 					<salesforce:parameters><![CDATA[#[output application/java
 ---
 {
@@ -43,6 +43,8 @@ output application/json
 				    ---
 				    { Contact: vars.queryData }
 				  ]"/>
+		<choice doc:name="Check Contact RecordType">
+			<when expression='#[(vars.queryData[0].RecordType.DeveloperName default "") == "Patient_Contact"]'>
 		<salesforce:query doc:name="userEmailQuery" doc:id="3406f10f-8998-4125-b692-b63b6b335d5e" config-ref="Salesforce_Config" target="userEmailVar">
 			<salesforce:salesforce-query ><![CDATA[SELECT Id, Email, Username FROM User WHERE Id = ':Id']]></salesforce:salesforce-query>
 			<salesforce:parameters ><![CDATA[#[output application/java
@@ -188,6 +190,13 @@ output application/json
 				<flow-ref doc:name="callToOutboundContactSubFlow" doc:id="0e309bcb-eb23-4079-8cc6-7e62b478f0a1" name="outboundContactSubFlow"/>
 			</otherwise>
 		</choice>
+		</when>
+		<otherwise>
+			<logger level="INFO" doc:name="Skip Contact Record"
+				message="Contact #[vars.queryData[0].Id] skipped - RecordType is #[vars.queryData[0].RecordType.DeveloperName]" />
+			<!-- Optionally end flow here -->
+		</otherwise>
+		</choice>
 	
 		<error-handler>
 			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" type="ANY">
@@ -198,7 +207,7 @@ output application/json
 ---
 {
 	"status": "ERROR",
-	"message": "Error processing ADT message: " + (error.description default "Unknown error"),
+	"message": "Error processing ADT message: " ++ (error.description default "Unknown error"),
 	"errorType": error.errorType.identifier default "UNKNOWN",
 	"timestamp": now()
 }]]></ee:set-payload>
@@ -266,7 +275,7 @@ if (!isEmpty(payload.data.payload.ChangeEventHeader.entityName) and (!isEmpty(pa
 				
 				<!-- 5. Log transformed payload for A04 -->
 				<logger level="INFO" doc:name="5. A04 Transformed Payload"
-						message="A04 TRANSFORMED - Payload preview: #[%dw 2.0 output application/json --- substring(payload, 0, 200) ++ '...']"/>
+						message="A04 TRANSFORMED - Payload preview: #[%dw 2.0 output application/json --- (payload as String)[0 to 199] ++ '...']"/>
 						
 				<hl7:write doc:name="A04" doc:id="ac17b6d7-5171-4e2c-a38a-7f920e067a04" config-ref="HL7_EDI_Config_A04" />
 				<!-- HL7 message output and segment analysis loggers for A04 -->
@@ -300,7 +309,7 @@ output application/json
 				
 				<!-- 8. Log transformed payload for A08 -->
 				<logger level="INFO" doc:name="8. A08 Transformed Payload"
-						message="A08 TRANSFORMED - Payload preview: #[%dw 2.0 output application/json --- substring(payload, 0, 200) ++ '...']"/>
+						message="A08 TRANSFORMED - Payload preview: #[%dw 2.0 output text/plain --- write(payload, 'application/json')[0 to 199] ++ '...']"/>
 						
 				<hl7:write doc:name="A08" doc:id="cab0abba-1aa0-4936-8ddf-44e3ef698350" config-ref="HL7_EDI_Config_A08" >
 				</hl7:write>
