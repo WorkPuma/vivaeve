@@ -12,8 +12,8 @@ http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/em
 http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 	<flow name="outboundContactImplementationFlow" doc:id="f640b450-687e-4eb3-bc13-a42f198e21b3" >
-		<try>
 		<salesforce:replay-channel-listener streamingChannel="/data/ContactChangeEvent" replayOption="FROM_LAST_REPLAY_ID" doc:name="Replay channel listener" doc:id="72348164-7a72-4c67-aa80-81ce1cd8d89b" config-ref="Salesforce_Config" cacheEventsInMemory="true"/>
+		<try>
 		<logger level="INFO" doc:name="inputPayloadLogger" doc:id="941802cd-ded1-497a-a3ef-b1c7946281d1" message="#[%dw 2.0
 output application/json
 ---
@@ -169,8 +169,27 @@ output application/json
 				<flow-ref doc:name="callToOutboundContactSubFlow" doc:id="0e309bcb-eb23-4079-8cc6-7e62b478f0a1" name="outboundContactSubFlow"/>
 			</otherwise>
 		</choice>
-		<error-handler ref="error-handler" />
 	
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" type="ANY">
+				<ee:transform doc:name="Format Error Response">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status": "ERROR",
+	"message": "Error processing ADT message: " + (error.description default "Unknown error"),
+	"errorType": error.errorType.identifier default "UNKNOWN",
+	"timestamp": now()
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="ERROR"
+						doc:name="ADT Processing Error Logger"
+						message="ADT MESSAGE ERROR - Type: #[error.errorType.identifier default 'UNKNOWN'], Description: #[error.description default 'Unknown error']" />
+			</on-error-continue>
+		</error-handler>
 		</try>
 	</flow>
 	<sub-flow name="outboundContactSubFlow" doc:id="93f5a7d7-6778-4b32-9e92-f748e0a45d5f" >
@@ -231,7 +250,18 @@ if (!isEmpty(payload.data.payload.ChangeEventHeader.entityName) and (!isEmpty(pa
 						message="A04 TRANSFORMED - Payload preview: #[%dw 2.0 output application/json --- substring(payload, 0, 200) ++ '...']"/>
 						
 				<hl7:write doc:name="A04" doc:id="ac17b6d7-5171-4e2c-a38a-7f920e067a04" config-ref="HL7_EDI_Config_A04" />
-				
+				<!-- HL7 message output and segment analysis loggers for A04 -->
+				<logger level="INFO" doc:name="HL7MessageLogger_A04" message="#[payload]"/>
+				<logger level="INFO" doc:name="HL7SegmentAnalysis_A04" message="#[%dw 2.0
+output application/json
+---
+{
+		hasMSH: payload contains 'MSH|',
+		hasPID: payload contains 'PID|',
+		hasSCH: payload contains 'SCH|',
+		hasAIL: payload contains 'AIL|',
+		hasAIP: payload contains 'AIP|'
+}]"/>
 				<!-- 6. Log after HL7 write -->
 				<logger level="INFO" doc:name="6. Post-HL7 Write A04"
 						message="A04 HL7 MESSAGE - Type: ADT^A04, Size: #[sizeOf(payload)]"/>
@@ -255,7 +285,18 @@ if (!isEmpty(payload.data.payload.ChangeEventHeader.entityName) and (!isEmpty(pa
 						
 				<hl7:write doc:name="A08" doc:id="cab0abba-1aa0-4936-8ddf-44e3ef698350" config-ref="HL7_EDI_Config_A08" >
 				</hl7:write>
-				
+				<!-- HL7 message output and segment analysis loggers for A08 -->
+				<logger level="INFO" doc:name="HL7MessageLogger_A08" message="#[payload]"/>
+				<logger level="INFO" doc:name="HL7SegmentAnalysis_A08" message="#[%dw 2.0
+output application/json
+---
+{
+		hasMSH: payload contains 'MSH|',
+		hasPID: payload contains 'PID|',
+		hasSCH: payload contains 'SCH|',
+		hasAIL: payload contains 'AIL|',
+		hasAIP: payload contains 'AIP|'
+}]"/>
 				<!-- 9. Log after HL7 write -->
 				<logger level="INFO" doc:name="9. Post-HL7 Write A08"
 						message="A08 HL7 MESSAGE - Type: ADT^A08, Size: #[sizeOf(payload)]"/>
@@ -267,26 +308,6 @@ if (!isEmpty(payload.data.payload.ChangeEventHeader.entityName) and (!isEmpty(pa
 			</otherwise>
 		</choice>
 		
-		<error-handler>
-			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" type="ANY">
-				<ee:transform doc:name="Format Error Response">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	"status": "ERROR",
-	"message": "Error processing ADT message: " + (error.description default "Unknown error"),
-	"errorType": error.errorType.identifier default "UNKNOWN",
-	"timestamp": now()
-}]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<logger level="ERROR"
-						doc:name="ADT Processing Error Logger"
-						message="ADT MESSAGE ERROR - Type: #[error.errorType.identifier default 'UNKNOWN'], Description: #[error.description default 'Unknown error']" />
-			</on-error-continue>
-		</error-handler>
 		
 		<!-- 10. Log after sending to NextGen -->
 		<logger level="INFO" doc:name="10. Contact Flow Response"
