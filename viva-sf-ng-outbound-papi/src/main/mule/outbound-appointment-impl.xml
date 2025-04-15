@@ -10,7 +10,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
-<import file="mule/generate-mappings.xml"/>
+<import file="generate-mappings.xml"/>
 	<flow name="outboundAppointmentImplementationFlow" doc:id="13ea4868-57e2-445d-a553-cd4417a81304" >
 		<salesforce:replay-channel-listener doc:name="Replay channel listener" doc:id="4dc1a9eb-e600-46f3-bb50-ae41d7539121" config-ref="Salesforce_Config" streamingChannel="/data/ServiceAppointmentChangeEvent" replayOption="FROM_LAST_REPLAY_ID" cacheEventsInMemory="true"/>
 		
@@ -112,9 +112,18 @@ var territoryId = vars.updateFields[0].ServiceTerritoryId
 ]]></ee:set-variable>
 				<ee:set-variable variableName="providerId"><![CDATA[%dw 2.0
 output application/json
-var resourceId = vars.updateFields[0].Service_Resource__c
 ---
-((vars.ProviderMapping default []) filter ((item) -> item.providerId == resourceId))[0].NPI default ""
+((vars.ProviderMapping default []) filter ((item) -> item.providerId == vars.updateFields[0].Provider__c))[0].NPI default ""
+]]></ee:set-variable>
+				<ee:set-variable variableName="providerFirstName"><![CDATA[%dw 2.0
+output application/json
+---
+((vars.ProviderMapping default []) filter ((item) -> item.providerId == vars.updateFields[0].Provider__c))[0].First_Name default ""
+]]></ee:set-variable>
+				<ee:set-variable variableName="providerLastName"><![CDATA[%dw 2.0
+output application/json
+---
+((vars.ProviderMapping default []) filter ((item) -> item.providerId == vars.updateFields[0].Provider__c))[0].Last_Name default ""
 ]]></ee:set-variable>
 				<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
 output application/json
@@ -146,6 +155,16 @@ vars.nextGenID != null and vars.nextGenID != ""
 ]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+		<logger level="INFO" doc:name="Log Provider First/Last Name"
+			message="#[%dw 2.0
+output application/json
+---
+{
+		providerFirstName: vars.providerFirstName,
+		providerLastName: vars.providerLastName,
+		providerId: vars.providerId
+}
+]" />
 		<logger level="INFO" doc:name="Log Mapped HL7 Variables"
 		  message="#[%dw 2.0
 		    output application/json

@@ -11,7 +11,7 @@ http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
 http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
-<import file="mule/generate-mappings.xml"/>
+<import file="generate-mappings.xml"/>
 	<flow name="outboundContactImplementationFlow" doc:id="f640b450-687e-4eb3-bc13-a42f198e21b3" >
 		<salesforce:replay-channel-listener streamingChannel="/data/ContactChangeEvent" replayOption="FROM_LAST_REPLAY_ID" doc:name="Replay channel listener" doc:id="72348164-7a72-4c67-aa80-81ce1cd8d89b" config-ref="Salesforce_Config" cacheEventsInMemory="true"/>
 		<try>
