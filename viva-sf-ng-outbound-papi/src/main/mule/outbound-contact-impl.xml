@@ -11,6 +11,7 @@ http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
 http://www.mulesoft.org/schema/mule/sap http://www.mulesoft.org/schema/mule/sap/current/mule-sap.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+<import file="mule/generate-mappings.xml"/>
 	<flow name="outboundContactImplementationFlow" doc:id="f640b450-687e-4eb3-bc13-a42f198e21b3" >
 		<salesforce:replay-channel-listener streamingChannel="/data/ContactChangeEvent" replayOption="FROM_LAST_REPLAY_ID" doc:name="Replay channel listener" doc:id="72348164-7a72-4c67-aa80-81ce1cd8d89b" config-ref="Salesforce_Config" cacheEventsInMemory="true"/>
 		<try>
@@ -36,6 +37,12 @@ output application/json
 	Id : payload.data.payload.ChangeEventHeader.recordIds[0]
 }]]]></salesforce:parameters>
 				</salesforce:query>
+				<logger level="INFO" doc:name="Log Contact Record"
+				  message="#[%dw 2.0
+				    output application/json
+				    ---
+				    { Contact: vars.queryData }
+				  ]"/>
 		<salesforce:query doc:name="userEmailQuery" doc:id="3406f10f-8998-4125-b692-b63b6b335d5e" config-ref="Salesforce_Config" target="userEmailVar">
 			<salesforce:salesforce-query ><![CDATA[SELECT Id, Email, Username FROM User WHERE Id = ':Id']]></salesforce:salesforce-query>
 			<salesforce:parameters ><![CDATA[#[output application/java
@@ -152,6 +159,18 @@ output application/json
 ]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+		<logger level="INFO" doc:name="Log Mapped Variables"
+		  message="#[%dw 2.0
+		    output application/json
+		    ---
+		    {
+		      transactionId: vars.transactionId,
+		      subject: vars.subject,
+		      emailAddressVar: vars.emailAddressVar,
+		      errorBody: vars.errorBody,
+		      errorSubject: vars.errorSubject
+		    }
+		  ]"/>
 		<choice doc:name="Choice" doc:id="79245701-43c0-4bff-954c-03b3ea9af723" >
 			<when expression='#[(payload.data.payload.ChangeEventHeader.changedFields contains "Name.FirstName") or (payload.data.payload.ChangeEventHeader.changedFields contains "Name.LastName") or (payload.data.payload.ChangeEventHeader.changedFields contains "Date_of_Birth__c")]'>
 				<email:send doc:name="sendEmail" doc:id="b9f99b8a-dc6f-4c6f-8eac-033f51ce376a" config-ref="Email_SMTP" fromAddress="${smtp.fromaddress}" subject='#[vars.subject]'>

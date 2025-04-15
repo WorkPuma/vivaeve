@@ -72,11 +72,13 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 		<os:connection />
 	</os:config>
 
-	<os:object-store name="MappingsObjectStore" 
-		doc:name="Object Store" 
+	<os:object-store name="MappingsObjectStore"
+		doc:name="Object Store"
 		doc:id="mappings-object-store-id"
 		config-ref="ObjectStore_Config"
-		persistent="true" />
+		persistent="true"
+		maxEntries="10000"
+		entryTtl="3600000" />
 		
 	<hl7:config name="HL7_EDI_Config_A04" doc:name="HL7 EDI Config" doc:id="b775032e-115f-42d0-afbb-a8ad857ff3b4" subcompSeparator="&amp;">
 		<hl7:schemas >

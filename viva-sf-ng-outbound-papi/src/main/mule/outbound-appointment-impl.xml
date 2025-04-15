@@ -10,6 +10,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd
 http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+<import file="mule/generate-mappings.xml"/>
 	<flow name="outboundAppointmentImplementationFlow" doc:id="13ea4868-57e2-445d-a553-cd4417a81304" >
 		<salesforce:replay-channel-listener doc:name="Replay channel listener" doc:id="4dc1a9eb-e600-46f3-bb50-ae41d7539121" config-ref="Salesforce_Config" streamingChannel="/data/ServiceAppointmentChangeEvent" replayOption="FROM_LAST_REPLAY_ID" cacheEventsInMemory="true"/>
 		
@@ -22,6 +23,16 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 			<os:retrieve doc:name="Retrieve TerritoryMapping" key="TerritoryMapping" target="TerritoryMapping" objectStore="MappingsObjectStore"/>
 			<os:retrieve doc:name="Retrieve WorkTypeMapping" key="WorkTypeMapping" target="WorkTypeMapping" objectStore="MappingsObjectStore"/>
 			<os:retrieve doc:name="Retrieve ProviderMapping" key="ProviderMapping" target="ProviderMapping" objectStore="MappingsObjectStore"/>
+			<logger level="INFO" doc:name="Log All ObjectStore Mappings"
+			  message="#[%dw 2.0
+			    output application/json
+			    ---
+			    {
+			      territoryMapping: vars.TerritoryMapping,
+			      workTypeMapping: vars.WorkTypeMapping,
+			      providerMapping: vars.ProviderMapping
+			    }
+			  ]"/>
 			<logger level="INFO" doc:name="MappingsLogger"
 				message="TerritoryMapping size: #[sizeOf(vars.TerritoryMapping)], WorkTypeMapping size: #[sizeOf(vars.WorkTypeMapping)], ProviderMapping size: #[sizeOf(vars.ProviderMapping)]" />
 			<error-handler>
@@ -48,6 +59,12 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 					Id: payload.data.payload.ChangeEventHeader.recordIds[0]
 				}]]]></salesforce:parameters>
 			</salesforce:query>
+			<logger level="INFO" doc:name="Log ServiceAppointment Record"
+			  message="#[%dw 2.0
+			    output application/json
+			    ---
+			    { ServiceAppointment: vars.updateFields }
+			  ]"/>
 			<choice doc:name="Validate Query Results">
 				<when expression="#[isEmpty(vars.updateFields)]">
 					<logger level="ERROR" message="APPOINTMENT NOT FOUND - RecordId: #[payload.data.payload.ChangeEventHeader.recordIds[0]]"/>
@@ -74,6 +91,12 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 				Id: (vars.updateFields[0].ContactId default null)
 			}]]]></salesforce:parameters>
 		</salesforce:query>
+		<logger level="INFO" doc:name="Log Contact Record"
+		  message="#[%dw 2.0
+		    output application/json
+		    ---
+		    { Contact: vars.queryData }
+		  ]"/>
 		
 		<!-- Add mapping/field extraction and validation here (see next step) -->
 		
@@ -123,6 +146,20 @@ vars.nextGenID != null and vars.nextGenID != ""
 ]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+		<logger level="INFO" doc:name="Log Mapped HL7 Variables"
+		  message="#[%dw 2.0
+		    output application/json
+		    ---
+		    {
+		      appLocation: vars.appLocation,
+		      providerId: vars.providerId,
+		      appointmentType: vars.appointmentType,
+		      scheduledStartTime: vars.scheduledStartTime,
+		      scheduledEndTime: vars.scheduledEndTime,
+		      nextGenID: vars.nextGenID,
+		      hasNextGenID: vars.hasNextGenID
+		    }
+		  ]"/>
 		<!-- Validate required mapping fields -->
 		<choice doc:name="Validate Required Mappings">
 			<when expression="#[vars.appLocation == 'Unknown Location' or vars.appointmentType == '' or vars.providerId == '']">
@@ -159,8 +196,8 @@ output application/json
 		ServiceTerritoryId: payload.data.payload.ServiceTerritoryId default null
 }]"/>
 		
-		<!-- Retrieve Mappings from Object Store V2 -->
-				message="APPOINTMENT VARIABLES - Location: #[vars.appLocation default 'null'], LocationId: #[vars.appLocationId default 'null'], Provider: #[vars.providerFirstName default ''] #[vars.providerLastName default ''], Start: #[vars.scheduledStartTime], End: #[vars.scheduledEndTime]"/>
+		<logger level="INFO" doc:name="AppointmentVariables"
+			message="APPOINTMENT VARIABLES - Location: #[vars.appLocation default 'null'], Start: #[vars.scheduledStartTime], End: #[vars.scheduledEndTime]"/>
 		<salesforce:query doc:name="userEmailQuery" doc:id="3c495d47-57eb-4330-bfe0-be457dcc5dac" config-ref="Salesforce_Config" target="userEmailVar">
 					<salesforce:salesforce-query><![CDATA[SELECT Id, Email, Username FROM User WHERE Id = ':Id']]></salesforce:salesforce-query>
 					<salesforce:parameters><![CDATA[#[output application/java
@@ -323,6 +360,5 @@ output application/json
 	target:  Mule::p('target'),
 	message: &quot;response sent to viva-sf-ng-outbound-sapi&quot;
 }]" />
-		<logger level="INFO" doc:name="outputPayload" doc:id="a58b94dc-56be-419f-af25-f8a97c2d0258" message="#[payload]"/>
-	</sub-flow>
+</sub-flow>
 </mule>
