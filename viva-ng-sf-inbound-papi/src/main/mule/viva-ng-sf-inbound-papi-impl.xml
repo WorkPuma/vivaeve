@@ -301,9 +301,24 @@ flatten(payload.Data.ADT_A04.PID."PID-04")."CX-01"[0] default "UNKNOWN_PATIENT_I
                 <ee:variables>
                     <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
 output application/json
-var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
+
+fun hl7ToApiName(langCode) =
+    langCode match {
+        case "en" -> "English"
+        case "es" -> "Spanish"
+        case "fr" -> "French"
+        case "ru" -> "Russian"
+        case "zh" -> "Chinese/Mandarin"
+        case "ar" -> "Arabic"
+        case "fa" -> "Farsi"
+        else null
+    }
+
 ---
-(language filter ($.primarylanguage == payload.Data.ADT_A08.PID."PID-15"."CE_0296-01"))[0].Language_Preferred__c
+if (payload.Data.ADT_A08.PID."PID-15"?"CE_0296-01"?)
+  hl7ToApiName(payload.Data.ADT_A08.PID."PID-15".CE_0296_01)
+else
+  null
 ]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
@@ -1036,9 +1051,29 @@ payload]]></ee:set-payload>
                 <ee:variables>
                     <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
 output application/json
-var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
+
+fun hl7ToApiName(langCode) =
+    langCode match {
+        case "en" -> "English"
+        case "es" -> "Spanish"
+        case "fr" -> "French"
+        case "ru" -> "Russian"
+        case "zh" -> "Chinese/Mandarin"
+        case "ar" -> "Arabic"
+        case "fa" -> "Farsi"
+        else null
+    }
+
 ---
-(language filter ($.primarylanguage == payload.Data.SIU_S12.PATIENT.PID."PID-15"[0]."CE_0296-01" ))[0].Language_Preferred__c]]></ee:set-variable>
+if (
+  payload.Data.SIU_S12.PATIENT.PID."PID-15"?
+    and (sizeOf(payload.Data.SIU_S12.PATIENT.PID."PID-15") > 0)
+    and payload.Data.SIU_S12.PATIENT.PID."PID-15"[0]?"CE_0296-01"?
+)
+  hl7ToApiName(payload.Data.SIU_S12.PATIENT.PID."PID-15"[0]."CE_0296-01")
+else
+  null
+]]></ee:set-variable>
                     <ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
@@ -1334,7 +1369,28 @@ payload]]></ee:set-payload>
 output application/json
 var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
 ---
-(language filter ($.primarylanguage == payload.Data.SIU_S13.PATIENT.PID."PID-15"[0]."CE_0296-01" ))[0].Language_Preferred__c]]></ee:set-variable>
+fun hl7ToApiName(langCode) =
+    langCode match {
+        case "en" -> "English"
+        case "es" -> "Spanish"
+        case "fr" -> "French"
+        case "ru" -> "Russian"
+        case "zh" -> "Chinese/Mandarin"
+        case "ar" -> "Arabic"
+        case "fa" -> "Farsi"
+        else null
+    }
+
+---
+if (
+  payload.Data.SIU_S13.PATIENT.PID."PID-15"?
+    and (sizeOf(payload.Data.SIU_S13.PATIENT.PID."PID-15") > 0)
+    and payload.Data.SIU_S13.PATIENT.PID."PID-15"[0]?"CE_0296-01"?
+)
+  hl7ToApiName(payload.Data.SIU_S13.PATIENT.PID."PID-15"[0]."CE_0296-01")
+else
+  null
+]]></ee:set-variable>
                     <ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
@@ -1612,9 +1668,29 @@ fun safeDOB(ts) =
                 <ee:variables>
                     <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
 output application/json
-var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
+
+fun hl7ToApiName(langCode) =
+    langCode match {
+        case "en" -> "English"
+        case "es" -> "Spanish"
+        case "fr" -> "French"
+        case "ru" -> "Russian"
+        case "zh" -> "Chinese/Mandarin"
+        case "ar" -> "Arabic"
+        case "fa" -> "Farsi"
+        else null
+    }
+
 ---
-(language filter ($.primarylanguage == payload.Data.SIU_S14.PATIENT.PID."PID-15"."CE_0296-01"[0]))[0].Language_Preferred__c]]></ee:set-variable>
+if (
+  payload.Data.SIU_S14.PATIENT.PID."PID-15"?
+    and (sizeOf(payload.Data.SIU_S14.PATIENT.PID."PID-15") > 0)
+    and payload.Data.SIU_S14.PATIENT.PID."PID-15"[0]?"CE_0296-01"?
+)
+  hl7ToApiName(payload.Data.SIU_S14.PATIENT.PID."PID-15"[0]."CE_0296-01")
+else
+  null
+]]></ee:set-variable>
                     <ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping
@@ -1913,9 +1989,29 @@ payload]]></ee:set-payload>
                 <ee:variables>
                     <ee:set-variable variableName="patientLanguage"><![CDATA[%dw 2.0
 output application/json
-var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
+
+fun hl7ToApiName(langCode) =
+    langCode match {
+        case "en" -> "English"
+        case "es" -> "Spanish"
+        case "fr" -> "French"
+        case "ru" -> "Russian"
+        case "zh" -> "Chinese/Mandarin"
+        case "ar" -> "Arabic"
+        case "fa" -> "Farsi"
+        else null
+    }
+
 ---
-(language filter ($.primarylanguage == payload.Data.SIU_S15.PATIENT.PID."PID-15"."CE_0296-01"[0]))[0].Language_Preferred__c]]></ee:set-variable>
+if (
+  payload.Data.SIU_S15.PATIENT.PID."PID-15"?
+    and (sizeOf(payload.Data.SIU_S15.PATIENT.PID."PID-15") > 0)
+    and payload.Data.SIU_S15.PATIENT.PID."PID-15"[0]?"CE_0296-01"?
+)
+  hl7ToApiName(payload.Data.SIU_S15.PATIENT.PID."PID-15"[0]."CE_0296-01")
+else
+  null
+]]></ee:set-variable>
                     <ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
 output application/json
 var appType = vars.WorkTypeMapping

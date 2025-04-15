@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:hl7="http://www.mulesoft.org/schema/mule/hl7"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/hl7 http://www.mulesoft.org/schema/mule/hl7/current/mule-hl7.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+<import file="generate-mappings.xml"/>
+	<flow name="outboundAppointmentImplementationFlow" doc:id="13ea4868-57e2-445d-a553-cd4417a81304" >
+		<salesforce:replay-channel-listener doc:name="Replay channel listener" doc:id="4dc1a9eb-e600-46f3-bb50-ae41d7539121" config-ref="Salesforce_Config" streamingChannel="/data/ServiceAppointmentChangeEvent" replayOption="FROM_LAST_REPLAY_ID" cacheEventsInMemory="true"/>
+		
+		<!-- Early logging before query -->
+		<logger level="INFO" doc:name="Pre-Query Logger"
+			message="RETRIEVING APPOINTMENT DATA - RecordId: #[payload.data.payload.ChangeEventHeader.recordIds[0]]"/>
+		
+		<!-- Early ObjectStore retrieval with error handling -->
+		<try doc:name="Try Object Store Retrieval">
+			<os:retrieve doc:name="Retrieve TerritoryMapping" key="TerritoryMapping" target="TerritoryMapping" objectStore="MappingsObjectStore"/>
+			<os:retrieve doc:name="Retrieve WorkTypeMapping" key="WorkTypeMapping" target="WorkTypeMapping" objectStore="MappingsObjectStore"/>
+			<os:retrieve doc:name="Retrieve ProviderMapping" key="ProviderMapping" target="ProviderMapping" objectStore="MappingsObjectStore"/>
+			<logger level="INFO" doc:name="MappingsLogger"
+				message="TerritoryMapping size: #[sizeOf(vars.TerritoryMapping)], WorkTypeMapping size: #[sizeOf(vars.WorkTypeMapping)], ProviderMapping size: #[sizeOf(vars.ProviderMapping)]" />
+			<error-handler>
+				<on-error-continue type="OS:KEY_NOT_FOUND">
+					<logger level="ERROR"
+						doc:name="Object Store Error Logger"
+						message="Required mapping not found in Object Store. Please ensure mappings are properly loaded. Error: #[error.description]" />
+					<!-- Continue processing with empty mappings -->
+				</on-error-continue>
+			</error-handler>
+		</try>
+		
+		<!-- Query ServiceAppointment with error handling and validation -->
+		<try doc:name="Try Appointment Retrieval">
+			<salesforce:query doc:name="serviceAppReqFields" config-ref="Salesforce_Config" target="updateFields">
+				<salesforce:salesforce-query><![CDATA[
+					SELECT Id, AdditionalInformation, Service_Resource__c, Provider__c, NextGen_ID__c,
+						ServiceTerritoryId, ContactId, SchedStartTime, SchedEndTime, Status,
+						WorkTypeId, Work_Type_Group__c, Duration, ActualDuration, DurationType
+					FROM ServiceAppointment
+					WHERE Id = ':Id'
+				]]></salesforce:salesforce-query>
+				<salesforce:parameters><![CDATA[#[{
+					Id: payload.data.payload.ChangeEventHeader.recordIds[0]
+				}]]]></salesforce:parameters>
+			</salesforce:query>
+			<logger level="INFO" doc:name="Log ServiceAppointment Record"
+			  message="#[%dw 2.0
+			    output application/json
+			    ---
+			    { ServiceAppointment: vars.updateFields }
+			  ]"/>
+			<choice doc:name="Validate Query Results">
+				<when expression="#[isEmpty(vars.updateFields)]">
+					<logger level="ERROR" message="APPOINTMENT NOT FOUND - RecordId: #[payload.data.payload.ChangeEventHeader.recordIds[0]]"/>
+					<raise-error type="APP:APPOINTMENT_NOT_FOUND" description="Appointment record not found"/>
+				</when>
+				<otherwise>
+					<logger level="INFO" message="APPOINTMENT RETRIEVED - NextGen ID: #[vars.updateFields[0].NextGen_ID__c default 'Not Set'], Status: #[vars.updateFields[0].Status default 'Unknown']"/>
+				</otherwise>
+			</choice>
+			<error-handler>
+				<on-error-propagate type="SALESFORCE:INVALID_INPUT,SALESFORCE:NOT_FOUND">
+					<logger level="ERROR" message="FAILED TO RETRIEVE APPOINTMENT - Error: #[error.description]"/>
+				</on-error-propagate>
+			</error-handler>
+		</try>
+		
+		<!-- Query Contact (if needed) -->
+		<salesforce:query doc:name="contactQuery" config-ref="Salesforce_Config" target="queryData">
+			<salesforce:salesforce-query><![CDATA[
+				SELECT Id, FirstName, LastName, MiddleName, Marital_Status__c, Patient_Gender_2__c, Language_Preferred__c, HF_Chart_Number__c, Email, Phone, MailingCountry, MailingState, MailingPostalCode, MailingCity, MailingStreet, Patient_Ethnicity__c, Patient_Race__c, Patient_Gender__c, Date_of_Birth__c, HealthFusion_Patient_Record_ID__c
+				FROM Contact WHERE Id = ':Id'
+			]]></salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[{
+				Id: (vars.updateFields[0].ContactId default null)
+			}]]]></salesforce:parameters>
+		</salesforce:query>
+		<logger level="INFO" doc:name="Log Contact Record"
+		  message="#[%dw 2.0
+		    output application/json
+		    ---
+		    { Contact: vars.queryData }
+		  ]"/>
+		
+		<!-- Add mapping/field extraction and validation here (see next step) -->
+		
+		<!-- Mapping/field extraction and validation -->
+		<ee:transform doc:name="Prepare HL7 Mappings">
+			<ee:message/>
+			<ee:variables>
+				<ee:set-variable variableName="appLocation"><![CDATA[%dw 2.0
+output application/json
+var territoryId = vars.updateFields[0].ServiceTerritoryId
+---
+((vars.TerritoryMapping default []) filter ((item) -> item.Id == territoryId))[0].LOCATION default "Unknown Location"
+]]></ee:set-variable>
+				<ee:set-variable variableName="providerId"><![CDATA[%dw 2.0
+output application/json
+---
+((vars.ProviderMapping default []) filter ((item) -> item.providerId == vars.updateFields[0].Provider__c))[0].NPI default ""
+]]></ee:set-variable>
+				<ee:set-variable variableName="providerFirstName"><![CDATA[%dw 2.0
+output application/json
+---
+((vars.ProviderMapping default []) filter ((item) -> item.providerId == vars.updateFields[0].Provider__c))[0].First_Name default ""
+]]></ee:set-variable>
+				<ee:set-variable variableName="providerLastName"><![CDATA[%dw 2.0
+output application/json
+---
+((vars.ProviderMapping default []) filter ((item) -> item.providerId == vars.updateFields[0].Provider__c))[0].Last_Name default ""
+]]></ee:set-variable>
+				<ee:set-variable variableName="appointmentType"><![CDATA[%dw 2.0
+output application/json
+var workTypeId = vars.updateFields[0].WorkTypeId
+---
+((vars.WorkTypeMapping default []) filter ((item) -> item.WorkTypeId == workTypeId))[0].NextGenField default ""
+]]></ee:set-variable>
+				<ee:set-variable variableName="scheduledStartTime"><![CDATA[%dw 2.0
+output application/java
+var startTime = vars.updateFields[0].SchedStartTime as DateTime
+---
+startTime - |PT5H|
+]]></ee:set-variable>
+				<ee:set-variable variableName="scheduledEndTime"><![CDATA[%dw 2.0
+output application/java
+var endTime = vars.updateFields[0].SchedEndTime as DateTime
+---
+endTime - |PT5H|
+]]></ee:set-variable>
+				<ee:set-variable variableName="nextGenID"><![CDATA[%dw 2.0
+output application/java
+---
+vars.updateFields[0].NextGen_ID__c
+]]></ee:set-variable>
+				<ee:set-variable variableName="hasNextGenID"><![CDATA[%dw 2.0
+output application/java
+---
+vars.nextGenID != null and vars.nextGenID != ""
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Set SIU Type Variables">
+		  <ee:message/>
+		  <ee:variables>
+		    <ee:set-variable variableName="checkConditionAppCreate">
+		      <![CDATA[%dw 2.0
+output application/java
+---
+(vars.updateFields[0].Status default "") == "Scheduled"
+		      ]]>
+		    </ee:set-variable>
+		    <ee:set-variable variableName="checkConditionAppCancel">
+		      <![CDATA[%dw 2.0
+output application/java
+---
+[
+		"Cancelled by Patient",
+		"Cancelled by Provider",
+		"Rescheduled by Patient",
+		"Rescheduled by Provider",
+		"No Show"
+] contains (vars.updateFields[0].Status default "")
+		      ]]>
+		    </ee:set-variable>
+		  </ee:variables>
+		</ee:transform>
+		<logger level="INFO"
+		      message="HL7 SIU mapping: Create = #[vars.checkConditionAppCreate], Cancel = #[vars.checkConditionAppCancel], Status = #[vars.updateFields[0].Status]"/>
+		<logger level="INFO" doc:name="Log Provider First/Last Name"
+			message="#[%dw 2.0
+output application/json
+---
+{
+		providerFirstName: vars.providerFirstName,
+		providerLastName: vars.providerLastName,
+		providerId: vars.providerId
+}
+]" />
+		<logger level="INFO" doc:name="Log Mapped HL7 Variables"
+		  message="#[%dw 2.0
+		    output application/json
+		    ---
+		    {
+		      appLocation: vars.appLocation,
+		      providerId: vars.providerId,
+		      appointmentType: vars.appointmentType,
+		      scheduledStartTime: vars.scheduledStartTime,
+		      scheduledEndTime: vars.scheduledEndTime,
+		      nextGenID: vars.nextGenID,
+		      hasNextGenID: vars.hasNextGenID
+		    }
+		  ]"/>
+		<!-- Validate required mapping fields -->
+		<choice doc:name="Validate Required Mappings">
+			<when expression="#[vars.appLocation == 'Unknown Location' or vars.appointmentType == '' or vars.providerId == '']">
+				<logger level="WARN" message="MISSING REQUIRED MAPPING - Location: #[vars.appLocation], AppointmentType: #[vars.appointmentType], Provider: #[vars.providerId]"/>
+				<!-- Optional: Handle missing mapping case -->
+			</when>
+		</choice>
+		<!-- Validate NextGen ID for updates -->
+		<choice doc:name="Validate NextGen ID">
+			<when expression="#[vars.hasNextGenID != true and vars.updateFields[0].Status == 'UPDATE']">
+				<logger level="WARN" message="MISSING NEXTGEN ID FOR UPDATE - Appointment: #[vars.updateFields[0].Id], Status: #[vars.updateFields[0].Status]"/>
+				<!-- Optional: Handle missing NextGen ID case -->
+			</when>
+		</choice>
+		<!-- HL7 transformation logging -->
+		<logger level="INFO" doc:name="Pre-HL7 Transformation"
+			message="PREPARING HL7 MESSAGE - NextGen ID: #[vars.nextGenID default 'Not Set'], Location: #[vars.appLocation], Provider: #[vars.providerId], AppointmentType: #[vars.appointmentType]"/>
+		<flow-ref doc:name="callingSubFlow" doc:id="65301612-ff0b-42a4-bb34-04dfe9abe3a3" name="outboundAppointmentSubFlow" />
+		<error-handler ref="error-handler" />
+	</flow>
+	<sub-flow name="outboundAppointmentSubFlow" doc:id="39192b0d-75cf-44a2-a68e-9769d3c0aaf5" >
+		<!-- 1. Log entry to appointment sub-flow -->
+		<logger level="INFO" doc:name="1. Appointment Sub-Flow Entry"
+				message="APPOINTMENT SUB-FLOW ENTRY - CorrelationId: #[vars.correlationId default 'NONE'], AppointmentId: #[payload.data.payload.ChangeEventHeader.recordIds[0]], Status: #[payload.data.payload.Status default 'null']"/>
+		<!-- Log full change event and ServiceTerritoryId before ObjectStore retrieval -->
+		<logger level="INFO" doc:name="ChangeEventDetails"
+			message="#[%dw 2.0
+output application/json
+---
+{
+		correlationId: vars.correlationId,
+		eventTimestamp: now(),
+		changeEvent: payload.data,
+		ServiceTerritoryId: payload.data.payload.ServiceTerritoryId default null
+}]"/>
+		
+		<logger level="INFO" doc:name="AppointmentVariables"
+			message="APPOINTMENT VARIABLES - Location: #[vars.appLocation default 'null'], Start: #[vars.scheduledStartTime], End: #[vars.scheduledEndTime]"/>
+		<salesforce:query doc:name="userEmailQuery" doc:id="3c495d47-57eb-4330-bfe0-be457dcc5dac" config-ref="Salesforce_Config" target="userEmailVar">
+					<salesforce:salesforce-query><![CDATA[SELECT Id, Email, Username FROM User WHERE Id = ':Id']]></salesforce:salesforce-query>
+					<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	Id : payload.data.payload.ChangeEventHeader.commitUser
+}]]]></salesforce:parameters>
+				</salesforce:query>
+		<ee:transform doc:name="preparingEmailPayload" doc:id="3e54c19c-a1ef-45ef-9c3e-8848683a9275">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="transactionId"><![CDATA[uuid()]]></ee:set-variable>
+				<ee:set-variable variableName="emailAddressVar"><![CDATA[%dw 2.0
+output application/json
+---
+if ((vars.userEmailVar[0].Email) != null and (vars.userEmailVar[0].Email?)) vars.userEmailVar[0].Email else ("mrudhula.eerisetti@prowesssoft.com")]]></ee:set-variable>
+				<ee:set-variable variableName="errorBody"><![CDATA[%dw 2.0
+output text/plain
+
+var errorBody = {
+    "Hello": vars.userEmailVar[0].Username,
+    "Message": "This email is to notify you that an error occurred while attempting to " ++ payload.data.payload.ChangeEventHeader.changeType ++ " an Appointment in NextGen.",
+    "Appointment Details": {
+        "Timestamp": now() as String {format: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"},
+        "AppointmentID": payload.data.payload.ChangeEventHeader.recordIds[0],
+        "Appointment Status": payload.data.payload.Status default "N/A",
+        "Patient Name": (vars.queryData[0].FirstName default "") ++ " " ++ (vars.queryData[0].LastName default ""),
+        "Date of Birth": vars.queryData[0].Date_of_Birth__c default null,
+        "Provider": (vars.providerFirstName default "") ++ " " ++ (vars.providerLastName default ""),
+        "Appointment Location": vars.appLocation default "N/A"
+    },
+    "UserID": payload.data.payload.ChangeEventHeader.commitUser default "N/A",
+    "Context": "The system encountered the above error while attempting to " ++ payload.data.payload.ChangeEventHeader.changeType ++ " the following Appointment in NextGen. Please review the details and address the issue."
+}
+
+---
+"Hello: " ++ errorBody.Hello ++ "
+Message: " ++ errorBody.Message ++ "
+
+Appointment Details:
+  - Timestamp: " ++ (errorBody.'Appointment Details'.Timestamp as String {class: "null"} default "N/A") ++ "
+  - AppointmentID: " ++ (errorBody.'Appointment Details'.AppointmentID as String {class: "null"} default "N/A") ++ "
+  - Appointment Status: " ++ (errorBody.'Appointment Details'.'Appointment Status' as String {class: "null"} default "N/A") ++ "
+  - Patient Name: " ++ (errorBody.'Appointment Details'.'Patient Name' as String {class: "null"} default "N/A") ++ "
+  - Date of Birth: " ++ (errorBody.'Appointment Details'.'Date of Birth' as String {class: "null"} default "N/A") ++ "
+  - Provider: " ++ (errorBody.'Appointment Details'.Provider as String {class: "null"} default "N/A") ++ "
+  - Appointment Location: " ++ (errorBody.'Appointment Details'.'Appointment Location' as String {class: "null"} default "N/A") ++ "
+
+UserID: " ++ (errorBody.UserID as String {class: "null"} default "N/A") ++ "
+Context: " ++ (errorBody.Context as String {class: "null"} default "N/A")
+]]></ee:set-variable>
+				<ee:set-variable variableName="errorSubject"><![CDATA[%dw 2.0
+output application/json
+---
+"Appointment " ++ 
+(payload.data.payload.ChangeEventHeader.changeType default "") ++ 
+" Error: " ++ 
+(vars.queryData[0].FirstName default "") ++ 
+" " ++ 
+(vars.queryData[0].LastName default "")
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="fe0508fa-beab-4510-9e1a-5224c9498136" message="id is valid processing HL7 message"/>
+		<choice doc:name="Choice" doc:id="33da795f-36c9-47d8-b72b-cfe1362eec3c">
+			<when expression="#[vars.checkConditionAppCreate]">
+				<ee:transform doc:name="s12Mapping" doc:id="346708d9-b416-4f18-b00f-459d04988170">
+					<ee:message>
+						<ee:set-payload resource="dwl/payload/s12-mapping.dwl" />
+					</ee:message>
+				</ee:transform>
+				<hl7:write doc:name="S12" doc:id="345673c4-663a-4e90-9713-3e11f7f18b38" config-ref="HL7_EDI_Config_S12" />
+				<logger level="INFO" doc:name="HL7MessageLogger_S12" message="#[payload]"/>
+				<logger level="INFO" doc:name="HL7SegmentAnalysis_S12" message="#[%dw 2.0
+output application/json
+---
+{
+		hasMSH: payload contains 'MSH|',
+		hasPID: payload contains 'PID|',
+		hasSCH: payload contains 'SCH|',
+		hasAIL: payload contains 'AIL|',
+		hasAIP: payload contains 'AIP|'
+}]"/>
+				<flow-ref doc:name="callToRequestFlow" doc:id="bca1aaa7-bcf0-4a6f-b8ae-a6d675c664ee" name="commonRequestFlow" />
+			</when>
+			<when expression="#[vars.checkConditionAppCancel]">
+				<ee:transform doc:name="s15Mapping" doc:id="abb48d7d-c6e7-48f3-b987-3bfe83aa54b5">
+					<ee:message>
+						<ee:set-payload resource="dwl/payload/s15-mapping.dwl" />
+					</ee:message>
+				</ee:transform>
+				<hl7:write doc:name="S15" doc:id="d94d80da-0189-473e-8b75-9b22c2bc54e6" config-ref="HL7_EDI_Config_S15" />
+				<logger level="INFO" doc:name="HL7MessageLogger_S15" message="#[payload]"/>
+				<logger level="INFO" doc:name="HL7SegmentAnalysis_S15" message="#[%dw 2.0
+output application/json
+---
+{
+		hasMSH: payload contains 'MSH|',
+		hasPID: payload contains 'PID|',
+		hasSCH: payload contains 'SCH|',
+		hasAIL: payload contains 'AIL|',
+		hasAIP: payload contains 'AIP|'
+}]"/>
+				<flow-ref doc:name="callToRequestFlow" doc:id="c18554f1-095c-4ecf-91d0-dbd2e1c629e3" name="commonRequestFlow" />
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="defaultCase" doc:id="0e88816a-3bdf-4d60-af1f-b8e287ff10b2" message='"invaild SIU type"' />
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="outputPayloadLogger" doc:id="e6aa0e76-3732-48ff-9ee1-74516b852419" message="#[%dw 2.0
+output application/json
+---
+{
+	correlationId : vars.correlationId,
+	eventTimestamp : now(),
+	applicationName: Mule::p('app.name'),
+	flowName: flow.name default &quot;implementation-flows&quot;,
+	environment: upper(Mule::p('mule.env')),
+	source: Mule::p('source'),
+	target:  Mule::p('target'),
+	message: &quot;response sent to viva-sf-ng-outbound-sapi&quot;
+}]" />
+</sub-flow>
+</mule>
