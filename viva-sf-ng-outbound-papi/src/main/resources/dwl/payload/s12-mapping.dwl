@@ -4,6 +4,14 @@ output application/json
 {
     "Data": {
         "SIU_S12": {
+            "RGS": {
+                "RGS-01": "",
+                "RGS-02": "",
+                "RGS-03": "",
+                "RGS-04": "",
+                "RGS-05": "",
+                "RGS-06": ""
+            },
             "RESOURCES": [
                 {
                     "LOCATION_RESOURCE": [

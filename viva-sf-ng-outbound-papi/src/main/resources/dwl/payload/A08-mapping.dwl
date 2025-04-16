@@ -20,7 +20,7 @@ fun languageToHL7CE(language) =
       else if (lang == "CHINESE" or lang == "ZH" or lang == "CHINESE/MANDARIN") "ZH"
       else if (lang == "ARABIC" or lang == "AR") "AR"
       else if (lang == "FARSI" or lang == "FA") "FA"
-      else "EN"
+      else null
     ---
     {
       "CE_0296-01": code,
@@ -28,6 +28,7 @@ fun languageToHL7CE(language) =
       "CE_0296-03": "HL70296"
     }
   }
+
 
 fun formatTS(dob) =
   if (dob == null or dob == "") null else { "TS-01": (dob as Date {format:"yyyy-MM-dd"}) as String {format:"yyyyMMdd"} }
@@ -115,11 +116,54 @@ fun formatTS(dob) =
       },
       "PV1": {
         "PV1-01": 1 as Number,
-        "PV1-02": "O",
-        "PV1-45": "N"
+        "PV1-02": "O"
+      },
+      "GT1": {
+        "GT1-01": "",
+        "GT1-02": "",
+        "GT1-03": "",
+        "GT1-04": "",
+        "GT1-05": "",
+        "GT1-06": "",
+        "GT1-07": "",
+        "GT1-08": "",
+        "GT1-09": "",
+        "GT1-10": "",
+        "GT1-11": "",
+        "GT1-12": "",
+        "GT1-13": "",
+        "GT1-14": "",
+        "GT1-15": "",
+        "GT1-16": "",
+        "GT1-17": "",
+        "GT1-18": "",
+        "GT1-19": "",
+        "GT1-20": ""
+      },
+      "IN1": {
+        "IN1-01": "",
+        "IN1-02": "",
+        "IN1-03": "",
+        "IN1-04": "",
+        "IN1-05": "",
+        "IN1-06": "",
+        "IN1-07": "",
+        "IN1-08": "",
+        "IN1-09": "",
+        "IN1-10": "",
+        "IN1-11": "",
+        "IN1-12": "",
+        "IN1-13": "",
+        "IN1-14": "",
+        "IN1-15": "",
+        "IN1-16": "",
+        "IN1-17": "",
+        "IN1-18": "",
+        "IN1-19": "",
+        "IN1-20": ""
       }
     }
   },
   "Id": "ADT_A08",
-  "Name": "ADT_A08"
+  "Name": "ADT_A08",
 }
