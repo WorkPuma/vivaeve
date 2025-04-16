@@ -14,6 +14,10 @@ fun getAppId() =
 fun getPatientId() =
   vars.queryData[0].HealthFusion_Patient_Record_ID__c
 
+// Only include value if present and non-empty
+fun includeIfPresent(val) =
+  if (val != null and val != "") val else null
+
 ---
 {
   "Data": {
@@ -105,17 +109,20 @@ fun getPatientId() =
         {
           "PID": {
             "PID-05":
-              if (vars.queryData[0].LastName? and vars.queryData[0].LastName != null)
+              if (
+                (vars.queryData[0].LastName? and vars.queryData[0].LastName != null) or
+                (vars.queryData[0].FirstName? and vars.queryData[0].FirstName != null)
+              )
                 [{
-                    "XPN-02": vars.queryData[0].FirstName replace /[^a-zA-Z]/ with "",
+                    "XPN-02": includeIfPresent(vars.queryData[0].FirstName replace /[^a-zA-Z]/ with ""),
                     // Middle name omitted unless required
-                    "XPN-01": vars.queryData[0].LastName replace /[^a-zA-Z]/ with ""
+                    "XPN-01": includeIfPresent(vars.queryData[0].LastName replace /[^a-zA-Z]/ with "")
                 }]
-              else
-                [],
-            "PID-04": [
-              { "CX-01": (payload.data.payload.ContactId default "000000") }
-            ],
+              else null,
+            "PID-04":
+              if ((payload.data.payload.ContactId? and payload.data.payload.ContactId != null))
+                [{ "CX-01": payload.data.payload.ContactId }]
+              else null,
             "PID-15": { "CE_0296-01": (vars.languageField default "EN") },
             "PID-03":
               if (vars.hl7MessageType == "UPDATE")
@@ -123,24 +130,35 @@ fun getPatientId() =
               else if (getPatientId() != null and getPatientId() != "")
                 [ { "CX-01": getPatientId() } ]
               else
-                [], // Omit the PID-03 if no key for CREATE
-            "PID-13": [
-              {
-                "XTN-04": (vars.queryData[0].Email default "noemail@yourdomain.com"),
-                "XTN-01": (vars.queryData[0].Phone default "000-000-0000")
-              }
-            ],
+                null, // Omit the PID-03 if no key for CREATE
+            "PID-13":
+              if (
+                (vars.queryData[0].Email? and vars.queryData[0].Email != null and vars.queryData[0].Email != "") or
+                (vars.queryData[0].Phone? and vars.queryData[0].Phone != null and vars.queryData[0].Phone != "")
+              )
+                [{
+                  "XTN-04": includeIfPresent(vars.queryData[0].Email),
+                  "XTN-01": includeIfPresent(vars.queryData[0].Phone)
+                }]
+              else null,
             "PID-01": 1,
-            "PID-12": "+1",
-            "PID-11": [
-              {
-                "XAD-05": (vars.queryData[0].MailingPostalCode default "00000"),
-                "XAD-04": (vars.queryData[0].MailingState default "XX"),
-                "XAD-06": (vars.queryData[0].MailingCountry default "USA"),
-                "XAD-03": (vars.queryData[0].MailingCity default "UNKNOWN"),
-                "XAD-01": (vars.queryData[0].MailingStreet default "UNKNOWN")
-              }
-            ],
+            // PID-12 removed - do not default country code
+            "PID-11":
+              if (
+                (vars.queryData[0].MailingPostalCode? and vars.queryData[0].MailingPostalCode != null and vars.queryData[0].MailingPostalCode != "") or
+                (vars.queryData[0].MailingState? and vars.queryData[0].MailingState != null and vars.queryData[0].MailingState != "") or
+                (vars.queryData[0].MailingCountry? and vars.queryData[0].MailingCountry != null and vars.queryData[0].MailingCountry != "") or
+                (vars.queryData[0].MailingCity? and vars.queryData[0].MailingCity != null and vars.queryData[0].MailingCity != "") or
+                (vars.queryData[0].MailingStreet? and vars.queryData[0].MailingStreet != null and vars.queryData[0].MailingStreet != "")
+              )
+                [{
+                  "XAD-05": includeIfPresent(vars.queryData[0].MailingPostalCode),
+                  "XAD-04": includeIfPresent(vars.queryData[0].MailingState),
+                  "XAD-06": includeIfPresent(vars.queryData[0].MailingCountry),
+                  "XAD-03": includeIfPresent(vars.queryData[0].MailingCity),
+                  "XAD-01": includeIfPresent(vars.queryData[0].MailingStreet)
+                }]
+              else null,
             "PID-22": (vars.queryData[0].Patient_Ethnicity__c default "PATIENT DECLINED"),
             "PID-10": (vars.queryData[0].Patient_Race__c default "PATIENT DECLINED"),
             "PID-08":
@@ -148,25 +166,28 @@ fun getPatientId() =
                 if (vars.queryData[0].Patient_Gender_2__c == "Female") "F"
                 else if (vars.queryData[0].Patient_Gender_2__c == "Male") "M"
                 else vars.queryData[0].Patient_Gender_2__c
-              else "U",   // U for Unknown/Unspecified
-            "PID-07": {
-              "TS-01":
-                if ((vars.queryData[0].Date_of_Birth__c?) and (vars.queryData[0].Date_of_Birth__c != null))
-                  (vars.queryData[0].Date_of_Birth__c as Date {format: "yyyy-MM-dd"} as String {format: "yyyyMMdd"})
-                else
-                  "19000101"
-            }
+              else "U",   // U for Unknown/Unspecified (per HL7)
+            "PID-07":
+              if ((vars.queryData[0].Date_of_Birth__c?) and (vars.queryData[0].Date_of_Birth__c != null))
+                { "TS-01": (vars.queryData[0].Date_of_Birth__c as Date {format: "yyyy-MM-dd"} as String {format: "yyyyMMdd"}) }
+              else null
           }
         }
       ],
       "PV1": {
-        "PV1-01": 1,
+        "PV1-01": 1 as Number,
         "PV1-02": "O",
-        "PV1-03": "^^^" ++ (vars.appLocationId as String default "UNKNOWN") ++ "^^^^^" ++ (vars.appLocationName default "UNKNOWN"),
-        "PV1-07": (vars.providerId as String default "0000000000") ++ "^" ++ (vars.providerLastName default "UNKNOWN") ++ "^" ++ (vars.providerFirstName default "UNKNOWN"),
+        "PV1-03":
+          if ((vars.appLocationId? and vars.appLocationId != null and vars.appLocationId != "") or (vars.appLocationName? and vars.appLocationName != null and vars.appLocationName != ""))
+            "^^^" ++ (includeIfPresent(vars.appLocationId as String) default "") ++ "^^^^^" ++ (includeIfPresent(vars.appLocationName) default "")
+          else null,
+        "PV1-07":
+          if ((vars.providerId? and vars.providerId != null and vars.providerId != "") or (vars.providerLastName? and vars.providerLastName != null and vars.providerLastName != "") or (vars.providerFirstName? and vars.providerFirstName != null and vars.providerFirstName != ""))
+            (includeIfPresent(vars.providerId as String) default "") ++ "^" ++ (includeIfPresent(vars.providerLastName) default "") ++ "^" ++ (includeIfPresent(vars.providerFirstName) default "")
+          else null,
         "PV1-19": getAppId() default "",
-        "PV1-44": (vars.scheduledStartTime as DateTime) as String {format: "yyyyMMddHHmmss"},
-        "PV1-45": (vars.scheduledEndTime as DateTime) as String {format: "yyyyMMddHHmmss"}
+        "PV1-44": if (vars.scheduledStartTime? and vars.scheduledStartTime != null) (vars.scheduledStartTime as DateTime) as String {format: "yyyyMMddHHmmss"} else null,
+        "PV1-45": if (vars.scheduledEndTime? and vars.scheduledEndTime != null) (vars.scheduledEndTime as DateTime) as String {format: "yyyyMMddHHmmss"} else null
       },
       "RESOURCES": [
         {
@@ -176,9 +197,8 @@ fun getPatientId() =
               "AIL": {
                 "AIL-01": 1,
                 "AIL-03": {
-                  ("PL-01": vars.appLocationId as String default "UNKNOWN")
-                    if ((vars.appLocationId?) and (vars.appLocationId != null)),
-                  "PL-04": { ("HD-01": vars.appLocation default "UNKNOWN") }
+                  ("PL-01": if ((vars.appLocationId?) and (vars.appLocationId != null) and (vars.appLocationId != "")) vars.appLocationId as String else null),
+                  "PL-04": { ("HD-01": includeIfPresent(vars.appLocation)) }
                 }
               }
             }
@@ -188,9 +208,9 @@ fun getPatientId() =
               "AIP": {
                 "AIP-01": 1,
                 "AIP-03": {
-                  ("XCN-02": vars.providerLastName default "UNKNOWN"),
-                  ("XCN-03": vars.providerFirstName default "UNKNOWN"),
-                  ("XCN-01": vars.providerId as String default "0000000000")
+                  ("XCN-02": includeIfPresent(vars.providerLastName)),
+                  ("XCN-03": includeIfPresent(vars.providerFirstName)),
+                  ("XCN-01": includeIfPresent(vars.providerId as String))
                 },
                 "AIP-04": {
                   "CE-01": "DOCTOR",

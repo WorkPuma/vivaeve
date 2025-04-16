@@ -281,6 +281,15 @@ if (!isEmpty(payload.data.payload.ChangeEventHeader.entityName) and (!isEmpty(pa
 							else
 								write(payload, 'application/json')[0 to 199] ++ '...'
 						]"/>
+				<logger level="INFO" doc:name="A04 PV1-01 Type"
+						message="#[%dw 2.0
+output application/json
+---
+{
+		PV1_01_type: typeOf(payload.Data.ADT_A04.PV1.'PV1-01'),
+		PV1_01_value: payload.Data.ADT_A04.PV1.'PV1-01'
+}
+]" />
 						
 				<hl7:write doc:name="A04" doc:id="ac17b6d7-5171-4e2c-a38a-7f920e067a04" config-ref="HL7_EDI_Config_A04" />
 				<!-- HL7 message output and segment analysis loggers for A04 -->

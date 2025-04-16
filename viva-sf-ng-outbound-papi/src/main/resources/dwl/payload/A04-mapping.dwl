@@ -49,6 +49,12 @@ fun makeLanguageCE(code) =
           "CM_MSG-01": "ADT"
         }
       },
+      "EVN": {
+        "EVN-01": "A04",
+        "EVN-02": {
+          "TS-01": now() as String {format: "yyyyMMddHHmmss"}
+        }
+      },
       "PID": {
         "PID-05": [
           {
@@ -84,12 +90,15 @@ fun makeLanguageCE(code) =
         // HL7 CE, dynamic in production, static for now
         "PID-15": makeLanguageCE("EN"),
         // TODO: When dynamic: "PID-22": payload.Patient_Ethnicity__c default null
-        "PID-22": null
+        // TODO: When dynamic, use robust pattern for Patient_Ethnicity__c or "PATIENT DECLINED"
+        "PID-22": "PATIENT DECLINED"
       },
       "PV1": {
-        "PV1-01": "1",
+        "PV1-01": 1 as Number,
         "PV1-02": "O",
-        "PV1-45": "N"
+        "PV1-45": {
+          "CE-01": "N"
+        }
       }
     }
   },
