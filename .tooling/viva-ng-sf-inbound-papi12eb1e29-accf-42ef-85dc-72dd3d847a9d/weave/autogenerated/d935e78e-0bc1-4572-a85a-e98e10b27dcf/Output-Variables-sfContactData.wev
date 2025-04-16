@@ -1,4 +1,0 @@
-%dw 2.0
-
-type auto_d935e78e_0bc1_4572_a85a_e98e10b27dcf_Output_Variables_sfContactData = Array<{|  FirstName: String,   LastName: String,   MiddleName: String,   Email: String,   Phone: String,   MailingState: String,   MailingPostalCode: String,   MailingCity: String,   MailingStreet: String,   Patient_Ethnicity__c: String | Null,   Patient_Race__c: String | Null,   Patient_Gender_2__c: String | Null,   Date_of_Birth__c: Date {"format": "yyyyMMdd"},   HealthFusion_Patient_Record_ID__c: String|}>
-

@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <groupId>com.mulesoft.connectors</groupId>
+        <artifactId>mule-connectivity-parent</artifactId>
+        <version>4.1.2</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>mule4-salesforce-pubsub-connector</artifactId>
+    <version>1.0.16</version>
+    <packaging>mule-extension</packaging>
+    <name>Salesforce PubSub Connector - Mule 4</name>
+
+    <properties>
+        <licensePath>LICENSE.md</licensePath>
+        <!-- salesforce API version -->
+        <api.version>61.0.0</api.version>
+        <mule.extensions.maven.plugin.version>1.3.1</mule.extensions.maven.plugin.version>
+        <mule.app.plugins.maven.plugin.version>1.3.1</mule.app.plugins.maven.plugin.version>
+        <munit.version>3.3.1</munit.version>
+        <mtf.tools.version>1.2.0</mtf.tools.version>
+        <jacoco.version>0.8.10</jacoco.version>
+        <!-- runtime version to run -->
+        <runtimeVersion>4.3.0</runtimeVersion>
+        <mule.sdk.api.version>0.7.0</mule.sdk.api.version>
+        <runtimeProduct>MULE_EE</runtimeProduct>
+        <gson.version>2.8.9</gson.version>
+        <grpcVersion>1.45.0</grpcVersion>
+        <skipJavaTests>false</skipJavaTests>
+        <munit.extensions.maven.plugin.version>1.4.0</munit.extensions.maven.plugin.version>
+        <config.ref.name.saml>${env.config.name.saml}</config.ref.name.saml>
+        <config.ref.name.jwt>${env.config.name.jwt}</config.ref.name.jwt>
+        <config.ref.name.basic.truststore>${env.config.name.basic.truststore}</config.ref.name.basic.truststore>
+        <config.ref.name.basic.invalid.truststore>${env.config.name.basic.invalid.truststore}</config.ref.name.basic.invalid.truststore>
+        <config.ref.name.basic.insecure.truststore>${env.config.name.basic.insecure.truststore}</config.ref.name.basic.insecure.truststore>
+        <config.ref.name.basic.mutual.tls>${env.config.name.basic.mutual.tls}</config.ref.name.basic.mutual.tls>
+        <config.ref.name.basic.mutual.tls.invalid.truststore>${env.config.name.basic.mutual.tls.invalid.truststore}</config.ref.name.basic.mutual.tls.invalid.truststore>
+        <config.ref.name.oauth.truststore>${env.config.name.oauth.truststore}</config.ref.name.oauth.truststore>
+        <config.ref.name.oauth.invalid.truststore>${env.config.name.oauth.invalid.truststore}</config.ref.name.oauth.invalid.truststore>
+        <config.ref.name.oauth.invalid.insecure.truststore>${env.config.name.oauth.invalid.insecure.truststore}</config.ref.name.oauth.invalid.insecure.truststore>
+        <config.ref.name.oauth.mutual.tls>${env.config.name.oauth.mutual.tls}</config.ref.name.oauth.mutual.tls>
+        <config.ref.name.oauth.mutual.tls.invalid.truststore>${env.config.name.oauth.mutual.tls.invalid.truststore}</config.ref.name.oauth.mutual.tls.invalid.truststore>
+        <config.ref.name.jwt.truststore>${env.config.name.jwt.truststore}</config.ref.name.jwt.truststore>
+        <config.ref.name.jwt.invalid.truststore>${env.config.name.jwt.invalid.truststore}</config.ref.name.jwt.invalid.truststore>
+        <config.ref.name.jwt.invalid.insecure.truststore>${env.config.name.jwt.invalid.insecure.truststore}</config.ref.name.jwt.invalid.insecure.truststore>
+        <config.ref.name.jwt.mutual.tls>${env.config.name.jwt.mutual.tls}</config.ref.name.jwt.mutual.tls>
+        <config.ref.name.jwt.mutual.tls.invalid.truststore>${env.config.name.jwt.mutual.tls.invalid.truststore}</config.ref.name.jwt.mutual.tls.invalid.truststore>
+        <config.ref.name.saml.truststore>${env.config.name.saml.truststore}</config.ref.name.saml.truststore>
+        <config.ref.name.saml.invalid.truststore>${env.config.name.saml.invalid.truststore}</config.ref.name.saml.invalid.truststore>
+        <config.ref.name.saml.invalid.insecure.truststore>${env.config.name.saml.invalid.insecure.truststore}</config.ref.name.saml.invalid.insecure.truststore>
+        <config.ref.name.saml.mutual.tls>${env.config.name.saml.mutual.tls}</config.ref.name.saml.mutual.tls>
+        <config.ref.name.saml.mutual.tls.invalid.truststore>${env.config.name.saml.mutual.tls.invalid.truststore}</config.ref.name.saml.mutual.tls.invalid.truststore>
+        <config.ref.name.basic.mTLS>${env.config.name.basic.mTLS}</config.ref.name.basic.mTLS>
+        <config.ref.name.basic.mTLS.wrong.url>${env.config.name.basic.mTLS.wrong.url}</config.ref.name.basic.mTLS.wrong.url>
+        <config.ref.name.basic.mTLS.wrong.token>${env.config.name.basic.mTLS.wrong.token}</config.ref.name.basic.mTLS.wrong.token>
+        <config.ref.name.basic.mTLS.wrong.credentials>${env.config.name.basic.mTLS.wrong.credentials}</config.ref.name.basic.mTLS.wrong.credentials>
+        <config.ref.name.saml.cert.alias>${env.config.name.saml.cert.alias}</config.ref.name.saml.cert.alias>
+        <config.ref.name.saml.cert.wrong.alias>${env.config.name.saml.cert.wrong.alias}</config.ref.name.saml.cert.wrong.alias>
+        <config.ref.name.saml.cert.no.alias>${env.config.name.saml.cert.no.alias}</config.ref.name.saml.cert.no.alias>
+        <config.ref.name.saml.invalid>${env.config.name.saml.invalid}</config.ref.name.saml.invalid>
+        <config.ref.name.saml.v53>${env.config.name.saml.v53}</config.ref.name.saml.v53>
+        <config.ref.name.saml.lower.version>${env.config.name.saml.lower.version}</config.ref.name.saml.lower.version>
+        <config.ref.name.saml.higher.version>${env.config.name.saml.higher.version}</config.ref.name.saml.higher.version>
+        <config.ref.name.jwt.invalid>${env.config.name.jwt.invalid}</config.ref.name.jwt.invalid>
+        <config.ref.name.jwt.lower.version>${env.config.name.jwt.lower.version}</config.ref.name.jwt.lower.version>
+        <config.ref.name.jwt.higher.version>${env.config.name.jwt.higher.version}</config.ref.name.jwt.higher.version>
+        <config.ref.name.jwt.v53>${env.config.name.jwt.v53}</config.ref.name.jwt.v53>
+        <config.ref.name.jwt.cert.alias>${env.config.name.jwt.cert.alias}</config.ref.name.jwt.cert.alias>
+        <config.ref.name.jwt.cert.wrong.alias>${env.config.name.jwt.cert.wrong.alias}</config.ref.name.jwt.cert.wrong.alias>
+        <config.ref.name.jwt.cert.no.alias>${env.config.name.jwt.cert.no.alias}</config.ref.name.jwt.cert.no.alias>
+    </properties>
+
+    <dependencies>
+        <!-- Used for encoding operations -->
+        <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro</artifactId>
+            <version>1.11.4</version>
+        </dependency>
+
+        <!-- used for code generation based on proto file -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.19.4</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+            <version>${grpcVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+            <version>${grpcVersion}</version>
+        </dependency>
+
+        <!-- Used for http communication for the grpc client. Either grpc-okhttp, grpc-netty, or grpc-netty-shaded artifact are needed -->
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+            <version>${grpcVersion}</version>
+        </dependency>
+
+        <!-- for unit testing the stubs -->
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-testing</artifactId>
+            <version>${grpcVersion}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- for testing FROM_OS option -->
+        <dependency>
+            <groupId>org.mule.connectors</groupId>
+            <artifactId>mule-objectstore-connector</artifactId>
+            <version>1.2.2</version>
+            <classifier>mule-plugin</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Our logging library -->
+        <dependency>
+            <groupId>com.mulesoft</groupId>
+            <artifactId>mule-connector-logging</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+
+        <!-- Mule SDK API -->
+        <dependency>
+            <groupId>org.mule.sdk</groupId>
+            <artifactId>mule-sdk-api</artifactId>
+            <version>${mule.sdk.api.version}</version>
+        </dependency>
+
+        <!-- Partner SOAP API used to obtain session id and platform events -->
+        <dependency>
+            <groupId>com.force.api</groupId>
+            <artifactId>force-partner-api</artifactId>
+            <version>${api.version}</version>
+        </dependency>
+        <!-- Metadata API used to obtain change data capture events -->
+        <dependency>
+            <groupId>com.force.api</groupId>
+            <artifactId>force-metadata-api</artifactId>
+            <version>${api.version}</version>
+        </dependency>
+
+        <!-- Apache commons -->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+
+        <!-- Gson, used for JSON manipulation -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+        </dependency>
+
+        <!-- OpenSAML for SAML authentication -->
+        <dependency>
+            <groupId>org.apache.santuario</groupId>
+            <artifactId>xmlsec</artifactId>
+            <version>2.2.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.woodstox</groupId>
+                    <artifactId>woodstox-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-core</artifactId>
+            <version>3.4.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-saml-impl</artifactId>
+            <version>3.4.3</version>
+            <exclusions>
+                <!--reported as vulnerability by nexusIQ-->
+                <exclusion>
+                    <groupId>org.apache.santuario</groupId>
+                    <artifactId>xmlsec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.velocity</groupId>
+                    <artifactId>velocity</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml-saml-api</artifactId>
+            <version>3.4.3</version>
+            <exclusions>
+                <!--reported as vulnerability by nexusIQ-->
+                <exclusion>
+                    <groupId>org.apache.santuario</groupId>
+                    <artifactId>xmlsec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Override the 2.12.2 library which comes as a transitive dependency from org.apache.avro:avro  -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.13.2.2</version>
+        </dependency>
+        <!-- Override 1.9.3 library which comes as a transitive dependency from org.mule.runtime:mule-core -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.4</version>
+        </dependency>
+        <!-- Override 1.20 library which comes as a transitive dependency from org.apache.avro:avro -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.21</version>
+        </dependency>
+        <!-- Override 1.1.3 library which comes as a transitive dependency from org.opensaml:opensaml-saml-impl -->
+        <dependency>
+            <groupId>org.cryptacular</groupId>
+            <artifactId>cryptacular</artifactId>
+            <version>1.2.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Override 30.1.1-android library which comes as a transitive dependency from io.grpc:grpc-protobuf -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.1-jre</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- munit plugins -->
+            <plugin>
+                <groupId>com.mulesoft.munit</groupId>
+                <artifactId>munit-extensions-maven-plugin</artifactId>
+                <version>${munit.extensions.maven.plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <munit.test.timeout>600000</munit.test.timeout>
+                    </systemPropertyVariables>
+                    <argLines>
+                        <argLine>
+                            -Dcom.mulesoft.dw.stacksize=2048
+                        </argLine>
+                        <argLine>
+                            -javaagent:${settings.localRepository}/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}-runtime.jar=destfile=${session.executionRootDirectory}/target/jacoco-munit.exec
+                        </argLine>
+                    </argLines>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <!-- MUnit Dependencies -->
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>munit-runner</artifactId>
+                        <version>${munit.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>munit-tools</artifactId>
+                        <version>${munit.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.mulesoft.munit</groupId>
+                        <artifactId>mtf-tools</artifactId>
+                        <version>${mtf.tools.version}</version>
+                        <classifier>mule-plugin</classifier>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jdeps-plugin</artifactId>
+                <version>3.1.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jdkinternals</goal> <!-- verify main classes -->
+                            <goal>test-jdkinternals</goal> <!-- verify test classes -->
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <failOnWarning>true</failOnWarning>
+                </configuration>
+            </plugin>
+            <!-- compile proto file into java files. -->
+            <plugin>
+                <groupId>com.github.os72</groupId>
+                <artifactId>protoc-jar-maven-plugin</artifactId>
+                <version>3.6.0.1</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <includeMavenTypes>direct</includeMavenTypes>
+
+                            <inputDirectories>
+                                <include>src/main/resources/proto</include>
+                            </inputDirectories>
+
+                            <outputTargets>
+                                <outputTarget>
+                                    <type>java</type>
+                                    <outputDirectory>src/main/java/</outputDirectory>
+                                </outputTarget>
+                                <outputTarget>
+                                    <type>grpc-java</type>
+                                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.15.0</pluginArtifact>
+                                    <outputDirectory>src/main/java/</outputDirectory>
+                                </outputTarget>
+                            </outputTargets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>connector-analyze</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <ignoredDependencies>
+                                <ignoredDependency>org.mule.*</ignoredDependency>
+                                <ignoredDependency>org.eclipse.jetty</ignoredDependency>
+                                <ignoredDependency>org.bouncycastle:bcprov-jdk15on</ignoredDependency>
+                                <ignoredDependency>com.sun.xml.ws:jaxws-rt</ignoredDependency>
+                                <ignoredDependency>org.owasp.esapi</ignoredDependency>
+                                <ignoredDependency>ca.juliusdavies</ignoredDependency>
+                                <ignoredDependency>org.hamcrest</ignoredDependency>
+                                <ignoredDependency>uk.co.datumedge</ignoredDependency>
+                                <ignoredDependency>org.awaitility</ignoredDependency>
+                                <ignoredDependency>commons-fileupload</ignoredDependency>
+                                <ignoredDependency>xml-security</ignoredDependency>
+                                <ignoredDependency>com.mulesoft.munit.utils:munit-http-mockserver</ignoredDependency>
+                                <ignoredDependency>org.apache.httpcomponents:httpclient</ignoredDependency>
+
+                            </ignoredDependencies>
+                            <failOnWarning>true</failOnWarning>
+                            <ignoredUsedUndeclaredDependencies>
+                                <ignoredUsedUndeclaredDependency>*</ignoredUsedUndeclaredDependency>
+                            </ignoredUsedUndeclaredDependencies>
+                            <ignoredUnusedDeclaredDependencies>
+                                <ignoredUnusedDeclaredDependency>io.grpc:grpc-netty-shaded:jar:${grpcVersion}</ignoredUnusedDeclaredDependency> <!-- Used for gRPC HTTP comm -->
+                                <ignoredUnusedDeclaredDependency>org.apache.santuario:xmlsec:jar:2.2.3</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>org.opensaml:opensaml-saml-impl:jar:3.4.3</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>com.fasterxml.jackson.core:jackson-databind:jar:2.13.2.2</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>org.apache.commons:commons-compress:jar:1.21</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>org.cryptacular:cryptacular:jar:1.2.4</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>commons-beanutils:commons-beanutils:jar:1.9.4</ignoredUnusedDeclaredDependency>
+                            </ignoredUnusedDeclaredDependencies>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <configuration>
+                    <destFile>${session.executionRootDirectory}/target/jacoco-java.exec</destFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>merge</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>merge</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${session.executionRootDirectory}/target/jacoco.exec</destFile>
+                            <fileSets>
+                                <fileSet>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>*.exec</include>
+                                    </includes>
+                                </fileSet>
+                            </fileSets>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <!--                            <outputDirectory>${session.executionRootDirectory}/target/munit-report</outputDirectory>-->
+                            <!--                            <formats>HTML</formats>-->
+                            <excludes>
+                                <exclude>**/com/mulesoft/connector/salesforce/pubsub/internal/protobuf/**/*</exclude>
+                                <exclude>**/com/mulesoft/connector/salesforce/pubsub/internal/error/exception/ExceptionMessages.class</exclude>
+                                <exclude>**/com/mulesoft/connector/salesforce/pubsub/internal/config/**/* </exclude>
+                                <exclude>**/com/mulesoft/connector/salesforce/pubsub/internal/extension/**/* </exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <scm>
+        <connection>scm:git:git://github.com:mulesoft/mule-salesforce-pubsub-connector.git</connection>
+        <developerConnection>scm:git:git@github.com:mulesoft/mule-salesforce-pubsub-connector.git</developerConnection>
+        <url>http://github.com/mulesoft/mule-salesforce-pubsub-connector</url>
+        <tag>HEAD</tag>
+    </scm>
+    <repositories>
+        <repository>
+            <id>mule-releases</id>
+            <name>Nexus Public Releases</name>
+            <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+
+    <profiles>
+        <profile>
+            <id>default-config</id>
+            <activation>
+                <property>
+                    <name>!mule.security.model</name> <!-- if mule.security.model does not exist -->
+                </property>
+            </activation>
+            <properties>
+                <env.config.name.saml>saml-config</env.config.name.saml>
+                <env.config.name.jwt>jwt-config</env.config.name.jwt>
+                <env.config.name.basic.truststore>basic-connection-trust-store</env.config.name.basic.truststore>
+                <env.config.name.basic.invalid.truststore>basic-connection-trust-store-negative</env.config.name.basic.invalid.truststore>
+                <env.config.name.basic.insecure.truststore>basic-connection-trust-store-negative-insecure</env.config.name.basic.insecure.truststore>
+                <env.config.name.basic.mutual.tls>basic-connection-mutualTLS</env.config.name.basic.mutual.tls>
+                <env.config.name.basic.mutual.tls.invalid.truststore>basic-connection-mutualTLS-invalid-trust</env.config.name.basic.mutual.tls.invalid.truststore>
+                <env.config.name.oauth.truststore>oauth-user-pass-connection-trust-store</env.config.name.oauth.truststore>
+                <env.config.name.oauth.invalid.truststore>oauth-user-pass-connection-trust-store-negative</env.config.name.oauth.invalid.truststore>
+                <env.config.name.oauth.invalid.insecure.truststore>oauth-user-pass-connection-trust-store-negative-insecure</env.config.name.oauth.invalid.insecure.truststore>
+                <env.config.name.oauth.mutual.tls>oauth-user-pass-connection-mutualTLS</env.config.name.oauth.mutual.tls>
+                <env.config.name.oauth.mutual.tls.invalid.truststore>oauth-user-pass-connection-mutualTLS-invalid-trust</env.config.name.oauth.mutual.tls.invalid.truststore>
+                <env.config.name.jwt.truststore>jwt-connection-trust-store</env.config.name.jwt.truststore>
+                <env.config.name.jwt.invalid.truststore>jwt-connection-trust-store-negative</env.config.name.jwt.invalid.truststore>
+                <env.config.name.jwt.invalid.insecure.truststore>jwt-connection-trust-store-negative-insecure</env.config.name.jwt.invalid.insecure.truststore>
+                <env.config.name.jwt.mutual.tls>jwt-connection-mutualTLS</env.config.name.jwt.mutual.tls>
+                <env.config.name.jwt.mutual.tls.invalid.truststore>jwt-connection-mutualTLS-invalid-trust</env.config.name.jwt.mutual.tls.invalid.truststore>
+                <env.config.name.saml.truststore>saml-connection-trust-store</env.config.name.saml.truststore>
+                <env.config.name.saml.invalid.truststore>saml-connection-trust-store-negative</env.config.name.saml.invalid.truststore>
+                <env.config.name.saml.invalid.insecure.truststore>jwt-connection-trust-store-negative-insecure</env.config.name.saml.invalid.insecure.truststore>
+                <env.config.name.saml.mutual.tls>saml-connection-mutualTLS</env.config.name.saml.mutual.tls>
+                <env.config.name.saml.mutual.tls.invalid.truststore>saml-connection-mutualTLS-invalid-trust</env.config.name.saml.mutual.tls.invalid.truststore>
+                <env.config.name.basic.mTLS>mutual-tls-basic-config</env.config.name.basic.mTLS>
+                <env.config.name.basic.mTLS.wrong.url>invalid-mutual-tls-basic-config-wrong-url</env.config.name.basic.mTLS.wrong.url>
+                <env.config.name.basic.mTLS.wrong.token>invalid-mutual-tls-basic-config-wrong-security-token</env.config.name.basic.mTLS.wrong.token>
+                <env.config.name.basic.mTLS.wrong.credentials>invalid-mutual-tls-basic-config-wrong-credentials</env.config.name.basic.mTLS.wrong.credentials>
+                <env.config.name.saml.cert.alias>saml-config-with-correct-cert-alias</env.config.name.saml.cert.alias>
+                <env.config.name.saml.cert.wrong.alias>saml-config-with-wrong-cert-alias</env.config.name.saml.cert.wrong.alias>
+                <env.config.name.saml.cert.no.alias>saml-config-with-no-cert-alias</env.config.name.saml.cert.no.alias>
+                <env.config.name.saml.invalid>invalid-saml-config</env.config.name.saml.invalid>
+                <env.config.name.saml.v53>saml-config-v53</env.config.name.saml.v53>
+                <env.config.name.saml.lower.version>saml-config-with-lower-unsupported-version</env.config.name.saml.lower.version>
+                <env.config.name.saml.higher.version>saml-config-with-higher-unsupported-version-fips</env.config.name.saml.higher.version>
+                <env.config.name.jwt.invalid>invalid-jwt-config</env.config.name.jwt.invalid>
+                <env.config.name.jwt.lower.version>jwt-config-with-lower-unsupported-version</env.config.name.jwt.lower.version>
+                <env.config.name.jwt.higher.version>jwt-config-with-higher-unsupported-version</env.config.name.jwt.higher.version>
+                <env.config.name.jwt.v53>jwt-config-v53</env.config.name.jwt.v53>
+                <env.config.name.jwt.cert.alias>jwt-config-with-correct-cert-alias</env.config.name.jwt.cert.alias>
+                <env.config.name.jwt.cert.wrong.alias>jwt-config-with-wrong-cert-alias</env.config.name.jwt.cert.wrong.alias>
+                <env.config.name.jwt.cert.no.alias>jwt-config-with-no-cert-alias</env.config.name.jwt.cert.no.alias>
+            </properties>
+        </profile>
+        <profile>
+            <id>fips-config</id>
+            <activation>
+                <property>
+                    <name>mule.security.model</name>
+                    <value>fips140-2</value> <!-- if mule.security.model == fips140-2 -->
+                </property>
+            </activation>
+            <properties>
+                <env.config.name.saml>saml-config-fips</env.config.name.saml>
+                <env.config.name.jwt>jwt-config-fips</env.config.name.jwt>
+                <env.config.name.basic.truststore>basic-connection-trust-store-fips</env.config.name.basic.truststore>
+                <env.config.name.basic.invalid.truststore>basic-connection-trust-store-negative-fips</env.config.name.basic.invalid.truststore>
+                <env.config.name.basic.insecure.truststore>basic-connection-trust-store-negative-insecure-fips</env.config.name.basic.insecure.truststore>
+                <env.config.name.basic.mutual.tls>basic-connection-mutualTLS-fips</env.config.name.basic.mutual.tls>
+                <env.config.name.basic.mutual.tls.invalid.truststore>basic-connection-mutualTLS-invalid-trust-fips</env.config.name.basic.mutual.tls.invalid.truststore>
+                <env.config.name.oauth.truststore>oauth-user-pass-connection-trust-store-fips</env.config.name.oauth.truststore>
+                <env.config.name.oauth.invalid.truststore>oauth-user-pass-connection-trust-store-negative-fips</env.config.name.oauth.invalid.truststore>
+                <env.config.name.oauth.invalid.insecure.truststore>oauth-user-pass-connection-trust-store-negative-insecure-fips</env.config.name.oauth.invalid.insecure.truststore>
+                <env.config.name.oauth.mutual.tls>oauth-user-pass-connection-mutualTLS-fips</env.config.name.oauth.mutual.tls>
+                <env.config.name.oauth.mutual.tls.invalid.truststore>oauth-user-pass-connection-mutualTLS-invalid-trust-fips</env.config.name.oauth.mutual.tls.invalid.truststore>
+                <env.config.name.jwt.truststore>jwt-connection-trust-store-fips</env.config.name.jwt.truststore>
+                <env.config.name.jwt.invalid.truststore>jwt-connection-trust-store-negative-fips</env.config.name.jwt.invalid.truststore>
+                <env.config.name.jwt.invalid.insecure.truststore>jwt-connection-trust-store-negative-insecure-fips</env.config.name.jwt.invalid.insecure.truststore>
+                <env.config.name.jwt.mutual.tls>jwt-connection-mutualTLS-fips</env.config.name.jwt.mutual.tls>
+                <env.config.name.jwt.mutual.tls.invalid.truststore>jwt-connection-mutualTLS-invalid-trust-fips</env.config.name.jwt.mutual.tls.invalid.truststore>
+                <env.config.name.saml.truststore>saml-connection-trust-store-fips</env.config.name.saml.truststore>
+                <env.config.name.saml.invalid.truststore>saml-connection-trust-store-negative-fips</env.config.name.saml.invalid.truststore>
+                <env.config.name.saml.invalid.insecure.truststore>jwt-connection-trust-store-negative-insecure-fips</env.config.name.saml.invalid.insecure.truststore>
+                <env.config.name.saml.mutual.tls>saml-connection-mutualTLS-fips</env.config.name.saml.mutual.tls>
+                <env.config.name.saml.mutual.tls.invalid.truststore>saml-connection-mutualTLS-invalid-trust-fips</env.config.name.saml.mutual.tls.invalid.truststore>
+                <env.config.name.basic.mTLS>mutual-tls-basic-config-fips</env.config.name.basic.mTLS>
+                <env.config.name.basic.mTLS.wrong.url>invalid-mutual-tls-basic-config-wrong-url-fips</env.config.name.basic.mTLS.wrong.url>
+                <env.config.name.basic.mTLS.wrong.token>invalid-mutual-tls-basic-config-wrong-security-token-fips</env.config.name.basic.mTLS.wrong.token>
+                <env.config.name.basic.mTLS.wrong.credentials>invalid-mutual-tls-basic-config-wrong-credentials-fips</env.config.name.basic.mTLS.wrong.credentials>
+                <env.config.name.saml.cert.alias>saml-config-with-correct-cert-alias-fips</env.config.name.saml.cert.alias>
+                <env.config.name.saml.cert.wrong.alias>saml-config-with-wrong-cert-alias-fips</env.config.name.saml.cert.wrong.alias>
+                <env.config.name.saml.cert.no.alias>saml-config-with-no-cert-alias-fips</env.config.name.saml.cert.no.alias>
+                <env.config.name.saml.invalid>invalid-saml-config-fips</env.config.name.saml.invalid>
+                <env.config.name.saml.v53>saml-config-v53-fips</env.config.name.saml.v53>
+                <env.config.name.saml.lower.version>saml-config-with-lower-unsupported-version-fips</env.config.name.saml.lower.version>
+                <env.config.name.saml.higher.version>saml-config-with-higher-unsupported-version-fips</env.config.name.saml.higher.version>
+                <env.config.name.jwt.invalid>invalid-jwt-config-fips</env.config.name.jwt.invalid>
+                <env.config.name.jwt.lower.version>jwt-config-with-lower-unsupported-version-fips</env.config.name.jwt.lower.version>
+                <env.config.name.jwt.higher.version>jwt-config-with-higher-unsupported-version-fips</env.config.name.jwt.higher.version>
+                <env.config.name.jwt.v53>jwt-config-v53-fips</env.config.name.jwt.v53>
+                <env.config.name.jwt.cert.alias>jwt-config-with-correct-cert-alias-fips</env.config.name.jwt.cert.alias>
+                <env.config.name.jwt.cert.wrong.alias>jwt-config-with-wrong-cert-alias-fips</env.config.name.jwt.cert.wrong.alias>
+                <env.config.name.jwt.cert.no.alias>jwt-config-with-no-cert-alias-fips</env.config.name.jwt.cert.no.alias>
+            </properties>
+        </profile>
+    </profiles>
+</project>

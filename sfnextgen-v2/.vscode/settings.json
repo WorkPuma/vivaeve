@@ -16,5 +16,6 @@
         "**/.exchange_modules_tmp": true,
         ".mule": true
     },
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.compile.nullAnalysis.mode": "automatic"
 }

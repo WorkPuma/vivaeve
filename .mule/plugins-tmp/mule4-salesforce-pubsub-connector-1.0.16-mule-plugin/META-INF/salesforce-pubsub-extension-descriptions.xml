@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension-documentation>
+    <configs>
+        <config name="pubsub-config">
+            <description><![CDATA[This class represents an extension configuration, values set in this class are commonly used across multiple operations since they represent something core from the extension.]]></description>
+            <parameters>
+                <parameter name="name">
+                    <description><![CDATA[The identifier of this element used to reference it in other components]]></description>
+                </parameter>
+                <parameter name="expirationPolicy">
+                    <description><![CDATA[Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.]]></description>
+                </parameter>
+            </parameters>
+        </config>
+    </configs>
+    <connections>
+        <connection name="basic">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[Specifies the amount of time that the consumer will attempt to establish a connection before it times out. Works in tandem with Time unit. Values less than one millisecond will be converted to 0]]></description>
+                </parameter>
+                <parameter name="connectionTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="loginRequestTimeout">
+                    <description><![CDATA[Specifies the amount of time the client will wait until the answer for the login request is received before it times out. Works in tandem with Login Request Time unit. Values less than one millisecond will be converted to 0]]></description>
+                </parameter>
+                <parameter name="loginRequestTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyConfiguration">
+                    <description><![CDATA[Proxy configuration for the connector.]]></description>
+                </parameter>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at least the keystore in the tls:context child element of this listener-config.]]></description>
+                </parameter>
+                <parameter name="username">
+                    <description><![CDATA[Username used to initialize the session.]]></description>
+                </parameter>
+                <parameter name="password">
+                    <description><![CDATA[Password used to authenticate the user.]]></description>
+                </parameter>
+                <parameter name="securityToken">
+                    <description><![CDATA[User's security token. It can be omitted if your IP has been added to the allow list on Salesforce.]]></description>
+                </parameter>
+                <parameter name="url">
+                    <description><![CDATA[Web service URL responsible for user authentication. This is the URL for the endpoint that is configured to handle SOAP authentication requests.]]></description>
+                </parameter>
+                <parameter name="host">
+                    <description><![CDATA[Host where the proxy requests will be sent.]]></description>
+                </parameter>
+                <parameter name="port">
+                    <description><![CDATA[Port where the proxy requests will be sent.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="config-with-oauth">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[Specifies the amount of time that the consumer will attempt to establish a connection before it times out. Works in tandem with Time unit. Values less than one millisecond will be converted to 0]]></description>
+                </parameter>
+                <parameter name="connectionTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="loginRequestTimeout">
+                    <description><![CDATA[Specifies the amount of time the client will wait until the answer for the login request is received before it times out. Works in tandem with Login Request Time unit. Values less than one millisecond will be converted to 0]]></description>
+                </parameter>
+                <parameter name="loginRequestTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyConfiguration">
+                    <description><![CDATA[Proxy configuration for the connector.]]></description>
+                </parameter>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at least the keystore in the tls:context child element of this listener-config.]]></description>
+                </parameter>
+                <parameter name="apiVersion">
+                    <description><![CDATA[The API version used. Defaults to the latest api version supported by the connector]]></description>
+                </parameter>
+                <parameter name="host">
+                    <description><![CDATA[Host where the proxy requests will be sent.]]></description>
+                </parameter>
+                <parameter name="port">
+                    <description><![CDATA[Port where the proxy requests will be sent.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+                <parameter name="consumerKey">
+                    <description><![CDATA[The OAuth consumerKey as registered with the service provider]]></description>
+                </parameter>
+                <parameter name="consumerSecret">
+                    <description><![CDATA[The OAuth consumerSecret as registered with the service provider]]></description>
+                </parameter>
+                <parameter name="authorizationUrl">
+                    <description><![CDATA[The service provider's authorization endpoint URL]]></description>
+                </parameter>
+                <parameter name="accessTokenUrl">
+                    <description><![CDATA[The service provider's accessToken endpoint URL]]></description>
+                </parameter>
+                <parameter name="scopes">
+                    <description><![CDATA[The OAuth scopes to be requested during the dance. If not provided, it will default to those in the annotation]]></description>
+                </parameter>
+                <parameter name="resourceOwnerId">
+                    <description><![CDATA[The resourceOwnerId which each component should use if it doesn't reference otherwise.]]></description>
+                </parameter>
+                <parameter name="before">
+                    <description><![CDATA[The name of a flow to be executed right before starting the OAuth dance]]></description>
+                </parameter>
+                <parameter name="after">
+                    <description><![CDATA[The name of a flow to be executed right after an accessToken has been received]]></description>
+                </parameter>
+                <parameter name="listenerConfig">
+                    <description><![CDATA[A reference to a <http:listener-config /> to be used in order to create the listener that will catch the access token callback endpoint.]]></description>
+                </parameter>
+                <parameter name="callbackPath">
+                    <description><![CDATA[The path of the access token callback endpoint]]></description>
+                </parameter>
+                <parameter name="authorizePath">
+                    <description><![CDATA[The path of the local http endpoint which triggers the OAuth dance]]></description>
+                </parameter>
+                <parameter name="externalCallbackUrl">
+                    <description><![CDATA[If the callback endpoint is behind a proxy or should be accessed through a non direct URL, use this parameter to tell the OAuth provider the URL it should use to access the callback]]></description>
+                </parameter>
+                <parameter name="objectStore">
+                    <description><![CDATA[A reference to the object store that should be used to store each resource owner id's data. If not specified, runtime will automatically provision the default one.]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="jwt">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[Specifies the amount of time that the consumer will attempt to establish a connection before it times out. Works in tandem with Time unit. Values less than one millisecond will be converted to 0]]></description>
+                </parameter>
+                <parameter name="connectionTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="loginRequestTimeout">
+                    <description><![CDATA[Specifies the amount of time the client will wait until the answer for the login request is received before it times out. Works in tandem with Login Request Time unit. Values less than one millisecond will be converted to 0]]></description>
+                </parameter>
+                <parameter name="loginRequestTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyConfiguration">
+                    <description><![CDATA[Proxy configuration for the connector.]]></description>
+                </parameter>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at least the keystore in the tls:context child element of this listener-config.]]></description>
+                </parameter>
+                <parameter name="apiVersion">
+                    <description><![CDATA[The API version used. Defaults to the latest api version supported by the connector]]></description>
+                </parameter>
+                <parameter name="consumerKey">
+                    <description><![CDATA[Consumer key for Salesforce connected app]]></description>
+                </parameter>
+                <parameter name="keyStore">
+                    <description><![CDATA[Path to key store used to sign data during authentication]]></description>
+                </parameter>
+                <parameter name="storePassword">
+                    <description><![CDATA[Password of key store]]></description>
+                </parameter>
+                <parameter name="certificateAlias">
+                    <description><![CDATA[Alias of the certificate]]></description>
+                </parameter>
+                <parameter name="principal">
+                    <description><![CDATA[Username of desired Salesforce user to take action on behalf of]]></description>
+                </parameter>
+                <parameter name="tokenEndpoint">
+                    <description><![CDATA[URL pointing to the server responsible for providing the authentication token. According to Salesforce it should be https://login.salesforce.com/services/oauth2/token, or, if implementing for a community, https://acme.force.com/customers/services/oauth2/token (where acme.force.com/customers is your community URL).]]></description>
+                </parameter>
+                <parameter name="audienceUrl">
+                    <description><![CDATA[The audience identifies the authorization server as an intended audience. The authorization server must verify that it is an intended audience for the token. Use the authorization server's URL for the audience value: https://login.salesforce.com, https://test.salesforce.com, or https://community.force.com/customers if implementing for a community.]]></description>
+                </parameter>
+                <parameter name="host">
+                    <description><![CDATA[Host where the proxy requests will be sent.]]></description>
+                </parameter>
+                <parameter name="port">
+                    <description><![CDATA[Port where the proxy requests will be sent.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="oauth-user-pass">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[Specifies the amount of time that the consumer will attempt to establish a connection before it times out. Works in tandem with Time unit. Values less than one millisecond will be converted to 0]]></description>
+                </parameter>
+                <parameter name="connectionTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="loginRequestTimeout">
+                    <description><![CDATA[Specifies the amount of time the client will wait until the answer for the login request is received before it times out. Works in tandem with Login Request Time unit. Values less than one millisecond will be converted to 0]]></description>
+                </parameter>
+                <parameter name="loginRequestTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyConfiguration">
+                    <description><![CDATA[Proxy configuration for the connector.]]></description>
+                </parameter>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at least the keystore in the tls:context child element of this listener-config.]]></description>
+                </parameter>
+                <parameter name="apiVersion">
+                    <description><![CDATA[The API version used. Defaults to the latest api version supported by the connector]]></description>
+                </parameter>
+                <parameter name="consumerKey">
+                    <description><![CDATA[Consumer key for Salesforce connected app]]></description>
+                </parameter>
+                <parameter name="consumerSecret">
+                    <description><![CDATA[Your application's client secret (consumer secret in Remote Access Detail).]]></description>
+                </parameter>
+                <parameter name="username">
+                    <description><![CDATA[Username used to initialize the session]]></description>
+                </parameter>
+                <parameter name="password">
+                    <description><![CDATA[Password used to authenticate the user]]></description>
+                </parameter>
+                <parameter name="securityToken">
+                    <description><![CDATA[User's security token. It can be omitted if your IP has been added to the allow list on Salesforce]]></description>
+                </parameter>
+                <parameter name="tokenEndpoint">
+                    <description><![CDATA[URL pointing to the server responsible for providing the authentication token. According to Salesforce it should be https://login.salesforce.com/services/oauth2/token, or, if implementing for a community, https://acme.force.com/customers/services/oauth2/token (where acme.force.com/customers is your community URL).]]></description>
+                </parameter>
+                <parameter name="host">
+                    <description><![CDATA[Host where the proxy requests will be sent.]]></description>
+                </parameter>
+                <parameter name="port">
+                    <description><![CDATA[Port where the proxy requests will be sent.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+        <connection name="saml">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="connectionTimeout">
+                    <description><![CDATA[Specifies the amount of time that the consumer will attempt to establish a connection before it times out. Works in tandem with Time unit. Values less than one millisecond will be converted to 0]]></description>
+                </parameter>
+                <parameter name="connectionTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="loginRequestTimeout">
+                    <description><![CDATA[Specifies the amount of time the client will wait until the answer for the login request is received before it times out. Works in tandem with Login Request Time unit. Values less than one millisecond will be converted to 0]]></description>
+                </parameter>
+                <parameter name="loginRequestTimeoutUnit">
+                    <description><![CDATA[]]></description>
+                </parameter>
+                <parameter name="proxyConfiguration">
+                    <description><![CDATA[Proxy configuration for the connector.]]></description>
+                </parameter>
+                <parameter name="tlsContextFactory">
+                    <description><![CDATA[Protocol to use for communication. Valid values are HTTP and HTTPS. Default value is HTTP. When using HTTPS the HTTP communication is going to be secured using TLS / SSL. If HTTPS was configured as protocol then the user needs to configure at least the keystore in the tls:context child element of this listener-config.]]></description>
+                </parameter>
+                <parameter name="apiVersion">
+                    <description><![CDATA[The API version used. Defaults to the latest api version supported by the connector]]></description>
+                </parameter>
+                <parameter name="consumerKey">
+                    <description><![CDATA[Consumer key for Salesforce connected app]]></description>
+                </parameter>
+                <parameter name="keyStore">
+                    <description><![CDATA[Path to key store used to sign data during authentication]]></description>
+                </parameter>
+                <parameter name="storePassword">
+                    <description><![CDATA[Password of key store]]></description>
+                </parameter>
+                <parameter name="certificateAlias">
+                    <description><![CDATA[Alias of the certificate]]></description>
+                </parameter>
+                <parameter name="principal">
+                    <description><![CDATA[Username of desired Salesforce user to take action on behalf of.]]></description>
+                </parameter>
+                <parameter name="tokenEndpoint">
+                    <description><![CDATA[URL pointing to the server responsible for providing the authentication token. According to Salesforce it should be https://login.salesforce.com/services/oauth2/token, or, if implementing for a community, https://acme.force.com/customers/services/oauth2/token (where acme.force.com/customers is your community URL).]]></description>
+                </parameter>
+                <parameter name="host">
+                    <description><![CDATA[Host where the proxy requests will be sent.]]></description>
+                </parameter>
+                <parameter name="port">
+                    <description><![CDATA[Port where the proxy requests will be sent.]]></description>
+                </parameter>
+                <parameter name="reconnection">
+                    <description><![CDATA[When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy]]></description>
+                </parameter>
+            </parameters>
+        </connection>
+    </connections>
+    <extension name="Salesforce PubSub">
+        <description><![CDATA[This is the main class of an extension, is the entry point from which configurations, connection providers, operations and sources are going to be declared.]]></description>
+        <parameters/>
+    </extension>
+    <operations>
+        <operation name="publishEvent">
+            <description><![CDATA[Publish the given list of events to the specified event topic. Only high-volume platform events, including real-time event monitoring events and change data capture events are allowed.]]></description>
+            <parameters>
+                <parameter name="topic">
+                    <description><![CDATA[The name of the topic used for message publishing.]]></description>
+                </parameter>
+                <parameter name="events">
+                    <description><![CDATA[A list of events to be published that match the schema of the current topic.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="target">
+                    <description><![CDATA[The name of a variable on which the operation's output will be placed]]></description>
+                </parameter>
+                <parameter name="targetValue">
+                    <description><![CDATA[An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+        <operation name="unauthorize">
+            <description><![CDATA[Deletes all the access token information of a given resource owner id so that it's impossible to execute any operation for that user without doing the authorization dance again]]></description>
+            <parameters>
+                <parameter name="resourceOwnerId">
+                    <description><![CDATA[The id of the resource owner which access should be invalidated]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+            </parameters>
+        </operation>
+    </operations>
+    <sources>
+        <source name="subscribe-channel-listener">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="channelName">
+                    <description><![CDATA[The name of the streaming channel to subscribe to]]></description>
+                </parameter>
+                <parameter name="replayOption">
+                    <description><![CDATA[Interface with the following implementations: LATEST (subscriber receives new events that are broadcast after the client subscribes), EARLIEST (subscriber receives all events, including past events that are within the retention window of the server and new events sent after subscription), CUSTOM (subscriber will only receive events with a replay id higher than the specified value). REPLAY ID FROM OBJECT STORE (subscriber will only receive events with a replay id higher than the one specified inside object store).]]></description>
+                </parameter>
+                <parameter name="eventBatchSize">
+                    <description><![CDATA[The total number of events included in a server batch. Lower values mean small memory footprint but more server calls while bigger values mean bigger memory footprint with less API calls. A new batch of events will be requested by the connector after the flow manages to consume the existing ones.]]></description>
+                </parameter>
+                <parameter name="config-ref">
+                    <description><![CDATA[The name of the configuration to be used to execute this component]]></description>
+                </parameter>
+                <parameter name="primaryNodeOnly">
+                    <description><![CDATA[Whether this source should only be executed on the primary node when runnning in Cluster]]></description>
+                </parameter>
+                <parameter name="streamingStrategy">
+                    <description><![CDATA[Configure if repeatable streams should be used and their behaviour]]></description>
+                </parameter>
+                <parameter name="redeliveryPolicy">
+                    <description><![CDATA[Defines a policy for processing the redelivery of the same message]]></description>
+                </parameter>
+                <parameter name="reconnectionStrategy">
+                    <description><![CDATA[A retry strategy in case of connectivity errors]]></description>
+                </parameter>
+            </parameters>
+        </source>
+    </sources>
+    <types>
+        <type name="com.mulesoft.connector.salesforce.pubsub.api.param.CustomReplayIdReplayOption">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="replayId">
+                    <description><![CDATA[Subscriber receives all events after the event specified by its replayId value. The value is ignored if replay option is set on EARLIEST, LATEST or FROM_OS.]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connector.salesforce.pubsub.api.param.EarliestReplayOption">
+            <description><![CDATA[]]></description>
+            <parameters/>
+        </type>
+        <type name="com.mulesoft.connector.salesforce.pubsub.api.param.FromOsReplayIdReplayOption">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="osName">
+                    <description><![CDATA[Name of the object store from where to get the latest replay id. The value is ignored if replay option is set on EARLIEST, LATEST or CUSTOM.]]></description>
+                </parameter>
+                <parameter name="osKey">
+                    <description><![CDATA[Name of the key that contains the latest replay id. The value is ignored if replay option is set on EARLIEST, LATEST or CUSTOM.]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connector.salesforce.pubsub.api.param.LatestReplayOption">
+            <description><![CDATA[]]></description>
+            <parameters/>
+        </type>
+        <type name="com.mulesoft.connector.salesforce.pubsub.api.param.ProxyConfiguration">
+            <description><![CDATA[]]></description>
+            <parameters>
+                <parameter name="host">
+                    <description><![CDATA[Host where the proxy requests will be sent.]]></description>
+                </parameter>
+                <parameter name="port">
+                    <description><![CDATA[Port where the proxy requests will be sent.]]></description>
+                </parameter>
+                <parameter name="username">
+                    <description><![CDATA[The username to authenticate against the proxy.]]></description>
+                </parameter>
+                <parameter name="password">
+                    <description><![CDATA[The password to authenticate against the proxy.]]></description>
+                </parameter>
+            </parameters>
+        </type>
+        <type name="com.mulesoft.connector.salesforce.pubsub.api.param.ReplayOption">
+            <description><![CDATA[]]></description>
+            <parameters/>
+        </type>
+    </types>
+</extension-documentation>

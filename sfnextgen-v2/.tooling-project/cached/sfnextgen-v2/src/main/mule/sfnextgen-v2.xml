@@ -1,16 +1,22 @@
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:salesforce-pub-sub="http://www.mulesoft.org/schema/mule/salesforce-pub-sub" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd         http://www.mulesoft.org/schema/mule/documentation http://www.mulesoft.org/schema/mule/documentation/current/mule-documentation.xsd         http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd         http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd         http://www.mulesoft.org/schema/mule/salesforce-pub-sub http://www.mulesoft.org/schema/mule/salesforce-pub-sub/current/mule-salesforce-pub-sub.xsd         http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
- <http:listener-config basePath="/" name="Listener-config">
-  <http:listener-connection host="localhost" port="8081"></http:listener-connection>
- </http:listener-config>
- <salesforce-pub-sub:pubsub-config name="Pubsub-config">
-  <salesforce-pub-sub:config-with-oauth-connection>
-   <salesforce-pub-sub:oauth-authorization-code accessTokenUrl="https://test.salesforce.com/services/oauth2/token" after="sfnextgen-v2Flow" authorizationUrl="https://test.salesforce.com/services/oauth2/authorize" before="sfnextgen-v2Flow" consumerKey="3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF" consumerSecret="5CD87471A3A77F6527C2B9B1E100ED78C8C1A0623875E1822E84080BD0B47A63"></salesforce-pub-sub:oauth-authorization-code>
-   <salesforce-pub-sub:oauth-callback-config authorizePath="/authorize" callbackPath="/callback" externalCallbackUrl="https://c432-50-158-35-114.ngrok-free.app" listenerConfig="Listener-config"></salesforce-pub-sub:oauth-callback-config>
-   <salesforce-pub-sub:oauth-store-config objectStore="defaultObjectStore"></salesforce-pub-sub:oauth-store-config>
-  </salesforce-pub-sub:config-with-oauth-connection>
- </salesforce-pub-sub:pubsub-config>
- <flow doc:id="91a16900-9ba2-4f7d-8ba0-c5701d4143dc" name="sfnextgen-v2Flow">
-  <salesforce-pub-sub:subscribe-channel-listener channelName="/event/Contact_Patient__e" config-ref="Pubsub-config" doc:id="a84151b5-a96b-4cc8-ae95-a949183b8b85" doc:name="Subscribe channel listener" replayOption=""></salesforce-pub-sub:subscribe-channel-listener>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:salesforce-pub-sub="http://www.mulesoft.org/schema/mule/salesforce-pub-sub" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:os="http://www.mulesoft.org/schema/mule/os" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd         http://www.mulesoft.org/schema/mule/documentation http://www.mulesoft.org/schema/mule/documentation/current/mule-documentation.xsd         http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd         http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd         http://www.mulesoft.org/schema/mule/salesforce-pub-sub http://www.mulesoft.org/schema/mule/salesforce-pub-sub/current/mule-salesforce-pub-sub.xsd         http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd         http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+  <os:object-store name="Object_store" doc:name="Object store" doc:id="82694471-2954-4007-a7ec-0867b1f3a287" />
+  <http:listener-config basePath="/" name="Listener-config">
+   <http:listener-connection host="localhost" port="8081"></http:listener-connection>
+  </http:listener-config>
+  <salesforce-pub-sub:pubsub-config name="Pubsub-config">
+   <salesforce-pub-sub:config-with-oauth-connection>
+    <salesforce-pub-sub:oauth-authorization-code accessTokenUrl="https://test.salesforce.com/services/oauth2/token" authorizationUrl="https://test.salesforce.com/services/oauth2/authorize" consumerKey="3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF" consumerSecret="5CD87471A3A77F6527C2B9B1E100ED78C8C1A0623875E1822E84080BD0B47A63"></salesforce-pub-sub:oauth-authorization-code>
+    <salesforce-pub-sub:oauth-callback-config authorizePath="/authorize" callbackPath="/callback" externalCallbackUrl="https://c432-50-158-35-114.ngrok-free.app" listenerConfig="Listener-config"></salesforce-pub-sub:oauth-callback-config>
+    <salesforce-pub-sub:oauth-store-config objectStore="Object_store"></salesforce-pub-sub:oauth-store-config>
+   </salesforce-pub-sub:config-with-oauth-connection>
+  </salesforce-pub-sub:pubsub-config>
+  <os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="7fe1933b-2fe2-4d4a-aa54-2df63fcde2ac" />
+	<flow doc:id="91a16900-9ba2-4f7d-8ba0-c5701d4143dc" name="sfnextgen-v2Flow">
+  <salesforce-pub-sub:subscribe-channel-listener channelName="/event/Contact_Patient__e" config-ref="Pubsub-config" doc:id="a84151b5-a96b-4cc8-ae95-a949183b8b85" doc:name="Subscribe channel listener">
+    <salesforce-pub-sub:replay-option>
+      <salesforce-pub-sub:latest/>
+    </salesforce-pub-sub:replay-option>
+  </salesforce-pub-sub:subscribe-channel-listener>
   <choice doc:name="Route by EventType__c">
    <when expression="#[payload.EventType__c == 'A04']">
     <ee:transform doc:name="To HL7 ADT^A04">
