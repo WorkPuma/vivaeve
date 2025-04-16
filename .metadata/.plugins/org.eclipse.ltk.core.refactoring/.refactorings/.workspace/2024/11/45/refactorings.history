@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename Java project &apos;elation-to-healthgorilla-1.0.0-snapshot-mule-application&apos; to &apos;elation-to-healthgorilla-2.0&apos;&#x0D;&#x0A;- Original element: &apos;elation-to-healthgorilla-1.0.0-snapshot-mule-application&apos;&#x0D;&#x0A;- Renamed element: &apos;elation-to-healthgorilla-1.0.0-snapshot-mule-application&apos;&#x0D;&#x0A;- Update references to refactored element" description="Rename Java project &apos;elation-to-healthgorilla-1.0.0-snapshot-mule-application&apos;" flags="7" id="org.eclipse.jdt.ui.rename.java.project" input="=elation-to-healthgorilla-1.0.0-snapshot-mule-application" name="elation-to-healthgorilla-2.0" references="true" stamp="1731193074800" version="1.0"/>
+</session>

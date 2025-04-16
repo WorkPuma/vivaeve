@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.mule.tooling.runtime.muleServerLaunchType">
+    <stringAttribute key="clear_data" value="NEVER"/>
+    <booleanAttribute key="consoleEnabled" value="true"/>
+    <stringAttribute key="launch_mule_server_version" value="org.mule.tooling.server.4.7.ee"/>
+    <stringAttribute key="maven.command.line" value=""/>
+    <booleanAttribute key="maven.snapshot.updates" value="false"/>
+    <stringAttribute key="mule-agent-port" value="52026"/>
+    <stringAttribute key="mule-agent-token-auth" value="8f0cb530-28a2-4ed9-9499-b8e35970463b"/>
+    <listAttribute key="mule-project-names">
+        <listEntry value="rosters-snowflake"/>
+    </listAttribute>
+    <intAttribute key="mule.debug.payload.max.collection.size" value="100"/>
+    <booleanAttribute key="org.eclipse.debug.core.ATTR_FORCE_SYSTEM_CONSOLE_ENCODING" value="false"/>
+    <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+        <listEntry value="/rosters-snowflake"/>
+    </listAttribute>
+    <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+        <listEntry value="4"/>
+    </listAttribute>
+    <mapAttribute key="org.eclipse.debug.core.environmentVariables">
+        <mapEntry key="anypoint.platform.config.analytics.agent.enabled" value="true"/>
+        <mapEntry key="aws.accessKeyId" value="AKIAVZL2GB7YSWW5KXPH"/>
+        <mapEntry key="aws.region" value="us-east-1"/>
+        <mapEntry key="aws.secretKey" value="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"/>
+        <mapEntry key="ddapikey" value="6a144e49f50985d327b939328b07bb90"/>
+        <mapEntry key="env" value="prod"/>
+        <mapEntry key="log.group.name" value="anypointLogs-prod"/>
+        <mapEntry key="log.stream.name" value="common-utilities-api-prod"/>
+        <mapEntry key="patientRosterBatchSize" value="300"/>
+        <mapEntry key="secure.key" value="2!GiCjPT99wl"/>
+    </mapAttribute>
+    <booleanAttribute key="org.eclipse.jdt.launching.ATTR_ATTR_USE_ARGFILE" value="false"/>
+    <booleanAttribute key="org.eclipse.jdt.launching.ATTR_SHOW_CODEDETAILS_IN_EXCEPTION_MESSAGES" value="true"/>
+    <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_CLASSPATH_ONLY_JAR" value="false"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="rosters-snowflake"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-M-XX:-UseBiasedLocking -M-Dfile.encoding=UTF-8 -M-XX:+UseG1GC -M-XX:+UseStringDeduplication -M-Dmule.deployment.forceParseConfigXmls=true"/>
+    <intAttribute key="remote-debug-max-stream-size" value="2"/>
+    <intAttribute key="remote-debug-port" value="6666"/>
+    <booleanAttribute key="remote-debug-suspend" value="false"/>
+</launchConfiguration>

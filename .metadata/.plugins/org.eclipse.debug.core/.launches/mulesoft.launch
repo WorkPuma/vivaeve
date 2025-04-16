@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.mule.tooling.runtime.muleServerLaunchType">
+    <stringAttribute key="clear_data" value="NEVER"/>
+    <booleanAttribute key="consoleEnabled" value="true"/>
+    <stringAttribute key="launch_mule_server_version" value="org.mule.tooling.server.4.7.ee"/>
+    <stringAttribute key="maven.command.line" value=""/>
+    <booleanAttribute key="maven.snapshot.updates" value="false"/>
+    <stringAttribute key="mule-agent-port" value="56536"/>
+    <stringAttribute key="mule-agent-token-auth" value="c7f4f2e9-cac1-452d-9045-2180ffbdbfcb"/>
+    <listAttribute key="mule-project-names"/>
+    <intAttribute key="mule.debug.payload.max.collection.size" value="100"/>
+    <booleanAttribute key="org.eclipse.debug.core.ATTR_FORCE_SYSTEM_CONSOLE_ENCODING" value="false"/>
+    <booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="false"/>
+    <mapAttribute key="org.eclipse.debug.core.environmentVariables">
+        <mapEntry key="aws.snowflake.accountName" value="ab16868.us-east-2.aws.snowflakecomputing.com"/>
+        <mapEntry key="aws.snowflake.database" value="HERSELF"/>
+        <mapEntry key="aws.snowflake.password" value="fJmgajwrppH%RXc#PrLtPB$*fv99LH%@!utEh27^oWMM"/>
+        <mapEntry key="aws.snowflake.role" value="accountadmin"/>
+        <mapEntry key="aws.snowflake.schema" value="HH_DMART"/>
+        <mapEntry key="aws.snowflake.user" value="datagrip"/>
+        <mapEntry key="aws.snowflake.warehouse" value="HERSELF_DEFAULT_XSMALL"/>
+        <mapEntry key="sf.clinicalEncounter.defaultRecordTypeId" value="0128b000001KDh2AAG"/>
+        <mapEntry key="sf.consumer.key" value="3MVG99gP.VbJma8XvtnoQ_tDwhfOnc3RYHPuawnclACLhBAcJBLy0rrQTjMjmGuQK8ZkxA7Z_4whowrepbgLV"/>
+        <mapEntry key="sf.consumer.secret" value="AFF1188685F21B420826D8B41F0F6E431943CC34DC3FDCE48FF57C6B51F138D3"/>
+        <mapEntry key="sf.name" value="salesforce@herself-health.com"/>
+        <mapEntry key="sf.pwd" value="VZfFlYb$P^^ul5smt8G"/>
+        <mapEntry key="sf.token" value="dXe5n7Dg6BFXxjS46GTfCF52E"/>
+        <mapEntry key="sf.url" value="https://herself.lightning.force.com"/>
+    </mapAttribute>
+    <booleanAttribute key="org.eclipse.jdt.launching.ATTR_ATTR_USE_ARGFILE" value="false"/>
+    <booleanAttribute key="org.eclipse.jdt.launching.ATTR_SHOW_CODEDETAILS_IN_EXCEPTION_MESSAGES" value="true"/>
+    <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_CLASSPATH_ONLY_JAR" value="false"/>
+    <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="salesforce-tcmencounters"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-M-XX:-UseBiasedLocking -M-Dfile.encoding=UTF-8 -M-XX:+UseG1GC -M-XX:+UseStringDeduplication -M-Dmule.deployment.forceParseConfigXmls=true&#13;&#10;&#13;&#10;-Daws.snowflake.accountName=ab16868.us-east-2.aws&#13;&#10;-Daws.snowflake.database=HERSELF&#13;&#10;-Daws.snowflake.password=fJmgajwrppH%RXc#PrLtPB$*fv99LH%@!utEh27^oWMM&#13;&#10;-Daws.snowflake.schema=HH_DMART&#13;&#10;-Daws.snowflake.user=datagrip&#13;&#10;-DencounterBatchSize=200&#13;&#10;-Dsf.clinicalEncounter.defaultRecordTypeId=0128b000001KDh2AAG&#13;&#10;-Dsf.consumer.key=3MVG99gP.VbJma8XvtnoQ_tDwhfOnc3RYHPuawnclACLhBAcJBLy0rrQTjMjmGuQK8ZkxA7Z_4whowrepbgLV&#13;&#10;-Dsf.consumer.secret=AFF1188685F21B420826D8B41F0F6E431943CC34DC3FDCE48FF57C6B51F138D3&#13;&#10;-Dsf.count=3&#13;&#10;-Dsf.frequency=5000&#13;&#10;-Dsf.name=salesforce@herself-health.com&#13;&#10;-Dsf.pwd=VZfFlYb$P^^ul5smt8G&#13;&#10;-Dsf.token=dXe5n7Dg6BFXxjS46GTfCF52E&#13;&#10;-Dsf.url=https://login.salesforce.com&#13;&#10;-Ddatadog.apiKey=2656014e12919b638a88af05f6f71a60"/>
+    <intAttribute key="remote-debug-max-stream-size" value="2"/>
+    <intAttribute key="remote-debug-port" value="6666"/>
+    <booleanAttribute key="remote-debug-suspend" value="false"/>
+</launchConfiguration>
