@@ -4,24 +4,21 @@
    <http:listener-connection host="localhost" port="8081"></http:listener-connection>
   </http:listener-config>
   <salesforce-pub-sub:pubsub-config name="Pubsub-config">
-		<salesforce-pub-sub:oauth-user-pass-connection consumerKey="3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF" consumerSecret="5CD87471A3A77F6527C2B9B1E100ED78C8C1A0623875E1822E84080BD0B47A63" username="cgainus@cokergroup.com.devchris" password="Mosby2350@#" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
-  
-</salesforce-pub-sub:pubsub-config>
+   <salesforce-pub-sub:config-with-oauth-connection>
+    <salesforce-pub-sub:oauth-authorization-code accessTokenUrl="https://test.salesforce.com/services/oauth2/token" authorizationUrl="https://test.salesforce.com/services/oauth2/authorize" consumerKey="3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF" consumerSecret="5CD87471A3A77F6527C2B9B1E100ED78C8C1A0623875E1822E84080BD0B47A63"></salesforce-pub-sub:oauth-authorization-code>
+    <salesforce-pub-sub:oauth-callback-config authorizePath="/authorize" callbackPath="/callback" externalCallbackUrl="https://c432-50-158-35-114.ngrok-free.app" listenerConfig="Listener-config"></salesforce-pub-sub:oauth-callback-config>
+    <salesforce-pub-sub:oauth-store-config objectStore="Object_store"></salesforce-pub-sub:oauth-store-config>
+   </salesforce-pub-sub:config-with-oauth-connection>
+  </salesforce-pub-sub:pubsub-config>
   <os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="7fe1933b-2fe2-4d4a-aa54-2df63fcde2ac" />
   <configuration-properties file="config.properties" />
   <flow doc:id="91a16900-9ba2-4f7d-8ba0-c5701d4143dc" name="sfnextgen-v2Flow">
-   <salesforce-pub-sub:subscribe-channel-listener channelName="/event/Contact__e" config-ref="Pubsub-config" doc:id="a84151b5-a96b-4cc8-ae95-a949183b8b85" doc:name="Subscribe channel listener">
+   <salesforce-pub-sub:subscribe-channel-listener channelName="/event/Contact_Patient__e" config-ref="Pubsub-config" doc:id="a84151b5-a96b-4cc8-ae95-a949183b8b85" doc:name="Subscribe channel listener">
     <salesforce-pub-sub:replay-option>
      <salesforce-pub-sub:latest/>
     </salesforce-pub-sub:replay-option>
    </salesforce-pub-sub:subscribe-channel-listener>
    <logger level="INFO" doc:name="Log Platform Event Payload" message="INCOMING PLATFORM EVENT PAYLOAD: #[write(payload, 'application/json')]"/>
-   
-   <!-- [DEBUG] Log keys at root and 'event' node -->
-   <logger level="INFO" doc:name="DEBUG - Payload Keys" message="DEBUG: Payload root keys = #[attributes.payload map ((v, k) -> k)]"/>
-   <logger level="INFO" doc:name="DEBUG - Event Node Keys" message="DEBUG: Payload.event keys = #[payload.event default null mapObject ((v, k) -> k)]"/>
-   <logger level="INFO" doc:name="DEBUG - Event_Type__c value" message="DEBUG: payload.event.Event_Type__c = #[payload.event.Event_Type__c default null], payload.EventType__c = #[payload.EventType__c default null]"/>
-   
    <set-variable variableName="sentToNextgen" value="${sent.to.nextgen}" doc:name="Set sentToNextgen"/>
    <choice doc:name="Route by EventType__c">
     <when expression="#[payload.EventType__c == 'A04']">
