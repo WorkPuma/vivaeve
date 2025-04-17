@@ -27,7 +27,9 @@
 output text/plain
 
 var event = payload.event
-var id = event.HealthFusion_Patient_Record_ID__c default ""
+var idRaw = event.HealthFusion_Patient_Record_ID__c default ""
+var id = if (upper(idRaw) startsWith "HF") idRaw[2 to -1] else idRaw
+var useId = (id != null and id != "")
 var dob =
     if ((event.Date_of_Birth__c default null) != null)
         ((event.Date_of_Birth__c) as Date {format: "MMMM dd, yyyy"}) as String {format:"yyyyMMdd"}
@@ -61,9 +63,9 @@ var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ 
 ++ "||ADT^A04|"
 ++ (now() as String {format:"yyyyMMddHHmmssSSS"}) ++ "|P|2.3"
 ++ "\nPID|1|"
-++ (if (id != "") id else "") ++ "|"  // PID-2
-++ "|"                                // PID-3 always blank per feedback
-++ "|"                                // PID-4 always blank per feedback
+++ (if (useId) id else "") ++ "|"  // PID-2
+++ (if (useId) id else "") ++ "|"  // PID-3
+++ (if (useId) "HF" ++ id else "") ++ "|" // PID-4
 ++ (
   upper(event.LastName__c default "") ++ "^" ++ upper(event.FirstName__c default "") ++ (if (!isEmpty(event.MiddleName__c default "")) "^" ++ upper(event.MiddleName__c) else "")
 ) ++ "|"  // Name field, middle name only if present
@@ -87,7 +89,7 @@ var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ 
 ++ "\nPV1|1|O|^^^1275017^^^^^FOREST HILLS||||||||1275017^^^1275017^^^^^FOREST HILLS|||||||||||||||||||||||N|||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS"
 ++ "\nGT1|1|"
 ++ "1|"                                // GT1-1
-++ (if (id != "") id else "") ++ "|"   // GT1-2 (blank if no ID)
+++ (if (useId) id else "") ++ "|"      // GT1-2
 ++ (
   upper(event.LastName__c default "") ++ "^" ++ upper(event.FirstName__c default "") ++ (if (!isEmpty(event.MiddleName__c default "")) "^" ++ upper(event.MiddleName__c) else "")
 ) ++ "|"                             // GT1-3: name, no caret if no middle
@@ -128,7 +130,8 @@ var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ 
 output text/plain
 
 var event = payload.event
-var id = event.HealthFusion_Patient_Record_ID__c default ""
+var idRaw = event.HealthFusion_Patient_Record_ID__c default ""
+var id = if (upper(idRaw) startsWith "HF") idRaw[2 to -1] else idRaw
 var useId = (id != null and id != "")
 var dob =
     if ((event.Date_of_Birth__c default null) != null)
@@ -136,7 +139,7 @@ var dob =
     else ""
 var gt1dob = if (dob != "") dob ++ "000000" else ""
 var middleName = event.MiddleName__c default ""
-var hl7Name = (event.LastName__c default "PATIENT DECLINED") ++ "^" ++ (event.FirstName__c default "PATIENT DECLINED") ++ (if (isEmpty(middleName) or middleName == null) "" else "^" ++ middleName)
+var hl7Name = upper(event.LastName__c default "") ++ "^" ++ upper(event.FirstName__c default "") ++ (if (!isEmpty(event.MiddleName__c default "")) "^" ++ upper(event.MiddleName__c) else "")
 var normGender =
     if (upper(event.Patient_Gender__c default "") == "M") "M"
     else if (upper(event.Patient_Gender__c default "") == "F") "F"
@@ -167,7 +170,7 @@ var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ 
 ++ (if (useId) id else "") ++ "|"
 ++ (if (useId) id else "") ++ "|"
 ++ (if (useId) "HF" ++ id else "HF") ++ "|"
-++ (upper(event.LastName__c default "") ++ "^" ++ upper(event.FirstName__c default "") ++ (if (!isEmpty(event.MiddleName__c default "")) "^" ++ upper(event.MiddleName__c) else "")) ++ "|"
+++ hl7Name ++ "|"
 ++ "|" // PID-6 blank (mother's maiden name)
 ++ dob ++ "|"
 ++ normGender ++ "||"
@@ -181,8 +184,8 @@ var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ 
 ++ patientEthnicity
 ++ "\nPV1|1|O|^^^1275017^^^^^FOREST HILLS||||||||1275017^^^1275017^^^^^FOREST HILLS|||||||||||||||||||||||N|||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS"
 ++ "\nGT1|1|"
-++ (if (useId) id else "") ++ "|"
-++ (upper(event.LastName__c default "") ++ "^" ++ upper(event.FirstName__c default "") ++ (if (!isEmpty(event.MiddleName__c default "")) "^" ++ upper(event.MiddleName__c) else "")) ++ "|"
+++ (if (useId) id else "") ++ "|" // GT1-2
+++ hl7Name ++ "|"
 ++ "|" // GT1-4 blank
 ++ (event.MailingStreet__c default "") ++ "^^"
 ++ (event.MailingCity__c default "") ++ "^"
