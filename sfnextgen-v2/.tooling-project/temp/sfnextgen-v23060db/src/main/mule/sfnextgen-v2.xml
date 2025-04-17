@@ -67,7 +67,7 @@ var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ 
 ++ (if (useId) id else "") ++ "|"  // PID-3
 ++ (if (useId) "HF" ++ id else "") ++ "|" // PID-4
 ++ (
-  upper(event.LastName__c default "") ++ "^" ++ upper(event.FirstName__c default "") ++ (if (!isEmpty(event.MiddleName__c default "")) "^" ++ (upper(event.MiddleName__c) default "") else "")
+  upper(event.LastName__c default "") ++ "^" ++ upper(event.FirstName__c default "") ++ (if (!isEmpty(event.MiddleName__c default "")) "^" ++ upper(event.MiddleName__c) else "")
 ) ++ "|"  // Name field, middle name only if present
 ++ "|"                                 // PID-6 (Mother's maiden) blank if not present
 ++ dob ++ "|"                          // PID-7
@@ -91,7 +91,7 @@ var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ 
 ++ "1|"                                // GT1-1
 ++ (if (useId) id else "") ++ "|"      // GT1-2
 ++ (
-  upper(event.LastName__c default "") ++ "^" ++ upper(event.FirstName__c default "") ++ (if (!isEmpty(event.MiddleName__c default "")) "^" ++ (upper(event.MiddleName__c) default "") else "")
+  upper(event.LastName__c default "") ++ "^" ++ upper(event.FirstName__c default "") ++ (if (!isEmpty(event.MiddleName__c default "")) "^" ++ upper(event.MiddleName__c) else "")
 ) ++ "|"                             // GT1-3: name, no caret if no middle
 ++ "|"                               // GT1-4 blank
 ++ (
