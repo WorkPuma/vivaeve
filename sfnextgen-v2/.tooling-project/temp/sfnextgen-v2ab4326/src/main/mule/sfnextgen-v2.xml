@@ -137,9 +137,7 @@ var status = "NEW"
 %dw 2.0
 output text/plain
 ---
-trim(payload as String)
-  replace "\r\n" with "\r"
-  replace "\n" with "\r"
+trim(payload as String) replace "\n" with "\r"
               ]]>
             </ee:set-payload>
           </ee:message>
@@ -251,7 +249,6 @@ var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ 
       <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON"/>
       <until-successful maxRetries="3" millisBetweenRetries="1000">
        <logger level="INFO" doc:name="HL7 body to NextGen" message="HL7 body to NextGen: #[payload]"/>
-       <logger level="INFO" doc:name="DEBUG Payload Structure" message="DEBUG payload at DW: #[payload]"/>
        <ee:transform doc:name="Fix HL7 Endlines">
          <ee:message>
            <ee:set-payload>
@@ -259,31 +256,26 @@ var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ 
 %dw 2.0
 output text/plain
 ---
-(trim(payload as String)
-  replace "\r\n" with "\r"
-  replace "\n" with "\r")
+trim(payload) replace "\n" with "\r"
              ]]>
            </ee:set-payload>
          </ee:message>
        </ee:transform>
        <http:request method="POST" url="${nextgen.url}" responseTimeout="60000" doc:name="NextGenAPI">
-         <http:headers><![CDATA[#[%dw 2.0
-output application/java
+         <http:headers><![CDATA[#[output application/java
 ---
 {
- "authorization": p('nextgen.auth'),
- "x-process": p('nextgen.x-process'),
- "priority": p('nextgen.Priority'),
- "node": p('nextgen.Node'),
+ "Authorization": p('nextgen.auth'),
+ "x-process" : p('nextgen.x-process'),
+ "Priority" : p('nextgen.Priority'),
+ "Node":  p('nextgen.Node'),
  "accountnumber": p('nextgen.accountnumber'),
  "x-api-key": p('nextgen.x-api-key'),
  "username": p('nextgen.username'),
- "content-type": p('nextgen.content-type')
-} as Object {class: "java.util.HashMap"}
-]]]></http:headers>
-        </http:request>
-        <logger level="INFO" doc:name="Log HTTP Request Headers" message="Sent request headers: #[attributes.requestHeaders]"/>
-        <logger level="INFO" doc:name="Log NextGen Full Response"
+ "content-type": "text/plain"
+}]]]></http:headers>
+       </http:request>
+       <logger level="INFO" doc:name="Log NextGen Full Response"
          message='Full NextGen Response: #[output application/json --- { "status": attributes.statusCode, "headers": attributes.headers, "payload": payload } ]'/>
      </until-successful>
       <!-- Outbound flow would go here. Add HTTP request or call as needed. -->
@@ -423,9 +415,7 @@ var status = "NEW"
 %dw 2.0
 output text/plain
 ---
-(trim(payload as String)
-  replace "\r\n" with "\r"
-  replace "\n" with "\r")
+trim(payload) replace "\n" with "\r"
                    ]]>
                  </ee:set-payload>
                </ee:message>
@@ -434,17 +424,16 @@ output text/plain
                <http:headers><![CDATA[#[output application/java
 ---
 {
-  "authorization": p('nextgen.auth'),
-  "x-process": p('nextgen.x-process'),
-  "priority": p('nextgen.Priority'),
-  "node": p('nextgen.Node'),
-  "accountnumber": p('nextgen.accountnumber'),
-  "x-api-key": p('nextgen.x-api-key'),
-  "username": p('nextgen.username'),
-  "content-type": p('nextgen.content-type')
-} as Object {class: "java.util.HashMap"} ]]]></http:headers>
+ "Authorization": p('nextgen.auth'),
+ "x-process" : p('nextgen.x-process'),
+ "Priority" : p('nextgen.Priority'),
+ "Node":  p('nextgen.Node'),
+ "accountnumber": p('nextgen.accountnumber'),
+ "x-api-key": p('nextgen.x-api-key'),
+ "username": p('nextgen.username'),
+ "content-type": "text/plain"
+}]]]></http:headers>
              </http:request>
-             <logger level="INFO" doc:name="Log HTTP Request Headers" message="Sent request headers: #[attributes.requestHeaders]"/>
              <logger level="INFO" doc:name="Log NextGen Full Response"
                message='Full NextGen Response: #[output application/json --- { "status": attributes.statusCode, "headers": attributes.headers, "payload": payload } ]'/>
            </until-successful>
@@ -571,18 +560,17 @@ trim(payload) replace "\n" with "\r"
                <http:headers><![CDATA[#[output application/java
 ---
 {
-  "authorization": p('nextgen.auth'),
-  "x-process": p('nextgen.x-process'),
-  "priority": p('nextgen.Priority'),
-  "node": p('nextgen.Node'),
-  "accountnumber": p('nextgen.accountnumber'),
-  "x-api-key": p('nextgen.x-api-key'),
-  "username": p('nextgen.username'),
-  "content-type": p('nextgen.content-type')
-} as Object {class: "java.util.HashMap"} ]]]></http:headers>
-              </http:request>
-              <logger level="INFO" doc:name="Log HTTP Request Headers" message="Sent request headers: #[attributes.requestHeaders]"/>
-              <logger level="INFO" doc:name="Log NextGen Full Response"
+ "Authorization": p('nextgen.auth'),
+ "x-process" : p('nextgen.x-process'),
+ "Priority" : p('nextgen.Priority'),
+ "Node":  p('nextgen.Node'),
+ "accountnumber": p('nextgen.accountnumber'),
+ "x-api-key": p('nextgen.x-api-key'),
+ "username": p('nextgen.username'),
+ "content-type": "text/plain"
+}]]]></http:headers>
+             </http:request>
+             <logger level="INFO" doc:name="Log NextGen Full Response"
                message='Full NextGen Response: #[output application/json --- { "status": attributes.statusCode, "headers": attributes.headers, "payload": payload } ]'/>
            </until-successful>
          </when>
