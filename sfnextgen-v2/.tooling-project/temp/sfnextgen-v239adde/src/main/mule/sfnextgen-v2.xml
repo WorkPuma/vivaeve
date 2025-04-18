@@ -143,8 +143,6 @@ var status = "NEW"
   "content-type": "text/plain"
 }]]]></http:headers>
         </http:request>
-        <logger level="INFO" doc:name="Log NextGen Full Response"
-          message='Full NextGen Response: #[output application/json --- { "status": attributes.statusCode, "headers": attributes.headers, "payload": payload } ]'/>
       </until-successful>
       <!-- Outbound flow would go here. Add HTTP request or call as needed. -->
      </when>
@@ -248,8 +246,6 @@ var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ 
  "content-type": "text/plain"
 }]]]></http:headers>
        </http:request>
-       <logger level="INFO" doc:name="Log NextGen Full Response"
-         message='Full NextGen Response: #[output application/json --- { "status": attributes.statusCode, "headers": attributes.headers, "payload": payload } ]'/>
      </until-successful>
       <!-- Outbound flow would go here. Add HTTP request or call as needed. -->
      </when>
@@ -369,7 +365,7 @@ var status = "NEW"
 "\nSCH||" ++ contId ++ "||||" ++ apptType ++ "|" ++ apptReason ++ "|" ++ apptType ++ "|" ++ duration ++ "|MIN|^^^" ++ schStart ++ "^" ++ schEnd ++ "|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "|||||||||" ++ status ++  
 "\nPID|1|" ++ pid ++ "|" ++ pid ++ "|HF" ++ pid ++ "|" ++ lastName ++ "^" ++ firstName ++ "||" ++ dob ++ "|" ++ hl7Gender ++ "||PATIENT DECLINED|" ++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip ++ "|" ++ formattedPhone ++ "^^^" ++ email ++ "^^" ++ area ++ "^" ++ rest ++ "||" ++ language ++ "|||||||PATIENT DECLINED" ++  
 "\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName ++ "||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||" ++ contId ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||" ++ schStart ++ "|" ++ schEnd ++  
-"\nRGS|1" ++  
+"\nRGS|" ++  
 "\nAIL|1||" ++ locationId ++ "^^^" ++ locationName ++  
 "\nAIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  ]]></ee:set-payload>
          </ee:message>
@@ -394,8 +390,6 @@ var status = "NEW"
  "content-type": "text/plain"
 }]]]></http:headers>
              </http:request>
-             <logger level="INFO" doc:name="Log NextGen Full Response"
-               message='Full NextGen Response: #[output application/json --- { "status": attributes.statusCode, "headers": attributes.headers, "payload": payload } ]'/>
            </until-successful>
          </when>
          <otherwise>
@@ -492,7 +486,7 @@ var schEnd =
 "\nSCH||" ++ apptId ++ "||||" ++ apptType ++ "|" ++ apptReason ++ "|" ++ apptType ++ "|" ++ durationRaw ++ "|MIN|^^^" ++ schStart ++ "^" ++ schEnd ++ "|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "|||||||||" ++ status ++  
 "\nPID|1|" ++ pid ++ "|" ++ pid ++ "|HF" ++ pid ++ "|" ++ lastName ++ "^" ++ firstName ++ "||" ++ dob ++ "|" ++ gender ++ "||PATIENT DECLINED|" ++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip ++ "|" ++ formattedPhone ++ "^^^" ++ email ++ "^^" ++ area ++ "^" ++ rest ++ "||" ++ language ++ "|||||||PATIENT DECLINED" ++  
 "\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName ++ "||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||" ++ apptId ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||" ++ schStart ++ "|" ++ schEnd ++  
-"\nRGS|1" ++  
+"\nRGS|" ++  
 "\nAIL|1||" ++ locationId ++ "^^^" ++ locationName ++  
 "\nAIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst]]></ee:set-payload>
          </ee:message>
@@ -517,8 +511,6 @@ var schEnd =
  "content-type": "text/plain"
 }]]]></http:headers>
              </http:request>
-             <logger level="INFO" doc:name="Log NextGen Full Response"
-               message='Full NextGen Response: #[output application/json --- { "status": attributes.statusCode, "headers": attributes.headers, "payload": payload } ]'/>
            </until-successful>
          </when>
          <otherwise>
