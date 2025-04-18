@@ -233,84 +233,115 @@ var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ 
            <ee:set-payload><![CDATA[%dw 2.0  
 output text/plain  
   
-import * from dw::core::Strings  
+var pe = payload.event  
   
-var e = payload.event  
+// MSH Fields  
+var sendingApp = "HEALTHFUSION^1266378"  
+var sendingFacility = "NEXTGENOFFICE^1266378"  
+var receivingApp = "FORESTHMS"  
+var receivingFacility = "FORESTHMS^1266378"  
   
-// Helper Functions  
-// Helper Functions
-fun mustHave(val) = if (val == null or val == "") "" else val
+// Identifiers  
+var placerId = if (pe.Placer_Appointment_ID__c != null and !isEmpty(pe.Placer_Appointment_ID__c)) pe.Placer_Appointment_ID__c as String else ""  
+var fillerId = pe.NextGen_ID__c as String  
+var patientIdRaw = pe.Patient_ID__c as String  
+var pid = if (patientIdRaw startsWith "HF") patientIdRaw[2 to -1] else patientIdRaw  
   
-// HL7 IDs  
-var rawPid = mustHave(e.Patient_ID__c)
-var pid = if((upper(rawPid) startsWith "HF")) rawPid[2 to -1] else rawPid  
+// Patient name and demographic  
+var patientLastName = (pe.Patient_Last_Name__c as String) default ""  
+var patientFirstName = (pe.Patient_First_Name__c as String) default ""  
+var dobIn = pe.Patient_DOB__c as String  
+var dob = (dobIn as Date {format:"yyyyMMdd"}) as String {format:"yyyyMMdd"} // expects 'yyyyMMdd'  
+var genderVal = upper(pe.Patient_Gender__c as String)  
+var gender =   
+  if (genderVal == "FEMALE") "F"  
+  else if (genderVal == "MALE") "M"  
+  else genderVal  
+var addressStreet = (pe.Patient_Street__c as String) default ""  
+var addressCity = (pe.Patient_City__c as String) default ""  
+var addressState = (pe.Patient_State__c as String) default ""  
+var addressZip = (pe.Patient_Zip__c as String) default ""  
   
-var lastName = mustHave(e.Patient_Last_Name__c)
-var firstName = mustHave(e.Patient_First_Name__c)
-var dobNum = mustHave(e.Patient_DOB__c)
-var dob = ((dobNum as Number) as Date) as String {format: "yyyyMMdd"}  
+// Phone construction, PID-13  
+var phone = (pe.Patient_Phone__c as String) default ""  
+var phoneDigits =  
+  if (sizeOf(phone) == 10)  
+    "(" ++ phone[0 to 2] ++ ")" ++ phone[3 to 5] ++ "-" ++ phone[6 to 9]  
+  else ""  
+var pid13 = phoneDigits ++ "^^^^^" ++ (if (!isEmpty(phone) and sizeOf(phone) == 10) phone[0 to 2] else "") ++ "^" ++ (if (!isEmpty(phone) and sizeOf(phone) == 10) phone[3 to 9] else "")  
   
-var genderRaw = mustHave(e.Patient_Gender__c)
-var hl7Gender =   
-    if (upper(genderRaw) == "FEMALE" or upper(genderRaw) == "F") "F"  
-    else if (upper(genderRaw) == "MALE" or upper(genderRaw) == "M") "M"  
-    else "U"  
+// Language - strict  
+var language = (pe.Patient_Language__c as String) default "EN"  
   
-var providerNpi = mustHave(e.Provider_NPI__c)
-var providerLast = mustHave(e.Provider_Last_Name__c)
-var providerFirst = mustHave(e.Provider_First_Name__c)
-var locationId = mustHave(e.Location_ID__c)
-var locationName = mustHave(e.Location_Name__c)
+// Appointment fields  
+var startDT = (pe.Start_DateTime__c as DateTime {format:"yyyyMMddHHmmss"})  
+var schStartStr = (startDT as String {format:"yyyyMMddHHmmss"})  
+var duration = pe.Duration_Value__c as Number  
+var schEndDT = startDT + (duration * 60000)  
+var schEndStr = (schEndDT as DateTime) as String {format:"yyyyMMddHHmmss"}  
+var apptType = (pe.Appointment_Type__c as String) default ""  
+var reason = (pe.Appointment_Reason__c as String) default ""  
   
-var schPlacer = mustHave(e.Placer_Appointment_ID__c)
+// Provider & Location  
+var providerNpi = (pe.Provider_NPI__c as String) default ""  
+var providerLast = upper((pe.Provider_Last_Name__c as String) default "")  
+var providerFirst = upper((pe.Provider_First_Name__c as String) default "")  
+var locationId = (pe.Location_ID__c as String) default ""  
+var locationName = upper((pe.Location_Name__c as String) default "")  
   
-var schFiller = if (e.NextGen_ID__c != null and e.NextGen_ID__c != "") e.NextGen_ID__c   
-                else schPlacer  
-  
-var apptType = mustHave(e.Appointment_Type__c)
-var apptReason = mustHave(e.Appointment_Reason__c)
-var duration = mustHave(e.Duration_Value__c)
-  
-var startEpoch = mustHave(e.Start_DateTime__c) as Number
-var endEpoch = mustHave(e.End_DateTime__c) as Number
-var schStart = (startEpoch as DateTime) as String {format:"yyyyMMddHHmmss"}  
-var schEnd = (endEpoch as DateTime) as String {format:"yyyyMMddHHmmss"}  
-  
-// Patient Address  
-var street = mustHave(e.Patient_Street__c)
-var city = mustHave(e.Patient_City__c)
-var state = mustHave(e.Patient_State__c)
-var zip = mustHave(e.Patient_Zip__c)
-  
-// Language: fallback to EN per HL7 spec for NextGen - but you can error if really required  
-var language = e.Patient_Language__c default "EN"  
-  
-// Phone Formatting  
-var phone = mustHave(e.Patient_Phone__c)
-var area = phone[0 to 2]  
-var rest = phone[3 to 9]  
-var phoneFormatted = "(" ++ area ++ ")" ++ rest[0 to 2] ++ "-" ++ rest[3 to 6]  
-  
-var pid13 =   
-    if (sizeOf(phone) == 10 and phone ~= /[0-9]{10}/)  
-        phoneFormatted ++ "^^^^^" ++ area ++ "^" ++ rest  
-    else  
-                ""
-  
-// Status (always NEW for S12)  
-var status = "NEW"  
+// Status strict map  
+var statusRaw = upper((pe.Appointment_Status__c as String) default "")  
+var status =  
+  if (statusRaw == "SCHEDULED") "NEW"  
+  else if (statusRaw == "RESCHEDULED") "RESCHEDULED"  
+  else if (statusRaw == "CHECKED OUT") "CHECKED OUT"  
+  else if (statusRaw == "CHECKED IN") "CHECKED IN"  
+  else if (statusRaw == "CANCELLED BY PROVIDER") "CANCELLED"  
+  else if (statusRaw == "NO SHOW") "NO SHOW"  
+  else statusRaw  
   
 ---  
 (  
-"MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|" ++  
-(now() as String {format:"yyyyMMddHHmmss"}) ++  
-"||SIU^S12|" ++ schFiller ++ "|P|2.3" ++  
-"\nSCH|" ++ schPlacer ++ "|" ++ schFiller ++ "||||" ++ apptType ++ "|" ++ apptReason ++ "|" ++ apptType ++ "|" ++ duration ++ "|MIN|^^^" ++ schStart ++ "^" ++ schEnd ++ "|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "|||||||||" ++ status ++  
-"\nPID|1|" ++ pid ++ "|" ++ pid ++ "|HF" ++ pid ++ "|" ++ upper(lastName) ++ "^" ++ upper(firstName) ++ "||" ++ dob ++ "|" ++ hl7Gender ++ "||PATIENT DECLINED|" ++ street ++ "^^" ++ upper(city) ++ "^" ++ upper(state) ++ "^" ++ zip ++ "|" ++ pid13 ++ "||" ++ language ++ "|||||||PATIENT DECLINED" ++  
-"\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ upper(locationName) ++ "||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||" ++ schFiller ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||" ++ schStart ++ "|" ++ schEnd ++  
-"\nRGS|" ++  
-"\nAIL|1||" ++ locationId ++ "^^^" ++ upper(locationName) ++  
-"\nAIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
+  // MSH  
+  "MSH|^~\\&|" ++ sendingApp ++ "|" ++ sendingFacility ++ "|" ++ receivingApp ++ "|" ++ receivingFacility ++ "|" ++ now() as String {format:"yyyyMMddHHmmss"} ++  
+      "||SIU^S12|" ++ fillerId ++ "|P|2.3"  
+  // SCH  
+  ++ "\nSCH|" ++ placerId ++ "|" ++ fillerId ++ "||||"  
+  ++ apptType ++ "|"  
+  ++ reason ++ "|"  
+  ++ apptType ++ "|"  
+  ++ (duration as String) ++ "|MIN|^^^"  
+  ++ schStartStr ++ "^" ++ schEndStr  
+  ++ "|||||"  
+  ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
+  ++ "|||||||||"  
+  ++ status  
+  // PID  
+  ++ "\nPID|1|"  
+  ++ pid ++ "|"  
+  ++ pid ++ "|HF" ++ pid ++ "|"  
+  ++ upper(patientLastName) ++ "^" ++ upper(patientFirstName) ++ "|"  
+  ++ "|"                     // Mother's maiden name  
+  ++ dob ++ "|"  
+  ++ gender ++ "|"  
+  ++ "|"                     // PID-9  
+  ++ "PATIENT DECLINED|"     // PID-10  
+  ++ addressStreet ++ "^^" ++ addressCity ++ "^" ++ addressState ++ "^" ++ addressZip ++ "|"  
+  ++ pid13 ++ "||"  
+  ++ language  
+  ++ "|||||||PATIENT DECLINED"  
+  // PV1  
+  ++ "\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName ++ "||||"  
+  ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||"  
+  ++ fillerId  
+  ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||"  
+  ++ schStartStr ++ "|" ++ schEndStr  
+  // RGS  
+  ++ "\nRGS|"  
+  // AIL  
+  ++ "\nAIL|1||" ++ locationId ++ "^^^" ++ locationName  
+  // AIP  
+  ++ "\nAIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
 )  ]]></ee:set-payload>
          </ee:message>
        </ee:transform>
@@ -334,37 +365,24 @@ output text/plain
   
 var pe = payload.event  
   
-var apptId        = (pe.NextGen_ID__c default "") as String  
-var pidRaw        = (pe.Patient_ID__c default "") as String  
-var pid           = if (upper(pidRaw) startsWith "HF") pidRaw[2 to -1] else pidRaw  
-  
-// DOB: Now a Date number  
-var dob           = (pe.Patient_DOB__c as Date) as String {format:"yyyyMMdd"}  
-  
-// Gender  
-var genderRaw     = (pe.Patient_Gender__c default "") as String  
-var gender =  
-  if (genderRaw == "Female") "F"  
-  else if (genderRaw == "Male") "M"  
+var apptId        = pe.NextGen_ID__c as String  
+var pid           = if ((pe.Patient_ID__c as String) startsWith "HF") (pe.Patient_ID__c as String)[2 to -1] else (pe.Patient_ID__c as String)  
+var dob           = (pe.Patient_DOB__c as Date {format:"MMMM dd, yyyy"}) as String {format:"yyyyMMdd"}  
+var gender        =  
+  if (pe.Patient_Gender__c as String == "Female") "F"  
+  else if (pe.Patient_Gender__c as String == "Male") "M"  
   else "U"  
   
-// --- PHONE NUMBER SECTION ---  
-var phone         = (pe.Patient_Phone__c default "") as String  
-var isGoodPhone   = sizeOf(phone) == 10 and phone ~= /[0-9]{10}/  
-var phoneFormatted = if (isGoodPhone)  
+var phone         = pe.Patient_Phone__c as String  
+var phoneFormatted=  
+  if (sizeOf(phone) == 10)  
     "(" ++ phone[0 to 2] ++ ")" ++ phone[3 to 5] ++ "-" ++ phone[6 to 9]  
-  else  
-    phone  
-var area  = if (isGoodPhone) phone[0 to 2] else ""  
-var rest  = if (isGoodPhone) phone[3 to 9] else ""  
-var contactInfo = if (isGoodPhone)  
-    phoneFormatted ++ "^^^" ++ "^^" ++ area ++ "^" ++ rest  
-  else  
-    phone ++ "^^^^^^"  
-// --------------------------------------  
+  else phone  
+var area          = if (sizeOf(phone) >= 3) phone[0 to 2] else ""  
+var rest          = if (sizeOf(phone) >= 7) phone[3 to 9] else ""  
+var contactInfo   = phoneFormatted ++ "^^^" ++ "^^" ++ area ++ "^" ++ rest  
   
-// Status  
-var statusRaw     = (pe.Appointment_Status__c default "") as String  
+var statusRaw     = pe.Appointment_Status__c as String  
 var status =  
   if (statusRaw == "Cancelled by Provider") "CANCELLED"  
   else if (statusRaw == "No Show") "NO SHOW"  
@@ -374,46 +392,36 @@ var status =
   else if (statusRaw == "Scheduled") "NEW"  
   else statusRaw  
   
-// Start/End as DateTime numbers (epoch ms)  
-var schStart      = pe.Start_DateTime__c as DateTime  
+var schStart      = (pe.Start_DateTime__c as DateTime {format:"M/d/yyyy h:mm a"})  
 var schStartStr   = (schStart as String {format:"yyyyMMddHHmmss"})  
-var schEnd        = pe.End_DateTime__c as DateTime  
+var schEnd        = schStart + ((pe.Duration_Value__c as Number) * 60000)  
 var schEndStr     = (schEnd as String {format:"yyyyMMddHHmmss"})  
   
-var providerNpi   = (pe.Provider_NPI__c default "") as String  
-var providerLast  = upper((pe.Provider_Last_Name__c default "") as String)  
-var providerFirst = upper((pe.Provider_First_Name__c default "") as String)  
-var apptType      = upper((pe.Appointment_Type__c default "") as String)  
-var apptReason    = (pe.Appointment_Reason__c default "") as String  
-var locationId    = (pe.Location_ID__c default "") as String  
-var locationName  = upper((pe.Location_Name__c default "") as String)  
-var patientLast   = upper((pe.Patient_Last_Name__c default "") as String)  
-var patientFirst  = upper((pe.Patient_First_Name__c default "") as String)  
-var language      = upper((pe.Patient_Language__c default "EN") as String)  
-var patientStreet = upper((pe.Patient_Street__c default "") as String)  
-var patientCity   = upper((pe.Patient_City__c default "") as String)  
-var patientState  = upper((pe.Patient_State__c default "") as String)  
-var patientZip    = upper((pe.Patient_Zip__c default "") as String)  
-var durationRaw   = (pe.Duration_Value__c default "") as String  
+var providerNpi   = pe.Provider_NPI__c as String  
+var providerLast  = upper(pe.Provider_Last_Name__c as String)  
+var providerFirst = upper(pe.Provider_First_Name__c as String)  
+var apptType      = upper(pe.Appointment_Type__c as String)  
+var apptReason    = (pe.Appointment_Reason__c as String)  
+var locationId    = pe.Location_ID__c as String  
+var locationName  = upper(pe.Location_Name__c as String)  
+var patientLast   = upper(pe.Patient_Last_Name__c as String)  
+var patientFirst  = upper(pe.Patient_First_Name__c as String)  
+var language      = upper(pe.Patient_Language__c as String)  
+var patientStreet = upper(pe.Patient_Street__c as String)  
+var patientCity   = upper(pe.Patient_City__c as String)  
+var patientState  = upper(pe.Patient_State__c as String)  
+var patientZip    = upper(pe.Patient_Zip__c as String)  
   
 ---  
 (  
-  "MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|" ++  
-  now() as String {format:"yyyyMMddHHmmss"} ++  
-  "||SIU^S15|" ++ apptId ++ "|P|2.3" ++  
-  
-  "\nSCH||" ++ apptId ++ "||||" ++ apptType ++ "|" ++ apptReason ++ "|" ++ apptType ++ "|" ++ durationRaw ++ "|MIN|" ++ "^^^" ++ schStartStr ++ "^" ++ schEndStr ++ "|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "|||||||||" ++ status ++  
-  
-  "\nPID|1|" ++ pid ++ "|" ++ pid ++ "|HF" ++ pid ++ "|" ++ patientLast ++ "^" ++ patientFirst ++ "|" ++ "|" ++ dob ++ "|" ++ gender ++ "|" ++ "|" ++ "PATIENT DECLINED|" ++ patientStreet ++ "^^" ++ patientCity ++ "^" ++ patientState ++ "^" ++ patientZip ++ "|" ++ contactInfo ++ "||" ++ language ++ "|||||||PATIENT DECLINED" ++  
-  
-  "\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName ++ "||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||" ++ apptId ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||" ++ schStartStr ++ "|" ++ schEndStr ++  
-  
-  "\nRGS|" ++  
-  
-  "\nAIL|1||" ++ locationId ++ "^^^" ++ locationName ++  
-  
-  "\nAIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
-)]]></ee:set-payload>
+"MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|" ++ now() as String {format:"yyyyMMddHHmmss"} ++ "||SIU^S15|" ++ apptId ++ "|P|2.3" ++  
+"\nSCH||" ++ apptId ++ "||||" ++ apptType ++ "|" ++ apptReason ++ "|" ++ apptType ++ "|" ++ (pe.Duration_Value__c as String) ++ "|MIN|" ++ "^^^" ++ schStartStr ++ "^" ++ schEndStr ++ "|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "|||||||||" ++ status ++  
+"\nPID|1|" ++ pid ++ "|" ++ pid ++ "|HF" ++ pid ++ "|" ++ patientLast ++ "^" ++ patientFirst ++ "|" ++ "|" ++ dob ++ "|" ++ gender ++ "|" ++ "|" ++ "PATIENT DECLINED|" ++ patientStreet ++ "^^" ++ patientCity ++ "^" ++ patientState ++ "^" ++ patientZip ++ "|" ++ contactInfo ++ "||" ++ language ++ "|||||||PATIENT DECLINED" ++  
+"\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName ++ "||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||" ++ apptId ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||" ++ schStartStr ++ "|" ++ schEndStr ++  
+"\nRGS|" ++  
+"\nAIL|1||" ++ locationId ++ "^^^" ++ locationName ++  
+"\nAIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
+)  ]]></ee:set-payload>
          </ee:message>
        </ee:transform>
        <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
@@ -429,7 +437,6 @@ var durationRaw   = (pe.Duration_Value__c default "") as String
      </when>
 
      <otherwise>
-       <logger doc:name="Debug Payload Type" level="WARN" message="(DEBUG) Payload type: #[payload.class], value: #[payload]"/>
        <logger doc:name="Unknown EventType - Skipped" level="WARN" message="Skipped NextGenServiceAppointment__e: unknown EventType: #[payload.event.Event_Type__c]"></logger>
      </otherwise>
    </choice>
