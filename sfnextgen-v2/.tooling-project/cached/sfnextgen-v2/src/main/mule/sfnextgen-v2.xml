@@ -15,6 +15,8 @@
      <salesforce-pub-sub:latest/>
     </salesforce-pub-sub:replay-option>
    </salesforce-pub-sub:subscribe-channel-listener>
+
+
    <logger level="INFO" doc:name="Log Platform Event Payload" message="INCOMING PLATFORM EVENT PAYLOAD: #[write(payload, 'application/json')]"/>
    
    <set-variable variableName="sentToNextgen" value="${sent.to.nextgen}" doc:name="Set sentToNextgen"/>
@@ -122,6 +124,219 @@ var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ 
      </otherwise>
     </choice>
    </when>
+
+   <when expression="#[payload.event.Event_Type__c == 'S12']">
+    <ee:transform doc:name="To HL7 SIU^S12">
+     <ee:message>
+      <ee:set-payload><![CDATA[
+%dw 2.0
+output text/plain
+
+var pe = payload.event
+var apptId = (pe.NextGen_ID__c default "") as String
+var pid =
+ if (pe.Patient_ID__c startsWith "HF") pe.Patient_ID__c[2 to -1]
+ else pe.Patient_ID__c
+var dob =
+ if (pe.Patient_DOB__c != null)
+   (pe.Patient_DOB__c as Date {format:"yyyy-MM-dd"}) as String {format:"yyyyMMdd"}
+ else
+   ""
+var gender =
+ if (pe.Patient_Gender__c == "Female") "F"
+ else if (pe.Patient_Gender__c == "Male") "M"
+ else "U"
+var phone = pe.Patient_Phone__c
+var phone_formatted =
+ if (sizeOf(phone) == 10)
+   "(" ++ phone[0 to 2] ++ ")" ++ phone[3 to 5] ++ "-" ++ phone[6 to 9]
+ else phone
+var area = if (!isEmpty(phone) and sizeOf(phone)>=3) phone[0 to 2] else ""
+var rest = if (!isEmpty(phone) and sizeOf(phone)>=7) phone[3 to 9] else ""
+var contactInfo = phone_formatted ++ "^^^" ++ "^^" ++ area ++ "^" ++ rest
+var status =
+ if (pe.Status__c == "Scheduled") "NEW"
+ else if (pe.Status__c == "RESCHEDULED") "RESCHEDULED"
+ else if (pe.Status__c == "Checked Out") "CHECKED OUT"
+ else if (pe.Status__c == "Checked In") "CHECKED IN"
+ else if (pe.Status__c == "Cancelled by Provider") "CANCELLED"
+ else upper(pe.Status__c)
+
+var schStart = pe.Start_DateTime__c as DateTime
+var schStartStr = schStart as String {format:"yyyyMMddHHmmss"}
+var schEnd =
+ if (pe.Duration_Value__c != null and pe.Duration_Value__c != "")
+   (schStart + (pe.Duration_Value__c as Number) * 60000)
+ else
+   schStart
+var schEndStr = schEnd as String {format:"yyyyMMddHHmmss"}
+
+---
+(
+ // MSH
+ "MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|"
+ ++ now() as String {format: "yyyyMMddHHmmss"}
+ ++ "||SIU^S12|"
+ ++ apptId ++ "|P|2.3"
+ // SCH
+ ++ "\nSCH||" ++ apptId ++ "||||"
+ ++ pe.Appointment_Type__c ++ "|"
+ ++ pe.Appointment_Reason__c ++ "|"
+ ++ pe.Appointment_Type__c ++ "|"
+ ++ (pe.Duration_Value__c as String) ++ "|MIN|"
+ ++ "^^^" ++ schStartStr ++ "^" ++ schEndStr
+ ++ "|||||"
+ ++ pe.Provider_NPI__c ++ "^"
+ ++ pe.Provider_Last_Name__c ++ "^"
+ ++ pe.Provider_First_Name__c
+ ++ "|||||||||"
+ ++ status
+ // PID
+ ++ "\nPID|1|"
+ ++ pid ++ "|"
+ ++ pid ++ "|"
+ ++ "HF" ++ pid ++ "|"
+ ++ pe.Patient_Last_Name__c ++ "^" ++ pe.Patient_First_Name__c ++ "|"
+ ++ "|"      // Mother's maiden name
+ ++ dob ++ "|"
+ ++ gender ++ "|"
+ ++ "|"      // PID-9
+ ++ "PATIENT DECLINED|"   // PID-10 Race
+ ++ pe.Patient_Street__c ++ "^^" ++ pe.Patient_City__c ++ "^" ++ pe.Patient_State__c ++ "^" ++ pe.Patient_Zip__c ++ "|"
+ ++ contactInfo ++ "||"
+ ++ (pe.Patient_Language__c default "EN") ++ "|||||||PATIENT DECLINED"
+ // PV1
+ ++ "\nPV1|1|O|^^^" ++ pe.Location_ID__c ++ "^^^^^" ++ pe.Location_Name__c ++ "||||"
+ ++ pe.Provider_NPI__c ++ "^" ++ pe.Provider_Last_Name__c ++ "^" ++ pe.Provider_First_Name__c ++ "||||"
+ ++ "1275017^^^1275017^^^^^FOREST HILLS||||||||"
+ ++ apptId
+ ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||" ++ schStartStr ++ "|" ++ schEndStr
+ // RGS
+ ++ "\nRGS|"
+ // AIL: location resource
+ ++ "\nAIL|1||" ++ pe.Location_ID__c ++ "^^^" ++ pe.Location_Name__c
+ // AIP: provider resource
+ ++ "\nAIP|1||" ++ pe.Provider_NPI__c ++ "^" ++ pe.Provider_Last_Name__c ++ "^" ++ pe.Provider_First_Name__c
+)
+      ]]></ee:set-payload>
+     </ee:message>
+    </ee:transform>
+    <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
+    <choice doc:name="NextGen Switch">
+     <when expression="#[vars.sentToNextgen]">
+      <!-- Send HL7 to NextGen API -->
+      <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON"/>
+     </when>
+     <otherwise>
+      <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only."/>
+     </otherwise>
+    </choice>
+   </when>
+
+   <when expression="#[payload.event.Event_Type__c == 'S15']">
+    <ee:transform doc:name="To HL7 SIU^S15">
+     <ee:message>
+      <ee:set-payload><![CDATA[
+%dw 2.0
+output text/plain
+
+var pe = payload.event
+var apptId = pe.NextGen_ID__c
+var pid =
+ if (pe.Patient_ID__c startsWith "HF") pe.Patient_ID__c[2 to -1]
+ else pe.Patient_ID__c
+var dob =
+ if (pe.Patient_DOB__c != null)
+   (pe.Patient_DOB__c as Date {format:"yyyy-MM-dd"}) as String {format:"yyyyMMdd"}
+ else
+   ""
+var gender =
+ if (pe.Patient_Gender__c == "Female") "F"
+ else if (pe.Patient_Gender__c == "Male") "M"
+ else "U"
+var phone = pe.Patient_Phone__c
+var phone_formatted =
+ if (sizeOf(phone) == 10)
+   "(" ++ phone[0 to 2] ++ ")" ++ phone[3 to 5] ++ "-" ++ phone[6 to 9]
+ else phone
+var area = if (!isEmpty(phone) and sizeOf(phone)>=3) phone[0 to 2] else ""
+var rest = if (!isEmpty(phone) and sizeOf(phone)>=7) phone[3 to 9] else ""
+var contactInfo = phone_formatted ++ "^^^" ++ "^^" ++ area ++ "^" ++ rest
+var status =
+ if (pe.Status__c == "Cancelled by Provider") "CANCELLED"
+ else if (upper(pe.Status__c) == "NO SHOW") "NO SHOW"
+ else upper(pe.Status__c)
+
+var schStart = pe.Start_DateTime__c as DateTime
+var schStartStr = schStart as String {format:"yyyyMMddHHmmss"}
+var schEnd =
+ if (pe.Duration_Value__c != null and pe.Duration_Value__c != "")
+   (schStart + (pe.Duration_Value__c as Number) * 60000)
+ else
+   schStart
+var schEndStr = schEnd as String {format:"yyyyMMddHHmmss"}
+
+---
+(
+ // MSH
+ "MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|"
+ ++ now() as String {format: "yyyyMMddHHmmss"}
+ ++ "||SIU^S15|"
+ ++ apptId ++ "|P|2.3"
+ // SCH
+ ++ "\nSCH||" ++ apptId ++ "||||"
+ ++ pe.Appointment_Type__c ++ "|"
+ ++ pe.Appointment_Reason__c ++ "|"
+ ++ pe.Appointment_Type__c ++ "|"
+ ++ (pe.Duration_Value__c as String) ++ "|MIN|"
+ ++ "^^^" ++ schStartStr ++ "^" ++ schEndStr
+ ++ "|||||"
+ ++ pe.Provider_NPI__c ++ "^"
+ ++ pe.Provider_Last_Name__c ++ "^"
+ ++ pe.Provider_First_Name__c
+ ++ "|||||||||"
+ ++ status
+ // PID
+ ++ "\nPID|1|"
+ ++ pid ++ "|"
+ ++ pid ++ "|"
+ ++ "HF" ++ pid ++ "|"
+ ++ pe.Patient_Last_Name__c ++ "^" ++ pe.Patient_First_Name__c ++ "|"
+ ++ "|"      // Mother's maiden name
+ ++ dob ++ "|"
+ ++ gender ++ "|"
+ ++ "|"      // PID-9
+ ++ "PATIENT DECLINED|"   // PID-10 Race
+ ++ pe.Patient_Street__c ++ "^^" ++ pe.Patient_City__c ++ "^" ++ pe.Patient_State__c ++ "^" ++ pe.Patient_Zip__c ++ "|"
+ ++ contactInfo ++ "||"
+ ++ (pe.Patient_Language__c default "EN") ++ "|||||||PATIENT DECLINED"
+ // PV1
+ ++ "\nPV1|1|O|^^^" ++ pe.Location_ID__c ++ "^^^^^" ++ pe.Location_Name__c ++ "||||"
+ ++ pe.Provider_NPI__c ++ "^" ++ pe.Provider_Last_Name__c ++ "^" ++ pe.Provider_First_Name__c ++ "||||"
+ ++ "1275017^^^1275017^^^^^FOREST HILLS||||||||"
+ ++ apptId
+ ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||" ++ schStartStr ++ "|" ++ schEndStr
+ // RGS
+ ++ "\nRGS|"
+ // AIL: location resource
+ ++ "\nAIL|1||" ++ pe.Location_ID__c ++ "^^^" ++ pe.Location_Name__c
+ // AIP: provider resource
+ ++ "\nAIP|1||" ++ pe.Provider_NPI__c ++ "^" ++ pe.Provider_Last_Name__c ++ "^" ++ pe.Provider_First_Name__c
+)
+      ]]></ee:set-payload>
+     </ee:message>
+    </ee:transform>
+    <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
+    <choice doc:name="NextGen Switch">
+     <when expression="#[vars.sentToNextgen]">
+      <!-- Send HL7 to NextGen API -->
+      <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON"/>
+     </when>
+     <otherwise>
+      <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only."/>
+     </otherwise>
+    </choice>
+   </when>
    <when expression="#[payload.event.Event_Type__c == 'A08']">
     <ee:transform doc:name="To HL7 ADT^A08">
      <ee:message>
@@ -213,6 +428,214 @@ var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ 
     <logger doc:name="Unknown EventType - Skipped" level="WARN" message="Skipped payload, unknown EventType: #[payload.event.Event_Type__c]"></logger>
    </otherwise>
   </choice>
+ </flow>
+
+ <flow name="NextGenServiceAppointment__e_SIU">
+   <!-- Begin NextGenServiceAppointment__e SIU Handler -->
+   <salesforce-pub-sub:subscribe-channel-listener channelName="/event/NextGenServiceAppointment__e" config-ref="Pubsub-config" doc:name="Subscribe NextGenServiceAppointment__e">
+     <salesforce-pub-sub:replay-option>
+       <salesforce-pub-sub:latest/>
+     </salesforce-pub-sub:replay-option>
+   </salesforce-pub-sub:subscribe-channel-listener>
+   <logger level="INFO" doc:name="Log NextGenServiceAppointment__e Payload" message="INCOMING NEXTGEN SERVICE APPOINTMENT: #[write(payload, 'application/json')]"/>
+   <set-variable variableName="sentToNextgen" value="${sent.to.nextgen}" doc:name="Set sentToNextgen"/>
+   <choice doc:name="Route by EventType__c">
+     <when expression="#[payload.event.Event_Type__c == 'S12']">
+       <ee:transform doc:name="To HL7 SIU^S12">
+         <ee:message>
+           <ee:set-payload><![CDATA[
+%dw 2.0
+output text/plain
+
+var pe = payload.event
+
+
+// Placer ID (optional, SCH-1)
+var placerId = if (pe.Placer_Appointment_ID__c == null or isEmpty(pe.Placer_Appointment_ID__c)) "" else (pe.Placer_Appointment_ID__c as String)
+// Filler ID (required, SCH-2)
+var fillerId = pe.NextGen_ID__c as String
+var patientIdRaw = pe.Patient_ID__c as String
+var patientLastName = pe.Patient_Last_Name__c as String
+var patientFirstName = pe.Patient_First_Name__c as String
+var patientDobRaw = pe.Patient_DOB__c as String
+var patientGenderRaw = pe.Patient_Gender__c as String
+var providerNpi = pe.Provider_NPI__c as String
+var providerLast = pe.Provider_Last_Name__c as String
+var providerFirst = pe.Provider_First_Name__c as String
+var locationId = pe.Location_ID__c as String
+var locationName = pe.Location_Name__c as String
+var startDateTimeRaw = pe.Start_DateTime__c as String
+var durationRaw = pe.Duration_Value__c as String
+var statusRaw = pe.Appointment_Status__c as String
+var apptType = pe.Appointment_Type__c as String
+
+// Patient ID HL7
+var pid =
+  if ((patientIdRaw as String) startsWith "HF")
+    (patientIdRaw as String)[2 to -1]
+  else
+    patientIdRaw as String
+
+// DOB
+var dob =
+  (patientDobRaw as Date {format:"MMMM dd, yyyy"}) as String {format:"yyyyMMdd"}
+
+// Gender HL7
+var genderVal = upper(patientGenderRaw as String)
+var gender =
+  if (genderVal == "FEMALE") "F"
+  else if (genderVal == "MALE") "M"
+  else "U"
+
+// Appointment
+var startDT = (startDateTimeRaw as DateTime {format:"M/d/yyyy h:mm a"})
+var schStartStr = (startDT as String {format:"yyyyMMddHHmmss"})
+var duration = durationRaw as Number
+var schEndDT = startDT + (duration * 60000)
+var schEndStr = (schEndDT as DateTime) as String {format:"yyyyMMddHHmmss"}
+
+// Phone (must be 10 digits)
+var phone = pe.Patient_Phone__c as String
+var phoneFormatted = if (sizeOf(phone) == 10) "(" ++ phone[0 to 2] ++ ")" ++ phone[3 to 5] ++ "-" ++ phone[6 to 9] else ""
+var pid13 = phoneFormatted ++ "^^^^^" ++ phone[0 to 2] ++ "^" ++ phone[3 to 9]
+
+var language = if (pe.Patient_Language__c == null or isEmpty(pe.Patient_Language__c)) "EN" else (pe.Patient_Language__c as String)
+var reason = if (pe.Appointment_Reason__c == null) "" else pe.Appointment_Reason__c as String
+
+var status =
+  if (upper(statusRaw) == "SCHEDULED") "NEW"
+  else if (upper(statusRaw) == "RESCHEDULED") "RESCHEDULED"
+  else if (upper(statusRaw) == "CHECKED OUT") "CHECKED OUT"
+  else if (upper(statusRaw) == "CHECKED IN") "CHECKED IN"
+  else if (upper(statusRaw) == "CANCELLED BY PROVIDER") "CANCELLED"
+  else if (upper(statusRaw) == "NO SHOW") "NO SHOW"
+  else upper(statusRaw)
+
+---
+(
+  "MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|"
+    ++ now() as String {format:"yyyyMMddHHmmss"}
+    ++ "||SIU^S12|"
+    ++ fillerId
+    ++ "|P|2.3"
+  ++ "\nSCH|" ++ placerId ++ "|" ++ fillerId ++ "||||" ++ apptType ++ "|" ++ reason ++ "|" ++ apptType ++ "|" ++ (durationRaw as String) ++ "|MIN|^^^" ++ schStartStr ++ "^" ++ schEndStr ++ "|||||" ++ providerNpi ++ "^" ++ upper(providerLast) ++ "^" ++ upper(providerFirst) ++ "|||||||||" ++ status
+  ++ "\nPID|1|" ++ pid ++ "|" ++ pid ++ "|HF" ++ pid ++ "|" ++ upper(patientLastName) ++ "^" ++ upper(patientFirstName) ++ "|" ++ "|" ++ dob ++ "|" ++ gender ++ "|" ++ "|" ++ "PATIENT DECLINED|" ++ (pe.Patient_Street__c as String) ++ "^^" ++ (pe.Patient_City__c as String) ++ "^" ++ (pe.Patient_State__c as String) ++ "^" ++ (pe.Patient_Zip__c as String) ++ "|" ++ pid13 ++ "||" ++ language ++ "|||||||PATIENT DECLINED"
+  ++ "\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ upper(locationName) ++ "||||" ++ providerNpi ++ "^" ++ upper(providerLast) ++ "^" ++ upper(providerFirst) ++ "||||" ++ "1275017^^^1275017^^^^^FOREST HILLS||||||||" ++ fillerId ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||" ++ schStartStr ++ "|" ++ schEndStr
+  ++ "\nRGS|"
+  ++ "\nAIL|1||" ++ locationId ++ "^^^" ++ upper(locationName)
+  ++ "\nAIP|1||" ++ providerNpi ++ "^" ++ upper(providerLast) ++ "^" ++ upper(providerFirst)
+)
+           ]]></ee:set-payload>
+         </ee:message>
+       </ee:transform>
+       <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
+       <choice doc:name="NextGen Switch">
+         <when expression="#[vars.sentToNextgen]">
+           <!-- Send HL7 to NextGen API -->
+           <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON"/>
+         </when>
+         <otherwise>
+           <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only."/>
+         </otherwise>
+       </choice>
+     </when>
+
+     <when expression="#[payload.event.Event_Type__c == 'S15']">
+       <ee:transform doc:name="To HL7 SIU^S15">
+         <ee:message>
+           <ee:set-payload><![CDATA[
+%dw 2.0
+output text/plain
+
+var pe = payload.event
+var apptId = pe.NextGen_ID__c
+var pid =
+ if (pe.Patient_ID__c startsWith "HF") pe.Patient_ID__c[2 to -1]
+ else pe.Patient_ID__c
+var dob =
+ if (pe.Patient_DOB__c != null)
+   (pe.Patient_DOB__c as Date {format:"MMMM dd, yyyy"}) as String {format:"yyyyMMdd"}
+ else
+   ""
+var gender =
+ if (pe.Patient_Gender__c == "Female") "F"
+ else if (pe.Patient_Gender__c == "Male") "M"
+ else "U"
+var phone = pe.Patient_Phone__c
+var phone_formatted =
+ if (sizeOf(phone) == 10)
+   "(" ++ phone[0 to 2] ++ ")" ++ phone[3 to 5] ++ "-" ++ phone[6 to 9]
+ else phone
+var area = if (!isEmpty(phone) and sizeOf(phone)>=3) phone[0 to 2] else ""
+var rest = if (!isEmpty(phone) and sizeOf(phone)>=7) phone[3 to 9] else ""
+var contactInfo = phone_formatted ++ "^^^" ++ "^^" ++ area ++ "^" ++ rest
+var status =
+  if ((pe.Appointment_Status__c default "") as String == "Cancelled by Provider") "CANCELLED"
+  else if ((pe.Appointment_Status__c default "") as String == "No Show") "NO SHOW"
+  else if ((pe.Appointment_Status__c default "") as String == "RESCHEDULED") "RESCHEDULED"
+  else if ((pe.Appointment_Status__c default "") as String == "Checked Out") "CHECKED OUT"
+  else if ((pe.Appointment_Status__c default "") as String == "Checked In") "CHECKED IN"
+  else if ((pe.Appointment_Status__c default "") as String == "Scheduled") "NEW"
+  else upper(pe.Appointment_Status__c default "")
+
+var schStart =
+  if ((pe.Start_DateTime__c default "") != "")
+    (pe.Start_DateTime__c as DateTime {format:"M/d/yyyy h:mm a"})
+  else null
+var schStartStr =
+  if (schStart != null) (schStart as String {format:"yyyyMMddHHmmss"}) else ""
+var schEnd =
+  if ((pe.Duration_Value__c default "") != "" and schStart != null)
+    schStart + ((pe.Duration_Value__c as Number) * 60000)
+  else schStart
+var schEndStr =
+  if (schEnd != null) (schEnd as String {format:"yyyyMMddHHmmss"}) else ""
+
+var providerNpi = pe.Provider_NPI__c default ""
+var providerLast = upper(pe.Provider_Last_Name__c default "")
+var providerFirst = upper(pe.Provider_First_Name__c default "")
+var apptType = upper(pe.Appointment_Type__c default "")
+var apptReason = if ((pe.Appointment_Reason__c default "") != "") pe.Appointment_Reason__c else ""
+var locationId = pe.Location_ID__c default ""
+var locationName = upper(pe.Location_Name__c default "")
+var patientLast = upper(pe.Patient_Last_Name__c default "")
+var patientFirst = upper(pe.Patient_First_Name__c default "")
+var language = upper(pe.Patient_Language__c default "EN")
+var patientStreet = upper(pe.Patient_Street__c default "")
+var patientCity = upper(pe.Patient_City__c default "")
+var patientState = upper(pe.Patient_State__c default "")
+var patientZip = upper(pe.Patient_Zip__c default "")
+
+---
+(
+"MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|" ++ now() as String {format:"yyyyMMddHHmmss"} ++ "||SIU^S15|" ++ (apptId default "") ++ "|P|2.3"
+++ "\nSCH||" ++ (apptId default "") ++ "||||" ++ apptType ++ "|" ++ apptReason ++ "|" ++ apptType ++ "|" ++ (pe.Duration_Value__c default "") ++ "|MIN|" ++ "^^^" ++ schStartStr ++ "^" ++ schEndStr ++ "|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "|||||||||" ++ status
+++ "\nPID|1|" ++ pid ++ "|" ++ pid ++ "|HF" ++ pid ++ "|" ++ patientLast ++ "^" ++ patientFirst ++ "|" ++ "|" ++ dob ++ "|" ++ gender ++ "|" ++ "|" ++ "PATIENT DECLINED|" ++ patientStreet ++ "^^" ++ patientCity ++ "^" ++ patientState ++ "^" ++ patientZip ++ "|" ++ contactInfo ++ "||" ++ language ++ "|||||||PATIENT DECLINED"
+++ "\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName ++ "||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||" ++ (apptId default "") ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||" ++ schStartStr ++ "|" ++ schEndStr
+++ "\nRGS|"
+++ "\nAIL|1||" ++ locationId ++ "^^^" ++ locationName
+++ "\nAIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst
+)
+           ]]></ee:set-payload>
+         </ee:message>
+       </ee:transform>
+       <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
+       <choice doc:name="NextGen Switch">
+         <when expression="#[vars.sentToNextgen]">
+           <!-- Send HL7 to NextGen API -->
+           <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON"/>
+         </when>
+         <otherwise>
+           <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only."/>
+         </otherwise>
+       </choice>
+     </when>
+
+     <otherwise>
+       <logger doc:name="Unknown EventType - Skipped" level="WARN" message="Skipped NextGenServiceAppointment__e: unknown EventType: #[payload.event.Event_Type__c]"></logger>
+     </otherwise>
+   </choice>
+   <!-- End NextGenServiceAppointment__e SIU Handler -->
  </flow>
 </mule>
 
