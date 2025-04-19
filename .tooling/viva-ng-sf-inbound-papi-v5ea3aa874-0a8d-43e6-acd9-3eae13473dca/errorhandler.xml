@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	
+	<error-handler name="error-handler"
+		doc:id="e99ab74d-de8d-4803-9bc2-4d353bd1f937">
+		
+		<!-- APIKIT error handling -->
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="ApiKit Errors" doc:id="01dd8baf-7120-49b5-b79b-ba14b497cfed" type="APIKIT:NOT_FOUND,APIKIT:BAD_REQUEST,APIKIT:METHOD_NOT_ALLOWED,APIKIT:NOT_ACCEPTABLE,APIKIT:UNSUPPORTED_MEDIA_TYPE,APIKIT:NOT_IMPLEMENTED">
+			<ee:transform doc:name="Format ApiKit Errors" doc:id="4e0e5ef7-2bcd-4dba-b2b9-89a569593745" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "messages": if(error.cause.errorMessage.payload.messages != null) 
+               (error.cause.errorMessage.payload.messages) 
+             else 
+               error.description,
+  "errorOrigin": p('application.name'),
+  "status": "ERROR",
+  "code": error.errorType.asString default error.errorMessage.attributes.statusCode,
+  "description": error.detailedDescription,
+  "correlationId": vars.correlationId default "",
+  "timestamp": now() >> "America/Chicago" as String {format: "yyyy-MM-dd'T'HH:mm:ss.SSS"}
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+---
+error.errorMessage.attributes.statusCode default 400]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<logger level="ERROR" doc:name="Log ApiKit Error" doc:id="4626d383-7bf9-4704-a8f9-5128d7fcdf78" 
+                message="#[%dw 2.0 output application/json --- {error: error.errorType.identifier, correlationId: vars.correlationId default '', details: payload}]" 
+                category="com.vivaeve.errors.apikit"/>
+			<flow-ref doc:name="error-handler-exit" doc:id="2bc7d59a-9d0a-40ca-a27d-85b3ccac7c2e" name="error-handler-exit" />
+		</on-error-propagate>
+		
+		<!-- Salesforce Composite error handling -->
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="Salesforce Composite Errors" doc:id="038bac04-d147-4c7a-ac2b-5c7f603dd49d" type="SALESFORCE-COMPOSITE:CONNECTIVITY,SALESFORCE-COMPOSITE:INVALID_SESSION,SALESFORCE-COMPOSITE:RETRY_EXHAUSTED,SALESFORCE-COMPOSITE:TRANSACTION,SALESFORCE-COMPOSITE:TRANSFORMATION,SALESFORCE-COMPOSITE:UNKNOWN,SALESFORCE-COMPOSITE:VALIDATION">
+			<ee:transform doc:name="Format SF Composite Errors" doc:id="9e687c90-f422-4160-991e-3f1132be952e" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "messages": if(error.cause.errorMessage.payload.messages != null) 
+               (error.cause.errorMessage.payload.messages) 
+             else 
+               error.description,
+  "errorOrigin": p('application.name'),
+  "status": "ERROR",
+  "code": error.errorType.asString,
+  "description": error.detailedDescription default error.description,
+  "correlationId": vars.correlationId default "",
+  "timestamp": now() >> "America/Chicago" as String {format: "yyyy-MM-dd'T'HH:mm:ss.SSS"},
+  "retryable": error.errorType.identifier == "CONNECTIVITY" or error.errorType.identifier == "RETRY_EXHAUSTED"
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+---
+if (error.errorType.identifier == "CONNECTIVITY" or error.errorType.identifier == "RETRY_EXHAUSTED")
+  503
+else if (error.errorType.identifier == "VALIDATION" or error.errorType.identifier == "INVALID_SESSION")
+  400
+else
+  500]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<logger level="ERROR" doc:name="Log SF Composite Error" doc:id="268c138a-d91e-4f1e-821b-05afcd0f3dfe" 
+                message="#[%dw 2.0 output application/json --- {error: error.errorType.identifier, correlationId: vars.correlationId default '', details: error.description, flow: flow.name default 'unknown'}]" 
+                category="com.vivaeve.errors.salesforce"/>
+			<flow-ref doc:name="Send Error Email" doc:id="2b3c5651-f5d0-4c6a-a696-882b59f0c58c" name="impl-error-email-flow"/>
+			<flow-ref doc:name="error-handler-exit" doc:id="57f9a92c-28d1-40ab-905c-265cbcd80fac" name="error-handler-exit" />
+		</on-error-propagate>
+		
+		<!-- Salesforce error handling -->
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="Salesforce Errors" doc:id="8afb906e-0d27-489d-a752-a67ae787781d" type="SALESFORCE:CONNECTIVITY, SALESFORCE:INVALID_INPUT, SALESFORCE:INVALID_RESPONSE, MULE:RETRY_EXHAUSTED, SALESFORCE:LIMIT_EXCEEDED, SALESFORCE:MUTUAL_AUTHENTICATION_FAILED, SALESFORCE:NOT_FOUND, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT">
+			<ee:transform doc:name="Format SF Errors" doc:id="9423ffec-f9dc-43db-aca4-69306a5eadce" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "messages": if(error.cause.errorMessage.payload.messages != null) 
+               (error.cause.errorMessage.payload.messages) 
+             else 
+               error.description,
+  "errorOrigin": p('application.name'),
+  "status": "ERROR",
+  "code": error.errorType.asString,
+  "description": error.detailedDescription default error.description,
+  "correlationId": vars.correlationId default "",
+  "timestamp": now() >> "America/Chicago" as String {format: "yyyy-MM-dd'T'HH:mm:ss.SSS"},
+  "retryable": error.errorType.identifier == "CONNECTIVITY" or 
+               error.errorType.identifier == "RETRY_EXHAUSTED" or 
+               error.errorType.identifier == "TIMEOUT"
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+---
+if (error.errorType.identifier == "CONNECTIVITY" or 
+    error.errorType.identifier == "RETRY_EXHAUSTED" or 
+    error.errorType.identifier == "TIMEOUT")
+  503
+else if (error.errorType.identifier == "INVALID_INPUT" or 
+         error.errorType.identifier == "NOT_FOUND")
+  400
+else if (error.errorType.identifier == "LIMIT_EXCEEDED")
+  429
+else
+  500]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<logger level="ERROR" doc:name="Log SF Error" doc:id="293597b8-7029-49a1-9d00-09a9f6c44579" 
+                message="#[%dw 2.0 output application/json --- {error: error.errorType.identifier, correlationId: vars.correlationId default '', details: error.description, messageId: vars.messageId default 'unknown'}]" 
+                category="com.vivaeve.errors.salesforce"/>
+			<flow-ref doc:name="Send Error Email" doc:id="2b38f822-0936-4209-ab62-a1737f8d5c34" name="impl-error-email-flow"/>
+			<flow-ref doc:name="error-handler-exit" doc:id="a39c063a-9ba0-4ab5-890a-ce1fdbe7d46c" name="error-handler-exit"/>
+		</on-error-propagate>
+		
+		<!-- HTTP error handling -->
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="HTTP Errors" doc:id="3630d2a1-4079-42a2-b862-7580f0a5b734" type="HTTP:BAD_GATEWAY,HTTP:BAD_REQUEST, HTTP:CLIENT_SECURITY, HTTP:CONNECTIVITY, HTTP:INTERNAL_SERVER_ERROR, HTTP:METHOD_NOT_ALLOWED, HTTP:NOT_ACCEPTABLE, HTTP:RETRY_EXHAUSTED, HTTP:SECURITY, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:TOO_MANY_REQUESTS, HTTP:UNSUPPORTED_MEDIA_TYPE, STREAM_MAXIMUM_SIZE_EXCEEDED" >
+			<ee:transform doc:name="Format HTTP Errors" doc:id="61256a08-a55f-4dee-8640-acb550b6f8de" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "messages": if(error.cause.errorMessage.payload.messages != null) 
+               (error.cause.errorMessage.payload.messages) 
+             else 
+               error.description,
+  "errorOrigin": p('application.name'),
+  "status": "ERROR",
+  "code": error.errorType.asString,
+  "description": error.detailedDescription default error.description,
+  "correlationId": vars.correlationId default "",
+  "timestamp": now() >> "America/Chicago" as String {format: "yyyy-MM-dd'T'HH:mm:ss.SSS"},
+  "statusCode": error.errorMessage.attributes.statusCode default 500,
+  "path": attributes.requestPath default "",
+  "retryable": ["CONNECTIVITY", "TIMEOUT", "RETRY_EXHAUSTED", "SERVICE_UNAVAILABLE", "BAD_GATEWAY"] contains error.errorType.identifier
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[error.errorMessage.attributes.statusCode default "500"]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<logger level="ERROR" doc:name="Log HTTP Error" doc:id="05967425-a776-4b91-8bdf-3eaee2f3a8ef" 
+                message="#[%dw 2.0 output application/json --- {error: error.errorType.identifier, correlationId: vars.correlationId default '', statusCode: error.errorMessage.attributes.statusCode default 500, path: attributes.requestPath default '', message: error.description}]" 
+                category="com.vivaeve.errors.http"/>
+			<flow-ref doc:name="Send Error Email" doc:id="eafedfec-d3c6-4d11-81fc-dc89ba0d573f" name="impl-error-email-flow"/>
+			<flow-ref doc:name="error-handler-exit" doc:id="7fdb943f-e5db-4738-92fa-a87abddf012b" name="error-handler-exit" />
+		</on-error-propagate>
+		
+		<!-- HL7 specific error handling -->
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="HL7 Errors" doc:id="bb82e95f-6612-47f9-90cf-65edec412f43" type="HL7:*">
+			<ee:transform doc:name="Format HL7 Errors">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "messages": error.description,
+  "errorOrigin": p('application.name'),
+  "status": "ERROR",
+  "code": error.errorType.asString,
+  "description": "Error processing HL7 message",
+  "correlationId": vars.correlationId default "",
+  "timestamp": now() >> "America/Chicago" as String {format: "yyyy-MM-dd'T'HH:mm:ss.SSS"},
+  "messageType": vars.inputPayload[8 to 16] default "unknown",
+  "details": error.detailedDescription
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<logger level="ERROR" doc:name="Log HL7 Error" message="#[%dw 2.0 output application/json --- {error: error.errorType.identifier, correlationId: vars.correlationId default '', messageType: vars.inputPayload[8 to 16] default 'unknown', patientId: vars.hfId default 'unknown', description: error.description}]" category="com.vivaeve.errors.hl7"/>
+			<flow-ref doc:name="Send Error Email" name="impl-error-email-flow"/>
+			<flow-ref doc:name="error-handler-exit" name="error-handler-exit" />
+		</on-error-propagate>
+		
+		<!-- Catch-all for any other errors -->
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="General Errors" doc:id="a0bb02c4-aa87-4bb5-9a0d-5a44a8ca681b" type="ANY">
+			<ee:transform doc:name="Format Generic Error" doc:id="35a1be2b-522d-4b3c-bbcb-6e71fe501282">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "messages": error.description,
+  "errorOrigin": p('application.name'),
+  "status": "ERROR",
+  "code": error.errorType.asString default "SYSTEM_ERROR",
+  "description": error.detailedDescription default error.description,
+  "correlationId": vars.correlationId default "",
+  "timestamp": now() >> "America/Chicago" as String {format: "yyyy-MM-dd'T'HH:mm:ss.SSS"},
+  "flow": flow.name default "unknown",
+  "component": error.failingComponent default ""
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[error.errorMessage.attributes.statusCode default "500"]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<logger level="ERROR" doc:name="Log Generic Error" doc:id="5a0b1da4-71b1-41e8-a70b-88d80f1ff867" 
+                message="#[%dw 2.0 output application/json --- {error: error.errorType.identifier, correlationId: vars.correlationId default '', flow: flow.name default 'unknown', component: error.failingComponent default '', message: error.description}]" 
+                category="com.vivaeve.errors.general"/>
+			<flow-ref doc:name="Send Error Email" doc:id="50de6ad5-ebc6-4609-9038-fe5561def113" name="impl-error-email-flow"/>
+			<flow-ref doc:name="error-handler-exit" doc:id="39e8067e-9a47-4deb-afb5-2ac6c480bab5" name="error-handler-exit" />
+		</on-error-propagate>
+	</error-handler>
+	
+	<!-- Error handler exit subflow -->
+	<sub-flow name="error-handler-exit" doc:id="f5573078-a469-465f-bad2-2ecbd7482506">
+		<logger level="ERROR" doc:name="Final Error Log" doc:id="f2bf290d-9461-452e-a9e4-50c0595dab65" 
+               message="#[%dw 2.0 output application/json --- {finalError: payload, correlationId: vars.correlationId default '', timestamp: now() as String {format: 'yyyy-MM-dd\'T\'HH:mm:ss.SSS'}}]" 
+               category="com.vivaeve.errors.final"/>
+	</sub-flow>
+	
+	<!-- Improved error email notification subflow -->
+	<sub-flow name="impl-error-email-flow" doc:id="b9941a64-979f-4a1e-9ed3-796115d86583">
+		<ee:transform doc:name="Prepare Error Email Content" doc:id="9c47a06f-8142-41fc-b6c5-e8bae559f355">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+    "subject": p('application.name') ++ " - Error Alert: " ++ error.errorType.identifier,
+    "body": "ERROR NOTIFICATION\n\n" ++
+            "Error Type: " ++ error.errorType.namespace ++ ":" ++ error.errorType.identifier ++ "\n" ++
+            "Timestamp: " ++ (now() as String {format: "yyyy-MM-dd'T'HH:mm:ss.SSS"}) ++ "\n" ++
+            "Environment: " ++ p('mule.env') default "unknown" ++ "\n" ++
+            "Correlation ID: " ++ (vars.correlationId default "") ++ "\n" ++
+            "Flow: " ++ (flow.name default "unknown") ++ "\n\n" ++
+            "MESSAGE:\n" ++ error.description ++ "\n\n" ++
+            "DETAILS:\n" ++ (error.detailedDescription default "") ++ "\n\n" ++
+            "CONTEXT INFORMATION:\n" ++
+            "Message Type: " ++ (vars.inputPayload[8 to 16] default "unknown") ++ "\n" ++
+            "Patient ID: " ++ (vars.hfId default "unknown") ++ "\n" ++
+            "Message ID: " ++ (vars.messageId default "unknown") ++ "\n\n" ++
+            "This is an automated notification from the " ++ p('application.name') ++ " system."
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		
+		<logger level="INFO" doc:name="Email Notification Log" doc:id="fc6d082a-e30b-445d-8c01-6e18b6c0d9c0" 
+               message='CorrelationId: #[vars.correlationId default ""]  "Sending Error Email to Support Team"' 
+               category="com.vivaeve.notifications"/>
+		
+		<!-- Add location-based email routing -->
+		<choice doc:name="Route by Location">
+			<when expression="#[vars.mailLocation == 'FOREST HILLS']">
+				<email:send doc:name="Send to Forest Hills Team" doc:id="468cc107-0473-4994-8974-d8eeb3a6427e" config-ref="Email_SMTP" 
+                           fromAddress="${email.from}" subject="#[payload.subject]">
+					<email:to-addresses>
+						<email:to-address value="${email.forest.to}" />
+					</email:to-addresses>
+					<email:body contentType="text/plain">
+						<email:content><![CDATA[#[payload.body]]]></email:content>
+					</email:body>
+				</email:send>
+			</when>
+			<when expression="#[vars.mailLocation == 'MADISON']">
+				<email:send doc:name="Send to Madison Team" doc:id="ae435f11-c071-4ff1-afec-d53a1b329b5f" config-ref="Email_SMTP" 
+                           fromAddress="${email.from}" subject="#[payload.subject]">
+					<email:to-addresses>
+						<email:to-address value="${email.madison.to}" />
+					</email:to-addresses>
+					<email:body contentType="text/plain">
+						<email:content><![CDATA[#[payload.body]]]></email:content>
+					</email:body>
+				</email:send>
+			</when>
+			<otherwise>
+				<email:send doc:name="Send to Default Team" doc:id="865dcc07-bf13-4e46-a9f4-5f294326052b" config-ref="Email_SMTP" 
+                           fromAddress="${email.from}" subject="#[payload.subject]">
+					<email:to-addresses>
+						<email:to-address value="${email.to}" />
+					</email:to-addresses>
+					<email:body contentType="text/plain">
+						<email:content><![CDATA[#[payload.body]]]></email:content>
+					</email:body>
+				</email:send>
+			</otherwise>
+		</choice>
+		
+		<logger level="INFO" doc:name="Email Sent Log" doc:id="f80bd669-5881-4509-8bd3-e8077ec4429d" 
+               message='CorrelationId: #[vars.correlationId default ""]   "Error Email sent successfully"' 
+               category="com.vivaeve.notifications"/>
+               
+		<ee:transform doc:name="Set Response" doc:id="9e5909f3-8ffb-4a6d-8b23-432b563aee9f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "status": "HANDLED",
+    "message": "Error notification has been sent",
+    "correlationId": vars.correlationId default "",
+    "timestamp": now() >> "America/Chicago" as String {format: "yyyy-MM-dd'T'HH:mm:ss.SSS"}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>
