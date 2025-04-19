@@ -1,0 +1,1586 @@
+ [
+        {
+            "Appointment Type": "AES BOTOX AND FILLER COMBO TX",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES BOTOX TX",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES Chemical Peel",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES Complimentary Consultation",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES DERM CONSULT",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES Derm Visit",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES FILLER TX",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES Follow Up",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES Follow Up Virtual",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES INJ Treatment 30 minutes",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES INJ Treatment 60 minutes",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES Microneedling/PRP",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES NPV BOTOX",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES NPV COMPLIMENTARY CONSULT",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES NPV Consult",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES NPV FILLER",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES NPV MICRONEEDLING",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES NPV SKIN CONSULT",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES NPV Virtual Consult",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES NUMBING",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES Secret PRO",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES Secret PRO CO2",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES Secret PRO with PRP",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES SKIN CARE CONSULT",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES Staff Follow Up",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES STAFF POST TX",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "AES Staff TX",
+            "Opportunity Record Type": "Aesthetics",
+            "Timo_Opp_Type": "Aesthetics",
+            "Opportunity Record Type ID": "0121T000000NESCQA4",
+            "Opportunity Owner": "AES",
+            "Opportunity Owner Id": "00GRj000002GcmX",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "DIETICIAN VIRTUAL CALL 30",
+            "Opportunity Record Type": "Dietitian ",
+            "Timo_Opp_Type": "Dietitian",
+            "Opportunity Record Type ID": "0121T000000NEKIQA4",
+            "Opportunity Owner": "Tamsin Jordan",
+            "Opportunity Owner Id": "0051T00000B7g5Q",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "DIETICIAN VIRTUAL CALL 60",
+            "Opportunity Record Type": "Dietitian ",
+            "Timo_Opp_Type": "Dietitian",
+            "Opportunity Record Type ID": "0121T000000NEKIQA4",
+            "Opportunity Owner": "Tamsin Jordan",
+            "Opportunity Owner Id": "0051T00000B7g5Q",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "Dietitian Consult 15 Minutes - Virtual Only",
+            "Opportunity Record Type": "Dietitian ",
+            "Timo_Opp_Type": "Dietitian",
+            "Opportunity Record Type ID": "0121T000000NEKIQA4",
+            "Opportunity Owner": "Tamsin Jordan",
+            "Opportunity Owner Id": "0051T00000B7g5Q",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "Dietitian Consult 30 Minutes",
+            "Opportunity Record Type": "Dietitian ",
+            "Timo_Opp_Type": "Dietitian",
+            "Opportunity Record Type ID": "0121T000000NEKIQA4",
+            "Opportunity Owner": "Tamsin Jordan",
+            "Opportunity Owner Id": "0051T00000B7g5Q",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "Dietitian Consult 60 Minutes",
+            "Opportunity Record Type": "Dietitian ",
+            "Timo_Opp_Type": "Dietitian",
+            "Opportunity Record Type ID": "0121T000000NEKIQA4",
+            "Opportunity Owner": "Tamsin Jordan",
+            "Opportunity Owner Id": "0051T00000B7g5Q",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "OB Dietitian In Person - 30min",
+            "Opportunity Record Type": "Dietitian ",
+            "Timo_Opp_Type": "Dietitian",
+            "Opportunity Record Type ID": "0121T000000NEKIQA4",
+            "Opportunity Owner": "Tamsin Jordan",
+            "Opportunity Owner Id": "0051T00000B7g5Q",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "OB Dietitian Virtual Call - 30min",
+            "Opportunity Record Type": "Dietitian ",
+            "Timo_Opp_Type": "Dietitian",
+            "Opportunity Record Type ID": "0121T000000NEKIQA4",
+            "Opportunity Owner": "Tamsin Jordan",
+            "Opportunity Owner Id": "0051T00000B7g5Q",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "1986/Dr. Axelrod Bloodwork",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "1986/DR. LEVIN BLOODWORK",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "1986/DR. LIEN BLOODWORK",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "9909 BLOODWORK",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "CERVICAL DILATION HYS D AND C",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "COMP NPV",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "COVID-19 TESTING",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "CRYO ABLATION",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "FH BLOODWORK",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "Fibroid 1. New Patient",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "Fibroid 10: Post-Op Follow Up",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "Fibroid 11. Post-Op MRI Review",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "FIBROID 12 IR SWAP PHONE CALL",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "Fibroid 2. MRI Imaging",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "Fibroid 3. MRI Review",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "FIBROID 360 POST OP",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "Fibroid 4. Hysteroscopic D and C",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "Fibroid 5. Sampling Post-Op",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "Fibroid 6. IR Consult",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "Fibroid 7. UFE Follow-Up",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "Fibroid 8. UFE Procedure",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "Fibroid 9. 2 Week Post-Op",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HOLD",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "HOSPITAL PREOP",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "HSC LYSIS ADHESION POLYPECTOMY",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "HSG",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "SURGERY",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "SURGICAL CONSULT",
+            "Opportunity Record Type": "Fibroid",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vMzQAI",
+            "Opportunity Owner": "PCT All",
+            "Opportunity Owner Id": "00GRj000001xyVp",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "1986/Dr. Axelrod Bloodwork",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "BLOODWORK",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "CERVICAL DILATION HYS D AND C",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "COLPO",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "COLPO ANESTHESIA",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "COMP NPV",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "CONTRACEPTIVE",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "COVID-19 TESTING",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "COVID-19 vaccination",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "CRYO ABLATION",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "CRYO SURGERY",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "C SECTION",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "C SECTION GARDEN",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "D AND C",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "DEPO SHOT",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "ELABORATE LAB FOLLOW UP",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "ENDOMETRIAL BX",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "EXISTING PT SLOT",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "FEMVIEW HSG",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "Fibroid",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "FERTILITY MONITORING",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "FH BLOODWORK",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "FLU SHOT",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "GYN NEW PATIENT",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HOLD",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HOSPITAL PREOP",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HSC LYSIS ADHESION POLYPECTOMY",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HSG",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HYMENECTOMY CONSULT",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HYMENECTOMY FOLLOW UP",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HYMENECTOMY POST-OP",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HYMENECTOMY PRE-OP",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HYMENECTOMY PROCEDURE",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HYMENOPLASTY CONSULT",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HYMENOPLASTY FOLLOW UP",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HYMENOPLASTY POST-OP",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HYMENOPLASTY PRE-OP",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HYMENOPLASTY PROCEDURE",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HYSTEROSCOPIC D AND C ",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HYSTEROSCOPIC MYOMECTOMY",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "HYSTEROSCOPY",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "INCISION CHECKS",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "IOL",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "Iron Infusion",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "IUD INSERTION",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "IUD INSERTION ANESTHESIA",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "IUD REMOVAL",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "IUI",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "LABIAPLASTY 1 HOUR",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "LABIAPLASTY 3 HOURS",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "LEEP",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "MRI NRS",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "MRI REVIEW",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "PAP SMEAR",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "PCP FOLLOW UP",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "PCP NEW PT",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "POST OP",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "POST OP IR CONSULT",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "POST OP PLASTIC SURGERY",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "PRESURGICAL",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "SALINE INFUSED SONO",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "SALINE INFUSED SONO ANESTHESIA",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "SONO HYSTOGRAM",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "SUCTION D AND C",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "SURGERY",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "SURGICAL CONSULT",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "TELEMED - LAB RESULTS",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "TELEMED - PRESCRIPTION REFILL",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "TRIPLE BOOKING BLOCK",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "URINE CULTURE",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "VAGINOPLASTY POST-OP",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "VIABILITY",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "VIRUTAL DISCOVERY CALL",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "VULVAR ABSCESS",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "VULVAR BIOPSY",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "WART REMOVAL",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "ZOCDOC GYN",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "ZOCDOC NEW PATIENT",
+            "Opportunity Record Type": "GYN",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN9QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "No Change"
+        },
+        {
+            "Appointment Type": "1986/Dr. Axelrod Bloodwork",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "BLOODWORK",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "BRCA TESTING",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "CERVICAL DILATION HYS D AND C",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "CIRCUMCISION",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "COMP NPV",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "COVID-19 TESTING",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "CRYO ABLATION",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "C SECTION",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "C SECTION GARDEN",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "D AND C",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "ELABORATE LAB FOLLOW UP",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "ENDOMETRIAL BX",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "EXISTING PT SLOT",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "FEMVIEW HSG",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "FERTILITY MONITORING",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "FH BLOODWORK",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "GLUCOSE 1 HOUR",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "GLUCOSE TEST 2 HOUR",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "GLUCOSE TEST 3 HOUR",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "HOSPITAL PREOP",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "INCISION CHECKS",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "IOL",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "OB CONSULT GARDEN",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "OB INITIAL",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "OB RETURN",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "OB VISIT WITH NST",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "POST OP IR CONSULT",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "POSTPARTUM",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "POSTPARTUM GARDEN",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "PRESURGICAL",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "SURGERY",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "SURGICAL CONSULT",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "TELEMED - LAB RESULTS",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "TELEMED - PRESCRIPTION REFILL",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "TRIPLE BOOKING BLOCK",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        },
+        {
+            "Appointment Type": "URINE CULTURE",
+            "Opportunity Record Type": "OB",
+            "Timo_Opp_Type": "GYN",
+            "Opportunity Record Type ID": "0121T0000006vN4QAI",
+            "Opportunity Owner": "NPCC Queue",
+            "Opportunity Owner Id": "00G1T000003Yc98",
+            "Anne vs Timo": "Please update"
+        }
+    ]

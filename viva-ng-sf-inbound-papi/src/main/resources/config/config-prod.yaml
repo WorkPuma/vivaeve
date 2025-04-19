@@ -35,11 +35,6 @@ os:
   persistent: true
   directory: "/tmp"
 
-# SF settings
-sf:
-  retryattempts: "3"
-  retryfrequency: "30000"
-  
 # Email settings 
 email:
   from: "viva.eve.notify@gmail.com"
@@ -50,3 +45,8 @@ email:
   osv2.clientId: "4ac92be9ab7a4f6aaacaf3ac4ca198f3"
 osv2.clientSecret: "385d4032B22349538557DBC1B9d871e2"
 osv2.region: "us-east-1"
+
+sf.consumer.key: "3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF"
+sf.username: "cgainus@cokergroup.com.devchris"
+sf.jwt.private.key: "server.key"
+sf.jwt.endpoint: "https://test.salesforce.com"

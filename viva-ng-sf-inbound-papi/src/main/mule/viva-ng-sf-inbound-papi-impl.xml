@@ -2385,14 +2385,12 @@ output application/json
 if (vars.errorMessage."Contact Details".Location == "FOREST HILLS") p('email.forest.to') else if (vars.errorMessage."Contact Details".Location == "MADISON") p('email.madison.to') else p('email.to') ]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<email:send doc:name="sendEmail" doc:id="9d538c6d-c5aa-4acf-9859-37d689f6aa36" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
-					<email:to-addresses >
-						<email:to-address value="#[vars.locationAddress]" />
-					</email:to-addresses>
-					<email:body contentType="text/plain" >
-						<email:content ><![CDATA[#[vars.errorMesg]]]></email:content>
-					</email:body>
-				</email:send>
+				            <!-- send to Teams webhook instead of email -->
+				            <set-variable variableName="alertType" value='"Error"'/>
+				            <set-variable variableName="status" value='"ALERT"'/>
+				            <set-variable variableName="errorMesg" value="vars.errorMesg"/>
+				            <set-variable variableName="contextKey" value="vars.subject"/>
+				            <flow-ref name="sendTeamsAlert"/>
 			</when>
 			<otherwise >
 				<logger level="INFO" doc:name="defaultMessage" doc:id="70ba4bb0-00d0-4f85-a139-e8e47116f148" message="###########No errors##############"/>
@@ -2456,12 +2454,12 @@ output application/json
 					</ee:transform>
 					<email:send doc:name="sendEmail" doc:id="257bc9e0-85ca-409b-87e3-ae2f97d6a72d" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java &#45;&#45;- vars.subject&#93;">
 						<email:to-addresses>
-							<email:to-address value="${email.to}" />
-						</email:to-addresses>
-						<email:body contentType="text/plain">
-							<email:content><![CDATA[#[vars.ErrorDetails&#93;&#93;&#93;></email:content>
-						</email:body>
-					</email:send>
+							                     <!-- send to Teams webhook instead of email -->
+							                     <set-variable variableName="alertType" value='"Error"'/>
+							                     <set-variable variableName="status" value='"ALERT"'/>
+							                     <set-variable variableName="errorMesg" value="vars.ErrorDetails"/>
+							                     <set-variable variableName="contextKey" value='""'/>
+							                     <flow-ref name="sendTeamsAlert"/>
 				</when>
 				<otherwise>
 					<logger level="INFO" doc:name="defaultMessage" doc:id="c086ed29-9197-443e-8c24-aeb7f945b882" message="##########No errors############" />
@@ -2550,12 +2548,12 @@ output text/plain
 				</ee:transform>
 				<email:send doc:name="sendEmail" doc:id="71089f02-d189-4403-89f4-02302467aeea" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]">
 					<email:to-addresses>
-						<email:to-address value="#[vars.locationAddress]" />
-					</email:to-addresses>
-					<email:body contentType="text/plain">
-						<email:content><![CDATA[#[vars.errorMesg]]]></email:content>
-					</email:body>
-				</email:send>
+						                  <!-- send to Teams webhook instead of email -->
+						                  <set-variable variableName="alertType" value='"Error"'/>
+						                  <set-variable variableName="status" value='"ALERT"'/>
+						                  <set-variable variableName="errorMesg" value="vars.errorMesg"/>
+						                  <set-variable variableName="contextKey" value="vars.subject"/>
+						                  <flow-ref name="sendTeamsAlert"/>
 			</when>
 			<otherwise >
 				<logger level="INFO" doc:name="defaultMessage" doc:id="5b2aeaa6-728c-4377-8bc6-3d65f56a0770" message="###########No errors##############" />
@@ -2700,14 +2698,12 @@ if (vars.errorMessage."Error Details".Location == "FOREST HILLS") p('email.fores
  ]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<email:send doc:name="sendEmail" doc:id="13ee8860-056b-4170-b35f-65f5d008d5b8" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
-					<email:to-addresses >
-						<email:to-address value="#[vars.locationAddress]" />
-					</email:to-addresses>
-					<email:body contentType="text/plain" >
-						<email:content ><![CDATA[#[vars.errorMesg]]]></email:content>
-					</email:body>
-				</email:send>
+				            <!-- send to Teams webhook instead of email -->
+				            <set-variable variableName="alertType" value='"Error"'/>
+				            <set-variable variableName="status" value='"ALERT"'/>
+				            <set-variable variableName="errorMesg" value="vars.errorMesg"/>
+				            <set-variable variableName="contextKey" value="vars.subject"/>
+				            <flow-ref name="sendTeamsAlert"/>
 			</when>
 			<otherwise >
 				<logger level="INFO" doc:name="defaultMessage" doc:id="25b70c84-f7f1-40f1-8c22-6b8abc6f4cc3" message="###########No errors##############" />
@@ -2809,14 +2805,12 @@ output application/json
 if (vars.errorMessage."Contact Details".Location == "FOREST HILLS") p('email.forest.to') else if (vars.errorMessage."Contact Details".Location == "MADISON") p('email.madison.to') else p('email.to') ]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<email:send doc:name="sendEmail" doc:id="10de3973-34f7-4690-9201-34b518665860" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
-					<email:to-addresses >
-						<email:to-address value="#[vars.locationAddress]" />
-					</email:to-addresses>
-					<email:body contentType="text/plain" >
-						<email:content ><![CDATA[#[vars.errorMesg]]]></email:content>
-					</email:body>
-				</email:send>
+				            <!-- send to Teams webhook instead of email -->
+				            <set-variable variableName="alertType" value='"Error"'/>
+				            <set-variable variableName="status" value='"ALERT"'/>
+				            <set-variable variableName="errorMesg" value="vars.errorMesg"/>
+				            <set-variable variableName="contextKey" value="vars.subject"/>
+				            <flow-ref name="sendTeamsAlert"/>
 			</when>
 			<otherwise >
 				<logger level="INFO" doc:name="defaultMessage" doc:id="693bde21-adab-4495-8d1b-528c571aedd2" message="###########No errors##############" />
@@ -2947,14 +2941,12 @@ if (vars.errorMessage."Error Details".Location == "FOREST HILLS") p('email.fores
  ]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<email:send doc:name="sendEmail" doc:id="2ec31c35-b039-4a5f-8f7f-7b8b8cebc24a" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]" >
-					<email:to-addresses >
-						<email:to-address value="#[vars.locationAddress]" />
-					</email:to-addresses>
-					<email:body contentType="text/plain" >
-						<email:content ><![CDATA[#[vars.errorMesg]]]></email:content>
-					</email:body>
-				</email:send>
+				            <!-- send to Teams webhook instead of email -->
+				            <set-variable variableName="alertType" value='"Error"'/>
+				            <set-variable variableName="status" value='"ALERT"'/>
+				            <set-variable variableName="errorMesg" value="vars.errorMesg"/>
+				            <set-variable variableName="contextKey" value="vars.subject"/>
+				            <flow-ref name="sendTeamsAlert"/>
 			</when>
 			<otherwise >
 				<logger level="INFO" doc:name="defaultMessage" doc:id="9ec4ad35-a4df-4dcb-85c2-c95ed1aace0a" message="###########No errors##############" />
@@ -3310,14 +3302,12 @@ else p('email.to')]]></ee:set-variable>
 				</ee:variables>
 			</ee:transform>
 
-			<email:send doc:name="sendEmail" config-ref="Email_SMTP" fromAddress="${email.from}" subject="#[output application/java --- vars.subject]">
-				<email:to-addresses>
-					<email:to-address value="#[vars.locationAddress]" />
-				</email:to-addresses>
-				<email:body contentType="text/plain">
-					<email:content><![CDATA[#[vars.errorMesg]]]></email:content>
-				</email:body>
-			</email:send>
+			         <!-- send to Teams webhook instead of email -->
+			         <set-variable variableName="alertType" value='"Error"'/>
+			         <set-variable variableName="status" value='"ALERT"'/>
+			         <set-variable variableName="errorMesg" value="vars.errorMesg"/>
+			         <set-variable variableName="contextKey" value="vars.subject"/>
+			         <flow-ref name="sendTeamsAlert"/>
 		</when>
 
 		<otherwise>

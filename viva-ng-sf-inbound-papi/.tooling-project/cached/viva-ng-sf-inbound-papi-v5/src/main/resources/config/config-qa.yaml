@@ -1,0 +1,37 @@
+api:
+  autodiscoveryId: "123456"  
+
+http:
+  host: "0.0.0.0"
+  port: "8083"
+  
+https:
+  host: "0.0.0.0"
+  port: "8082"
+  
+request:
+  host: "0.0.0.0"
+  port: "8083"
+  method: "POST"
+  path: "/api/nextgenemr"  
+
+email:
+  from: "viva.eve.notify@gmail.com"
+  to: "cgainus@cokergroup.com"
+  madison:
+   to: "cgainus@cokergroup.com"
+  forest:
+   to: "cgainus@cokergroup.com"
+  
+  host: "smtp.gmail.com"
+  port: "587"
+  username: "viva.eve.notify@gmail.com"
+  
+osv2.clientId: "4ac92be9ab7a4f6aaacaf3ac4ca198f3"
+osv2.clientSecret: "385d4032B22349538557DBC1B9d871e2"
+osv2.region: "us-east-1"
+
+sf.consumer.key: "3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF"
+sf.jwt.username: "cgainus@cokergroup.com.devchris"
+sf.jwt.keyfile: "server.key"
+sf.jwt.endpoint: "https://test.salesforce.com"

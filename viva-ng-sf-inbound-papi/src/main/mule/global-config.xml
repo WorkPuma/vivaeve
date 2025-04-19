@@ -110,14 +110,19 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 		</email:smtp-connection>
 	</email:smtp-config>
 	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config">
-  <salesforce:oauth-user-pass-connection 
-      consumerKey="${sf.consumer.key}" 
-      consumerSecret="${sf.client.secret}" 
-      username="${sf.username}" 
-      password="${sf.password}"
-      tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
+	   <salesforce:jwt-connection
+	       consumerKey="${sf.consumer.key}"
+	       username="${sf.username}"
+	       jwtPrivateKey="classpath://${sf.jwt.private.key}"
+	       tokenEndpoint="https://test.salesforce.com/services/oauth2/token"/>
 </salesforce:sfdc-config>
-	<os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="7c107e4e-3e10-4d28-be1c-2d59a4ef7f9f" />
+
+    <flow name="log-salesforce-jwt-config">
+        <logger level="INFO" doc:name="Log Salesforce JWT Config"
+            message='[JWT CONFIG] consumerKey: ${sf.consumer.key}, username: ${sf.username}, privateKey (path): ${sf.jwt.private.key}, tokenEndpoint: ${sf.jwt.endpoint}'/>
+    </flow>
+ <os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="7c107e4e-3e10-4d28-be1c-2d59a4ef7f9f" />
 	<os:object-store name="MappingsObjectStore" doc:name="Object store" doc:id="c98e4b6d-4fa5-49a5-8aaf-5baf4be41ad3" maxEntries="1000" entryTtl="3600000" entryTtlUnit="MILLISECONDS" expirationInterval="60000" expirationIntervalUnit="MILLISECONDS" config-ref="ObjectStore_Config" />
 
+	   <flow name="log-salesforce-jwt-config" doc:id="log-salesforce-jwt-config">
 </mule>

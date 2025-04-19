@@ -4,8 +4,10 @@
 
 # SF configurations
 
-sf:
-  password: "![vQNrzpgkITKUti7HF9taZg==]"
-
 email:
   password: "![sRYskx1HIVL9l4YDsD/AUgKP2V4g22J0MSXaqoNKUwI=]"
+
+sf.consumer.key: "3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF"
+sf.username: "cgainus@cokergroup.com.devchris"
+sf.jwt.private.key: "server.key"
+sf.jwt.endpoint: "https://test.salesforce.com"

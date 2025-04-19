@@ -37,7 +37,6 @@ INDEX VERSION 1.134+C:\Users\ychri\AnypointStudio\studio-workspace\.metadata\.pl
 534977579.index
 3065717500.index
 821213950.index
-2852381874.index
 4060481237.index
 3011788224.index
 1671771997.index

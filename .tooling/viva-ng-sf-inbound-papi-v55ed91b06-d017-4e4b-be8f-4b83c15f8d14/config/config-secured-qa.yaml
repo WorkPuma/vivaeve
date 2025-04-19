@@ -1,0 +1,11 @@
+# Use this file for encrypted user/password information.
+# Unencrypted values may be used in this file using standard yaml syntax
+# Encrypted values must be enclosed in ![] within the quotes.
+
+# SF configurations
+
+sf:
+  password: "![vQNrzpgkITKUti7HF9taZg==]"
+
+email:
+  password: "![sRYskx1HIVL9l4YDsD/AUgKP2V4g22J0MSXaqoNKUwI=]"

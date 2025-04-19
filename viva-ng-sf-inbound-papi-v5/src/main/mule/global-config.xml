@@ -110,12 +110,8 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 		</email:smtp-connection>
 	</email:smtp-config>
 	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config">
-  <salesforce:oauth-user-pass-connection 
-      consumerKey="${sf.consumer.key}" 
-      consumerSecret="${sf.client.secret}" 
-      username="${sf.username}" 
-      password="${sf.password}"
-      tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
+		<salesforce:jwt-connection consumerKey="3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF" keyStore="C:\Users\ychri\AnypointStudio\studio-workspace\viva-ng-sf-inbound-papi-v5\src\main\resources\keystore\keyStoreFile.jks" storePassword="Krypto" certificateAlias="salesforcejwt" principal="cgainus@cokergroup.com.devchris" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
+
 </salesforce:sfdc-config>
 	<os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="7c107e4e-3e10-4d28-be1c-2d59a4ef7f9f" />
 	<os:object-store name="MappingsObjectStore" doc:name="Object store" doc:id="c98e4b6d-4fa5-49a5-8aaf-5baf4be41ad3" maxEntries="1000" entryTtl="3600000" entryTtlUnit="MILLISECONDS" expirationInterval="60000" expirationIntervalUnit="MILLISECONDS" config-ref="ObjectStore_Config" />

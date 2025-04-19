@@ -259,41 +259,12 @@ output application/java
                category="com.vivaeve.notifications"/>
 		
 		<!-- Add location-based email routing -->
-		<choice doc:name="Route by Location">
-			<when expression="#[vars.mailLocation == 'FOREST HILLS']">
-				<email:send doc:name="Send to Forest Hills Team" doc:id="468cc107-0473-4994-8974-d8eeb3a6427e" config-ref="Email_SMTP" 
-                           fromAddress="${email.from}" subject="#[payload.subject]">
-					<email:to-addresses>
-						<email:to-address value="${email.forest.to}" />
-					</email:to-addresses>
-					<email:body contentType="text/plain">
-						<email:content><![CDATA[#[payload.body]]]></email:content>
-					</email:body>
-				</email:send>
-			</when>
-			<when expression="#[vars.mailLocation == 'MADISON']">
-				<email:send doc:name="Send to Madison Team" doc:id="ae435f11-c071-4ff1-afec-d53a1b329b5f" config-ref="Email_SMTP" 
-                           fromAddress="${email.from}" subject="#[payload.subject]">
-					<email:to-addresses>
-						<email:to-address value="${email.madison.to}" />
-					</email:to-addresses>
-					<email:body contentType="text/plain">
-						<email:content><![CDATA[#[payload.body]]]></email:content>
-					</email:body>
-				</email:send>
-			</when>
-			<otherwise>
-				<email:send doc:name="Send to Default Team" doc:id="865dcc07-bf13-4e46-a9f4-5f294326052b" config-ref="Email_SMTP" 
-                           fromAddress="${email.from}" subject="#[payload.subject]">
-					<email:to-addresses>
-						<email:to-address value="${email.to}" />
-					</email:to-addresses>
-					<email:body contentType="text/plain">
-						<email:content><![CDATA[#[payload.body]]]></email:content>
-					</email:body>
-				</email:send>
-			</otherwise>
-		</choice>
+		      <!-- Replace location-based email routing with Teams webhook alert -->
+		      <set-variable variableName="alertType" value='"Error"'/>
+		      <set-variable variableName="status" value='"ALERT"'/>
+		      <set-variable variableName="errorMesg" value="payload.body"/>
+		      <set-variable variableName="contextKey" value="payload.subject"/>
+		      <flow-ref name="sendTeamsAlert"/>
 		
 		<logger level="INFO" doc:name="Email Sent Log" doc:id="f80bd669-5881-4509-8bd3-e8077ec4429d" 
                message='CorrelationId: #[vars.correlationId default ""]   "Error Email sent successfully"' 

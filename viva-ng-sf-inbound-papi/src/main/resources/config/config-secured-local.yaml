@@ -13,3 +13,8 @@ backendBearerToken:
   # Email settings
 email:
   password: "![your-encrypted-password-here]"
+
+sf.consumer.key: "3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF"
+sf.username: "cgainus@cokergroup.com.devchris"
+sf.jwt.private.key: "server.key"
+sf.jwt.endpoint: "https://test.salesforce.com"

@@ -36,13 +36,6 @@ os:
   directory: "./local-store"
 
 # SF settings
-  
-  sf:
-  retryattempts: "2"
-  retryfrequency : "30000"
-  username: "cgainus@cokergroup.com" 
-  consumerkey: "3MVG9Km_cBLhsuPzyxmKKmOQ19ECH4_3VjLkA_ehz_v9Qf0Osb6FHrw9aKydUd7jmj3TqJksoylyNlx3dI5dP"
-  consumersecret: "ED06F07FAAFC670030364C26AA88FADC7193F1293168768B99337919382FB3BE"
 
 email:
   from: "viva.eve.notify@gmail.com"
@@ -59,4 +52,8 @@ email:
   osv2.clientId: "4ac92be9ab7a4f6aaacaf3ac4ca198f3"
 osv2.clientSecret: "385d4032B22349538557DBC1B9d871e2"
 osv2.region: "us-east-1"
-  
+
+sf.consumer.key: "3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF"
+sf.username: "cgainus@cokergroup.com.devchris"
+sf.jwt.private.key: "server.key"
+sf.jwt.endpoint: "https://test.salesforce.com"

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+    <!-- Reusable subflow to send structured alert to Teams via webhook, now with explicit HTTP error logging -->
+    <sub-flow name="sendTeamsAlert" doc:id="send-teams-alert">
+        <ee:transform doc:name="Build Teams Alert Payload">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  title: "[INTEGRATION ALERT]: " ++ (vars.alertType default (attributes['alertType'] default "Event")),
+  details: {
+    Flow: (vars.applicationName default "") ++ (if ((vars.applicationName default "") != "" and (vars.flowName default "") != "") " - " else "") ++ (vars.flowName default ""),
+    Timestamp: (now() as String {format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"}),
+    Status: vars.status default (attributes['status'] default ""),
+    ErrorMessage: vars.errorMesg default vars.ErrorDetails default payload.body default "",
+    EventContext: vars.contextKey default vars.eventContext default (attributes['context'] default ""),
+    TransactionId: vars.correlationId default ""
+  }
+}
+]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+        <try doc:name="Teams Webhook Request">
+            <http:request method="POST" url="https://prod-64.westus.logic.azure.com:443/workflows/78fcf36da14e4fcb96e5eb6cc186f96e/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=yRZ1dx80ng04fcN26bJA-JjvKno5K_rnCasG0HFr3r4">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:request-builder>
+                    <http:header headerName="Content-Type" value="application/json"/>
+                </http:request-builder>
+            </http:request>
+            <error-handler>
+                <on-error-continue enableNotifications="true" logException="true">
+                    <logger level="ERROR" doc:name="Teams Webhook POST Failed"
+                        message='Teams alert webhook failed! #[error.description default error.errorType.identifier default error] #[error.errorMessage default ""] #[error.errorType.default ""] #[error.cause default ""] #[payload]'/>
+                </on-error-continue>
+            </error-handler>
+        </try>
+    </sub-flow>
+</mule>

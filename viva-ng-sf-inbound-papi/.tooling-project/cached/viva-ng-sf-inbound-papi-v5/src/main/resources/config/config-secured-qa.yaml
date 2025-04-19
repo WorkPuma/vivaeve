@@ -1,0 +1,13 @@
+# Use this file for encrypted user/password information.
+# Unencrypted values may be used in this file using standard yaml syntax
+# Encrypted values must be enclosed in ![] within the quotes.
+
+# SF configurations
+
+email:
+  password: "![sRYskx1HIVL9l4YDsD/AUgKP2V4g22J0MSXaqoNKUwI=]"
+
+sf.consumer.key: "3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF"
+sf.jwt.username: "cgainus@cokergroup.com.devchris"
+sf.jwt.keyfile: "server.key"
+sf.jwt.endpoint: "https://test.salesforce.com"
