@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_1b38a52c_5379_4009_b444_31a047fe1cba_Input_Variables_contactFields = Array<{|  FirstName: String,   LastName: String,   Language_Preferred__c: Any,   Email: String | Null,   Phone: String | Null,   MailingState: String | Null,   MailingCity: String | Null,   MailingPostalCode: String | Null,   MailingStreet: String | Null,   Patient_Ethnicity__c: String,   Patient_Race__c: String,   Visit_Reason__c: String | Null,   Patient_Gender_2__c: String,   HealthFusion_Patient_Record_ID__c: String | Null,   Date_of_Birth__c: Date|}>
+

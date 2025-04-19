@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_1b38a52c_5379_4009_b444_31a047fe1cba_Input_Variables_appointmentFields = Array<{|  NextGen_ID__c: String | Null,   ParentRecordId: String,   ContactId: String,   Status: String | Null,   AdditionalInformation: Any,   Service_Resource__c: Any|}>
+
