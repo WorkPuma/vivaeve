@@ -1,0 +1,76 @@
+# Mule-specific files
+.mule/
+.tooling/
+.tooling-apps-cache/
+.studio/
+.classpath
+.project
+.settings/
+
+# Maven files
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Anypoint Studio files
+.studio/
+.metadata/
+.mule_user_home/
+.mule_user_settings/
+.ApplicatioNData/
+exchange-docs/
+src/test/resources/sample_data/
+
+# Package files
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Logs
+logs/
+*.log
+log4j2.xml
+
+# Temporary files
+temp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE-specific files (Eclipse/IntelliJ/VS Code)
+*.launch
+.idea/
+*.iws
+*.iml
+*.ipr
+*.code-workspace
+.vscode/
+.roo
+.tooling-project
+
+# Anypoint Platform credentials
+*.dwl
+*.yaml.yaml
+*-secure.properties
+*-secure.json
+keystore/*.jks
+keystore/*.p12

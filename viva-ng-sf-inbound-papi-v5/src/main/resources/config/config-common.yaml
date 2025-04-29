@@ -1,0 +1,28 @@
+# Common File to be use in All env
+application:
+  name: "viva-ng-sf-inbound-eapi"
+  
+source: "viva-ng-sf-inbound-eapi"
+target: "viva-ng-sf-inbound-papi"
+ 
+# Logger
+logger:
+  category:
+    payload: "com.prowess.integration.logging.payload"
+    milestones: "com.prowess.integration.logging.milestones"
+
+milestone:
+  cateogry: "LOG"
+  requetReceived: "RequestReceived"
+  requetSent: "RequetSent"
+  successResponseReceived: "SuccessResponseReceived"
+  successResponseSent: "SuccessResponseSent"
+  app: "application" # Added this line with a string value
+
+# Object Store common settings
+os:
+  entryTtl: "30"
+  entryTtlUnit: "DAYS"
+  maxEntries: "100"
+  persistent: "false"
+  directory: "./local-store"

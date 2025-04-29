@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<!-- [STUDIO:"opportunity-testFlow"]<flow name="opportunity-testFlow" doc:id="3d70bad8-bd38-4e8e-b0ff-328742128bc9" >
+		<ee:transform doc:name="Input payload" doc:id="1f489516-8be3-4d73-9c0d-4f71ffc8c231" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="inputpayload" ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+payload&#93;&#93;></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="f251ea0b-a71b-4f50-9e6a-434e340b0165" millisBetweenRetries="${sf.retryfrequency}">
+			<salesforce:query doc:name="Contact Query" doc:id="ee55eb24-3689-4b11-8e44-6187635c1777" config-ref="Salesforce_Config" target="ContactOutput">
+				<salesforce:salesforce-query><![CDATA[SELECT HealthFusion_Patient_Record_ID__c, Id, OwnerId, AccountId, PhoneNumberFormatted__c FROM Contact WHERE HealthFusion_Patient_Record_ID__c = :hfId]]></salesforce:salesforce-query>
+				<salesforce:parameters><![CDATA[#[{
+    hfId: flatten(vars.inputPayload.Data.SIU_S12.PATIENT.PID."PID-04")."CX-01"[0]
+}]]]></salesforce:parameters>
+			</salesforce:query>
+		</until-successful>
+		<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="24f383c0-ac87-47a3-992d-283e56ec4ff3" millisBetweenRetries="${sf.retryfrequency}">
+			<salesforce:query doc:name="Query to get relation" doc:id="70a1b555-d798-4528-8fdc-86a10437743a" config-ref="Salesforce_Config" target="sfName">
+				<salesforce:salesforce-query><![CDATA[select Id, Name, Patient_Contact__c from Opportunity where Patient_Contact__c = :contactId]]></salesforce:salesforce-query>
+				<salesforce:parameters><![CDATA[#[{
+    "contactId": vars.ContactOutput.Id[0]
+}]]]></salesforce:parameters>
+			</salesforce:query>
+		</until-successful>
+		<ee:transform doc:name="opportunity_variables" doc:id="7329ccd2-6bc3-4deb-8400-7e5ce7946d3d" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="RecordId" ><![CDATA[%dw 2.0
+output application/json
+var record = readUrl("classpath://oportunity_mappings.json","application/json") 
+&#45;&#45;-
+(record filter ($."Appointment Type" == vars.inputPayload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))."Opportunity Record Type ID"[0&#93;&#93;&#93;></ee:set-variable>
+				<ee:set-variable variableName="OwnerId" ><![CDATA[%dw 2.0
+output application/json
+var owner = readUrl("classpath://oportunity_mappings.json","application/json")
+&#45;&#45;-
+(owner filter ($."Appointment Type" == vars.inputpayload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01"))."Opportunity Owner Id"[0&#93;&#93;&#93;></ee:set-variable>
+				<ee:set-variable variableName="workTypeNameNg" ><![CDATA[%dw 2.0
+output application/json
+var owner = readUrl("classpath://Appointment_type_mappings.json","application/json")
+&#45;&#45;-
+(owner filter (vars.inputpayload.Data.SIU_S12.SCH."SCH-08"."CE_0277-01" == $.NextGenField)).Work_Type_Group__c[0&#93;&#93;&#93;></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="settingTheSfName" doc:id="b266c56d-b901-47a7-bb66-dd62f16993e0" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="workTypeNameSf" ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+trim((vars.sfName.Name[0&#93;  splitBy  "-")[-1&#93; as String)&#93;&#93;></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="conditionCheck" doc:id="8ef2a4ee-bd4b-4f92-b0c6-2a8034e15b41" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+vars.workTypeNameSf == vars.workTypeNameNg&#93;&#93;></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice to check Opportunity Exists?" doc:id="51230cf9-5d38-409f-b1ec-e5a8c3b4a872" >
+			<when expression="#[payload != true&#93;">
+				<ee:transform doc:name="Opportunity_Creation" doc:id="9c367654-b953-4cab-a4f4-08ae69d7e54f">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+[{
+	"Name": vars.inputpayload.Data.SIU_S12.SCH."SCH-06"."CE-01",
+	"AccountId":vars.ContactOutput.AccountId[0&#93;,
+	"CloseDate":now () as Number as DateTime as Date { format:"MM-dd-yyyy"},
+	"StageName":"Physician Appointment Scheduled",
+	"RecordTypeId": vars.RecordId,
+	"OwnerId": vars.ContactOutput.OwnerId[0&#93;
+	
+	
+}&#93;&#93;&#93;></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<until-successful maxRetries="${sf.retryattempts}" doc:name="Until Successful" doc:id="63d5caca-0263-44b6-a534-678ef183f39f" millisBetweenRetries="${sf.retryfrequency}">
+					<salesforce:create doc:name="Create an Opportunity" doc:id="1ef7ff17-c506-4095-bf46-a0b545c47999" config-ref="Salesforce_Config" type="Opportunity" />
+				</until-successful>
+				<logger level="INFO" doc:name="Response_Creation" doc:id="b136df1f-0eaa-452d-8543-d804ec0921ff" message="#[%dw 2.0&#10;output application/json&#10;&#45;&#45;-&#10;payload&#93;"/>
+				<ee:transform doc:name="Mapping the Ooportunity" doc:id="67434824-7707-483b-b436-546204b100d3">
+			<ee:message>
+			</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="opportunity_c" ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+    "opportunity__c":payload.items.id[0&#93;
+}&#93;&#93;></ee:set-variable>
+					</ee:variables>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Default Ooportunity" doc:id="860f5210-28de-4493-8838-5ba741c0af7c" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="opportunity_c" ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+	Opportunity__c: vars.sfName.Id[0&#93;
+}&#93;&#93;></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="9351198e-bb9f-4e3f-b8ed-dfb65b759c81" message="After response"/>
+		<error-handler ref="error-handler" />
+	</flow> [STUDIO] -->
+</mule>
