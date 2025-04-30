@@ -1,0 +1,594 @@
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:salesforce-pub-sub="http://www.mulesoft.org/schema/mule/salesforce-pub-sub" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:os="http://www.mulesoft.org/schema/mule/os" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd         http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd         http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd         http://www.mulesoft.org/schema/mule/salesforce-pub-sub http://www.mulesoft.org/schema/mule/salesforce-pub-sub/current/mule-salesforce-pub-sub.xsd         http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd         http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+  <os:object-store name="Object_store" doc:name="Object store" doc:id="e3d87352-ab27-4974-bea7-9a73b942318d" />
+  <http:listener-config basePath="/" name="Listener-config">
+   <http:listener-connection host="localhost" port="8081"></http:listener-connection>
+  </http:listener-config>
+  <salesforce-pub-sub:pubsub-config name="Pubsub-config">
+		<salesforce-pub-sub:oauth-user-pass-connection consumerKey="3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF" consumerSecret="5CD87471A3A77F6527C2B9B1E100ED78C8C1A0623875E1822E84080BD0B47A63" username="cgainus@cokergroup.com.devchris" password="Mosby2350@#" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
+  
+</salesforce-pub-sub:pubsub-config>
+  <os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="2ec4399b-dcb4-41f4-8117-95deda97f097" />
+  <configuration-properties file="config.properties" />
+  <flow doc:id="86717ad9-123d-425c-9890-431ca8546ece" name="sfnextgen-v2Flow">
+   <salesforce-pub-sub:subscribe-channel-listener channelName="/event/Contact__e" config-ref="Pubsub-config" doc:id="53ab7e31-e7f7-439e-b27d-612051bd1a61" doc:name="Subscribe channel listener">
+    <salesforce-pub-sub:replay-option>
+     <salesforce-pub-sub:latest/>
+    </salesforce-pub-sub:replay-option>
+   </salesforce-pub-sub:subscribe-channel-listener>
+
+
+   <logger level="INFO" doc:name="Log Platform Event Payload" message="INCOMING PLATFORM EVENT PAYLOAD: #[write(payload, 'application/json')]"/>
+   
+   <set-variable variableName="sentToNextgen" value="${sent.to.nextgen}" doc:name="Set sentToNextgen"/>
+   <choice doc:name="Route by EventType__c">
+    <when expression="#[payload.event.Event_Type__c == 'A04']">
+     <ee:transform doc:name="To HL7 ADT^A04">
+      <ee:message>
+       <ee:set-payload><![CDATA[%dw 2.0  
+output text/plain   
+import * from dw::core::Strings   
+  
+var e = payload.event   
+  
+// Helper functions for handling nulls  
+fun safeTrim(val) = if (val == null) "" else trim(val as String)  
+fun safeUpper(val) = if (val == null) "" else upper(safeTrim(val))  
+  
+var rawPid = safeTrim(e.Patient_ID__c)  
+var pid = if (upper(rawPid) startsWith "HF") rawPid[2 to -1] else rawPid   
+  
+var lastName = safeUpper(e.Patient_Last_Name__c)  
+var firstName = safeUpper(e.Patient_First_Name__c)  
+  
+var dobNum = safeTrim(e.Patient_DOB__c)  
+var dob = if (dobNum != null and !isEmpty(dobNum))   
+    ((dobNum as Number) as DateTime {unit: "milliseconds"}) as String {format: "yyyyMMdd"}     
+    else ""   
+  
+var genderRaw = safeTrim(e.Patient_Gender__c)  
+var hl7Gender =   
+    if (upper(genderRaw) == "FEMALE" or upper(genderRaw) == "F") "F"  
+    else if (upper(genderRaw) == "MALE" or upper(genderRaw) == "M") "M"  
+    else "U"  
+  
+var providerNpi   = safeTrim(e.Provider_NPI__c)  
+var providerLast  = safeUpper(e.Provider_Last_Name__c)  
+var providerFirst = safeUpper(e.Provider_First_Name__c)  
+  
+var locationId   = safeTrim(e.Location_ID__c)  
+var locationName = safeUpper(e.Location_Name__c)  
+  
+var contId = if ((safeTrim(e.NextGen_ID__c) default "") != "")   
+    safeTrim(e.NextGen_ID__c)   
+    else safeTrim(e.Placer_Appointment_ID__c)  
+  
+var apptType = safeUpper(e.Appointment_Type__c)  
+var apptReason = if ((safeTrim(e.Appointment_Reason__c) default "") != "")   
+    safeUpper(e.Appointment_Reason__c)   
+    else ""   
+  
+var duration   = safeTrim(e.Duration_Value__c)  
+var startEpoch = safeTrim(e.Start_DateTime__c)  
+var endEpoch   = safeTrim(e.End_DateTime__c)  
+  
+var schStart = if (startEpoch != null and !isEmpty(startEpoch))   
+    (startEpoch as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}   
+    else ""   
+  
+var schEnd = if (endEpoch != null and !isEmpty(endEpoch))   
+    (endEpoch as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}   
+    else ""   
+  
+// Patient Address   
+var street = safeUpper(e.Patient_Street__c)  
+var city   = safeUpper(e.Patient_City__c)  
+var state  = safeUpper(e.Patient_State__c)  
+var zip    = safeUpper(e.Patient_Zip__c)  
+  
+// Language: use exact from input, do not fallback to EN   
+var language = if (e.Patient_Language__c != null) safeUpper(e.Patient_Language__c) else ""  
+  
+// --- PID-13 Phone & Email formatting ---  
+var phoneRaw = e.Patient_Phone__c  
+var phone    = if (phoneRaw == null) "" else phoneRaw as String  
+var email    = if (e.Patient_Email__c == null) "" else upper(e.Patient_Email__c as String)  
+  
+// Phone components  
+var validPhone = !isEmpty(phone) and sizeOf(phone) == 10 and (match(phone, /[0-9]{10}/))  
+var area   = if (validPhone) phone[0 to 2] else ""  
+var prefix = if (validPhone) phone[3 to 5] else ""  
+var lineNum= if (validPhone) phone[6 to 9] else ""  
+var rest   = if (validPhone) prefix ++ lineNum else ""  
+var formattedPhone = if (validPhone) "(" ++ area ++ ")" ++ prefix ++ "-" ++ lineNum else phone  
+  
+// PID-13 field: (<area>)<prefix>-<line>^^^<EMAIL>^^<area>^<prefix+line>  
+var pid13 = formattedPhone ++ "^^^" ++ email ++ "^^" ++ area ++ "^" ++ rest  
+  
+var status = "NEW"   
+  
+---  
+"MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|"  
+++ (now() as String {format:"yyyyMMddHHmmss"})  
+++ "||SIU^S12|"  
+++ contId  
+++ "|P|2.3"  
+++ "\nSCH||" ++ contId ++ "||||" ++ apptType ++ "|" ++ apptReason ++ "|" ++ apptType ++ "|" ++ duration ++ "|MIN|^^^" ++ schStart ++ "^" ++ schEnd ++ "|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "|||||||||" ++ status  
+++ "\nPID|1|"  
+++ pid ++ "|"  
+++ pid ++ "|HF" ++ pid ++ "|"  
+++ lastName ++ "^" ++ firstName ++ "||"  
+++ dob ++ "|"  
+++ hl7Gender ++ "||PATIENT DECLINED|"  
+++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip // PID-11 address  
+++ "|"   
+++ ""                                        // PID-12 business phone BLANK  
+++ "|"   
+++ pid13                                     // PID-13 home phone/email  
+++ "||" ++ language  
+++ "|||||||PATIENT DECLINED"  
+++ "\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName ++ "||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||" ++ contId ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||" ++ schStart ++ "|" ++ schEnd  
+++ "\nRGS|"  
+++ "\nAIL|1||" ++ locationId ++ "^^^" ++ locationName  
+++ "\nAIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  ]]></ee:set-payload>
+     </ee:message>
+    </ee:transform>
+    <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
+    <set-variable variableName="hl7FilePath" value="#['C:\\\\Users\\\\ychri\\\\Desktop\\\\foresthms\\\\toNGO\\\\ADT\\\\ADT04_' ++ uuid() ++ '.hl7']" doc:name="Set HL7 File Path"/>
+    <file:write path="#[vars.hl7FilePath]" doc:name="Write HL7 to File"/>
+    <choice doc:name="NextGen Switch">
+     <when expression="#[vars.sentToNextgen]">
+      <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON"/>
+      <until-successful maxRetries="3" millisBetweenRetries="1000">
+        <logger level="INFO" doc:name="HL7 body to NextGen" message="HL7 body to NextGen: #[payload]"/>
+        <ee:transform doc:name="Fix HL7 Endlines">
+          <ee:message>
+            <ee:set-payload>
+              <![CDATA[
+%dw 2.0
+output text/plain
+---
+trim(payload as String)
+  replace "\r\n" with "\r"
+  replace "\n" with "\r"
+              ]]>
+            </ee:set-payload>
+          </ee:message>
+        </ee:transform>
+      </until-successful>
+      <!-- Outbound flow would go here. Add HTTP request or call as needed. -->
+     </when>
+     <otherwise>
+      <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only."/>
+     </otherwise>
+    </choice>
+   </when>
+   <when expression="#[payload.event.Event_Type__c == 'A08']">
+    <ee:transform doc:name="To HL7 ADT^A08">
+     <ee:message>
+      <ee:set-payload><![CDATA[%dw 2.0  
+output text/plain  
+  
+var event = payload.event  
+var idRaw = event.HealthFusion_Patient_Record_ID__c default ""  
+var id = if (upper(idRaw) startsWith "HF") idRaw[2 to -1] else idRaw  
+var useId = (id != null and id != "")  
+var dob =   
+    if ((event.Date_of_Birth__c default null) != null)  
+        ((event.Date_of_Birth__c) as Date {format: "MMMM dd, yyyy"}) as String {format:"yyyyMMdd"}  
+    else ""  
+var gt1dob = if (dob != "") dob ++ "000000" else ""  
+var middleName = event.MiddleName__c default ""  
+var hl7Name = upper(event.LastName__c default "") ++ "^" ++ upper(event.FirstName__c default "")   
+    ++ (if (!isEmpty(event.MiddleName__c default "")) "^" ++ ("" ++ upper(event.MiddleName__c default "")) else "")  
+var normGender =   
+    if (upper(event.Patient_Gender__c default "") == "M") "M"  
+    else if (upper(event.Patient_Gender__c default "") == "F") "F"  
+    else "U"  
+var normLang = event.Language__c default "EN"  
+var patientRace = event.Patient_Race__c default "PATIENT DECLINED"  
+var patientEthnicity = event.Patient_Ethnicity__c default "PATIENT DECLINED"  
+var phone = event.Phone__c default ""  
+var email = event.Email__c default ""  
+var phoneFormatted = event.PhoneNumberFormatted__c default ""  
+var nicePhone =  
+    if (!isEmpty(phoneFormatted)) phoneFormatted  
+    else if (!isEmpty(phone) and sizeOf(phone) == 10)  
+        "(" ++ phone[0 to 2] ++ ")" ++ phone[3 to 5] ++ "-" ++ phone[6 to 9]  
+    else phone  
+var area = if (!isEmpty(phone) and sizeOf(phone) >= 3) phone[0 to 2] else ""  
+var rest = if (!isEmpty(phone) and sizeOf(phone) >= 7) phone[3 to 9] else ""  
+var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ "^^" ++ area ++ "^" ++ rest  
+  
+---  
+"MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|"   
+++ now() as String {format: "yyyyMMddHHmmss"}  
+++ "||ADT^A08|"  
+++ upper(uuid() as String)  
+++ "|P|2.3"  
+++ "\nPID|1|"  
+++ (if (useId) id else "")  
+++ "|"  
+++ (if (useId) id else "")  
+++ "|"  
+++ (if (useId) "HF" ++ id else "HF")  
+++ "|"  
+++ hl7Name  
+++ "|"  
+++ "|"                            // PID-6 blank (mother's maiden name)  
+++ dob  
+++ "|"  
+++ normGender  
+++ "||"  
+++ patientRace  
+++ "|"  
+++ (event.MailingStreet__c default "") ++ "^^" ++ (event.MailingCity__c default "") ++ "^"   
+   ++ (event.MailingState__c default "") ++ "^" ++ (event.MailingPostalCode__c default "") // PID-11 (address)  
+++ "|"   
+++ ""                           // PID-12 (Phone Business) left blank  
+++ "|"   
+++ contactInfo                  // PID-13 (Phone Home) -- CORRECT HL7 PLACEMENT  
+++ "||"  
+++ normLang  
+++ "|||||||"  
+++ patientEthnicity  
+++ "\nPV1|1|O|^^^1275017^^^^^FOREST HILLS||||||||1275017^^^1275017^^^^^FOREST HILLS|||||||||||||||||||||||N|||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS"  
+++ "\nGT1|1|"  
+++ (if (useId) id else "")  
+++ "|"  
+++ hl7Name  
+++ "|"  
+++ "|" // GT1-4 blank  
+++ (event.MailingStreet__c default "") ++ "^^" ++ (event.MailingCity__c default "") ++ "^"   
+   ++ (event.MailingState__c default "") ++ "^" ++ (event.MailingPostalCode__c default "")  
+++ "|"  
+++ contactInfo  
+++ "||"  
+++ gt1dob  
+++ "|"  
+++ normGender  
+++ "||OTHER"  ]]></ee:set-payload>
+     </ee:message>
+    </ee:transform>
+    <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
+    <set-variable variableName="hl7FilePath" value="#['C:\\\\Users\\\\ychri\\\\Desktop\\\\foresthms\\\\toNGO\\\\ADT\\\\ADT08_' ++ uuid() ++ '.hl7']" doc:name="Set HL7 File Path"/>
+    <file:write path="#[vars.hl7FilePath]" doc:name="Write HL7 to File"/>
+    <choice doc:name="NextGen Switch">
+     <when expression="#[vars.sentToNextgen]">
+      <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON"/>
+      <until-successful maxRetries="3" millisBetweenRetries="1000">
+       <logger level="INFO" doc:name="HL7 body to NextGen" message="HL7 body to NextGen: #[payload]"/>
+       <logger level="INFO" doc:name="DEBUG Payload Structure" message="DEBUG payload at DW: #[payload]"/>
+       <ee:transform doc:name="Fix HL7 Endlines">
+         <ee:message>
+           <ee:set-payload>
+             <![CDATA[
+%dw 2.0
+output text/plain
+---
+(trim(payload as String)
+  replace "\r\n" with "\r"
+  replace "\n" with "\r")
+             ]]>
+           </ee:set-payload>
+         </ee:message>
+       </ee:transform>
+     </until-successful>
+      <!-- Outbound flow would go here. Add HTTP request or call as needed. -->
+     </when>
+     <otherwise>
+      <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only."/>
+     </otherwise>
+    </choice>
+   </when>
+   <otherwise>
+    <logger doc:name="Unknown EventType - Skipped" level="WARN" message="Skipped payload, unknown EventType: #[payload.event.Event_Type__c]"></logger>
+   </otherwise>
+  </choice>
+ </flow>
+
+ <flow name="NextGenServiceAppointment__e_SIU">
+   <!-- Begin NextGenServiceAppointment__e SIU Handler -->
+   <salesforce-pub-sub:subscribe-channel-listener channelName="/event/NextGenServiceAppointment__e" config-ref="Pubsub-config" doc:name="Subscribe NextGenServiceAppointment__e">
+     <salesforce-pub-sub:replay-option>
+       <salesforce-pub-sub:latest/>
+     </salesforce-pub-sub:replay-option>
+   </salesforce-pub-sub:subscribe-channel-listener>
+   <logger level="INFO" doc:name="Log NextGenServiceAppointment__e Payload" message="INCOMING NEXTGEN SERVICE APPOINTMENT: #[write(payload, 'application/json')]"/>
+   <set-variable variableName="sentToNextgen" value="${sent.to.nextgen}" doc:name="Set sentToNextgen"/>
+   <choice doc:name="Route by EventType__c">
+     <when expression="#[payload.event.Event_Type__c == 'S12']">
+       <ee:transform doc:name="To HL7 SIU^S12">
+         <ee:message>
+           <ee:set-payload><![CDATA[%dw 2.0  
+output text/plain  
+import * from dw::core::Strings  
+  
+var e = payload.event  
+  
+// Helper functions for handling nulls  
+fun safeTrim(val) = if (val == null) "" else trim(val as String)  
+fun safeUpper(val) = if (val == null) "" else upper(safeTrim(val))  
+  
+var rawPid = safeTrim(e.Patient_ID__c)  
+var pid = if (upper(rawPid) startsWith "HF") rawPid[2 to -1] else rawPid  
+  
+var lastName = safeUpper(e.Patient_Last_Name__c)  
+var firstName = safeUpper(e.Patient_First_Name__c)  
+  
+var dobNum = safeTrim(e.Patient_DOB__c)  
+var dob =  
+    if (dobNum != null and !isEmpty(dobNum))  
+        ((dobNum as Number) as DateTime {unit: "milliseconds"}) as String {format: "yyyyMMdd"}  
+    else  
+        ""  
+  
+var genderRaw = safeTrim(e.Patient_Gender__c)  
+var hl7Gender =  
+    if (upper(genderRaw) == "FEMALE" or upper(genderRaw) == "F") "F"  
+    else if (upper(genderRaw) == "MALE" or upper(genderRaw) == "M") "M"  
+    else "U"  
+  
+var providerNpi = safeTrim(e.Provider_NPI__c)  
+var providerLast = safeUpper(e.Provider_Last_Name__c)  
+var providerFirst = safeUpper(e.Provider_First_Name__c)  
+var locationId = safeTrim(e.Location_ID__c)  
+var locationName = safeUpper(e.Location_Name__c)  
+  
+var contId =  
+    if (safeTrim(e.NextGen_ID__c) != "")  
+        safeTrim(e.NextGen_ID__c)  
+    else  
+        safeTrim(e.Placer_Appointment_ID__c)  
+  
+var apptType = safeUpper(e.Appointment_Type__c)  
+var apptReason =  
+    if (safeTrim(e.Appointment_Reason__c) != "")  
+        safeUpper(e.Appointment_Reason__c)  
+    else  
+        ""  
+var duration = safeTrim(e.Duration_Value__c)  
+  
+var startEpoch = safeTrim(e.Start_DateTime__c)  
+var endEpoch = safeTrim(e.End_DateTime__c)  
+var schStart =  
+    if (startEpoch != null and !isEmpty(startEpoch))  
+        (startEpoch as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}  
+    else  
+        ""  
+var schEnd =  
+    if (endEpoch != null and !isEmpty(endEpoch))  
+        (endEpoch as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}  
+    else  
+        ""  
+  
+// Patient Address  
+var street = safeUpper(e.Patient_Street__c)  
+var city = safeUpper(e.Patient_City__c)  
+var state = safeUpper(e.Patient_State__c)  
+var zip = safeUpper(e.Patient_Zip__c)  
+  
+// Language  
+var language = if (e.Patient_Language__c != null) safeUpper(e.Patient_Language__c) else ""  
+  
+// PID-13 Phone & Email formatting  
+var phoneRaw = e.Patient_Phone__c  
+var phone = if (phoneRaw == null) "" else phoneRaw as String  
+var email = if (e.Email__c == null) "" else upper(e.Patient_Email__c as String)  
+var validPhone = !isEmpty(phone) and sizeOf(phone) == 10  
+var area = if (validPhone) phone[0 to 2] else ""  
+var prefix = if (validPhone) phone[3 to 5] else ""  
+var lineNum = if (validPhone) phone[6 to 9] else ""  
+var rest = if (validPhone) prefix ++ lineNum else ""  
+var formattedPhone = if (validPhone) "(" ++ area ++ ")" ++ prefix ++ "-" ++ lineNum else phone  
+var pid13 = formattedPhone ++ "^^^" ++ email ++ "^^" ++ area ++ "^" ++ rest  
+  
+var status = "NEW"  
+  
+---  
+"MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|"  
+++ (now() as String {format:"yyyyMMddHHmmss"})  
+++ "||SIU^S12|" ++ contId ++ "|P|2.3"  
+++ "\nSCH||" ++ contId ++ "||||"   // SCH-1 .. SCH-6  
+++ apptReason ++ "|"              // SCH-7 (Appointment Reason)  
+++ apptType ++ "|"                // SCH-8 (Appointment Type)  
+++ duration ++ "|"                // SCH-9 (Duration)  
+++ "MIN|"                         // SCH-10 (Duration units)  
+++ "^^^" ++ schStart ++ "^" ++ schEnd // SCH-11 (dates)  
+++ "|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
+++ "|||||||||" ++ status  
+++ "\nPID|1|"  
+++ pid ++ "|"  
+++ pid ++ "|HF" ++ pid ++ "|"  
+++ lastName ++ "^" ++ firstName ++ "||"  
+++ dob ++ "|"  
+++ hl7Gender ++ "||PATIENT DECLINED|"  
+++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip // PID-11  
+++ "|" ++ ""                                           // PID-12 (leave blank)  
+++ "|" ++ pid13                                        // PID-13  
+++ "||" ++ language  
+++ "|||||||PATIENT DECLINED"  
+++ "\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName  
+++ "||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
+++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||"  
+++ contId ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||"  
+++ schStart ++ "|" ++ schEnd  
+++ "\nRGS|1"  
+++ "\nAIL|1||" ++ locationId ++ "^^^" ++ locationName  
+++ "\nAIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  ]]></ee:set-payload>
+         </ee:message>
+       </ee:transform>
+       <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
+       <set-variable variableName="hl7FilePath" value="#['C:\\\\Users\\\\ychri\\\\Desktop\\\\foresthms\\\\toNGO\\\\SIU\\\\SIU12_' ++ uuid() ++ '.hl7']" doc:name="Set HL7 File Path"/>
+       <file:write path="#[vars.hl7FilePath]" doc:name="Write HL7 to File"/>
+       <choice doc:name="NextGen Switch">
+         <when expression="#[vars.sentToNextgen]">
+           <!-- Send HL7 to NextGen API -->
+           <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON"/>
+           <until-successful maxRetries="3" millisBetweenRetries="1000">
+             <logger level="INFO" doc:name="HL7 body to NextGen" message="HL7 body to NextGen: #[payload]"/>
+             <ee:transform doc:name="Fix HL7 Endlines">
+               <ee:message>
+                 <ee:set-payload>
+                   <![CDATA[
+%dw 2.0
+output text/plain
+---
+(trim(payload as String)
+  replace "\r\n" with "\r"
+  replace "\n" with "\r")
+                   ]]>
+                 </ee:set-payload>
+               </ee:message>
+             </ee:transform>
+           </until-successful>
+         </when>
+         <otherwise>
+           <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only."/>
+         </otherwise>
+       </choice>
+     </when>
+
+     <when expression="#[payload.event.Event_Type__c == 'S15']">
+       <ee:transform doc:name="To HL7 SIU^S15">
+         <ee:message>
+           <ee:set-payload><![CDATA[%dw 2.0  
+output text/plain  
+import * from dw::core::Strings  
+  
+var pe = payload.event  
+  
+// Helper: No fallbacks, explicit string handling  
+fun safeTrim(val) = if (val == null) "" else trim(val as String)  
+fun safeUpper(val) = if (val == null) "" else upper(safeTrim(val))  
+  
+// Patient Identifiers  
+var apptId = safeTrim(pe.NextGen_ID__c)  
+var pidRaw = safeTrim(pe.Patient_ID__c)  
+var pid = if (upper(pidRaw) startsWith "HF") pidRaw[2 to -1] else pidRaw  
+  
+// Demographics  
+var lastName     = safeUpper(pe.Patient_Last_Name__c)  
+var firstName    = safeUpper(pe.Patient_First_Name__c)  
+var dobRaw       = safeTrim(pe.Patient_DOB__c)  
+var dob =  
+    if (!isEmpty(dobRaw))  
+        ((dobRaw as Number) as DateTime {unit: "milliseconds"}) as String {format: "yyyyMMdd"}  
+    else  
+        ""  
+var genderRaw    = safeTrim(pe.Patient_Gender__c)  
+var gender =  
+    if (upper(genderRaw) == "FEMALE" or upper(genderRaw) == "F") "F"  
+    else if (upper(genderRaw) == "MALE" or upper(genderRaw) == "M") "M"  
+    else "U"  
+  
+// Patient Address  
+var street       = safeUpper(pe.Patient_Street__c)  
+var city         = safeUpper(pe.Patient_City__c)  
+var state        = safeUpper(pe.Patient_State__c)  
+var zip          = safeUpper(pe.Patient_Zip__c)  
+  
+// Language (no EN fallback)  
+var language     = if (pe.Patient_Language__c != null) safeUpper(pe.Patient_Language__c) else ""  
+  
+// Phone & Email  
+var phoneRaw     = pe.Patient_Phone__c  
+var phone        = if (phoneRaw == null) "" else phoneRaw as String  
+var email        = if (pe.Email__c == null) "" else upper(pe.Email__c as String)  
+var validPhone   = !isEmpty(phone) and sizeOf(phone) == 10  
+var area         = if (validPhone) phone[0 to 2] else ""  
+var prefix       = if (validPhone) phone[3 to 5] else ""  
+var lineNum      = if (validPhone) phone[6 to 9] else ""  
+var rest         = if (validPhone) prefix ++ lineNum else ""  
+var formattedPhone = if (validPhone) "(" ++ area ++ ")" ++ prefix ++ "-" ++ lineNum else phone  
+  
+// Status for S15  
+var status = "CANCELLED"  
+  
+// Appointment details  
+var providerNpi   = safeTrim(pe.Provider_NPI__c)  
+var providerLast  = safeUpper(pe.Provider_Last_Name__c)  
+var providerFirst = safeUpper(pe.Provider_First_Name__c)  
+var apptType      = safeUpper(pe.Appointment_Type__c)  
+var apptReasonRaw = pe.Appointment_Reason__c  
+var apptReason    = if (apptReasonRaw != null) safeUpper(apptReasonRaw) else ""  
+var locationId    = safeTrim(pe.Location_ID__c)  
+var locationName  = safeUpper(pe.Location_Name__c)  
+var durationRaw   = safeTrim(pe.Duration_Value__c)  
+  
+// Start/End times (no defaults)  
+var schStartRaw   = safeTrim(pe.Start_DateTime__c)  
+var schEndRaw     = safeTrim(pe.End_DateTime__c)  
+var schStart =  
+    if (!isEmpty(schStartRaw))  
+        (schStartRaw as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}  
+    else ""  
+var schEnd =  
+    if (!isEmpty(schEndRaw))  
+        (schEndRaw as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}  
+    else ""  
+  
+// Message Construction (strict for S15)  
+---  
+"MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|"  
+++ (now() as String {format:"yyyyMMddHHmmss"})  
+++ "||SIU^S15|" ++ apptId ++ "|P|2.3"  
+++ "\nSCH||" ++ apptId ++ "||||"                  // SCH-1 to SCH-6  
+++ apptReason ++ "|"                             // SCH-7 (Appointment Reason)  
+++ apptType ++ "|"                               // SCH-8 (Appointment Type)  
+++ durationRaw ++ "|"                            // SCH-9 (Duration Value)  
+++ "MIN|"                                        // SCH-10 (Duration Unit)  
+++ "^^^" ++ schStart ++ "^" ++ schEnd            // SCH-11 (dates)  
+++ "|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
+++ "|||||||||" ++ status  
+++ "\nPID|1|" ++ pid ++ "|" ++ pid ++ "|HF" ++ pid ++ "|" ++ lastName ++ "^" ++ firstName ++ "||"  
+++ dob ++ "|" ++ gender ++ "||PATIENT DECLINED|" ++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip  
+++ "|" ++ ""                         // PID-12 (Business phone blank)  
+++ "|" ++ formattedPhone ++ "^^^" ++ email ++ "^^" ++ area ++ "^" ++ rest // PID-13 (home phone/email)  
+++ "||" ++ language ++ "|||||||PATIENT DECLINED"  
+++ "\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName  
+++ "||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
+++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||"  
+++ apptId ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||"  
+++ schStart ++ "|" ++ schEnd  
+++ "\nRGS|1"  
+++ "\nAIL|1||" ++ locationId ++ "^^^" ++ locationName  
+++ "\nAIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  ]]></ee:set-payload>
+         </ee:message>
+       </ee:transform>
+       <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
+       <set-variable variableName="hl7FilePath" value="#['C:\\\\Users\\\\ychri\\\\Desktop\\\\foresthms\\\\toNGO\\\\SIU\\\\SIU15_' ++ uuid() ++ '.hl7']" doc:name="Set HL7 File Path"/>
+       <file:write path="#[vars.hl7FilePath]" doc:name="Write HL7 to File"/>
+       <choice doc:name="NextGen Switch">
+         <when expression="#[vars.sentToNextgen]">
+           <!-- Send HL7 to NextGen API -->
+           <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON"/>
+           <until-successful maxRetries="3" millisBetweenRetries="1000">
+             <logger level="INFO" doc:name="HL7 body to NextGen" message="HL7 body to NextGen: #[payload]"/>
+             <ee:transform doc:name="Fix HL7 Endlines">
+               <ee:message>
+                 <ee:set-payload>
+                   <![CDATA[
+%dw 2.0
+output text/plain
+---
+trim(payload) replace "\n" with "\r"
+                   ]]>
+                 </ee:set-payload>
+               </ee:message>
+             </ee:transform>
+           </until-successful>
+         </when>
+         <otherwise>
+           <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only."/>
+         </otherwise>
+       </choice>
+     </when>
+
+     <otherwise>
+       <logger doc:name="Debug Payload Type" level="WARN" message="(DEBUG) Payload type: #[payload.class], value: #[payload]"/>
+       <logger doc:name="Unknown EventType - Skipped" level="WARN" message="Skipped NextGenServiceAppointment__e: unknown EventType: #[payload.event.Event_Type__c]"></logger>
+     </otherwise>
+   </choice>
+   <!-- End NextGenServiceAppointment__e SIU Handler -->
+ </flow>
+</mule>

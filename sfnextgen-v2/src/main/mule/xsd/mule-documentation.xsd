@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  MuleSoft - Public copy of mule-documentation.xsd for namespace http://www.mulesoft.org/schema/mule/documentation.
+  Source: Mule Community Edition public repo and legacy Anypoint Studio installations.
+  For Studio and Maven schema resolution in offline/enterprise environments.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.mulesoft.org/schema/mule/documentation"
+            xmlns="http://www.mulesoft.org/schema/mule/documentation"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+    <xsd:element name="description" type="xsd:string" />
+    <xsd:element name="documentation" type="xsd:string" />
+    <xsd:attribute name="name" type="xsd:string" />
+    <xsd:attribute name="id" type="xsd:string" />
+</xsd:schema>
