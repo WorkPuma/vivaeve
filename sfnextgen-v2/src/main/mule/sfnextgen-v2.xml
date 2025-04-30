@@ -1,30 +1,65 @@
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:salesforce-pub-sub="http://www.mulesoft.org/schema/mule/salesforce-pub-sub" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:os="http://www.mulesoft.org/schema/mule/os" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd         http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd         http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd         http://www.mulesoft.org/schema/mule/salesforce-pub-sub http://www.mulesoft.org/schema/mule/salesforce-pub-sub/current/mule-salesforce-pub-sub.xsd         http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd         http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-  <os:object-store name="Object_store" doc:name="Object store" doc:id="991fdafd-b179-48f8-9574-62c20aa9740b" />
-  <http:listener-config basePath="/" name="Listener-config">
-   <http:listener-connection host="localhost" port="8081"></http:listener-connection>
-  </http:listener-config>
-  <salesforce-pub-sub:pubsub-config name="Pubsub-config">
-		<salesforce-pub-sub:oauth-user-pass-connection consumerKey="3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF" consumerSecret="5CD87471A3A77F6527C2B9B1E100ED78C8C1A0623875E1822E84080BD0B47A63" username="cgainus@cokergroup.com.devchris" password="Mosby2350@#" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" 
+      xmlns:file="http://www.mulesoft.org/schema/mule/file" 
+      xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+      xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" 
+      xmlns:salesforce-pub-sub="http://www.mulesoft.org/schema/mule/salesforce-pub-sub" 
+      xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xmlns:os="http://www.mulesoft.org/schema/mule/os" 
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+        http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+        http://www.mulesoft.org/schema/mule/salesforce-pub-sub http://www.mulesoft.org/schema/mule/salesforce-pub-sub/current/mule-salesforce-pub-sub.xsd
+        http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+        http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd">
   
-</salesforce-pub-sub:pubsub-config>
-  <os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="97a9c096-9d2a-4361-912f-552fdb414e27" />
+  <!-- Object store configuration -->
+  <os:object-store name="Object_store" doc:name="Object store" doc:id="55e027a0-70fd-4e97-bfce-3fdc27bdeeda" />
+  
+  <!-- HTTP listener configuration -->
+  <http:listener-config name="Listener-config" doc:name="HTTP Listener config" basePath="/">
+    <http:listener-connection host="localhost" port="8081" />
+  </http:listener-config>
+  
+  <!-- Salesforce Pub/Sub configuration -->
+  <salesforce-pub-sub:pubsub-config name="Pubsub-config" doc:name="Salesforce PubSub Config">
+    <salesforce-pub-sub:oauth-user-pass-connection consumerKey="3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF" consumerSecret="5CD87471A3A77F6527C2B9B1E100ED78C8C1A0623875E1822E84080BD0B47A63" username="cgainus@cokergroup.com.devchris" password="Mosby2350@#" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
+  </salesforce-pub-sub:pubsub-config>
+  
+  <!-- SFTP configuration -->
+  <sftp:config name="SFTP_Config" doc:name="SFTP Config" doc:id="9f7c4ec7-6cca-42f0-b928-e6e55a857432">
+    <sftp:connection host="sftp.prod.ngo.nextgenaws.net" 
+                    port="22" 
+                    username="foresthms" 
+                    password="E7aipaPHV9hf9p3b76Nh"
+                    workingDir="/" />
+  </sftp:config>
+  
+  <!-- ObjectStore configuration -->
+  <os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="720a116f-1631-400f-aedd-ed9762252524" />
+  
+  <!-- Configuration properties -->
   <configuration-properties file="config.properties" />
-  <flow doc:id="0412e5df-b2e8-45f8-a812-56305fc6499d" name="sfnextgen-v2Flow">
-   <salesforce-pub-sub:subscribe-channel-listener channelName="/event/Contact__e" config-ref="Pubsub-config" doc:id="80c2571f-d7e0-4781-9c54-2c1558b23a56" doc:name="Subscribe channel listener">
-    <salesforce-pub-sub:replay-option>
-     <salesforce-pub-sub:latest/>
-    </salesforce-pub-sub:replay-option>
-   </salesforce-pub-sub:subscribe-channel-listener>
-
-
-   <logger level="INFO" doc:name="Log Platform Event Payload" message="INCOMING PLATFORM EVENT PAYLOAD: #[write(payload, 'application/json')]"/>
-   
-   <set-variable variableName="sentToNextgen" value="${sent.to.nextgen}" doc:name="Set sentToNextgen"/>
-   <choice doc:name="Route by EventType__c">
-    <when expression="#[payload.event.Event_Type__c == 'A04']">
-     <ee:transform doc:name="To HL7 ADT^A04">
-      <ee:message>
-       <ee:set-payload><![CDATA[%dw 2.0  
+  
+  <!-- First flow: Contact__e processing -->
+  <flow name="sfnextgen-v2Flow" doc:id="569a12c5-1665-4513-9f26-005d78ba61d1">
+    <salesforce-pub-sub:subscribe-channel-listener doc:name="Subscribe channel listener" doc:id="40cbd672-9934-4c39-9ef4-b25b6e23244f" config-ref="Pubsub-config" channelName="/event/Contact__e">
+      <salesforce-pub-sub:replay-option>
+        <salesforce-pub-sub:latest />
+      </salesforce-pub-sub:replay-option>
+    </salesforce-pub-sub:subscribe-channel-listener>
+    <logger level="INFO" doc:name="Log Platform Event Payload" message="INCOMING PLATFORM EVENT PAYLOAD: #[write(payload, 'application/json')]" />
+    <set-variable variableName="sentToNextgen" value="${sent.to.nextgen}" doc:name="Set sentToNextgen" />
+    <choice doc:name="Route by EventType__c">
+      <when expression="#[payload.event.Event_Type__c == 'A04']">
+        <ee:transform doc:name="To HL7 ADT^A04">
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0  
 output text/plain   
 import * from dw::core::Strings   
   
@@ -85,42 +120,40 @@ var status = "NEW"
 ++ "\nRGS|"  
 ++ "\nAIL|1||" ++ locationId ++ "^^^" ++ locationName  
 ++ "\nAIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  ]]></ee:set-payload>
-     </ee:message>
-    </ee:transform>
-    <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
-    <set-variable variableName="hl7FilePath" value="#['C:\\\\Users\\\\ychri\\\\Desktop\\\\foresthms\\\\toNGO\\\\ADT\\\\ADT04_' ++ uuid() ++ '.hl7']" doc:name="Set HL7 File Path"/>
-    <file:write path="#[vars.hl7FilePath]" doc:name="Write HL7 to File"/>
-    <choice doc:name="NextGen Switch">
-     <when expression="#[vars.sentToNextgen]">
-      <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON"/>
-      <until-successful maxRetries="3" millisBetweenRetries="1000">
-        <logger level="INFO" doc:name="HL7 body to NextGen" message="HL7 body to NextGen: #[payload]"/>
-        <ee:transform doc:name="Fix HL7 Endlines">
-          <ee:message>
-            <ee:set-payload>
-              <![CDATA[
+          </ee:message>
+        </ee:transform>
+        <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]" />
+        <set-variable variableName="hl7FilePath" value="#['C:\\\\Users\\\\ychri\\\\Desktop\\\\foresthms\\\\toNGO\\\\ADT\\\\ADT04_' ++ uuid() ++ '.hl7']" doc:name="Set HL7 File Path" />
+        <file:write doc:name="Write HL7 to File" path="#[vars.hl7FilePath]" />
+        <choice doc:name="NextGen Switch">
+          <when expression="#[vars.sentToNextgen]">
+            <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON" />
+            <until-successful maxRetries="3" millisBetweenRetries="1000">
+              <logger level="INFO" doc:name="HL7 body to NextGen" message="HL7 body to NextGen: #[payload]" />
+              <ee:transform doc:name="Fix HL7 Endlines">
+                <ee:message>
+                  <ee:set-payload><![CDATA[
 %dw 2.0
 output text/plain
 ---
 trim(payload as String)
   replace "\r\n" with "\r"
   replace "\n" with "\r"
-              ]]>
-            </ee:set-payload>
-          </ee:message>
-        </ee:transform>
-      </until-successful>
-      <!-- Outbound flow would go here. Add HTTP request or call as needed. -->
-     </when>
-     <otherwise>
-      <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only."/>
-     </otherwise>
-    </choice>
-   </when>
-   <when expression="#[payload.event.Event_Type__c == 'A08']">
-    <ee:transform doc:name="To HL7 ADT^A08">
-     <ee:message>
-      <ee:set-payload><![CDATA[%dw 2.0  
+                  ]]></ee:set-payload>
+                </ee:message>
+              </ee:transform>
+            </until-successful>
+            <!-- Outbound flow would go here. Add HTTP request or call as needed. -->
+          </when>
+          <otherwise>
+            <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only." />
+          </otherwise>
+        </choice>
+      </when>
+      <when expression="#[payload.event.Event_Type__c == 'A08']">
+        <ee:transform doc:name="To HL7 ADT^A08">
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0  
 output text/plain  
   
 var event = payload.event  
@@ -190,59 +223,57 @@ var patientEthnicity = event.Patient_Ethnicity__c default "PATIENT DECLINED"
 ++ "|"  
 ++ normGender  
 ++ "||OTHER"  ]]></ee:set-payload>
-     </ee:message>
-    </ee:transform>
-    <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
-    <set-variable variableName="hl7FilePath" value="#['C:\\\\Users\\\\ychri\\\\Desktop\\\\foresthms\\\\toNGO\\\\ADT\\\\ADT08_' ++ uuid() ++ '.hl7']" doc:name="Set HL7 File Path"/>
-    <file:write path="#[vars.hl7FilePath]" doc:name="Write HL7 to File"/>
-    <choice doc:name="NextGen Switch">
-     <when expression="#[vars.sentToNextgen]">
-      <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON"/>
-      <until-successful maxRetries="3" millisBetweenRetries="1000">
-       <logger level="INFO" doc:name="HL7 body to NextGen" message="HL7 body to NextGen: #[payload]"/>
-       <logger level="INFO" doc:name="DEBUG Payload Structure" message="DEBUG payload at DW: #[payload]"/>
-       <ee:transform doc:name="Fix HL7 Endlines">
-         <ee:message>
-           <ee:set-payload>
-             <![CDATA[
+          </ee:message>
+        </ee:transform>
+        <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]" />
+        <set-variable variableName="hl7FilePath" value="#['C:\\\\Users\\\\ychri\\\\Desktop\\\\foresthms\\\\toNGO\\\\ADT\\\\ADT08_' ++ uuid() ++ '.hl7']" doc:name="Set HL7 File Path" />
+        <file:write doc:name="Write HL7 to File" path="#[vars.hl7FilePath]" />
+        <choice doc:name="NextGen Switch">
+          <when expression="#[vars.sentToNextgen]">
+            <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON" />
+            <until-successful maxRetries="3" millisBetweenRetries="1000">
+              <logger level="INFO" doc:name="HL7 body to NextGen" message="HL7 body to NextGen: #[payload]" />
+              <logger level="INFO" doc:name="DEBUG Payload Structure" message="DEBUG payload at DW: #[payload]" />
+              <ee:transform doc:name="Fix HL7 Endlines">
+                <ee:message>
+                  <ee:set-payload><![CDATA[
 %dw 2.0
 output text/plain
 ---
 (trim(payload as String)
   replace "\r\n" with "\r"
   replace "\n" with "\r")
-             ]]>
-           </ee:set-payload>
-         </ee:message>
-       </ee:transform>
-     </until-successful>
-      <!-- Outbound flow would go here. Add HTTP request or call as needed. -->
-     </when>
-     <otherwise>
-      <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only."/>
-     </otherwise>
+                  ]]></ee:set-payload>
+                </ee:message>
+              </ee:transform>
+            </until-successful>
+            <!-- Outbound flow would go here. Add HTTP request or call as needed. -->
+          </when>
+          <otherwise>
+            <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only." />
+          </otherwise>
+        </choice>
+      </when>
+      <otherwise>
+        <logger doc:name="Unknown EventType - Skipped" level="WARN" message="Skipped payload, unknown EventType: #[payload.event.Event_Type__c]" />
+      </otherwise>
     </choice>
-   </when>
-   <otherwise>
-    <logger doc:name="Unknown EventType - Skipped" level="WARN" message="Skipped payload, unknown EventType: #[payload.event.Event_Type__c]"></logger>
-   </otherwise>
-  </choice>
- </flow>
+  </flow>
 
- <flow name="NextGenServiceAppointment__e_SIU">
-   <!-- Begin NextGenServiceAppointment__e SIU Handler -->
-   <salesforce-pub-sub:subscribe-channel-listener channelName="/event/NextGenServiceAppointment__e" config-ref="Pubsub-config" doc:name="Subscribe NextGenServiceAppointment__e">
-     <salesforce-pub-sub:replay-option>
-       <salesforce-pub-sub:latest/>
-     </salesforce-pub-sub:replay-option>
-   </salesforce-pub-sub:subscribe-channel-listener>
-   <logger level="INFO" doc:name="Log NextGenServiceAppointment__e Payload" message="INCOMING NEXTGEN SERVICE APPOINTMENT: #[write(payload, 'application/json')]"/>
-   <set-variable variableName="sentToNextgen" value="${sent.to.nextgen}" doc:name="Set sentToNextgen"/>
-   <choice doc:name="Route by EventType__c">
-     <when expression="#[payload.event.Event_Type__c == 'S12']">
-       <ee:transform doc:name="To HL7 SIU^S12">
-         <ee:message>
-           <ee:set-payload><![CDATA[%dw 2.0  
+  <!-- Second flow: NextGenServiceAppointment__e SIU Handler -->
+  <flow name="NextGenServiceAppointment__e_SIU">
+    <salesforce-pub-sub:subscribe-channel-listener doc:name="Subscribe NextGenServiceAppointment__e" config-ref="Pubsub-config" channelName="/event/NextGenServiceAppointment__e">
+      <salesforce-pub-sub:replay-option>
+        <salesforce-pub-sub:latest />
+      </salesforce-pub-sub:replay-option>
+    </salesforce-pub-sub:subscribe-channel-listener>
+    <logger level="INFO" doc:name="Log NextGenServiceAppointment__e Payload" message="INCOMING NEXTGEN SERVICE APPOINTMENT: #[write(payload, 'application/json')]" />
+    <set-variable variableName="sentToNextgen" value="${sent.to.nextgen}" doc:name="Set sentToNextgen" />
+    <choice doc:name="Route by EventType__c">
+      <when expression="#[payload.event.Event_Type__c == 'S12']">
+        <ee:transform doc:name="To HL7 SIU^S12">
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0  
 output text/plain  
 import * from dw::core::Strings  
   
@@ -343,43 +374,56 @@ lastName ++ "^" ++ firstName ++ "||" ++ dob ++ "|" ++ hl7Gender ++
 "RGS|1" ++ "\r" ++  
 "AIL|1||" ++ locationId ++ "^^^" ++ locationName ++ "\r" ++  
 "AIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  ]]></ee:set-payload>
-         </ee:message>
-       </ee:transform>
-       <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
-       <set-variable variableName="hl7FilePath" value="#['C:\\\\Users\\\\ychri\\\\Desktop\\\\foresthms\\\\toNGO\\\\SIU\\\\SIU12_' ++ uuid() ++ '.hl7']" doc:name="Set HL7 File Path"/>
-       <file:write path="#[vars.hl7FilePath]" doc:name="Write HL7 to File"/>
-       <choice doc:name="NextGen Switch">
-         <when expression="#[vars.sentToNextgen]">
-           <!-- Send HL7 to NextGen API -->
-           <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON"/>
-           <until-successful maxRetries="3" millisBetweenRetries="1000">
-             <logger level="INFO" doc:name="HL7 body to NextGen" message="HL7 body to NextGen: #[payload]"/>
-             <ee:transform doc:name="Fix HL7 Endlines">
-               <ee:message>
-                 <ee:set-payload>
-                   <![CDATA[
+          </ee:message>
+        </ee:transform>
+        <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]" />
+        
+        <!-- Generate a unique filename -->
+        <set-variable variableName="filename" value='#["SIU12_" ++ uuid() ++ ".hl7"]' doc:name="Set filename" />
+        
+        <!-- Set local file path variable -->
+        <set-variable variableName="hl7FilePath" value="#['C:\\Users\\ychri\\Desktop\\foresthms\\toNGO\\SIU\\' ++ vars.filename]" doc:name="Set HL7 File Path" />
+        
+        <!-- Write to local file -->
+        <file:write doc:name="Write HL7 to File" path="#[vars.hl7FilePath]" />
+        
+        <!-- SFTP upload step -->
+        <logger level="INFO" doc:name="SFTP Upload Start" message="Uploading to SFTP: #[vars.filename]" />
+        <sftp:write doc:name="Upload to SFTP" config-ref="SFTP_Config" path="#['/foresthms/toNGO/SIU/' ++ vars.filename]">
+            <sftp:content><![CDATA[#[payload]]]></sftp:content>
+        </sftp:write>
+        <logger level="INFO" doc:name="SFTP Upload Complete" message="Successfully uploaded to SFTP: #[vars.filename]" />
+        
+        <choice doc:name="NextGen Switch">
+          <when expression="#[vars.sentToNextgen]">
+            <!-- Send HL7 to NextGen API -->
+            <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON" />
+            <until-successful maxRetries="3" millisBetweenRetries="1000">
+              <logger level="INFO" doc:name="HL7 body to NextGen" message="HL7 body to NextGen: #[payload]" />
+              <ee:transform doc:name="Fix HL7 Endlines">
+                <ee:message>
+                  <ee:set-payload><![CDATA[
 %dw 2.0
 output text/plain
 ---
 (trim(payload as String)
   replace "\r\n" with "\r"
   replace "\n" with "\r")
-                   ]]>
-                 </ee:set-payload>
-               </ee:message>
-             </ee:transform>
-           </until-successful>
-         </when>
-         <otherwise>
-           <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only."/>
-         </otherwise>
-       </choice>
-     </when>
+                  ]]></ee:set-payload>
+                </ee:message>
+              </ee:transform>
+            </until-successful>
+          </when>
+          <otherwise>
+            <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only." />
+          </otherwise>
+        </choice>
+      </when>
 
-     <when expression="#[payload.event.Event_Type__c == 'S15']">
-       <ee:transform doc:name="To HL7 SIU^S15">
-         <ee:message>
-           <ee:set-payload><![CDATA[%dw 2.0  
+      <when expression="#[payload.event.Event_Type__c == 'S15']">
+        <ee:transform doc:name="To HL7 SIU^S15">
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0  
 output text/plain  
 import * from dw::core::Strings  
   
@@ -475,42 +519,54 @@ var status = "CANCELLED"
  ++ "RGS|1\r"  
  ++ "AIL|1||" ++ locationId ++ "^^^" ++ locationName ++ "\r"  
  ++ "AIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  ]]></ee:set-payload>
-         </ee:message>
-       </ee:transform>
-       <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
-       <set-variable variableName="hl7FilePath" value="#['C:\\\\Users\\\\ychri\\\\Desktop\\\\foresthms\\\\toNGO\\\\SIU\\\\SIU15_' ++ uuid() ++ '.hl7']" doc:name="Set HL7 File Path"/>
-       <file:write path="#[vars.hl7FilePath]" doc:name="Write HL7 to File"/>
-       <choice doc:name="NextGen Switch">
-         <when expression="#[vars.sentToNextgen]">
-           <!-- Send HL7 to NextGen API -->
-           <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON"/>
-           <until-successful maxRetries="3" millisBetweenRetries="1000">
-             <logger level="INFO" doc:name="HL7 body to NextGen" message="HL7 body to NextGen: #[payload]"/>
-             <ee:transform doc:name="Fix HL7 Endlines">
-               <ee:message>
-                 <ee:set-payload>
-                   <![CDATA[
+          </ee:message>
+        </ee:transform>
+        <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]" />
+        
+        <!-- Generate a unique filename -->
+        <set-variable variableName="filename" value='#["SIU15_" ++ uuid() ++ ".hl7"]' doc:name="Set filename" />
+        
+        <!-- Set local file path variable -->
+        <set-variable variableName="hl7FilePath" value="#['C:\\Users\\ychri\\Desktop\\foresthms\\toNGO\\SIU\\' ++ vars.filename]" doc:name="Set HL7 File Path" />
+        
+        <!-- Write to local file -->
+        <file:write doc:name="Write HL7 to File" path="#[vars.hl7FilePath]" />
+        
+        <!-- SFTP upload step -->
+        <logger level="INFO" doc:name="SFTP Upload Start" message="Uploading to SFTP: #[vars.filename]" />
+        <sftp:write doc:name="Upload to SFTP" config-ref="SFTP_Config" path="#['/foresthms/toNGO/SIU/' ++ vars.filename]">
+          <sftp:content><![CDATA[#[payload]]]></sftp:content>
+        </sftp:write>
+        <logger level="INFO" doc:name="SFTP Upload Complete" message="Successfully uploaded to SFTP: #[vars.filename]" />
+        
+        <choice doc:name="NextGen Switch">
+          <when expression="#[vars.sentToNextgen]">
+            <!-- Send HL7 to NextGen API -->
+            <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON" />
+            <until-successful maxRetries="3" millisBetweenRetries="1000">
+              <logger level="INFO" doc:name="HL7 body to NextGen" message="HL7 body to NextGen: #[payload]" />
+              <ee:transform doc:name="Fix HL7 Endlines">
+                <ee:message>
+                  <ee:set-payload><![CDATA[
 %dw 2.0
 output text/plain
 ---
 trim(payload) replace "\n" with "\r"
-                   ]]>
-                 </ee:set-payload>
-               </ee:message>
-             </ee:transform>
-           </until-successful>
-         </when>
-         <otherwise>
-           <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only."/>
-         </otherwise>
-       </choice>
-     </when>
+                  ]]></ee:set-payload>
+                </ee:message>
+              </ee:transform>
+            </until-successful>
+          </when>
+          <otherwise>
+            <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only." />
+          </otherwise>
+        </choice>
+      </when>
 
-     <otherwise>
-       <logger doc:name="Debug Payload Type" level="WARN" message="(DEBUG) Payload type: #[payload.class], value: #[payload]"/>
-       <logger doc:name="Unknown EventType - Skipped" level="WARN" message="Skipped NextGenServiceAppointment__e: unknown EventType: #[payload.event.Event_Type__c]"></logger>
-     </otherwise>
-   </choice>
-   <!-- End NextGenServiceAppointment__e SIU Handler -->
- </flow>
+      <otherwise>
+        <logger doc:name="Debug Payload Type" level="WARN" message="(DEBUG) Payload type: #[payload.class], value: #[payload]" />
+        <logger doc:name="Unknown EventType - Skipped" level="WARN" message="Skipped NextGenServiceAppointment__e: unknown EventType: #[payload.event.Event_Type__c]" />
+      </otherwise>
+    </choice>
+  </flow>
 </mule>
