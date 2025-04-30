@@ -303,7 +303,7 @@ flatten(payload.Data.ADT_A04.PID."PID-04")."CX-01"[0] default "UNKNOWN_PATIENT_I
 output application/json
 var language =  readUrl("classpath://Language_Preferred__c.json","application/json")
 ---
-(language filter ($.primarylanguage == payload.Data.ADT_A08.PID."PID-15"."CE_0296-01"))[0].Language_Preferred__c
+(language filter ($.primarylanguage == payload.Data.ADT_A04.PID."PID-15"."CE_0296-01"))[0].Language_Preferred__c
 ]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
@@ -327,26 +327,28 @@ output application/java
 output application/java
 ---
 [{
-     "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A04.PID."PID-04"."CX-01"[0],     
-      "FirstName": flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-02"[0],
-      "LastName": flatten(payload.Data.ADT_A08.PID."PID-05")."XPN-01"[0],
-      "MiddleName": payload.Data.ADT_A08.PID."PID-05"."XPN-03"[0],
-      "Email": payload.Data.ADT_A08.PID."PID-13"."XTN-04"[0],
-      "Phone": payload.Data.ADT_A08.PID."PID-13"."XTN-01"[0],
-      "MailingState": payload.Data.ADT_A08.PID."PID-11"."XAD-04"[0],
-      "MailingPostalCode": payload.Data.ADT_A08.PID."PID-11"."XAD-05"[0],
-      "MailingCity": payload.Data.ADT_A08.PID."PID-11"."XAD-03"[0],
-      "MailingStreet": payload.Data.ADT_A08.PID."PID-11"."XAD-01"[0],
-      "Patient_Ethnicity__c": payload.Data.ADT_A08.PID."PID-22",
-      "Patient_Race__c": payload.Data.ADT_A08.PID."PID-10",
-      "Patient_Gender_2__c": if(payload.Data.ADT_A08.PID."PID-08" == "M") ("Male") else if (payload.Data.ADT_A08.PID."PID-08" == "F") ("Female") else (payload.Data.ADT_A08.PID."PID-08"),
-      "Date_of_Birth__c": if (payload.Data.ADT_A04.PID."PID-07" == null) 
-                     null 
+     "HealthFusion_Patient_Record_ID__c": payload.Data.ADT_A04.PID."PID-04"."CX-01"[0],
+      "FirstName": flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-02"[0],
+      "LastName": flatten(payload.Data.ADT_A04.PID."PID-05")."XPN-01"[0],
+      "MiddleName": payload.Data.ADT_A04.PID."PID-05"."XPN-03"[0],
+      "Email": payload.Data.ADT_A04.PID."PID-13"."XTN-04"[0],
+      "Phone": payload.Data.ADT_A04.PID."PID-13"."XTN-01"[0],
+      "MailingState": payload.Data.ADT_A04.PID."PID-11"."XAD-04"[0],
+      "MailingPostalCode": payload.Data.ADT_A04.PID."PID-11"."XAD-05"[0],
+      "MailingCity": payload.Data.ADT_A04.PID."PID-11"."XAD-03"[0],
+      "MailingStreet": payload.Data.ADT_A04.PID."PID-11"."XAD-01"[0],
+      "Patient_Ethnicity__c": payload.Data.ADT_A04.PID."PID-22",
+      "Patient_Race__c": payload.Data.ADT_A04.PID."PID-10",
+      "Patient_Gender_2__c": if(payload.Data.ADT_A04.PID."PID-08" == "M") "Male"
+         else if (payload.Data.ADT_A04.PID."PID-08" == "F") "Female"
+         else (payload.Data.ADT_A04.PID."PID-08"),
+      "Date_of_Birth__c": if (payload.Data.ADT_A04.PID."PID-07" == null)
+                     null
                      else if (payload.Data.ADT_A04.PID."PID-07" is String)
                      (payload.Data.ADT_A04.PID."PID-07" as Date {format: "yyyyMMdd"}) default null
                      else
                      (payload.Data.ADT_A04.PID."PID-07"."TS-01" as Date {format: "yyyyMMdd"}) default null
-    }]]]></ee:set-variable>
+}]]]></ee:set-variable>
                 </ee:variables>
             </ee:transform>
 
@@ -1549,7 +1551,10 @@ output application/json
         "Email": vars.sfContactData.Email[0],
         "Phone": vars.sfContactData.Phone[0],
         "Location": vars.mailLocation,
-        "Contact Full Name": if(vars.sfContactData.FirstName[0] == null) " " else (vars.sfContactData.FirstName[0]) ++ " " ++  if(vars.sfContactData.LastName[0] == null) " " else (vars.sfContactData.LastName[0]) ++ " " ++  if(vars.sfContactData.MiddleName[0] == null) "" else (vars.sfContactData.MiddleName[0])
+        "Contact Full Name":
+            (vars.sfContactData.FirstName[0] default "") ++ " " ++
+            (vars.sfContactData.MiddleName[0] default "") ++ " " ++
+            (vars.sfContactData.LastName[0] default "")
     },  
     "Error Details": {
         "statusCode": vars.accountResponse.items.statusCode[0],
@@ -1814,7 +1819,10 @@ output application/json
         "Email": vars.sfContactData.Email[0],
         "Location": vars.mailLocation,
         "Phone": vars.sfContactData.Phone[0],
-        "Contact Full Name": if(vars.sfContactData.FirstName[0] == null) " " else (vars.sfContactData.FirstName[0]) ++ " " ++  if(vars.sfContactData.LastName[0] == null) " " else (vars.sfContactData.LastName[0]) ++ " " ++  if(vars.sfContactData.MiddleName[0] == null) "" else (vars.sfContactData.MiddleName[0])
+        "Contact Full Name":
+            (vars.sfContactData.FirstName[0] default "") ++ " " ++
+            (vars.sfContactData.MiddleName[0] default "") ++ " " ++
+            (vars.sfContactData.LastName[0] default "")
     },  
     "Error Details": {
         "statusCode": payload.items.statusCode[0],
@@ -2284,47 +2292,80 @@ output application/json
 		<sub-flow name="contact-update-response-handler" doc:id="3bd3be27-d901-42e6-8061-47a153f66210">
 	<choice doc:name="Choice">
 		<when expression="#[payload.successful == false]">
-			<ee:transform doc:name="errorDetails">
-				<ee:message>
-					<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	status: "ERROR",
-	errorMessage: payload.items.message[0],
-	statusMessage: payload.items.statusCode[0]
-}]]></ee:set-payload>
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="errorMessage"><![CDATA[%dw 2.0
-output application/json
----
-{   
-    message: "Hello Team This email is to notify you that an error occurred while attempting to Update a Contact in Salesforce",
-    "Contact Details": {
-        contactId: payload.items.id[0],
-        "Date of Birth": vars.sfContactData.Date_of_Birth__c[0],
-        Email: vars.sfContactData.Email[0],
-        Phone: vars.sfContactData.Phone[0],
-        Location: vars.mailLocation,
-        "Contact Full Name": 
-            (vars.sfContactData.FirstName[0] default "") ++ " " ++ 
-            (vars.sfContactData.MiddleName[0] default "") ++ " " ++ 
-            (vars.sfContactData.LastName[0] default "")
-    },
-    "Error Details": {
-        statusCode: payload.items.statusCode[0],
-        errorMessage: payload.items.message[0],
-        "error Type": error.errorType
-    }
-}]]></ee:set-variable>
+		<ee:transform doc:name="errorDetails">  
+    <ee:message>  
+        <ee:set-payload><![CDATA[  
+%dw 2.0  
+output application/json  
+---  
+{  
+    status: "ERROR",  
+    errorMessage: payload.items.message[0],  
+    statusMessage: payload.items.statusCode[0]  
+}  
+        ]]></ee:set-payload>  
+    </ee:message>  
+    <ee:variables>  
+        <ee:set-variable variableName="errorMessage"><![CDATA[  
+%dw 2.0  
+output application/json  
+---  
+{  
+    message: "Hello Team This email is to notify you that an error occurred while attempting to Update a Contact in Salesforce",  
+    "Contact Details": {  
+        contactId: payload.items.id[0],  
+        "Date of Birth": vars.sfContactData.Date_of_Birth__c[0],  
+        Email: vars.sfContactData.Email[0],  
+        Phone: vars.sfContactData.Phone[0],  
+        Location: vars.mailLocation,  
+        "Contact Full Name":  
+            (vars.sfContactData.FirstName[0] default "") ++ " " ++  
+            (vars.sfContactData.MiddleName[0] default "") ++ " " ++  
+            (vars.sfContactData.LastName[0] default "")  
+    },  
+    "Error Details": {  
+        statusCode: payload.items.statusCode[0],  
+        errorMessage: payload.items.message[0],  
+        "error Type": error.errorType  
+    }  
+}  
+        ]]></ee:set-variable>  
 
-					<ee:set-variable variableName="subject"><![CDATA[%dw 2.0
-output application/json
----
-"Contact Updation Error " ++ vars.sfContactData.FirstName[0] ++ " " ++ vars.sfContactData.MiddleName[0] ++ " " ++ vars.sfContactData.LastName[0] default " "]]></ee:set-variable>
-				</ee:variables>
-			</ee:transform>
+    </ee:variables>  
+</ee:transform>  
+<ee:transform doc:name="Transform Message">  
+    <ee:message />  
+    <ee:variables>  
+        <ee:set-variable variableName="errorMesg"><![CDATA[  
+%dw 2.0  
+output text/plain  
+---  
+"Hello Team,\n\n" ++  
+"This email is to notify you that an error occurred while attempting to Update a Contact in Salesforce.\n\n" ++  
+"Contact Details:\n" ++  
+"Contact ID: " ++ (vars.errorMessage."Contact Details".contactId default "N/A") ++ "\n" ++  
+"Date of Birth: " ++ (vars.errorMessage."Contact Details"."Date of Birth" default "N/A") ++ "\n" ++  
+"Email: " ++ (vars.errorMessage."Contact Details".Email default "N/A") ++ "\n" ++  
+"Phone: " ++ (vars.errorMessage."Contact Details".Phone default "N/A") ++ "\n" ++  
+"Contact Full Name: " ++ (vars.errorMessage."Contact Details"."Contact Full Name" default "N/A") ++ "\n\n" ++  
+"Error Details:\n" ++  
+"Status Code: " ++ (vars.errorMessage."Error Details".statusCode default "N/A") ++ "\n" ++  
+"Error Message: " ++ (vars.errorMessage."Error Details".errorMessage default "N/A") ++ "\n" ++  
+"Error Type: " ++ (vars.errorMessage."Error Details"."error Type" default "N/A")  
+        ]]></ee:set-variable>  
+        <ee:set-variable variableName="locationAddress"><![CDATA[  
+%dw 2.0  
+output application/json  
+---  
+if (vars.errorMessage."Contact Details".Location == "FOREST HILLS")   
+    p('email.forest.to')  
+else if (vars.errorMessage."Contact Details".Location == "MADISON")   
+    p('email.madison.to')  
+else   
+    p('email.to')  
+        ]]></ee:set-variable>  
+    </ee:variables>  
+</ee:transform>  
 
 			<ee:transform doc:name="Transform Message">
 				<ee:message />
