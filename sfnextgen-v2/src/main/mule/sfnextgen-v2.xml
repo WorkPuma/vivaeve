@@ -34,75 +34,32 @@ var e = payload.event
 fun safeTrim(val) = if (val == null) "" else trim(val as String)  
 fun safeUpper(val) = if (val == null) "" else upper(safeTrim(val))  
   
-var rawPid = safeTrim(e.Patient_ID__c)  
-var pid = if (upper(rawPid) startsWith "HF") rawPid[2 to -1] else rawPid   
-  
-var lastName = safeUpper(e.Patient_Last_Name__c)  
-var firstName = safeUpper(e.Patient_First_Name__c)  
-  
-var dobNum = safeTrim(e.Patient_DOB__c)  
-var dob = if (dobNum != null and !isEmpty(dobNum))   
-    ((dobNum as Number) as DateTime {unit: "milliseconds"}) as String {format: "yyyyMMdd"}     
-    else ""   
-  
-var genderRaw = safeTrim(e.Patient_Gender__c)  
-var hl7Gender =   
-    if (upper(genderRaw) == "FEMALE" or upper(genderRaw) == "F") "F"  
-    else if (upper(genderRaw) == "MALE" or upper(genderRaw) == "M") "M"  
-    else "U"  
-  
-var providerNpi   = safeTrim(e.Provider_NPI__c)  
-var providerLast  = safeUpper(e.Provider_Last_Name__c)  
-var providerFirst = safeUpper(e.Provider_First_Name__c)  
-  
-var locationId   = safeTrim(e.Location_ID__c)  
-var locationName = safeUpper(e.Location_Name__c)  
-  
-var contId = if ((safeTrim(e.NextGen_ID__c) default "") != "")   
-    safeTrim(e.NextGen_ID__c)   
-    else safeTrim(e.Placer_Appointment_ID__c)  
-  
-var apptType = safeUpper(e.Appointment_Type__c)  
-var apptReason = if ((safeTrim(e.Appointment_Reason__c) default "") != "")   
-    safeUpper(e.Appointment_Reason__c)   
-    else ""   
-  
-var duration   = safeTrim(e.Duration_Value__c)  
-var startEpoch = safeTrim(e.Start_DateTime__c)  
-var endEpoch   = safeTrim(e.End_DateTime__c)  
-  
-var schStart = if (startEpoch != null and !isEmpty(startEpoch))   
-    (startEpoch as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}   
-    else ""   
-  
-var schEnd = if (endEpoch != null and !isEmpty(endEpoch))   
-    (endEpoch as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}   
-    else ""   
-  
-// Patient Address   
-var street = safeUpper(e.Patient_Street__c)  
-var city   = safeUpper(e.Patient_City__c)  
-var state  = safeUpper(e.Patient_State__c)  
-var zip    = safeUpper(e.Patient_Zip__c)  
-  
-// Language: use exact from input, do not fallback to EN   
-var language = if (e.Patient_Language__c != null) safeUpper(e.Patient_Language__c) else ""  
-  
-// --- PID-13 Phone & Email formatting ---  
-var phoneRaw = e.Patient_Phone__c  
-var phone    = if (phoneRaw == null) "" else phoneRaw as String  
-var email    = if (e.Patient_Email__c == null) "" else upper(e.Patient_Email__c as String)  
-  
-// Phone components  
-var validPhone = !isEmpty(phone) and sizeOf(phone) == 10 and (match(phone, /[0-9]{10}/))  
-var area   = if (validPhone) phone[0 to 2] else ""  
-var prefix = if (validPhone) phone[3 to 5] else ""  
-var lineNum= if (validPhone) phone[6 to 9] else ""  
-var rest   = if (validPhone) prefix ++ lineNum else ""  
-var formattedPhone = if (validPhone) "(" ++ area ++ ")" ++ prefix ++ "-" ++ lineNum else phone  
-  
-// PID-13 field: (<area>)<prefix>-<line>^^^<EMAIL>^^<area>^<prefix+line>  
-var pid13 = formattedPhone ++ "^^^" ++ email ++ "^^" ++ area ++ "^" ++ rest  
+var firstName  = safeUpper(e.FirstName__c)
+var lastName   = safeUpper(e.LastName__c)
+var middleName = safeUpper(e.MiddleName__c)
+var dobNum     = safeTrim(e.Date_of_Birth__c)
+var dob        = if (!isEmpty(dobNum)) (dobNum as Date {format: "MMMM dd, yyyy"}) as String {format:"yyyyMMdd"} else ""
+var genderRaw  = safeTrim(e.Patient_Gender__c)
+var hl7Gender  = if (upper(genderRaw) == "FEMALE" or upper(genderRaw) == "F") "F"
+                 else if (upper(genderRaw) == "MALE" or upper(genderRaw) == "M") "M" else "U"
+var street     = safeUpper(e.MailingStreet__c)
+var city       = safeUpper(e.MailingCity__c)
+var state      = safeUpper(e.MailingState__c)
+var zip        = safeUpper(e.MailingPostalCode__c)
+var language   = if (e.Language__c != null) safeUpper(e.Language__c) else "EN"
+var phoneRaw   = e.Phone__c
+var phone      = if (phoneRaw == null) "" else phoneRaw as String
+var email      = if (e.Email__c == null) "" else upper(e.Email__c as String)
+var validPhone = !isEmpty(phone) and sizeOf(phone) == 10 and (match(phone, /[0-9]{10}/))
+var area       = if (validPhone) phone[0 to 2] else ""
+var prefix     = if (validPhone) phone[3 to 5] else ""
+var lineNum    = if (validPhone) phone[6 to 9] else ""
+var rest       = if (validPhone) prefix ++ lineNum else ""
+var formattedPhone = if (validPhone) "(" ++ area ++ ")" ++ prefix ++ "-" ++ lineNum else phone
+var pid13      = formattedPhone ++ "^^^" ++ email ++ "^^" ++ area ++ "^" ++ rest
+var patientRace = e.Patient_Race__c default "PATIENT DECLINED"
+var patientEthnicity = e.Patient_Ethnicity__c default "PATIENT DECLINED"
+
   
 var status = "NEW"   
   
@@ -113,19 +70,17 @@ var status = "NEW"
 ++ contId  
 ++ "|P|2.3"  
 ++ "\nSCH||" ++ contId ++ "||||" ++ apptType ++ "|" ++ apptReason ++ "|" ++ apptType ++ "|" ++ duration ++ "|MIN|^^^" ++ schStart ++ "^" ++ schEnd ++ "|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "|||||||||" ++ status  
-++ "\nPID|1|"  
-++ pid ++ "|"  
-++ pid ++ "|HF" ++ pid ++ "|"  
-++ lastName ++ "^" ++ firstName ++ "||"  
-++ dob ++ "|"  
-++ hl7Gender ++ "||PATIENT DECLINED|"  
-++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip // PID-11 address  
-++ "|"   
-++ ""                                        // PID-12 business phone BLANK  
-++ "|"   
-++ pid13                                     // PID-13 home phone/email  
-++ "||" ++ language  
-++ "|||||||PATIENT DECLINED"  
+++ "\nPID|1|"
+++ pid ++ "|"
+++ pid ++ "|HF" ++ pid ++ "|"
+++ lastName ++ "^" ++ firstName ++
+"||" ++ dob ++ "|" ++ hl7Gender ++
+"||PATIENT DECLINED|" ++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip
+++ "|"           // PID-12 (Phone Business, blank)
+++ pid13         // PID-13 (Phone Home/Email)
+++ "||" ++ language  // PID-14/PID-15
+++ "|||||||"    // PID-16 to PID-21
+++ "PATIENT DECLINED"
 ++ "\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName ++ "||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||" ++ contId ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||" ++ schStart ++ "|" ++ schEnd  
 ++ "\nRGS|"  
 ++ "\nAIL|1||" ++ locationId ++ "^^^" ++ locationName  
@@ -170,34 +125,32 @@ output text/plain
   
 var event = payload.event  
 var idRaw = event.HealthFusion_Patient_Record_ID__c default ""  
-var id = if (upper(idRaw) startsWith "HF") idRaw[2 to -1] else idRaw  
-var useId = (id != null and id != "")  
-var dob =   
-    if ((event.Date_of_Birth__c default null) != null)  
-        ((event.Date_of_Birth__c) as Date {format: "MMMM dd, yyyy"}) as String {format:"yyyyMMdd"}  
-    else ""  
-var gt1dob = if (dob != "") dob ++ "000000" else ""  
-var middleName = event.MiddleName__c default ""  
-var hl7Name = upper(event.LastName__c default "") ++ "^" ++ upper(event.FirstName__c default "")   
-    ++ (if (!isEmpty(event.MiddleName__c default "")) "^" ++ ("" ++ upper(event.MiddleName__c default "")) else "")  
-var normGender =   
-    if (upper(event.Patient_Gender__c default "") == "M") "M"  
-    else if (upper(event.Patient_Gender__c default "") == "F") "F"  
-    else "U"  
-var normLang = event.Language__c default "EN"  
-var patientRace = event.Patient_Race__c default "PATIENT DECLINED"  
-var patientEthnicity = event.Patient_Ethnicity__c default "PATIENT DECLINED"  
-var phone = event.Phone__c default ""  
-var email = event.Email__c default ""  
-var phoneFormatted = event.PhoneNumberFormatted__c default ""  
-var nicePhone =  
-    if (!isEmpty(phoneFormatted)) phoneFormatted  
-    else if (!isEmpty(phone) and sizeOf(phone) == 10)  
-        "(" ++ phone[0 to 2] ++ ")" ++ phone[3 to 5] ++ "-" ++ phone[6 to 9]  
-    else phone  
-var area = if (!isEmpty(phone) and sizeOf(phone) >= 3) phone[0 to 2] else ""  
-var rest = if (!isEmpty(phone) and sizeOf(phone) >= 7) phone[3 to 9] else ""  
-var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ "^^" ++ area ++ "^" ++ rest  
+var lastName   = safeUpper(event.LastName__c)
+var firstName  = safeUpper(event.FirstName__c)
+var middleName = safeUpper(event.MiddleName__c)
+var dobString  = event.Date_of_Birth__c default ""
+var dob        = if (isEmpty(dobString)) "" else try(() -> (dobString as Date {format: "MMMM dd, yyyy"}) as String {format: "yyyyMMdd"}) default ""
+var genderRaw  = safeTrim(event.Patient_Gender__c)
+var hl7Gender  = if (upper(genderRaw) == "FEMALE" or upper(genderRaw) == "F") "F"
+                 else if (upper(genderRaw) == "MALE" or upper(genderRaw) == "M") "M" else "U"
+var street     = safeUpper(event.MailingStreet__c)
+var city       = safeUpper(event.MailingCity__c)
+var state      = safeUpper(event.MailingState__c)
+var zip        = safeUpper(event.MailingPostalCode__c)
+var language   = if (event.Language__c != null) safeUpper(event.Language__c) else "EN"
+var phoneRaw   = event.Phone__c
+var phone      = if (phoneRaw == null) "" else phoneRaw as String
+var email      = if (event.Email__c == null) "" else upper(event.Email__c as String)
+var validPhone = !isEmpty(phone) and sizeOf(phone) == 10 and (match(phone, /[0-9]{10}/))
+var area       = if (validPhone) phone[0 to 2] else ""
+var prefix     = if (validPhone) phone[3 to 5] else ""
+var lineNum    = if (validPhone) phone[6 to 9] else ""
+var rest       = if (validPhone) prefix ++ lineNum else ""
+var formattedPhone = if (validPhone) "(" ++ area ++ ")" ++ prefix ++ "-" ++ lineNum else phone
+var pid13      = formattedPhone ++ "^^^" ++ email ++ "^^" ++ area ++ "^" ++ rest
+var patientRace = event.Patient_Race__c default "PATIENT DECLINED"
+var patientEthnicity = event.Patient_Ethnicity__c default "PATIENT DECLINED"
+
   
 ---  
 "MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|"   
@@ -205,32 +158,22 @@ var contactInfo = nicePhone ++ "^^^" ++ (if (!isEmpty(email)) email else "") ++ 
 ++ "||ADT^A08|"  
 ++ upper(uuid() as String)  
 ++ "|P|2.3"  
-++ "\nPID|1|"  
-++ (if (useId) id else "")  
-++ "|"  
-++ (if (useId) id else "")  
-++ "|"  
-++ (if (useId) "HF" ++ id else "HF")  
-++ "|"  
-++ hl7Name  
-++ "|"  
-++ "|"                            // PID-6 blank (mother's maiden name)  
-++ dob  
-++ "|"  
-++ normGender  
-++ "||"  
-++ patientRace  
-++ "|"  
-++ (event.MailingStreet__c default "") ++ "^^" ++ (event.MailingCity__c default "") ++ "^"   
-   ++ (event.MailingState__c default "") ++ "^" ++ (event.MailingPostalCode__c default "") // PID-11 (address)  
-++ "|"   
-++ ""                           // PID-12 (Phone Business) left blank  
-++ "|"   
-++ contactInfo                  // PID-13 (Phone Home) -- CORRECT HL7 PLACEMENT  
-++ "||"  
-++ normLang  
-++ "|||||||"  
-++ patientEthnicity  
+++ "\nPID|1|"
+++ pid ++ "|"                  // PID-2: Patient ID
+++ pid ++ "|"                  // PID-3: Patient Identifier List
+++ "HF" ++ pid ++ "|"          // PID-4: External ID
+++ lastName ++ "^" ++ firstName ++ "^" ++ middleName  // PID-5: Name
+++ "||"                        // PID-6: Mother's Maiden Name
+++ dob ++ "|"                  // PID-7: DOB (HL7 format)
+++ hl7Gender ++ "|"            // PID-8: Sex
+++ "||"                        // PID-9: Alias
+++ patientRace ++ "|"          // PID-10: Race
+++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip  // PID-11: Address
+++ "|"                         // PID-12: Business phone (blank)
+++ pid13                       // PID-13: Home phone/email
+++ "||" ++ language            // PID-14, PID-15
+++ "|||||||"                  // PID-16 to PID-21 (all blank)
+++ patientEthnicity           // PID-22: Ethnic Group
 ++ "\nPV1|1|O|^^^1275017^^^^^FOREST HILLS||||||||1275017^^^1275017^^^^^FOREST HILLS|||||||||||||||||||||||N|||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS"  
 ++ "\nGT1|1|"  
 ++ (if (useId) id else "")  
@@ -440,104 +383,98 @@ output text/plain
 output text/plain  
 import * from dw::core::Strings  
   
-var pe = payload.event  
+var e = payload.event  
   
-// Helper: No fallbacks, explicit string handling  
+// Helper functions for handling nulls  
 fun safeTrim(val) = if (val == null) "" else trim(val as String)  
 fun safeUpper(val) = if (val == null) "" else upper(safeTrim(val))  
   
-// Patient Identifiers  
-var apptId = safeTrim(pe.NextGen_ID__c)  
-var pidRaw = safeTrim(pe.Patient_ID__c)  
-var pid = if (upper(pidRaw) startsWith "HF") pidRaw[2 to -1] else pidRaw  
+var rawPid = safeTrim(e.Patient_ID__c)  
+var pid = if (upper(rawPid) startsWith "HF") rawPid[2 to -1] else rawPid  
   
-// Demographics  
-var lastName     = safeUpper(pe.Patient_Last_Name__c)  
-var firstName    = safeUpper(pe.Patient_First_Name__c)  
-var dobRaw       = safeTrim(pe.Patient_DOB__c)  
-var dob =  
-    if (!isEmpty(dobRaw))  
-        ((dobRaw as Number) as DateTime {unit: "milliseconds"}) as String {format: "yyyyMMdd"}  
-    else  
-        ""  
-var genderRaw    = safeTrim(pe.Patient_Gender__c)  
-var gender =  
+var lastName = safeUpper(e.Patient_Last_Name__c)  
+var firstName = safeUpper(e.Patient_First_Name__c)  
+  
+var dobNum = safeTrim(e.Patient_DOB__c)  
+var dob = if (dobNum != null and !isEmpty(dobNum))  
+    ((dobNum as Number) as DateTime {unit: "milliseconds"}) as String {format: "yyyyMMdd"}  
+    else ""  
+  
+var genderRaw = safeTrim(e.Patient_Gender__c)  
+var hl7Gender =  
     if (upper(genderRaw) == "FEMALE" or upper(genderRaw) == "F") "F"  
     else if (upper(genderRaw) == "MALE" or upper(genderRaw) == "M") "M"  
     else "U"  
   
+var providerNpi = safeTrim(e.Provider_NPI__c)  
+var providerLast = safeUpper(e.Provider_Last_Name__c)  
+var providerFirst = safeUpper(e.Provider_First_Name__c)  
+var locationId = safeTrim(e.Location_ID__c)  
+var locationName = safeUpper(e.Location_Name__c)  
+  
+var contId = if (safeTrim(e.NextGen_ID__c) != "")  
+    safeTrim(e.NextGen_ID__c)  
+    else safeTrim(e.Placer_Appointment_ID__c)  
+  
+var apptType = safeUpper(e.Appointment_Type__c)  
+var apptReason = if (safeTrim(e.Appointment_Reason__c) != "")  
+    safeUpper(e.Appointment_Reason__c)  
+    else ""  
+var duration = safeTrim(e.Duration_Value__c)  
+  
+var startEpoch = safeTrim(e.Start_DateTime__c)  
+var endEpoch = safeTrim(e.End_DateTime__c)  
+var schStart = if (startEpoch != null and !isEmpty(startEpoch))  
+    (startEpoch as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}  
+    else ""  
+var schEnd = if (endEpoch != null and !isEmpty(endEpoch))  
+    (endEpoch as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}  
+    else ""  
+  
 // Patient Address  
-var street       = safeUpper(pe.Patient_Street__c)  
-var city         = safeUpper(pe.Patient_City__c)  
-var state        = safeUpper(pe.Patient_State__c)  
-var zip          = safeUpper(pe.Patient_Zip__c)  
+var street = safeUpper(e.Patient_Street__c)  
+var city = safeUpper(e.Patient_City__c)  
+var state = safeUpper(e.Patient_State__c)  
+var zip = safeUpper(e.Patient_Zip__c)  
   
-// Language (no EN fallback)  
-var language     = if (pe.Patient_Language__c != null) safeUpper(pe.Patient_Language__c) else ""  
-  
-// Phone & Email  
-var phoneRaw     = pe.Patient_Phone__c  
-var phone        = if (phoneRaw == null) "" else phoneRaw as String  
-var email        = if (pe.Email__c == null) "" else upper(pe.Email__c as String)  
-var validPhone   = !isEmpty(phone) and sizeOf(phone) == 10  
-var area         = if (validPhone) phone[0 to 2] else ""  
-var prefix       = if (validPhone) phone[3 to 5] else ""  
-var lineNum      = if (validPhone) phone[6 to 9] else ""  
-var rest         = if (validPhone) prefix ++ lineNum else ""  
+// PID-13 Phone & Email formatting  
+var phoneRaw = e.Patient_Phone__c  
+var phone = if (phoneRaw == null) "" else phoneRaw as String  
+var email = if ((e.Email__c default "") != "") upper(e.Email__c as String) else ""  
+var validPhone = !isEmpty(phone) and sizeOf(phone) == 10  
+var area = if (validPhone) phone[0 to 2] else ""  
+var prefix = if (validPhone) phone[3 to 5] else ""  
+var lineNum = if (validPhone) phone[6 to 9] else ""  
+var rest = if (validPhone) prefix ++ lineNum else ""  
 var formattedPhone = if (validPhone) "(" ++ area ++ ")" ++ prefix ++ "-" ++ lineNum else phone  
+// PID-13: phone^^^email^^area^rest  
+var pid13 = formattedPhone ++ "^^^" ++ email ++ "^^" ++ area ++ "^" ++ rest  
   
-// Status for S15  
 var status = "CANCELLED"  
   
-// Appointment details  
-var providerNpi   = safeTrim(pe.Provider_NPI__c)  
-var providerLast  = safeUpper(pe.Provider_Last_Name__c)  
-var providerFirst = safeUpper(pe.Provider_First_Name__c)  
-var apptType      = safeUpper(pe.Appointment_Type__c)  
-var apptReasonRaw = pe.Appointment_Reason__c  
-var apptReason    = if (apptReasonRaw != null) safeUpper(apptReasonRaw) else ""  
-var locationId    = safeTrim(pe.Location_ID__c)  
-var locationName  = safeUpper(pe.Location_Name__c)  
-var durationRaw   = safeTrim(pe.Duration_Value__c)  
-  
-// Start/End times (no defaults)  
-var schStartRaw   = safeTrim(pe.Start_DateTime__c)  
-var schEndRaw     = safeTrim(pe.End_DateTime__c)  
-var schStart =  
-    if (!isEmpty(schStartRaw))  
-        (schStartRaw as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}  
-    else ""  
-var schEnd =  
-    if (!isEmpty(schEndRaw))  
-        (schEndRaw as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}  
-    else ""  
-  
-// Message Construction (strict for S15)  
+// HL7 segment output with CR as delimiter!  
 ---  
-"MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|"  
-++ (now() as String {format:"yyyyMMddHHmmss"})  
-++ "||SIU^S15|" ++ apptId ++ "|P|2.3"  
-++ "\nSCH||" ++ apptId ++ "||||"                  // SCH-1 to SCH-6  
-++ apptReason ++ "|"                             // SCH-7 (Appointment Reason)  
-++ apptType ++ "|"                               // SCH-8 (Appointment Type)  
-++ durationRaw ++ "|"                            // SCH-9 (Duration Value)  
-++ "MIN|"                                        // SCH-10 (Duration Unit)  
-++ "^^^" ++ schStart ++ "^" ++ schEnd            // SCH-11 (dates)  
-++ "|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
-++ "|||||||||" ++ status  
-++ "\nPID|1|" ++ pid ++ "|" ++ pid ++ "|HF" ++ pid ++ "|" ++ lastName ++ "^" ++ firstName ++ "||"  
-++ dob ++ "|" ++ gender ++ "||PATIENT DECLINED|" ++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip  
-++ "|" ++ ""                         // PID-12 (Business phone blank)  
-++ "|" ++ formattedPhone ++ "^^^" ++ email ++ "^^" ++ area ++ "^" ++ rest // PID-13 (home phone/email)  
-++ "||" ++ language ++ "|||||||PATIENT DECLINED"  
-++ "\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName  
-++ "||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
-++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||"  
-++ apptId ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||"  
-++ schStart ++ "|" ++ schEnd  
-++ "\nRGS|1"  
-++ "\nAIL|1||" ++ locationId ++ "^^^" ++ locationName  
-++ "\nAIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  ]]></ee:set-payload>
+// MSH segment  
+"MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|"   
+ ++ (now() as String {format:"yyyyMMddHHmmss"})  
+ ++ "||SIU^S15|"  
+ ++ contId ++ "|P|2.3\r"  
+ // SCH segment with correct mapping  
+ ++ "SCH|" ++ contId ++ "|" ++ contId ++ "|||||" ++ apptReason ++ "|" ++ apptType ++ "|" ++ duration  
+ ++ "|MIN|^^^" ++ schStart ++ "^" ++ schEnd  
+ ++ "|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
+ ++ "|||||||||" ++ status ++ "\r"  
+ // PID/other segments as before  
+ ++ "PID|1|" ++ pid ++ "|" ++ pid ++ "|HF" ++ pid ++ "|" ++ lastName ++ "^" ++ firstName ++  
+ "||" ++ dob ++ "|" ++ hl7Gender ++ "||PATIENT DECLINED|" ++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip  
+ ++ "||" ++ pid13 ++ "||EN|||||||PATIENT DECLINED\r"  
+ ++ "PV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName  
+ ++ "||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
+ ++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||" ++ contId  
+ ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||" ++ schStart ++ "|" ++ schEnd ++ "\r"  
+ ++ "RGS|1\r"  
+ ++ "AIL|1||" ++ locationId ++ "^^^" ++ locationName ++ "\r"  
+ ++ "AIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  ]]></ee:set-payload>
          </ee:message>
        </ee:transform>
        <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
