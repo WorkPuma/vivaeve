@@ -1,5 +1,5 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:salesforce-pub-sub="http://www.mulesoft.org/schema/mule/salesforce-pub-sub" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:os="http://www.mulesoft.org/schema/mule/os" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd         http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd         http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd         http://www.mulesoft.org/schema/mule/salesforce-pub-sub http://www.mulesoft.org/schema/mule/salesforce-pub-sub/current/mule-salesforce-pub-sub.xsd         http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd         http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-  <os:object-store name="Object_store" doc:name="Object store" doc:id="e3d87352-ab27-4974-bea7-9a73b942318d" />
+  <os:object-store name="Object_store" doc:name="Object store" doc:id="991fdafd-b179-48f8-9574-62c20aa9740b" />
   <http:listener-config basePath="/" name="Listener-config">
    <http:listener-connection host="localhost" port="8081"></http:listener-connection>
   </http:listener-config>
@@ -7,10 +7,10 @@
 		<salesforce-pub-sub:oauth-user-pass-connection consumerKey="3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF" consumerSecret="5CD87471A3A77F6527C2B9B1E100ED78C8C1A0623875E1822E84080BD0B47A63" username="cgainus@cokergroup.com.devchris" password="Mosby2350@#" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
   
 </salesforce-pub-sub:pubsub-config>
-  <os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="2ec4399b-dcb4-41f4-8117-95deda97f097" />
+  <os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="97a9c096-9d2a-4361-912f-552fdb414e27" />
   <configuration-properties file="config.properties" />
-  <flow doc:id="86717ad9-123d-425c-9890-431ca8546ece" name="sfnextgen-v2Flow">
-   <salesforce-pub-sub:subscribe-channel-listener channelName="/event/Contact__e" config-ref="Pubsub-config" doc:id="53ab7e31-e7f7-439e-b27d-612051bd1a61" doc:name="Subscribe channel listener">
+  <flow doc:id="0412e5df-b2e8-45f8-a812-56305fc6499d" name="sfnextgen-v2Flow">
+   <salesforce-pub-sub:subscribe-channel-listener channelName="/event/Contact__e" config-ref="Pubsub-config" doc:id="80c2571f-d7e0-4781-9c54-2c1558b23a56" doc:name="Subscribe channel listener">
     <salesforce-pub-sub:replay-option>
      <salesforce-pub-sub:latest/>
     </salesforce-pub-sub:replay-option>
@@ -316,11 +316,9 @@ var lastName = safeUpper(e.Patient_Last_Name__c)
 var firstName = safeUpper(e.Patient_First_Name__c)  
   
 var dobNum = safeTrim(e.Patient_DOB__c)  
-var dob =  
-    if (dobNum != null and !isEmpty(dobNum))  
-        ((dobNum as Number) as DateTime {unit: "milliseconds"}) as String {format: "yyyyMMdd"}  
-    else  
-        ""  
+var dob = if (dobNum != null and !isEmpty(dobNum))  
+    ((dobNum as Number) as DateTime {unit: "milliseconds"}) as String {format: "yyyyMMdd"}  
+    else ""  
   
 var genderRaw = safeTrim(e.Patient_Gender__c)  
 var hl7Gender =  
@@ -334,32 +332,24 @@ var providerFirst = safeUpper(e.Provider_First_Name__c)
 var locationId = safeTrim(e.Location_ID__c)  
 var locationName = safeUpper(e.Location_Name__c)  
   
-var contId =  
-    if (safeTrim(e.NextGen_ID__c) != "")  
-        safeTrim(e.NextGen_ID__c)  
-    else  
-        safeTrim(e.Placer_Appointment_ID__c)  
+var contId = if (safeTrim(e.NextGen_ID__c) != "")  
+    safeTrim(e.NextGen_ID__c)  
+    else safeTrim(e.Placer_Appointment_ID__c)  
   
 var apptType = safeUpper(e.Appointment_Type__c)  
-var apptReason =  
-    if (safeTrim(e.Appointment_Reason__c) != "")  
-        safeUpper(e.Appointment_Reason__c)  
-    else  
-        ""  
+var apptReason = if (safeTrim(e.Appointment_Reason__c) != "")  
+    safeUpper(e.Appointment_Reason__c)  
+    else ""  
 var duration = safeTrim(e.Duration_Value__c)  
   
 var startEpoch = safeTrim(e.Start_DateTime__c)  
 var endEpoch = safeTrim(e.End_DateTime__c)  
-var schStart =  
-    if (startEpoch != null and !isEmpty(startEpoch))  
-        (startEpoch as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}  
-    else  
-        ""  
-var schEnd =  
-    if (endEpoch != null and !isEmpty(endEpoch))  
-        (endEpoch as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}  
-    else  
-        ""  
+var schStart = if (startEpoch != null and !isEmpty(startEpoch))  
+    (startEpoch as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}  
+    else ""  
+var schEnd = if (endEpoch != null and !isEmpty(endEpoch))  
+    (endEpoch as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMddHHmmss"}  
+    else ""  
   
 // Patient Address  
 var street = safeUpper(e.Patient_Street__c)  
@@ -367,54 +357,49 @@ var city = safeUpper(e.Patient_City__c)
 var state = safeUpper(e.Patient_State__c)  
 var zip = safeUpper(e.Patient_Zip__c)  
   
-// Language  
-var language = if (e.Patient_Language__c != null) safeUpper(e.Patient_Language__c) else ""  
-  
 // PID-13 Phone & Email formatting  
 var phoneRaw = e.Patient_Phone__c  
 var phone = if (phoneRaw == null) "" else phoneRaw as String  
-var email = if (e.Email__c == null) "" else upper(e.Patient_Email__c as String)  
+var email = if ((e.Email__c default "") != "") upper(e.Email__c as String) else ""  
 var validPhone = !isEmpty(phone) and sizeOf(phone) == 10  
 var area = if (validPhone) phone[0 to 2] else ""  
 var prefix = if (validPhone) phone[3 to 5] else ""  
 var lineNum = if (validPhone) phone[6 to 9] else ""  
 var rest = if (validPhone) prefix ++ lineNum else ""  
 var formattedPhone = if (validPhone) "(" ++ area ++ ")" ++ prefix ++ "-" ++ lineNum else phone  
+// PID-13: phone^^^email^^area^rest  
 var pid13 = formattedPhone ++ "^^^" ++ email ++ "^^" ++ area ++ "^" ++ rest  
   
 var status = "NEW"  
   
+// HL7 segment output with CR as delimiter!  
 ---  
-"MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|"  
-++ (now() as String {format:"yyyyMMddHHmmss"})  
-++ "||SIU^S12|" ++ contId ++ "|P|2.3"  
-++ "\nSCH||" ++ contId ++ "||||"   // SCH-1 .. SCH-6  
-++ apptReason ++ "|"              // SCH-7 (Appointment Reason)  
-++ apptType ++ "|"                // SCH-8 (Appointment Type)  
-++ duration ++ "|"                // SCH-9 (Duration)  
-++ "MIN|"                         // SCH-10 (Duration units)  
-++ "^^^" ++ schStart ++ "^" ++ schEnd // SCH-11 (dates)  
-++ "|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
-++ "|||||||||" ++ status  
-++ "\nPID|1|"  
-++ pid ++ "|"  
-++ pid ++ "|HF" ++ pid ++ "|"  
-++ lastName ++ "^" ++ firstName ++ "||"  
-++ dob ++ "|"  
-++ hl7Gender ++ "||PATIENT DECLINED|"  
-++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip // PID-11  
-++ "|" ++ ""                                           // PID-12 (leave blank)  
-++ "|" ++ pid13                                        // PID-13  
-++ "||" ++ language  
-++ "|||||||PATIENT DECLINED"  
-++ "\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName  
-++ "||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  
-++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||"  
-++ contId ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||"  
-++ schStart ++ "|" ++ schEnd  
-++ "\nRGS|1"  
-++ "\nAIL|1||" ++ locationId ++ "^^^" ++ locationName  
-++ "\nAIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  ]]></ee:set-payload>
+"MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|" ++  
+(now() as String {format:"yyyyMMddHHmmss"}) ++  
+"||SIU^S12|" ++ contId ++ "|P|2.3" ++ "\r" ++  
+  
+"SCH|" ++ contId ++ "|" ++ contId ++ "||||" ++  
+apptType ++ "|"                  // SCH-7: Appointment Reason  
+++ apptType ++ "|"               // SCH-8: Appointment Type  
+++ duration ++ "|"               // SCH-9: Duration  
+++ "MIN|" ++  
+"^^^" ++ schStart ++ "^" ++ schEnd ++  
+"|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++  
+"|||||||||" ++ status ++ "\r" ++  
+  
+"PID|1|" ++ pid ++ "|" ++ pid ++ "|HF" ++ pid ++ "|" ++  
+lastName ++ "^" ++ firstName ++ "||" ++ dob ++ "|" ++ hl7Gender ++  
+"||PATIENT DECLINED|" ++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip ++  
+"||" ++ pid13 ++ "||EN|||||||PATIENT DECLINED" ++ "\r" ++  
+  
+"PV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName ++  
+"||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++  
+"||||1275017^^^1275017^^^^^FOREST HILLS||||||||" ++ contId ++  
+"||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||" ++ schStart ++ "|" ++ schEnd ++ "\r" ++  
+  
+"RGS|1" ++ "\r" ++  
+"AIL|1||" ++ locationId ++ "^^^" ++ locationName ++ "\r" ++  
+"AIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  ]]></ee:set-payload>
          </ee:message>
        </ee:transform>
        <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]"/>
