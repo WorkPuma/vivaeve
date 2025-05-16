@@ -41,64 +41,65 @@
         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{
-  "type": "message",
-  "attachments": [
-    {
-      "contentType": "application/vnd.microsoft.card.adaptive",
-      "content": {
-        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-        "type": "AdaptiveCard",
-        "version": "1.2",
-        "body": [
+(
+  {
+    "type": "AdaptiveCard",
+    "version": "1.4",
+    "body": [
+      {
+        "type": "TextBlock",
+        "text": "HL7 Integration Error",
+        "weight": "Bolder",
+        "size": "Large",
+        "color": "Attention",
+        "wrap": true
+      },
+      {
+        "type": "TextBlock",
+        "text": "An error occurred while processing an HL7 message.",
+        "wrap": true
+      },
+      {
+        "type": "FactSet",
+        "facts": [
           {
-            "type": "TextBlock",
-            "text": "HL7 Integration Error",
-            "weight": "Bolder",
-            "size": "Medium",
-            "color": "Attention"
+            "title": "Error Message:",
+            "value": vars.errorMessage default "Unknown error"
           },
           {
-            "type": "TextBlock",
-            "text": "An error occurred while processing an HL7 message",
-            "wrap": true
+            "title": "Message Type:",
+            "value": vars.messageType default "Unknown"
           },
           {
-            "type": "FactSet",
-            "facts": [
-              {
-                "title": "Error Message:",
-                "value": vars.errorMessage default "Unknown error"
-              },
-              {
-                "title": "Message Type:",
-                "value": vars.messageType default "Unknown"
-              },
-              {
-                "title": "Correlation ID:",
-                "value": vars.correlationId default correlationId
-              },
-              {
-                "title": "Timestamp:",
-                "value": now() as String {format: "yyyy-MM-dd HH:mm:ss"}
-              },
-              {
-                "title": "Environment:",
-                "value": p('mule.env') default "Unknown"
-              }
-            ]
+            "title": "Correlation ID:",
+            "value": vars.correlationId default correlationId
           },
           {
-            "type": "TextBlock",
-            "text": "Please investigate this error in the application logs.",
-            "wrap": true,
-            "style": "emphasis"
+            "title": "Timestamp:",
+            "value": now() as String {format: "yyyy-MM-dd HH:mm:ss"}
+          },
+          {
+            "title": "Environment:",
+            "value": p('mule.env') default "Unknown"
           }
         ]
+      },
+      {
+        "type": "TextBlock",
+        "text": "Please investigate this error in the application logs.",
+        "wrap": true,
+        "isSubtle": true
       }
-    }
-  ]
-}
+    ],
+    "actions": [
+      {
+        "type": "Action.OpenUrl",
+        "title": "View Logs",
+        "url": "https://your-logging-system.example.com"
+      }
+    ]
+  } ++ { "$schema": "http://adaptivecards.io/schemas/adaptive-card.json" }
+) as Object
 ]]></ee:set-payload>
       </ee:message>
     </ee:transform>
@@ -293,8 +294,6 @@ var phoneEmailField = (pidFields[13] default "") splitBy "^"
     </ee:transform>
     <logger level="INFO" doc:name="Log Contact Event Payload" message="Publishing Contact__e event: #[payload]" />
     <salesforce-pub-sub:publish-event doc:name="Publish event" doc:id="e5e9974d-cf97-4c81-aa7d-b128d823510d" config-ref="Salesforce_PubSub_Config" topic="/event/Contact__e"/>
-    <logger level="INFO" doc:name="Log Salesforce Publish Attributes" message="Salesforce publish attributes: #[attributes]" />
-    
     <logger level="INFO" doc:name="Log Contact Event Published" 
             message="Contact platform event published: #[payload.Contact__e]"/>
     
@@ -323,121 +322,114 @@ var phoneEmailField = (pidFields[13] default "") splitBy "^"
 output application/json
 import * from dw::core::Strings
 
-// Helper functions  
-fun safeTrim(val) = if (val == null or val == "") "" else trim(val as String)
-fun safeArray(segment, index) = if (sizeOf(segment) > index) segment[index] else ""
-fun parseField(field, delimiter) = field splitBy delimiter
-fun formatDateTime(dateTimeStr) = 
-  if (isEmpty(dateTimeStr) or sizeOf(dateTimeStr) < 14) null
-  else (dateTimeStr[0 to 3] ++ "-" ++ dateTimeStr[4 to 5] ++ "-" ++ dateTimeStr[6 to 7] ++ 
-        "T" ++ dateTimeStr[8 to 9] ++ ":" ++ dateTimeStr[10 to 11] ++ ":" ++ dateTimeStr[12 to 13] ++ "-05:00")
-fun formatDate(dateStr) = 
-  if (isEmpty(dateStr) or sizeOf(dateStr) < 8) null
-  else (dateStr[0 to 3] ++ "-" ++ dateStr[4 to 5] ++ "-" ++ dateStr[6 to 7])
-fun extractDurationValue(durationStr) = 
-  if (isEmpty(durationStr)) null else durationStr as Number
-fun mapStatus(status) = 
-  if (upper(status) == "BOOKED" or upper(status) == "NEW") "Scheduled"
-  else if (upper(status) == "CANCELLED") "Canceled"
-  else status
-fun mapDurationType(durationType) =
-  if (upper(durationType) == "MIN") "Minutes"
-  else if (upper(durationType) == "HRS") "Hours" 
-  else durationType
-
-// Parse segments
-var segments = payload.segments
-var schSegment = (segments filter startsWith($, "SCH"))[0] default ""
-var pidSegment = (segments filter startsWith($, "PID"))[0] default ""
-var ailSegment = (segments filter startsWith($, "AIL"))[0] default ""
-var aipSegment = (segments filter startsWith($, "AIP"))[0] default ""
+var hl7Text = payload.originalHL7
+var segments = hl7Text splitBy /\r|\n|\s(?=PID|MSH|PV1|GT1|IN1|SCH|AIL|AIP)/
+var schSegment = (segments filter (s) -> startsWith(s, "SCH"))[0] default ""
+var pidSegment = (segments filter (s) -> startsWith(s, "PID"))[0] default ""
+var ailSegment = (segments filter (s) -> startsWith(s, "AIL"))[0] default ""
+var aipSegment = (segments filter (s) -> startsWith(s, "AIP"))[0] default ""
 
 // Parse SCH fields
 var schFields = schSegment splitBy "|"
-var appointmentId = safeArray(parseField(safeArray(schFields, 2), "^"), 0)
-var appointmentReason = safeArray(parseField(safeArray(schFields, 7), "^"), 0)
-var appointmentType = safeArray(parseField(safeArray(schFields, 8), "^"), 0)
-var duration = safeArray(schFields, 9)
-var durationType = safeArray(schFields, 10)
-var timingField = parseField(safeArray(schFields, 11), "^")
-var startTime = safeArray(timingField, 3)
-var endTime = safeArray(timingField, 4)
-var providerField = parseField(safeArray(schFields, 16), "^")
-var providerNpi = safeArray(providerField, 0)
-var providerLastName = safeArray(providerField, 1)
-var providerFirstName = safeArray(providerField, 2)
-var status = safeArray(schFields, 25)
+var appointmentId = (schFields[2] splitBy "^")[0] default ""
+var appointmentReason = (schFields[7] splitBy "^")[0] default ""
+var appointmentType = (schFields[8] splitBy "^")[0] default ""
+var duration = schFields[9] default ""
+var durationType = schFields[10] default ""
+var timingField = schFields[11] splitBy "^"
+var startTime = timingField[3] default ""
+var endTime = timingField[4] default ""
+var providerField = schFields[16] splitBy "^"
+var providerNpi = providerField[0] default ""
+var providerLastName = providerField[1] default ""
+var providerFirstName = providerField[2] default ""
+var status = schFields[25] default ""
 
 // Parse PID fields (for patient info)
 var pidFields = pidSegment splitBy "|"
-var patientId = safeArray(parseField(safeArray(pidFields, 4), "^"), 0)
-var nameField = parseField(safeArray(pidFields, 5), "^")
-var patientLastName = safeArray(nameField, 0)
-var patientFirstName = safeArray(nameField, 1)
-var dobField = safeArray(pidFields, 7)
-var genderField = safeArray(pidFields, 8)
-var phoneEmailField = parseField(safeArray(pidFields, 13), "^")
-var patientPhone = safeArray(phoneEmailField, 0)
-var patientEmail = safeArray(phoneEmailField, 3)
-var addressField = parseField(safeArray(pidFields, 11), "^")
-var patientStreet = safeArray(addressField, 0)
-var patientCity = safeArray(addressField, 2)
-var patientState = safeArray(addressField, 3)
-var patientZip = safeArray(addressField, 4)
+var patientId = (pidFields[4] splitBy "^")[0] default ""
+var nameField = (pidFields[5] default "") splitBy "^"
+var patientLastName = nameField[0] default ""
+var patientFirstName = nameField[1] default ""
+var dobField = pidFields[7] default ""
+var genderField = pidFields[8] default ""
+var phoneEmailField = (pidFields[13] default "") splitBy "^"
+var patientPhone = phoneEmailField[0] default ""
+var patientEmail = phoneEmailField[3] default ""
+var addressField = (pidFields[11] default "") splitBy "^"
+var patientStreet = addressField[0] default ""
+var patientCity = addressField[2] default ""
+var patientState = addressField[3] default ""
+var patientZip = addressField[4] default ""
 
 // Parse AIL fields (location)
 var ailFields = ailSegment splitBy "|"
-var locationField = parseField(safeArray(ailFields, 3), "^")
-var locationId = safeArray(locationField, 0)
-var locationName = safeArray(locationField, 3)
+var locationField = (ailFields[3] default "") splitBy "^"
+var locationId = locationField[0] default ""
+var locationName = locationField[3] default ""
 
 // Format gender
 var genderFormatted = if (upper(genderField) == "M") "Male" 
                      else if (upper(genderField) == "F") "Female" 
                      else genderField
-
 ---
-{
-  NextGenServiceAppointment__e: {
-    Event_Type__c: payload.triggerEvent,
-    NextGen_ID__c: appointmentId,
-    Placer_Appointment_ID__c: appointmentId,
-    Appointment_Type__c: appointmentType,
-    Appointment_Reason__c: appointmentReason,
-    Duration_Value__c: extractDurationValue(duration),
-    Duration_Type__c: mapDurationType(durationType),
-    Start_DateTime__c: formatDateTime(startTime),
-    End_DateTime__c: formatDateTime(endTime),
-    Status__c: mapStatus(status),
-    
-    // Patient Information
-    Patient_ID__c: patientId,
-    Patient_First_Name__c: patientFirstName,
-    Patient_Last_Name__c: patientLastName,
-    Patient_DOB__c: formatDate(dobField),
-    Patient_Gender__c: genderFormatted,
-    Patient_Phone__c: patientPhone,
-    Email__c: patientEmail,
-    Patient_Street__c: patientStreet,
-    Patient_City__c: patientCity,
-    Patient_State__c: patientState,
-    Patient_Zip__c: patientZip,
-    
-    // Provider Information
-    Provider_NPI__c: providerNpi,
-    Provider_First_Name__c: providerFirstName,
-    Provider_Last_Name__c: providerLastName,
-    
-    // Location Information
-    Location_ID__c: locationId,
-    Location_Name__c: locationName
-  }
-}]]></ee:set-payload>
+[{
+  Event_Type__c: payload.triggerEvent,
+  NextGen_ID__c: appointmentId,
+  Placer_Appointment_ID__c: appointmentId,
+  Appointment_Type__c: appointmentType,
+  Appointment_Reason__c: appointmentReason,
+  Appointment_Status__c: if (status != "") status else null,
+  Duration_Value__c: if (duration != "") duration else null,
+  Start_DateTime__c: 
+    if (startTime != "" and sizeOf(startTime) >= 14)
+      ((startTime[0 to 3] ++ "-" ++ startTime[4 to 5] ++ "-" ++ startTime[6 to 7] ++ "T" ++ startTime[8 to 9] ++ ":" ++ startTime[10 to 11] ++ ":" ++ startTime[12 to 13] ++ "Z") as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} as Number {unit: "milliseconds"})
+    else
+      null,
+  End_DateTime__c: 
+    if (endTime != "" and sizeOf(endTime) >= 14)
+      ((endTime[0 to 3] ++ "-" ++ endTime[4 to 5] ++ "-" ++ endTime[6 to 7] ++ "T" ++ endTime[8 to 9] ++ ":" ++ endTime[10 to 11] ++ ":" ++ endTime[12 to 13] ++ "Z") as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} as Number {unit: "milliseconds"})
+    else
+      null,
+  // Patient Information
+  Patient_ID__c: if (patientId != "") "HF" ++ patientId else null,
+  Patient_First_Name__c: if (patientFirstName != "") patientFirstName else null,
+  Patient_Last_Name__c: if (patientLastName != "") patientLastName else null,
+  Patient_DOB__c: 
+    if (dobField != "" and sizeOf(dobField) >= 8)
+      (
+        ((dobField[0 to 3] ++ "-" ++ dobField[4 to 5] ++ "-" ++ dobField[6 to 7]) ++ "T00:00:00Z")
+        as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} 
+        as Number {unit: "milliseconds"}
+      )
+    else
+      null,
+  Patient_Gender__c: if (genderFormatted != "") genderFormatted else null,
+  Patient_Phone__c: if (patientPhone != "") patientPhone else null,
+  Email__c: if (patientEmail != "") patientEmail else null,
+  Patient_Street__c: if (patientStreet != "") patientStreet else null,
+  Patient_City__c: if (patientCity != "") patientCity else null,
+  Patient_State__c: if (patientState != "") patientState else null,
+  Patient_Zip__c: if (patientZip != "") patientZip else null,
+  Patient_Language__c: (pidFields[15] default ""),
+  // Provider Information
+  Provider_NPI__c: if (providerNpi != "") providerNpi else null,
+  Provider_First_Name__c: if (providerFirstName != "") providerFirstName else null,
+  Provider_Last_Name__c: if (providerLastName != "") providerLastName else null,
+  Provider_Type__c: (schFields[17] default ""),
+  // Location Information
+  Location_ID__c: if (locationId != "") locationId else null,
+  Location_Name__c: if (locationName != "") locationName else null,
+  // Required by Pub/Sub
+  CreatedDate: now() as Number {unit: "milliseconds"},
+  CreatedById: "005Rj00000Fzk3mIAB"
+}]
+]]></ee:set-payload>
       </ee:message>
     </ee:transform>
     
-    <!-- Publish Service Appointment Platform Event -->
-    <salesforce-pub-sub:publish-event doc:name="Publish event" doc:id="2a179085-6b21-4941-ace8-f558bb53f187" config-ref="Salesforce_PubSub_Config" topic="/event/NextGen_Appointment__e"/>
+    <logger level="INFO" doc:name="Log SIU Event Payload" message="Publishing NextGenServiceAppointment__e event: #[payload]" />
+    <salesforce-pub-sub:publish-event doc:name="Publish event" doc:id="2a179085-6b21-4941-ace8-f558bb53f187" config-ref="Salesforce_PubSub_Config" topic="/event/NextGenServiceAppointment__e"/>
     
     <logger level="INFO" doc:name="Log Service Appointment Event Published" 
             message="Service Appointment platform event published: #[payload.NextGenServiceAppointment__e]"/>
