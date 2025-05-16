@@ -11,7 +11,7 @@
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
-        <ee:transform doc:name="initializationOfVariables" doc:id="abced7bf-1a88-475c-8ccf-631547de2cfd">
+        <ee:transform doc:name="initializationOfVariables" doc:id="0543e4b6-0798-45e9-8848-9faf8a280399">
 			<ee:message />
 			<ee:variables>
 				<ee:set-variable variableName="transactionId"><![CDATA[uuid()]]></ee:set-variable>
@@ -39,7 +39,7 @@ correlationId default " "
         <apikit:console config-ref="viva-ng-sf-inbound-papi-config" />
     </flow>
     <flow name="post:\nextgenemr:text\plain:viva-ng-sf-inbound-papi-config">
-		<flow-ref doc:name="callToImplFlow" doc:id="58b585dc-a8dc-4dcb-a75c-c21659693edf" name="nextgen-sf-papi-impl" />
+		<flow-ref doc:name="callToImplFlow" doc:id="187e7490-ccfa-4afd-a970-e64e34d8afb0" name="nextgen-sf-papi-impl" />
 		
     </flow>
 </mule>

@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" 
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+      xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" 
+      xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+      xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+      xmlns:salesforce-pub-sub="http://www.mulesoft.org/schema/mule/salesforce-pub-sub"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+        http://www.mulesoft.org/schema/mule/salesforce-pub-sub http://www.mulesoft.org/schema/mule/salesforce-pub-sub/current/mule-salesforce-pub-sub.xsd">
+
+  <!-- HTTP listener configuration to receive from API layer -->
+  <http:listener-config name="Inbound-Listener-Config" doc:name="HTTP Listener config" basePath="/">
+    <http:listener-connection host="0.0.0.0" port="${app.port}" />
+  </http:listener-config>
+  
+  <!-- Teams webhook HTTP request configuration -->
+  <http:request-config name="Teams-Webhook-Config" doc:name="Teams Webhook Config">
+    <http:request-connection host="prod-160.westus.logic.azure.com" port="443" protocol="HTTPS" />
+  </http:request-config>
+  
+  <!-- Salesforce connection configuration -->
+  <salesforce:sfdc-config name="Salesforce-Config" doc:name="Salesforce Config">
+		<salesforce:oauth-user-pass-connection consumerKey="3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF" consumerSecret="5CD87471A3A77F6527C2B9B1E100ED78C8C1A0623875E1822E84080BD0B47A63" username="cgainus@cokergroup.com.devchris" password="Mosby2350@#" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
+  
+</salesforce:sfdc-config>
+  
+  <!-- Configuration properties -->
+  <configuration-properties file="config.properties" />
+  
+  <!-- Teams Error Notification Sub-Flow -->
+  <salesforce-pub-sub:pubsub-config name="Salesforce_PubSub_Config" doc:name="Salesforce PubSub Config" doc:id="d7b408f4-7797-4afd-b111-e80c2127b0f9" >
+		<salesforce-pub-sub:oauth-user-pass-connection consumerKey="3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF" consumerSecret="5CD87471A3A77F6527C2B9B1E100ED78C8C1A0623875E1822E84080BD0B47A63" username="cgainus@cokergroup.com.devchris" password="Mosby2350@#" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
+	</salesforce-pub-sub:pubsub-config>
+	<sub-flow name="send-teams-error-notification" doc:id="4653536f-9fe1-429d-92ef-c884f6723dac">
+    <ee:transform doc:name="Build Teams Message" doc:id="dc5e9afa-96e3-4107-8c48-0c94ffa7a02a">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "type": "message",
+  "attachments": [
+    {
+      "contentType": "application/vnd.microsoft.card.adaptive",
+      "content": {
+        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+        "type": "AdaptiveCard",
+        "version": "1.2",
+        "body": [
+          {
+            "type": "TextBlock",
+            "text": "HL7 Integration Error",
+            "weight": "Bolder",
+            "size": "Medium",
+            "color": "Attention"
+          },
+          {
+            "type": "TextBlock",
+            "text": "An error occurred while processing an HL7 message",
+            "wrap": true
+          },
+          {
+            "type": "FactSet",
+            "facts": [
+              {
+                "title": "Error Message:",
+                "value": vars.errorMessage default "Unknown error"
+              },
+              {
+                "title": "Message Type:",
+                "value": vars.messageType default "Unknown"
+              },
+              {
+                "title": "Correlation ID:",
+                "value": vars.correlationId default correlationId
+              },
+              {
+                "title": "Timestamp:",
+                "value": now() as String {format: "yyyy-MM-dd HH:mm:ss"}
+              },
+              {
+                "title": "Environment:",
+                "value": p('mule.env') default "Unknown"
+              }
+            ]
+          },
+          {
+            "type": "TextBlock",
+            "text": "Please investigate this error in the application logs.",
+            "wrap": true,
+            "style": "emphasis"
+          }
+        ]
+      }
+    }
+  ]
+}
+]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    
+    <http:request method="POST" doc:name="Send to Teams" config-ref="Teams-Webhook-Config"
+      path="/workflows/c8858631b44242cabe025d41de8b1657/triggers/manual/paths/invoke">
+      <http:headers><![CDATA[#[{'Content-Type': 'application/json'}]]]></http:headers>
+      <http:query-params><![CDATA[
+        {
+          'api-version': '2016-06-01',
+          'sp': '/triggers/manual/run',
+          'sv': '1.0',
+          'sig': 'lKmKLNSkt1i7vY3LjX8uRB4hsKST9g8rymcI87px7F4'
+        }
+      ]]></http:query-params>
+    </http:request>
+    
+    <logger level="INFO" doc:name="Log Teams Notification Sent" 
+            message="Teams error notification sent successfully" />
+  </sub-flow>
+  
+  <!-- Main inbound HL7 processing flow -->
+  <flow name="inbound-hl7-processing-flow" doc:id="13a85dab-806c-4356-aa4d-1a3c0ff4b18c">
+    <http:listener doc:name="HL7 Inbound Listener" 
+                   config-ref="Inbound-Listener-Config" 
+                   path="/inbound/hl7" 
+                   allowedMethods="POST"/>
+    
+    <!-- Log incoming HL7 message -->
+    <logger level="INFO" doc:name="Log Incoming HL7" 
+            message="INCOMING HL7 MESSAGE: #[payload]" />
+    
+    <!-- Parse HL7 message and extract message type -->
+    <ee:transform doc:name="Parse HL7 Headers" doc:id="e4e6df7c-8466-424a-9ad2-56a89abe6907">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/java
+import * from dw::core::Strings
+
+var hl7Text = payload as String
+var segments = hl7Text splitBy /\r|\n|\s(?=PID|MSH|PV1|GT1|IN1)/
+var mshSegment = segments[0]
+var mshFields = mshSegment splitBy "|"
+
+var messageType = mshFields[8]
+var eventType = messageType splitBy "^"
+var messageCode = eventType[0]
+var triggerEvent = eventType[1]
+
+---
+{
+  originalHL7: hl7Text,
+  segments: segments,
+  messageType: messageCode,
+  triggerEvent: triggerEvent,
+  fullMessageType: messageType
+}]]></ee:set-payload>
+      </ee:message>
+      <ee:variables>
+        <ee:set-variable variableName="messageType"><![CDATA[%dw 2.0
+output application/java
+var mshSegment = (payload as String splitBy /\r|\n|\s(?=PID|MSH|PV1|GT1|IN1)/)[0]
+var mshFields = mshSegment splitBy "|"
+var messageType = mshFields[8]
+var eventType = messageType splitBy "^"
+---
+eventType[0] ++ "^" ++ eventType[1]]]></ee:set-variable>
+      </ee:variables>
+    </ee:transform>
+    
+    <!-- Route by message type -->
+    <choice doc:name="Route by Message Type">
+      <!-- ADT Messages (Patient Registration/Updates) -->
+      <when expression="#[vars.messageType == 'ADT^A04' or vars.messageType == 'ADT^A08']">
+        <flow-ref doc:name="Process ADT Message" name="process-adt-message-flow"/>
+      </when>
+      
+      <!-- SIU Messages (Scheduling) -->
+      <when expression="#[vars.messageType startsWith 'SIU^S']">
+        <flow-ref doc:name="Process SIU Message" name="process-siu-message-flow"/>
+      </when>
+      
+      <otherwise>
+        <logger level="WARN" doc:name="Unsupported Message Type" 
+                message="Unsupported HL7 message type: #[vars.messageType]"/>
+        <ee:transform doc:name="Set Error Response">
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
+output text/plain
+---
+"MSH|^~\&|FORESTHMS|FORESTHMS^1266378|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|" ++
+(now() as String {format:"yyyyMMddHHmmss"}) ++
+"||ACK^" ++ payload.triggerEvent ++ "|" ++ uuid() ++ "|P|2.3" ++
+"\rMSA|AE|" ++ uuid() ++ "|Unsupported message type|"]]></ee:set-payload>
+          </ee:message>
+        </ee:transform>
+        <set-variable variableName="httpStatus" value="400" doc:name="Set Error Status"/>
+      </otherwise>
+    </choice>
+    
+    <!-- Return ACK on success -->
+    <ee:transform doc:name="Create ACK Response">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output text/plain
+---
+"MSH|^~\&|FORESTHMS|FORESTHMS^1266378|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|" ++
+(now() as String {format:"yyyyMMddHHmmss"}) ++
+"||ACK^" ++ (payload.triggerEvent default "") ++ "|" ++ uuid() ++ "|P|2.3" ++
+"\rMSA|AA|" ++ uuid() ++ "|Message processed successfully|"]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <set-variable variableName="httpStatus" value="200" doc:name="Set Success Status"/>
+    
+    <error-handler>
+      <on-error-continue enableNotifications="true" logException="true">
+        <logger level="ERROR" doc:name="Log Error" 
+                message="Error processing HL7 message: #[error.description]"/>
+        
+        <!-- Set error variables for Teams notification -->
+        <set-variable variableName="errorMessage" value="#[error.description]" doc:name="Set Error Message"/>
+        
+        <!-- Send Teams notification -->
+        <flow-ref doc:name="Send Teams Error Notification" name="send-teams-error-notification"/>
+        
+        <ee:transform doc:name="Create NACK Response">
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
+output text/plain
+---
+"MSH|^~\&|FORESTHMS|FORESTHMS^1266378|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|" ++
+(now() as String {format:"yyyyMMddHHmmss"}) ++
+"||ACK^" ++ ((vars.messageType splitBy "^")[1] default "") ++ "|" ++ uuid() ++ "|P|2.3" ++
+"\rMSA|AE|" ++ uuid() ++ "|Error processing message: " ++ error.description ++ "|"]]></ee:set-payload>
+          </ee:message>
+        </ee:transform>
+        <set-variable variableName="httpStatus" value="500" doc:name="Set Error Status"/>
+      </on-error-continue>
+    </error-handler>
+  </flow>
+  
+  <!-- ADT Message Processing Flow -->
+  <flow name="process-adt-message-flow" doc:id="64b9b2ce-5edc-4882-accc-c4b1bbb61d16">
+    <ee:transform doc:name="Parse ADT Message to Contact Event" doc:id="09cd8e4a-d48e-45d3-8b07-293c8e488182">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+import * from dw::core::Strings
+
+var hl7Text = payload.originalHL7
+var segments = hl7Text splitBy /\r|\n|\s(?=PID|MSH|PV1|GT1|IN1)/
+var pidSegment = (segments filter (s) -> startsWith(s, "PID"))[0] default ""
+var pidFields = pidSegment splitBy "|"
+var nameField = (pidFields[5] default "") splitBy "^"
+var addressField = (pidFields[11] default "") splitBy "^"
+var phoneEmailField = (pidFields[13] default "") splitBy "^"
+---
+[{
+  Event_Type__c: payload.triggerEvent,
+  HealthFusion_Patient_Record_ID__c: 
+    if ((pidFields[3] default "") != "")
+      "HF" ++ (pidFields[3] default "")
+    else
+      "",
+  FirstName__c: (nameField[1] default ""),
+  LastName__c: (nameField[0] default ""),
+  MiddleName__c: (nameField[2] default ""),
+  Email__c: (phoneEmailField[3] default ""),
+  Phone__c: (phoneEmailField[0] default ""),
+  MailingStreet__c: (addressField[0] default ""),
+  MailingCity__c: (addressField[2] default ""),
+  MailingState__c: (addressField[3] default ""),
+  MailingPostalCode__c: (addressField[4] default ""),
+  Date_of_Birth__c: 
+    if ((pidFields[7] default "") != "" and sizeOf(pidFields[7]) >= 8)
+      (
+        ((pidFields[7][0 to 3] ++ "-" ++ pidFields[7][4 to 5] ++ "-" ++ pidFields[7][6 to 7]) ++ "T00:00:00Z")
+        as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} 
+        as Number {unit: "milliseconds"}
+      )
+    else
+      null,
+  Patient_Gender__c: (pidFields[8] default ""),
+  Patient_Race__c: (pidFields[10] default ""),
+  Patient_Ethnicity__c: (pidFields[22] default ""),
+  Language__c: (pidFields[15] default ""),
+  CreatedDate: now() as Number {unit: "milliseconds"},
+  CreatedById: "005Rj00000Fzk3mIAB"
+}]
+]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <logger level="INFO" doc:name="Log Contact Event Payload" message="Publishing Contact__e event: #[payload]" />
+    <salesforce-pub-sub:publish-event doc:name="Publish event" doc:id="e5e9974d-cf97-4c81-aa7d-b128d823510d" config-ref="Salesforce_PubSub_Config" topic="/event/Contact__e"/>
+    <logger level="INFO" doc:name="Log Salesforce Publish Attributes" message="Salesforce publish attributes: #[attributes]" />
+    
+    <logger level="INFO" doc:name="Log Contact Event Published" 
+            message="Contact platform event published: #[payload.Contact__e]"/>
+    
+    <error-handler>
+      <on-error-continue enableNotifications="true" logException="true">
+        <logger level="ERROR" doc:name="Log ADT Error" 
+                message="Error processing ADT message: #[error.description]"/>
+        
+        <!-- Set error variables for Teams notification -->
+        <set-variable variableName="errorMessage" value="#[error.description]" doc:name="Set ADT Error Message"/>
+        
+        <!-- Send Teams notification -->
+        <flow-ref doc:name="Send Teams Error Notification" name="send-teams-error-notification"/>
+        
+        <!-- Re-throw error to be handled by main flow -->
+        <raise-error type="APP:ADT_PROCESSING_ERROR" description="#[error.description]"/>
+      </on-error-continue>
+    </error-handler>
+  </flow>
+  
+  <!-- SIU Message Processing Flow -->
+  <flow name="process-siu-message-flow" doc:id="50d24947-bf04-47ae-a46d-797bfeb24926">
+    <ee:transform doc:name="Parse SIU Message to Service Appointment Event" doc:id="c4104467-7556-4fd5-afd8-1f71605498c0">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+import * from dw::core::Strings
+
+// Helper functions  
+fun safeTrim(val) = if (val == null or val == "") "" else trim(val as String)
+fun safeArray(segment, index) = if (sizeOf(segment) > index) segment[index] else ""
+fun parseField(field, delimiter) = field splitBy delimiter
+fun formatDateTime(dateTimeStr) = 
+  if (isEmpty(dateTimeStr) or sizeOf(dateTimeStr) < 14) null
+  else (dateTimeStr[0 to 3] ++ "-" ++ dateTimeStr[4 to 5] ++ "-" ++ dateTimeStr[6 to 7] ++ 
+        "T" ++ dateTimeStr[8 to 9] ++ ":" ++ dateTimeStr[10 to 11] ++ ":" ++ dateTimeStr[12 to 13] ++ "-05:00")
+fun formatDate(dateStr) = 
+  if (isEmpty(dateStr) or sizeOf(dateStr) < 8) null
+  else (dateStr[0 to 3] ++ "-" ++ dateStr[4 to 5] ++ "-" ++ dateStr[6 to 7])
+fun extractDurationValue(durationStr) = 
+  if (isEmpty(durationStr)) null else durationStr as Number
+fun mapStatus(status) = 
+  if (upper(status) == "BOOKED" or upper(status) == "NEW") "Scheduled"
+  else if (upper(status) == "CANCELLED") "Canceled"
+  else status
+fun mapDurationType(durationType) =
+  if (upper(durationType) == "MIN") "Minutes"
+  else if (upper(durationType) == "HRS") "Hours" 
+  else durationType
+
+// Parse segments
+var segments = payload.segments
+var schSegment = (segments filter startsWith($, "SCH"))[0] default ""
+var pidSegment = (segments filter startsWith($, "PID"))[0] default ""
+var ailSegment = (segments filter startsWith($, "AIL"))[0] default ""
+var aipSegment = (segments filter startsWith($, "AIP"))[0] default ""
+
+// Parse SCH fields
+var schFields = schSegment splitBy "|"
+var appointmentId = safeArray(parseField(safeArray(schFields, 2), "^"), 0)
+var appointmentReason = safeArray(parseField(safeArray(schFields, 7), "^"), 0)
+var appointmentType = safeArray(parseField(safeArray(schFields, 8), "^"), 0)
+var duration = safeArray(schFields, 9)
+var durationType = safeArray(schFields, 10)
+var timingField = parseField(safeArray(schFields, 11), "^")
+var startTime = safeArray(timingField, 3)
+var endTime = safeArray(timingField, 4)
+var providerField = parseField(safeArray(schFields, 16), "^")
+var providerNpi = safeArray(providerField, 0)
+var providerLastName = safeArray(providerField, 1)
+var providerFirstName = safeArray(providerField, 2)
+var status = safeArray(schFields, 25)
+
+// Parse PID fields (for patient info)
+var pidFields = pidSegment splitBy "|"
+var patientId = safeArray(parseField(safeArray(pidFields, 4), "^"), 0)
+var nameField = parseField(safeArray(pidFields, 5), "^")
+var patientLastName = safeArray(nameField, 0)
+var patientFirstName = safeArray(nameField, 1)
+var dobField = safeArray(pidFields, 7)
+var genderField = safeArray(pidFields, 8)
+var phoneEmailField = parseField(safeArray(pidFields, 13), "^")
+var patientPhone = safeArray(phoneEmailField, 0)
+var patientEmail = safeArray(phoneEmailField, 3)
+var addressField = parseField(safeArray(pidFields, 11), "^")
+var patientStreet = safeArray(addressField, 0)
+var patientCity = safeArray(addressField, 2)
+var patientState = safeArray(addressField, 3)
+var patientZip = safeArray(addressField, 4)
+
+// Parse AIL fields (location)
+var ailFields = ailSegment splitBy "|"
+var locationField = parseField(safeArray(ailFields, 3), "^")
+var locationId = safeArray(locationField, 0)
+var locationName = safeArray(locationField, 3)
+
+// Format gender
+var genderFormatted = if (upper(genderField) == "M") "Male" 
+                     else if (upper(genderField) == "F") "Female" 
+                     else genderField
+
+---
+{
+  NextGenServiceAppointment__e: {
+    Event_Type__c: payload.triggerEvent,
+    NextGen_ID__c: appointmentId,
+    Placer_Appointment_ID__c: appointmentId,
+    Appointment_Type__c: appointmentType,
+    Appointment_Reason__c: appointmentReason,
+    Duration_Value__c: extractDurationValue(duration),
+    Duration_Type__c: mapDurationType(durationType),
+    Start_DateTime__c: formatDateTime(startTime),
+    End_DateTime__c: formatDateTime(endTime),
+    Status__c: mapStatus(status),
+    
+    // Patient Information
+    Patient_ID__c: patientId,
+    Patient_First_Name__c: patientFirstName,
+    Patient_Last_Name__c: patientLastName,
+    Patient_DOB__c: formatDate(dobField),
+    Patient_Gender__c: genderFormatted,
+    Patient_Phone__c: patientPhone,
+    Email__c: patientEmail,
+    Patient_Street__c: patientStreet,
+    Patient_City__c: patientCity,
+    Patient_State__c: patientState,
+    Patient_Zip__c: patientZip,
+    
+    // Provider Information
+    Provider_NPI__c: providerNpi,
+    Provider_First_Name__c: providerFirstName,
+    Provider_Last_Name__c: providerLastName,
+    
+    // Location Information
+    Location_ID__c: locationId,
+    Location_Name__c: locationName
+  }
+}]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    
+    <!-- Publish Service Appointment Platform Event -->
+    <salesforce-pub-sub:publish-event doc:name="Publish event" doc:id="2a179085-6b21-4941-ace8-f558bb53f187" config-ref="Salesforce_PubSub_Config" topic="/event/NextGen_Appointment__e"/>
+    
+    <logger level="INFO" doc:name="Log Service Appointment Event Published" 
+            message="Service Appointment platform event published: #[payload.NextGenServiceAppointment__e]"/>
+    
+    <error-handler>
+      <on-error-continue enableNotifications="true" logException="true">
+        <logger level="ERROR" doc:name="Log SIU Error" 
+                message="Error processing SIU message: #[error.description]"/>
+        
+        <!-- Set error variables for Teams notification -->
+        <set-variable variableName="errorMessage" value="#[error.description]" doc:name="Set SIU Error Message"/>
+        
+        <!-- Send Teams notification -->
+        <flow-ref doc:name="Send Teams Error Notification" name="send-teams-error-notification"/>
+        
+        <!-- Re-throw error to be handled by main flow -->
+        <raise-error type="APP:SIU_PROCESSING_ERROR" description="#[error.description]"/>
+      </on-error-continue>
+    </error-handler>
+  </flow>
+</mule>
