@@ -401,7 +401,7 @@ var genderFormatted = if (upper(genderField) == "M") "Male"
     else
       null,
   // Patient Information
-  Patient_ID__c: if (patientId != "") "HF" ++ patientId else null,
+  Patient_ID__c: if (patientId != "" and not startsWith(patientId, "HF")) "HF" ++ patientId else patientId,
   Patient_First_Name__c: if (patientFirstName != "") patientFirstName else null,
   Patient_Last_Name__c: if (patientLastName != "") patientLastName else null,
   Patient_DOB__c: 
