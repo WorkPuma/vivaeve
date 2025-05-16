@@ -19,7 +19,7 @@
   
   <!-- Teams webhook HTTP request configuration -->
   <http:request-config name="Teams-Webhook-Config" doc:name="Teams Webhook Config">
-    <http:request-connection host="prod-160.westus.logic.azure.com" port="443" protocol="HTTPS" />
+    <http:request-connection host="prod-64.westus.logic.azure.com" port="443" protocol="HTTPS" />
   </http:request-config>
   
   <!-- Salesforce connection configuration -->
@@ -41,78 +41,77 @@
         <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-(
-  {
-    "type": "AdaptiveCard",
-    "version": "1.4",
-    "body": [
-      {
-        "type": "TextBlock",
-        "text": "HL7 Integration Error",
-        "weight": "Bolder",
-        "size": "Large",
-        "color": "Attention",
-        "wrap": true
-      },
-      {
-        "type": "TextBlock",
-        "text": "An error occurred while processing an HL7 message.",
-        "wrap": true
-      },
-      {
-        "type": "FactSet",
-        "facts": [
-          {
-            "title": "Error Message:",
-            "value": vars.errorMessage default "Unknown error"
-          },
-          {
-            "title": "Message Type:",
-            "value": vars.messageType default "Unknown"
-          },
-          {
-            "title": "Correlation ID:",
-            "value": vars.correlationId default correlationId
-          },
-          {
-            "title": "Timestamp:",
-            "value": now() as String {format: "yyyy-MM-dd HH:mm:ss"}
-          },
-          {
-            "title": "Environment:",
-            "value": p('mule.env') default "Unknown"
-          }
-        ]
-      },
-      {
-        "type": "TextBlock",
-        "text": "Please investigate this error in the application logs.",
-        "wrap": true,
-        "isSubtle": true
-      }
-    ],
-    "actions": [
-      {
-        "type": "Action.OpenUrl",
-        "title": "View Logs",
-        "url": "https://your-logging-system.example.com"
-      }
-    ]
-  } ++ { "$schema": "http://adaptivecards.io/schemas/adaptive-card.json" }
-) as Object
+{
+  "type": "AdaptiveCard",
+  "version": "1.4",
+  "\$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "HL7 Integration Error",
+      "weight": "Bolder",
+      "size": "Large",
+      "color": "Attention",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "An error occurred while processing an HL7 message.",
+      "wrap": true
+    },
+    {
+      "type": "FactSet",
+      "facts": [
+        {
+          "title": "Error Message:",
+          "value": vars.errorMessage default "Unknown error"
+        },
+        {
+          "title": "Message Type:",
+          "value": vars.messageType default "Unknown"
+        },
+        {
+          "title": "Correlation ID:",
+          "value": vars.correlationId default correlationId
+        },
+        {
+          "title": "Timestamp:",
+          "value": now() as String {format: "yyyy-MM-dd HH:mm:ss"}
+        },
+        {
+          "title": "Environment:",
+          "value": p('mule.env') default "Unknown"
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Please investigate this error in the application logs.",
+      "wrap": true,
+      "isSubtle": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "View Logs",
+      "url": "https://your-logging-system.example.com"
+    }
+  ]
+}
 ]]></ee:set-payload>
       </ee:message>
     </ee:transform>
     
     <http:request method="POST" doc:name="Send to Teams" config-ref="Teams-Webhook-Config"
-      path="/workflows/c8858631b44242cabe025d41de8b1657/triggers/manual/paths/invoke">
+      path="/workflows/a7dc7cdf16444d9c952b305876471885/triggers/manual/paths/invoke">
       <http:headers><![CDATA[#[{'Content-Type': 'application/json'}]]]></http:headers>
       <http:query-params><![CDATA[
         {
           'api-version': '2016-06-01',
           'sp': '/triggers/manual/run',
           'sv': '1.0',
-          'sig': 'lKmKLNSkt1i7vY3LjX8uRB4hsKST9g8rymcI87px7F4'
+          'sig': 'cODV_I9brBQP6QN8TGm0ZczHZD-XkBAqVmZhXZGyzyw'
         }
       ]]></http:query-params>
     </http:request>
@@ -166,7 +165,15 @@ var mshFields = mshSegment splitBy "|"
 var messageType = mshFields[8]
 var eventType = messageType splitBy "^"
 ---
-eventType[0] ++ "^" ++ eventType[1]]]></ee:set-variable>
+eventType[0] ++ "^" ++ eventType[1] default ""]]></ee:set-variable>
+        <ee:set-variable variableName="triggerEvent"><![CDATA[%dw 2.0
+output application/java
+var mshSegment = (payload as String splitBy /\r|\n|\s(?=PID|MSH|PV1|GT1|IN1)/)[0]
+var mshFields = mshSegment splitBy "|"
+var messageType = mshFields[8]
+var eventType = messageType splitBy "^"
+---
+eventType[1] default ""]]></ee:set-variable>
       </ee:variables>
     </ee:transform>
     
@@ -208,8 +215,9 @@ output text/plain
 ---
 "MSH|^~\&|FORESTHMS|FORESTHMS^1266378|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|" ++
 (now() as String {format:"yyyyMMddHHmmss"}) ++
-"||ACK^" ++ (payload.triggerEvent default "") ++ "|" ++ uuid() ++ "|P|2.3" ++
-"\rMSA|AA|" ++ uuid() ++ "|Message processed successfully|"]]></ee:set-payload>
+"||ACK^" ++ (vars.triggerEvent default "") ++ "|" ++ uuid() ++ "|P|2.3" ++
+"\rMSA|AA|" ++ uuid() ++ "|Message processed successfully|"
+]]></ee:set-payload>
       </ee:message>
     </ee:transform>
     <set-variable variableName="httpStatus" value="200" doc:name="Set Success Status"/>
@@ -232,8 +240,9 @@ output text/plain
 ---
 "MSH|^~\&|FORESTHMS|FORESTHMS^1266378|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|" ++
 (now() as String {format:"yyyyMMddHHmmss"}) ++
-"||ACK^" ++ ((vars.messageType splitBy "^")[1] default "") ++ "|" ++ uuid() ++ "|P|2.3" ++
-"\rMSA|AE|" ++ uuid() ++ "|Error processing message: " ++ error.description ++ "|"]]></ee:set-payload>
+"||ACK^" ++ (vars.triggerEvent default "") ++ "|" ++ uuid() ++ "|P|2.3" ++
+"\rMSA|AE|" ++ uuid() ++ "|Error processing message: " ++ error.description ++ "|"
+]]></ee:set-payload>
           </ee:message>
         </ee:transform>
         <set-variable variableName="httpStatus" value="500" doc:name="Set Error Status"/>
