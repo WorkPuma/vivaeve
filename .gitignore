@@ -74,3 +74,9 @@ Thumbs.db
 *-secure.json
 keystore/*.jks
 keystore/*.p12
+
+# Environment variables
+.env
+
+# Secure properties
+secure.properties
