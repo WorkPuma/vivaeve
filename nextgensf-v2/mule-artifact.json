@@ -12,6 +12,7 @@
         "salesforce.pubsub.username",
         "salesforce.pubsub.password",
         "salesforce.pubsub.tokenEndpoint",
+        "teams.webhook.host",
         "teams.webhook.sig"
     ]
 }

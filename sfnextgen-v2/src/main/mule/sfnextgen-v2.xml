@@ -28,13 +28,12 @@
   
   <!-- Salesforce Pub/Sub configuration -->
   <salesforce-pub-sub:pubsub-config name="Pubsub-config" doc:name="Salesforce PubSub Config">
-    <salesforce-pub-sub:oauth-user-pass-connection consumerKey="3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF" consumerSecret="5CD87471A3A77F6527C2B9B1E100ED78C8C1A0623875E1822E84080BD0B47A63" username="cgainus@cokergroup.com.devchris" password="Mosby2350@#" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
+    <salesforce-pub-sub:oauth-user-pass-connection consumerKey="3MVG9EJ2FoGDnkgW10u.6ZvgwW3LGMgid02xtC3GxAiFxD.iCux1HyHyGcWhUH8gCIOGhIkMBeLXEqAHccsfj" consumerSecret="EE577E2385BE4B27D1A110F2A3C08B50D1F141BB41A5474B50E99F257129E564" username="cgainus@cokergroup.com.uat" password="Mosby2350@#" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
   </salesforce-pub-sub:pubsub-config>
   
   <!-- SFTP configuration -->
   <sftp:config name="SFTP_Config" doc:name="SFTP Config" doc:id="9f7c4ec7-6cca-42f0-b928-e6e55a857432">
-    <sftp:connection host="sftp.prod.ngo.nextgenaws.net" 
-                    port="22" 
+    <sftp:connection host="sftp.prod.ngo.nextgenaws.nets" 
                     username="foresthms" 
                     password="E7aipaPHV9hf9p3b76Nh"
                     workingDir="/" />
@@ -73,7 +72,7 @@ var firstName  = safeUpper(e.FirstName__c)
 var lastName   = safeUpper(e.LastName__c)
 var middleName = safeUpper(e.MiddleName__c)
 var dobNum     = safeTrim(e.Date_of_Birth__c)
-var dob        = if (!isEmpty(dobNum)) (dobNum as Date {format: "MMMM dd, yyyy"}) as String {format:"yyyyMMdd"} else ""
+var dob        = if (!isEmpty(dobNum)) (dobNum as Number as DateTime {unit: "milliseconds"}) as String {format:"yyyyMMdd"} else ""
 var genderRaw  = safeTrim(e.Patient_Gender__c)
 var hl7Gender  = if (upper(genderRaw) == "FEMALE" or upper(genderRaw) == "F") "F"
                  else if (upper(genderRaw) == "MALE" or upper(genderRaw) == "M") "M" else "U"
@@ -82,44 +81,69 @@ var city       = safeUpper(e.MailingCity__c)
 var state      = safeUpper(e.MailingState__c)
 var zip        = safeUpper(e.MailingPostalCode__c)
 var language   = if (e.Language__c != null) safeUpper(e.Language__c) else "EN"
+
+// Handle phone being an array or string
 var phoneRaw   = e.Phone__c
-var phone      = if (phoneRaw == null) "" else phoneRaw as String
+var phoneStr   = if (phoneRaw == null) "" 
+                 else if (phoneRaw is Array) (phoneRaw[0] default "") as String 
+                 else phoneRaw as String
 var email      = if (e.Email__c == null) "" else upper(e.Email__c as String)
-var validPhone = !isEmpty(phone) and sizeOf(phone) == 10 and (match(phone, /[0-9]{10}/))
-var area       = if (validPhone) phone[0 to 2] else ""
-var prefix     = if (validPhone) phone[3 to 5] else ""
-var lineNum    = if (validPhone) phone[6 to 9] else ""
+
+// Now work with phoneStr which is definitely a string
+var validPhone = !isEmpty(phoneStr) and sizeOf(phoneStr) == 10 and isNumeric(phoneStr)
+var area       = if (validPhone) phoneStr[0 to 2] else ""
+var prefix     = if (validPhone) phoneStr[3 to 5] else ""
+var lineNum    = if (validPhone) phoneStr[6 to 9] else ""
 var rest       = if (validPhone) prefix ++ lineNum else ""
-var formattedPhone = if (validPhone) "(" ++ area ++ ")" ++ prefix ++ "-" ++ lineNum else phone
+var formattedPhone = if (validPhone) "(" ++ area ++ ")" ++ prefix ++ "-" ++ lineNum else phoneStr
 var pid13      = formattedPhone ++ "^^^" ++ email ++ "^^" ++ area ++ "^" ++ rest
 var patientRace = e.Patient_Race__c default "PATIENT DECLINED"
 var patientEthnicity = e.Patient_Ethnicity__c default "PATIENT DECLINED"
 
-  
-var status = "NEW"   
+// Generate a unique control ID for this message
+var controlId = uuid()
+
+// Generate a patient ID based on available information
+// If there's a HealthFusion_Patient_Record_ID__c, use it, otherwise generate one
+var patientId = if (!isEmpty(safeTrim(e.HealthFusion_Patient_Record_ID__c))) 
+                   safeTrim(e.HealthFusion_Patient_Record_ID__c)
+                else 
+                   uuid()[0 to 8]
   
 ---  
 "MSH|^~\\&|HEALTHFUSION^1266378|NEXTGENOFFICE^1266378|FORESTHMS|FORESTHMS^1266378|"  
 ++ (now() as String {format:"yyyyMMddHHmmss"})  
-++ "||SIU^S12|"  
-++ contId  
+++ "||ADT^A04|"  
+++ controlId  
 ++ "|P|2.3"  
-++ "\nSCH||" ++ contId ++ "||||" ++ apptType ++ "|" ++ apptReason ++ "|" ++ apptType ++ "|" ++ duration ++ "|MIN|^^^" ++ schStart ++ "^" ++ schEnd ++ "|||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "|||||||||" ++ status  
-++ "\nPID|1|"
-++ pid ++ "|"
-++ pid ++ "|HF" ++ pid ++ "|"
-++ lastName ++ "^" ++ firstName ++
-"||" ++ dob ++ "|" ++ hl7Gender ++
-"||PATIENT DECLINED|" ++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip
+++ "\r"  // Use CR for segment terminator
+++ "PID|1|"
+++ patientId ++ "|"
+++ patientId ++ "|HF" ++ patientId ++ "|"
+++ lastName ++ "^" ++ firstName ++ "^" ++ middleName 
+++ "||" ++ dob ++ "|" ++ hl7Gender
+++ "||PATIENT DECLINED|" ++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip
 ++ "|"           // PID-12 (Phone Business, blank)
 ++ pid13         // PID-13 (Phone Home/Email)
 ++ "||" ++ language  // PID-14/PID-15
 ++ "|||||||"    // PID-16 to PID-21
-++ "PATIENT DECLINED"
-++ "\nPV1|1|O|^^^" ++ locationId ++ "^^^^^" ++ locationName ++ "||||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst ++ "||||1275017^^^1275017^^^^^FOREST HILLS||||||||" ++ contId ++ "||||||||||||||||||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS|||||" ++ schStart ++ "|" ++ schEnd  
-++ "\nRGS|"  
-++ "\nAIL|1||" ++ locationId ++ "^^^" ++ locationName  
-++ "\nAIP|1||" ++ providerNpi ++ "^" ++ providerLast ++ "^" ++ providerFirst  ]]></ee:set-payload>
+++ patientEthnicity
+++ "\r"  // Use CR for segment terminator
+++ "PV1|1|O|FOREST HILLS^^^1275017^^^^^FOREST HILLS||||1275017^^^1275017^^^^^FOREST HILLS||||1275017^^^1275017^^^^^FOREST HILLS|||||||||||||||||||||||N|||||1266378;FOREST HILLS MEDICAL SERVICES;FORESTHMS"
+++ "\r"  // Use CR for segment terminator
+++ "GT1|1|" 
+++ patientId 
+++ "|" 
+++ lastName ++ "^" ++ firstName ++ "^" ++ middleName
+++ "||" 
+++ street ++ "^^" ++ city ++ "^" ++ state ++ "^" ++ zip 
+++ "|" 
+++ pid13  
+++ "||" 
+++ dob ++ "000000" 
+++ "|" 
+++ hl7Gender 
+++ "||SELF|||||||||OTHER"]]></ee:set-payload>
           </ee:message>
         </ee:transform>
         <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED:&#10;#[payload]" />

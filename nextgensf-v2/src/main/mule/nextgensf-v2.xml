@@ -121,7 +121,7 @@ output application/json
           'api-version': '2016-06-01',
           'sp': '/triggers/manual/run',
           'sv': '1.0',
-          'sig': '${secure::teams.webhook.sig}'
+          'sig': '${teams.webhook.sig}'
         }
       ]]></http:query-params>
     </http:request>
