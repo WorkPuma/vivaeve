@@ -6,13 +6,11 @@
       xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
       xmlns:salesforce-pub-sub="http://www.mulesoft.org/schema/mule/salesforce-pub-sub"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-      xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
         http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
-        http://www.mulesoft.org/schema/mule/salesforce-pub-sub http://www.mulesoft.org/schema/mule/salesforce-pub-sub/current/mule-salesforce-pub-sub.xsd
-        http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+        http://www.mulesoft.org/schema/mule/salesforce-pub-sub http://www.mulesoft.org/schema/mule/salesforce-pub-sub/current/mule-salesforce-pub-sub.xsd">
 
   <!-- HTTP listener configuration to receive from API layer -->
   <http:listener-config name="Inbound-Listener-Config" doc:name="HTTP Listener config" basePath="/">
@@ -471,9 +469,4 @@ var genderFormatted = if (upper(genderField) == "M") "Male"
       </on-error-continue>
     </error-handler>
   </flow>
-  
-  <!-- Secure Properties Configuration -->
-  <secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config"
-    key="${secure.key}" algorithm="${secure.algorithm}" mode="${secure.mode}">
-  </secure-properties:config>
 </mule>
