@@ -19,17 +19,17 @@
   
   <!-- Teams webhook HTTP request configuration -->
   <http:request-config name="Teams-Webhook-Config" doc:name="Teams Webhook Config">
-    <http:request-connection host="${secure::teams.webhook.host}" port="443" protocol="HTTPS" />
+    <http:request-connection host="${teams.webhook.host}" port="443" protocol="HTTPS" />
   </http:request-config>
   
   <!-- Salesforce connection configuration -->
   <salesforce:sfdc-config name="Salesforce-Config" doc:name="Salesforce Config">
 		<salesforce:oauth-user-pass-connection 
-      consumerKey="${secure::salesforce.consumerKey}"
-      consumerSecret="${secure::salesforce.consumerSecret}"
-      username="${secure::salesforce.username}"
-      password="${secure::salesforce.password}"
-      tokenEndpoint="${secure::salesforce.tokenEndpoint}" />
+      consumerKey="${salesforce.consumerKey}"
+      consumerSecret="${salesforce.consumerSecret}"
+      username="${salesforce.username}"
+      password="${salesforce.password}"
+      tokenEndpoint="${salesforce.tokenEndpoint}" />
   
 </salesforce:sfdc-config>
   
@@ -39,11 +39,11 @@
   <!-- Teams Error Notification Sub-Flow -->
   <salesforce-pub-sub:pubsub-config name="Salesforce_PubSub_Config" doc:name="Salesforce PubSub Config" doc:id="d7b408f4-7797-4afd-b111-e80c2127b0f9" >
 		<salesforce-pub-sub:oauth-user-pass-connection 
-      consumerKey="${secure::salesforce.pubsub.consumerKey}"
-      consumerSecret="${secure::salesforce.pubsub.consumerSecret}"
-      username="${secure::salesforce.pubsub.username}"
-      password="${secure::salesforce.pubsub.password}"
-      tokenEndpoint="${secure::salesforce.pubsub.tokenEndpoint}" />
+      consumerKey="${salesforce.pubsub.consumerKey}"
+      consumerSecret="${salesforce.pubsub.consumerSecret}"
+      username="${salesforce.pubsub.username}"
+      password="${salesforce.pubsub.password}"
+      tokenEndpoint="${salesforce.pubsub.tokenEndpoint}" />
 	</salesforce-pub-sub:pubsub-config>
 	<sub-flow name="send-teams-error-notification" doc:id="4653536f-9fe1-429d-92ef-c884f6723dac">
     <ee:transform doc:name="Build Teams Message" doc:id="dc5e9afa-96e3-4107-8c48-0c94ffa7a02a">
