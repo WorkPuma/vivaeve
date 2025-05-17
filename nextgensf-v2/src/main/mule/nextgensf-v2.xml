@@ -6,11 +6,13 @@
       xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
       xmlns:salesforce-pub-sub="http://www.mulesoft.org/schema/mule/salesforce-pub-sub"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
       xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
         http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
         http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
-        http://www.mulesoft.org/schema/mule/salesforce-pub-sub http://www.mulesoft.org/schema/mule/salesforce-pub-sub/current/mule-salesforce-pub-sub.xsd">
+        http://www.mulesoft.org/schema/mule/salesforce-pub-sub http://www.mulesoft.org/schema/mule/salesforce-pub-sub/current/mule-salesforce-pub-sub.xsd
+        http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
 
   <!-- HTTP listener configuration to receive from API layer -->
   <http:listener-config name="Inbound-Listener-Config" doc:name="HTTP Listener config" basePath="/">
@@ -19,12 +21,17 @@
   
   <!-- Teams webhook HTTP request configuration -->
   <http:request-config name="Teams-Webhook-Config" doc:name="Teams Webhook Config">
-    <http:request-connection host="prod-64.westus.logic.azure.com" port="443" protocol="HTTPS" />
+    <http:request-connection host="${secure::teams.webhook.host}" port="443" protocol="HTTPS" />
   </http:request-config>
   
   <!-- Salesforce connection configuration -->
   <salesforce:sfdc-config name="Salesforce-Config" doc:name="Salesforce Config">
-		<salesforce:oauth-user-pass-connection consumerKey="3MVG9EJ2FoGDnkgW10u.6ZvgwW3LGMgid02xtC3GxAiFxD.iCux1HyHyGcWhUH8gCIOGhIkMBeLXEqAHccsfj" consumerSecret="EE577E2385BE4B27D1A110F2A3C08B50D1F141BB41A5474B50E99F257129E564" username="cgainus@cokergroup.com.uat" password="Mosby2350@#" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
+		<salesforce:oauth-user-pass-connection 
+      consumerKey="${secure::salesforce.consumerKey}"
+      consumerSecret="${secure::salesforce.consumerSecret}"
+      username="${secure::salesforce.username}"
+      password="${secure::salesforce.password}"
+      tokenEndpoint="${secure::salesforce.tokenEndpoint}" />
   
 </salesforce:sfdc-config>
   
@@ -33,7 +40,12 @@
   
   <!-- Teams Error Notification Sub-Flow -->
   <salesforce-pub-sub:pubsub-config name="Salesforce_PubSub_Config" doc:name="Salesforce PubSub Config" doc:id="d7b408f4-7797-4afd-b111-e80c2127b0f9" >
-		<salesforce-pub-sub:oauth-user-pass-connection consumerKey="3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF" consumerSecret="5CD87471A3A77F6527C2B9B1E100ED78C8C1A0623875E1822E84080BD0B47A63" username="cgainus@cokergroup.com.devchris" password="Mosby2350@#" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
+		<salesforce-pub-sub:oauth-user-pass-connection 
+      consumerKey="${secure::salesforce.pubsub.consumerKey}"
+      consumerSecret="${secure::salesforce.pubsub.consumerSecret}"
+      username="${secure::salesforce.pubsub.username}"
+      password="${secure::salesforce.pubsub.password}"
+      tokenEndpoint="${secure::salesforce.pubsub.tokenEndpoint}" />
 	</salesforce-pub-sub:pubsub-config>
 	<sub-flow name="send-teams-error-notification" doc:id="4653536f-9fe1-429d-92ef-c884f6723dac">
     <ee:transform doc:name="Build Teams Message" doc:id="dc5e9afa-96e3-4107-8c48-0c94ffa7a02a">
@@ -111,7 +123,7 @@ output application/json
           'api-version': '2016-06-01',
           'sp': '/triggers/manual/run',
           'sv': '1.0',
-          'sig': 'cODV_I9brBQP6QN8TGm0ZczHZD-XkBAqVmZhXZGyzyw'
+          'sig': '${secure::teams.webhook.sig}'
         }
       ]]></http:query-params>
     </http:request>
@@ -459,4 +471,9 @@ var genderFormatted = if (upper(genderField) == "M") "Male"
       </on-error-continue>
     </error-handler>
   </flow>
+  
+  <!-- Secure Properties Configuration -->
+  <secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config"
+    key="${secure.key}" algorithm="${secure.algorithm}" mode="${secure.mode}">
+  </secure-properties:config>
 </mule>
