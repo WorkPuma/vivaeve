@@ -23,7 +23,7 @@
   
   <!-- HTTP listener configuration -->
   <http:listener-config name="Listener-config" doc:name="HTTP Listener config" basePath="/">
-    <http:listener-connection host="localhost" port="8081" />
+    <http:listener-connection host="0.0.0.0" port="8081" />
   </http:listener-config>
   
   <!-- Salesforce Pub/Sub configuration -->
@@ -568,5 +568,12 @@ trim(payload) replace "\n" with "\r"
         <logger doc:name="Unknown EventType - Skipped" level="WARN" message="Skipped NextGenServiceAppointment__e: unknown EventType: #[payload.event.Event_Type__c]" />
       </otherwise>
     </choice>
+  </flow>
+
+  <!-- HTTP POST listener for /api/nextgenemr -->
+  <flow name="api-nextgenemr-post">
+    <http:listener config-ref="Listener-config" path="/api/nextgenemr" allowedMethods="POST"/>
+    <!-- Add your processing logic here -->
+    <set-payload value="Received POST to /api/nextgenemr"/>
   </flow>
 </mule>

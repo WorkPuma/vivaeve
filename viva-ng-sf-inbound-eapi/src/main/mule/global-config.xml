@@ -61,7 +61,7 @@ http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/
 	<import doc:name="Import" doc:id="0944269d-ce37-428a-a2d2-4f4295817d4f" file="common-global.xml" />
 	<import doc:name="Import" doc:id="06cde4e4-cb98-44fd-b22e-10378ee0773f" file="mule-common-logging.xml" />
 	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="852fa4b1-f09d-4996-975e-47bd0b7f1308" >
-		<http:request-connection host="${request.host}" port="${request.port}" />
+		<http:request-connection host="${request.host}" port="${request.port}" protocol="HTTP" />
 	</http:request-config>
 
 

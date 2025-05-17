@@ -3,7 +3,7 @@ application:
   name: "viva-ng-sf-inbound-eapi"
   
 source: "viva-ng-sf-inbound-eapi"
-target: "viva-ng-sf-inbound-papi"
+target: "nextgensf-v2"
  
 # Logger
 logger:
@@ -17,3 +17,20 @@ milestone:
   requetSent: "RequetSent"
   successResponseReceived: "SuccessResponseReceived"
   successResponseSent: "SuccessResponseSent"
+
+request:
+  host: "nextgensf-v2.us-e2.cloudhub.io"
+  port: "80"
+  method: "POST"
+  path: "/api/nextgenemr"
+  
+https:
+  host: "0.0.0.0"
+  port: "8443"  # Changed from 8082 to 8443
+  
+tls:
+  type: "JKS"
+  path: "viva-keystore.jks"
+  alias: "viva-cert"
+  keyPassword: "VivaEve!1988"      # Add this
+  password: "VivaEve!1988"         # Add this

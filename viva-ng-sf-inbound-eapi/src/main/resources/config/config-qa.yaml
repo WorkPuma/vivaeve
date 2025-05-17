@@ -2,17 +2,18 @@ api:
   autodiscoveryId: "19824259"  
 
 request:
-  host: "viva-ng-sf-inbound-papi.us-e2.cloudhub.io"
-  port: ""
+  host: "nextgensf-v2.us-e2.cloudhub.io"
+  port: "80"
   method: "POST"
   path: "/api/nextgenemr"
   
 https:
   host: "0.0.0.0"
-  port: "8082"
+  port: "8443"
   
 tls:
   type: "JKS"
   path: "viva-keystore.jks"
   alias: "viva-cert"
-
+  keyPassword: "VivaEve!1988"
+  password: "VivaEve!1988"

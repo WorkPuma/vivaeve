@@ -24,7 +24,7 @@
   
   <!-- Salesforce connection configuration -->
   <salesforce:sfdc-config name="Salesforce-Config" doc:name="Salesforce Config">
-		<salesforce:oauth-user-pass-connection consumerKey="3MVG9EJ2FoGDnkgX9daA9yPi8VoYEaz9vnyWVDSZrwD3XA_DXS_MnLW3YYPn.PBp3yj..tgpXlYUuwmp26VZF" consumerSecret="5CD87471A3A77F6527C2B9B1E100ED78C8C1A0623875E1822E84080BD0B47A63" username="cgainus@cokergroup.com.devchris" password="Mosby2350@#" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
+		<salesforce:oauth-user-pass-connection consumerKey="3MVG9EJ2FoGDnkgW10u.6ZvgwW3LGMgid02xtC3GxAiFxD.iCux1HyHyGcWhUH8gCIOGhIkMBeLXEqAHccsfj" consumerSecret="EE577E2385BE4B27D1A110F2A3C08B50D1F141BB41A5474B50E99F257129E564" username="cgainus@cokergroup.com.uat" password="Mosby2350@#" tokenEndpoint="https://test.salesforce.com/services/oauth2/token" />
   
 </salesforce:sfdc-config>
   
@@ -124,7 +124,7 @@ output application/json
   <flow name="inbound-hl7-processing-flow" doc:id="13a85dab-806c-4356-aa4d-1a3c0ff4b18c">
     <http:listener doc:name="HL7 Inbound Listener" 
                    config-ref="Inbound-Listener-Config" 
-                   path="/inbound/hl7" 
+                   path="/api/nextgenemr" 
                    allowedMethods="POST"/>
     
     <!-- Log incoming HL7 message -->
