@@ -1,6 +1,20 @@
 {
-  "minMuleVersion": "4.4.0",
+  "minMuleVersion": "4.6.6",
   "javaSpecificationVersions": [
     "11"
+  ],
+  "secureProperties": [
+    "salesforce.consumerSecret",
+    "salesforce.password",
+    "salesforce.tokenEndpoint",
+    "salesforce.pubsub.consumerKey",
+    "salesforce.consumerKey",
+    "salesforce.pubsub.password",
+    "salesforce.pubsub.username",
+    "salesforce.pubsub.tokenEndpoint",
+    "salesforce.username",
+    "salesforce.pubsub.consumerSecret",
+    "teams.webhook.sig",
+    "teams.webhook.host"
   ]
 }
