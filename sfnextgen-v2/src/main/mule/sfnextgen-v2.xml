@@ -218,6 +218,7 @@ output application/json
             <ee:transform doc:name="To HL7 SIU^S12">
               <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
+output text/plain
 import buildSIU_S12 from dwl::hl7::siu
 ---
 buildSIU_S12(payload.event)
@@ -272,6 +273,7 @@ output text/plain
             <ee:transform doc:name="To HL7 SIU^S15">
               <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
+output text/plain
 import buildSIU_S15 from dwl::hl7::siu
 ---
 buildSIU_S15(payload.event)
