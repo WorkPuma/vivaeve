@@ -278,11 +278,8 @@ var phoneEmailField = (pidFields[13] default "") splitBy "^"
 ---
 [{
   Event_Type__c: payload.triggerEvent,
-  HealthFusion_Patient_Record_ID__c: 
-    if ((pidFields[3] default "") != "")
-      "HF" ++ (pidFields[3] default "")
-    else
-      "",
+  ContactId__c: if ((pidFields[3] default "") startsWith "003") pidFields[3] else null,
+  HealthFusion_Patient_Record_ID__c: if ((pidFields[4] default "") startsWith "HF") pidFields[4] else null,
   FirstName__c: (nameField[1] default ""),
   LastName__c: (nameField[0] default ""),
   MiddleName__c: (nameField[2] default ""),
@@ -426,7 +423,8 @@ if (payload.triggerEvent == "S14")
         ((endTime[0 to 3] ++ "-" ++ endTime[4 to 5] ++ "-" ++ endTime[6 to 7] ++ "T" ++ endTime[8 to 9] ++ ":" ++ endTime[10 to 11] ++ ":" ++ endTime[12 to 13] ++ "Z") as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} as Number {unit: "milliseconds"})
       else
         null,
-    HealthFusion_Patient_Record_ID__c: if (patientId != "" and not startsWith(patientId, "HF")) "HF" ++ patientId else patientId,
+    ContactId__c: if ((pidFields[3] default "") startsWith "003") pidFields[3] else null,
+    HealthFusion_Patient_Record_ID__c: if ((pidFields[4] default "") startsWith "HF") pidFields[4] else null,
     Patient_First_Name__c: if (patientFirstName != "") patientFirstName else null,
     Patient_Last_Name__c: if (patientLastName != "") patientLastName else null,
     Patient_DOB__c: 
@@ -476,7 +474,8 @@ else
         ((endTime[0 to 3] ++ "-" ++ endTime[4 to 5] ++ "-" ++ endTime[6 to 7] ++ "T" ++ endTime[8 to 9] ++ ":" ++ endTime[10 to 11] ++ ":" ++ endTime[12 to 13] ++ "Z") as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} as Number {unit: "milliseconds"})
       else
         null,
-    HealthFusion_Patient_Record_ID__c: if (patientId != "" and not startsWith(patientId, "HF")) "HF" ++ patientId else patientId,
+    ContactId__c: if ((pidFields[3] default "") startsWith "003") pidFields[3] else null,
+    HealthFusion_Patient_Record_ID__c: if ((pidFields[4] default "") startsWith "HF") pidFields[4] else null,
     Patient_First_Name__c: if (patientFirstName != "") patientFirstName else null,
     Patient_Last_Name__c: if (patientLastName != "") patientLastName else null,
     Patient_DOB__c: 
