@@ -322,6 +322,51 @@ trim(payload) replace "\n" with "\r"
             </choice>
           </when>
 
+          <when expression="#[payload.event.Event_Type__c == 'S14']">
+            <ee:transform doc:name="To HL7 SIU^S14">
+              <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output text/plain
+import buildSIU_S14 from dwl::hl7::siu
+---
+buildSIU_S14(payload.event)
+              ]]></ee:set-payload>
+              </ee:message>
+            </ee:transform>
+            <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED (correlationId: #[vars.correlationId]):&#10;#[payload]" />
+            <set-variable variableName="filename" value='#["SIU14_" ++ uuid() ++ ".hl7"]' doc:name="Set filename" />
+            <set-variable variableName="hl7FilePath" value="#['C:\\Users\\ychri\\Desktop\\foresthms\\toNGO\\SIU\\' ++ vars.filename]" doc:name="Set HL7 File Path" />
+            <file:write doc:name="Write HL7 to File" path="#[vars.hl7FilePath]" />
+            <logger level="INFO" doc:name="SFTP Upload Start" message="Uploading to SFTP: #[vars.filename] (correlationId: #[vars.correlationId])" />
+            <sftp:write doc:name="Upload to SFTP" config-ref="SFTP_Config" path="#['/foresthms/toNGO/SIU/' ++ vars.filename]">
+              <sftp:content><![CDATA[#[payload]]]></sftp:content>
+            </sftp:write>
+            <logger level="INFO" doc:name="SFTP Upload Complete" message="Successfully uploaded to SFTP: #[vars.filename] (correlationId: #[vars.correlationId])" />
+            <choice doc:name="NextGen Switch">
+              <when expression="#[vars.sentToNextgen]">
+                <logger level="INFO" doc:name="NextGen Outbound" message="Sending HL7 message to NextGen API, switch is ON (correlationId: #[vars.correlationId])" />
+                <until-successful maxRetries="3" millisBetweenRetries="1000">
+                  <logger level="INFO" doc:name="HL7 body to NextGen" message="HL7 body to NextGen: #[payload]" />
+                  <ee:transform doc:name="Fix HL7 Endlines">
+                    <ee:message>
+                      <ee:set-payload><![CDATA[
+%dw 2.0
+output text/plain
+---
+(trim(payload as String)
+  replace "\r\n" with "\r"
+  replace "\n" with "\r")
+                      ]]></ee:set-payload>
+                    </ee:message>
+                  </ee:transform>
+                </until-successful>
+              </when>
+              <otherwise>
+                <logger level="INFO" doc:name="NextGen Outbound" message="Not sending HL7 message to NextGen API, switch is OFF. HL7 message was logged to console only." />
+              </otherwise>
+            </choice>
+          </when>
+
           <otherwise>
             <logger doc:name="Debug Payload Type" level="WARN" message="(DEBUG) Payload type: #[payload.class], value: #[payload]" />
             <logger doc:name="Unknown EventType - Skipped" level="WARN" message="Skipped NextGenServiceAppointment__e: unknown EventType: #[payload.event.Event_Type__c]" />
