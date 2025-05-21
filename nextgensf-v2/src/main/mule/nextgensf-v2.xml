@@ -305,6 +305,7 @@ var phoneEmailField = (pidFields[13] default "") splitBy "^"
   Patient_Race__c: (pidFields[10] default ""),
   Patient_Ethnicity__c: (pidFields[22] default ""),
   Language__c: (pidFields[15] default ""),
+  Update_Source__c: "NextGen Office",
   CreatedDate: now() as Number {unit: "milliseconds"},
   CreatedById: "005Rj00000Fzk3mIAB"
 }]
@@ -343,6 +344,9 @@ import * from dw::core::Strings
 
 var hl7Text = payload.originalHL7
 var segments = hl7Text splitBy /\r|\n|\s(?=PID|MSH|PV1|GT1|IN1|SCH|AIL|AIP)/
+var mshSegment = (segments filter (s) -> startsWith(s, "MSH"))[0] default ""
+var mshFields = mshSegment splitBy "|"
+var mshTimestamp = mshFields[6] default ""
 var schSegment = (segments filter (s) -> startsWith(s, "SCH"))[0] default ""
 var pidSegment = (segments filter (s) -> startsWith(s, "PID"))[0] default ""
 var ailSegment = (segments filter (s) -> startsWith(s, "AIL"))[0] default ""
@@ -391,58 +395,117 @@ var locationName = locationField[3] default ""
 var genderFormatted = if (upper(genderField) == "M") "Male" 
                      else if (upper(genderField) == "F") "Female" 
                      else genderField
+
+// Parse MSH-7 timestamp
+var checkedTimestamp = if (mshTimestamp != "" and sizeOf(mshTimestamp) >= 14)
+  (
+    (mshTimestamp[0 to 3] ++ "-" ++ mshTimestamp[4 to 5] ++ "-" ++ mshTimestamp[6 to 7] ++ "T" ++ mshTimestamp[8 to 9] ++ ":" ++ mshTimestamp[10 to 11] ++ ":" ++ mshTimestamp[12 to 13] ++ "Z")
+    as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"}
+    as Number {unit: "milliseconds"}
+  )
+else
+  null
+
 ---
-[{
-  Event_Type__c: payload.triggerEvent,
-  NextGen_ID__c: appointmentId,
-  Placer_Appointment_ID__c: appointmentId,
-  Appointment_Type__c: appointmentType,
-  Appointment_Reason__c: appointmentReason,
-  Appointment_Status__c: if (status != "") status else null,
-  Duration_Value__c: if (duration != "") duration else null,
-  Start_DateTime__c: 
-    if (startTime != "" and sizeOf(startTime) >= 14)
-      ((startTime[0 to 3] ++ "-" ++ startTime[4 to 5] ++ "-" ++ startTime[6 to 7] ++ "T" ++ startTime[8 to 9] ++ ":" ++ startTime[10 to 11] ++ ":" ++ startTime[12 to 13] ++ "Z") as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} as Number {unit: "milliseconds"})
-    else
-      null,
-  End_DateTime__c: 
-    if (endTime != "" and sizeOf(endTime) >= 14)
-      ((endTime[0 to 3] ++ "-" ++ endTime[4 to 5] ++ "-" ++ endTime[6 to 7] ++ "T" ++ endTime[8 to 9] ++ ":" ++ endTime[10 to 11] ++ ":" ++ endTime[12 to 13] ++ "Z") as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} as Number {unit: "milliseconds"})
-    else
-      null,
-  // Patient Information
-  Patient_ID__c: if (patientId != "" and not startsWith(patientId, "HF")) "HF" ++ patientId else patientId,
-  Patient_First_Name__c: if (patientFirstName != "") patientFirstName else null,
-  Patient_Last_Name__c: if (patientLastName != "") patientLastName else null,
-  Patient_DOB__c: 
-    if (dobField != "" and sizeOf(dobField) >= 8)
-      (
-        ((dobField[0 to 3] ++ "-" ++ dobField[4 to 5] ++ "-" ++ dobField[6 to 7]) ++ "T00:00:00Z")
-        as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} 
-        as Number {unit: "milliseconds"}
-      )
-    else
-      null,
-  Patient_Gender__c: if (genderFormatted != "") genderFormatted else null,
-  Patient_Phone__c: if (patientPhone != "") patientPhone else null,
-  Email__c: if (patientEmail != "") patientEmail else null,
-  Patient_Street__c: if (patientStreet != "") patientStreet else null,
-  Patient_City__c: if (patientCity != "") patientCity else null,
-  Patient_State__c: if (patientState != "") patientState else null,
-  Patient_Zip__c: if (patientZip != "") patientZip else null,
-  Patient_Language__c: (pidFields[15] default ""),
-  // Provider Information
-  Provider_NPI__c: if (providerNpi != "") providerNpi else null,
-  Provider_First_Name__c: if (providerFirstName != "") providerFirstName else null,
-  Provider_Last_Name__c: if (providerLastName != "") providerLastName else null,
-  Provider_Type__c: (schFields[17] default ""),
-  // Location Information
-  Location_ID__c: if (locationId != "") locationId else null,
-  Location_Name__c: if (locationName != "") locationName else null,
-  // Required by Pub/Sub
-  CreatedDate: now() as Number {unit: "milliseconds"},
-  CreatedById: "005Rj00000Fzk3mIAB"
-}]
+if (payload.triggerEvent == "S14")
+  [{
+    Event_Type__c: payload.triggerEvent,
+    NextGen_ID__c: appointmentId,
+    Placer_Appointment_ID__c: appointmentId,
+    Appointment_Type__c: appointmentType,
+    Appointment_Reason__c: appointmentReason,
+    Appointment_Status__c: if (status != "") status else null,
+    Duration_Value__c: if (duration != "") duration else null,
+    Start_DateTime__c: 
+      if (startTime != "" and sizeOf(startTime) >= 14)
+        ((startTime[0 to 3] ++ "-" ++ startTime[4 to 5] ++ "-" ++ startTime[6 to 7] ++ "T" ++ startTime[8 to 9] ++ ":" ++ startTime[10 to 11] ++ ":" ++ startTime[12 to 13] ++ "Z") as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} as Number {unit: "milliseconds"})
+      else
+        null,
+    End_DateTime__c: 
+      if (endTime != "" and sizeOf(endTime) >= 14)
+        ((endTime[0 to 3] ++ "-" ++ endTime[4 to 5] ++ "-" ++ endTime[6 to 7] ++ "T" ++ endTime[8 to 9] ++ ":" ++ endTime[10 to 11] ++ ":" ++ endTime[12 to 13] ++ "Z") as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} as Number {unit: "milliseconds"})
+      else
+        null,
+    HealthFusion_Patient_Record_ID__c: if (patientId != "" and not startsWith(patientId, "HF")) "HF" ++ patientId else patientId,
+    Patient_First_Name__c: if (patientFirstName != "") patientFirstName else null,
+    Patient_Last_Name__c: if (patientLastName != "") patientLastName else null,
+    Patient_DOB__c: 
+      if (dobField != "" and sizeOf(dobField) >= 8)
+        (
+          ((dobField[0 to 3] ++ "-" ++ dobField[4 to 5] ++ "-" ++ dobField[6 to 7]) ++ "T00:00:00Z")
+          as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} 
+          as Number {unit: "milliseconds"}
+        )
+      else
+        null,
+    Patient_Gender__c: if (genderFormatted != "") genderFormatted else null,
+    Patient_Phone__c: if (patientPhone != "") patientPhone else null,
+    Email__c: if (patientEmail != "") patientEmail else null,
+    Patient_Street__c: if (patientStreet != "") patientStreet else null,
+    Patient_City__c: if (patientCity != "") patientCity else null,
+    Patient_State__c: if (patientState != "") patientState else null,
+    Patient_Zip__c: if (patientZip != "") patientZip else null,
+    Patient_Language__c: (pidFields[15] default ""),
+    Provider_NPI__c: if (providerNpi != "") providerNpi else null,
+    Provider_First_Name__c: if (providerFirstName != "") providerFirstName else null,
+    Provider_Last_Name__c: if (providerLastName != "") providerLastName else null,
+    Provider_Type__c: (schFields[17] default ""),
+    Location_ID__c: if (locationId != "") locationId else null,
+    Location_Name__c: if (locationName != "") locationName else null,
+    Update_Source__c: "NextGen Office",
+    (if (lower(status) == "checked in") { Checked_In_Time__c: checkedTimestamp } else if (lower(status) == "checked out") { Checked_Out_Time__c: checkedTimestamp } else {}),
+    CreatedDate: now() as Number {unit: "milliseconds"},
+    CreatedById: "005Rj00000Fzk3mIAB"
+  }]
+else
+  [{
+    Event_Type__c: payload.triggerEvent,
+    NextGen_ID__c: appointmentId,
+    Placer_Appointment_ID__c: appointmentId,
+    Appointment_Type__c: appointmentType,
+    Appointment_Reason__c: appointmentReason,
+    Appointment_Status__c: if (status != "") status else null,
+    Duration_Value__c: if (duration != "") duration else null,
+    Start_DateTime__c: 
+      if (startTime != "" and sizeOf(startTime) >= 14)
+        ((startTime[0 to 3] ++ "-" ++ startTime[4 to 5] ++ "-" ++ startTime[6 to 7] ++ "T" ++ startTime[8 to 9] ++ ":" ++ startTime[10 to 11] ++ ":" ++ startTime[12 to 13] ++ "Z") as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} as Number {unit: "milliseconds"})
+      else
+        null,
+    End_DateTime__c: 
+      if (endTime != "" and sizeOf(endTime) >= 14)
+        ((endTime[0 to 3] ++ "-" ++ endTime[4 to 5] ++ "-" ++ endTime[6 to 7] ++ "T" ++ endTime[8 to 9] ++ ":" ++ endTime[10 to 11] ++ ":" ++ endTime[12 to 13] ++ "Z") as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} as Number {unit: "milliseconds"})
+      else
+        null,
+    HealthFusion_Patient_Record_ID__c: if (patientId != "" and not startsWith(patientId, "HF")) "HF" ++ patientId else patientId,
+    Patient_First_Name__c: if (patientFirstName != "") patientFirstName else null,
+    Patient_Last_Name__c: if (patientLastName != "") patientLastName else null,
+    Patient_DOB__c: 
+      if (dobField != "" and sizeOf(dobField) >= 8)
+        (
+          ((dobField[0 to 3] ++ "-" ++ dobField[4 to 5] ++ "-" ++ dobField[6 to 7]) ++ "T00:00:00Z")
+          as DateTime {format: "yyyy-MM-dd'T'HH:mm:ssX"} 
+          as Number {unit: "milliseconds"}
+        )
+      else
+        null,
+    Patient_Gender__c: if (genderFormatted != "") genderFormatted else null,
+    Patient_Phone__c: if (patientPhone != "") patientPhone else null,
+    Email__c: if (patientEmail != "") patientEmail else null,
+    Patient_Street__c: if (patientStreet != "") patientStreet else null,
+    Patient_City__c: if (patientCity != "") patientCity else null,
+    Patient_State__c: if (patientState != "") patientState else null,
+    Patient_Zip__c: if (patientZip != "") patientZip else null,
+    Patient_Language__c: (pidFields[15] default ""),
+    Provider_NPI__c: if (providerNpi != "") providerNpi else null,
+    Provider_First_Name__c: if (providerFirstName != "") providerFirstName else null,
+    Provider_Last_Name__c: if (providerLastName != "") providerLastName else null,
+    Provider_Type__c: (schFields[17] default ""),
+    Location_ID__c: if (locationId != "") locationId else null,
+    Location_Name__c: if (locationName != "") locationName else null,
+    Update_Source__c: "NextGen Office",
+    CreatedDate: now() as Number {unit: "milliseconds"},
+    CreatedById: "005Rj00000Fzk3mIAB"
+  }]
 ]]></ee:set-payload>
       </ee:message>
     </ee:transform>

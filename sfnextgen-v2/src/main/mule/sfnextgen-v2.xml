@@ -53,7 +53,25 @@
       </salesforce-pub-sub:replay-option>
     </salesforce-pub-sub:subscribe-channel-listener>
     <choice doc:name="Route by Update_Source__c">
-      <when expression="#[payload.event.Update_Source__c == 'Salesforce']">
+      <when expression="#['Salesforce' == (payload.event.Update_Source__c default null)]">
+        <logger level="INFO" doc:name="Skip Salesforce Event" message="Skipped event with Update_Source__c: #[payload.event.Update_Source__c]" />
+      </when>
+      <otherwise>
+        <ee:transform doc:name="Ensure Update_Source__c">
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  event: payload.event ++ {
+    Update_Source__c: (payload.event.Update_Source__c default null) as String default "NextGen Office"
+  },
+  eventId: payload.eventId,
+  replayId: payload.replayId
+}
+]]></ee:set-payload>
+          </ee:message>
+        </ee:transform>
         <set-variable variableName="correlationId" value="#[uuid()]" />
         <logger level="INFO" doc:name="Log Platform Event Payload" message="INCOMING PLATFORM EVENT PAYLOAD (correlationId: #[vars.correlationId]): #[write(payload, 'application/json')]" />
         <set-variable variableName="sentToNextgen" value="${sent.to.nextgen}" doc:name="Set sentToNextgen" />
@@ -151,9 +169,6 @@ output text/plain
             <logger doc:name="Unknown EventType - Skipped" level="WARN" message="Skipped payload, unknown EventType: #[payload.event.Event_Type__c]" />
           </otherwise>
         </choice>
-      </when>
-      <otherwise>
-        <logger level="INFO" doc:name="Skip Non-Salesforce Event" message="Skipped event with Update_Source__c: #[payload.event.Update_Source__c]" />
       </otherwise>
     </choice>
     <error-handler>
@@ -175,7 +190,25 @@ output text/plain
     <logger level="INFO" doc:name="Log NextGenServiceAppointment__e Payload" message="INCOMING NEXTGEN SERVICE APPOINTMENT (correlationId: #[vars.correlationId]): #[write(payload, 'application/json')]" />
     <set-variable variableName="sentToNextgen" value="${sent.to.nextgen}" doc:name="Set sentToNextgen" />
     <choice doc:name="Route by Update_Source__c">
-      <when expression="#[payload.event.Update_Source__c == 'Salesforce']">
+      <when expression="#['Salesforce' == (payload.event.Update_Source__c default null)]">
+        <logger level="INFO" doc:name="Skip Salesforce Event" message="Skipped event with Update_Source__c: #[payload.event.Update_Source__c]" />
+      </when>
+      <otherwise>
+        <ee:transform doc:name="Ensure Update_Source__c">
+          <ee:message>
+            <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  event: payload.event ++ {
+    Update_Source__c: (payload.event.Update_Source__c default null) as String default "NextGen Office"
+  },
+  eventId: payload.eventId,
+  replayId: payload.replayId
+}
+]]></ee:set-payload>
+          </ee:message>
+        </ee:transform>
         <choice doc:name="Route by EventType__c">
           <when expression="#[payload.event.Event_Type__c == 'S12']">
             <ee:transform doc:name="To HL7 SIU^S12">
@@ -288,9 +321,6 @@ trim(payload) replace "\n" with "\r"
             <logger doc:name="Unknown EventType - Skipped" level="WARN" message="Skipped NextGenServiceAppointment__e: unknown EventType: #[payload.event.Event_Type__c]" />
           </otherwise>
         </choice>
-      </when>
-      <otherwise>
-        <logger level="INFO" doc:name="Skip Non-Salesforce Event" message="Skipped event with Update_Source__c: #[payload.event.Update_Source__c]" />
       </otherwise>
     </choice>
     <error-handler>
