@@ -53,7 +53,7 @@
       </salesforce-pub-sub:replay-option>
     </salesforce-pub-sub:subscribe-channel-listener>
     <choice doc:name="Route by Update_Source__c">
-      <when expression="#['Salesforce' == (payload.event.Update_Source__c default null)]">
+      <when expression="#[(payload.event.Update_Source__c default null) == null or (payload.event.Update_Source__c default null) == 'NextGen Office']">
         <logger level="INFO" doc:name="Skip Salesforce Event" message="Skipped event with Update_Source__c: #[payload.event.Update_Source__c]" />
       </when>
       <otherwise>
@@ -80,15 +80,17 @@ output application/json
             <ee:transform doc:name="To HL7 ADT^A04">
               <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
+output text/plain
 import buildADT_A04 from dwl::hl7::adt
 ---
 buildADT_A04(payload.event)
-    ]]></ee:set-payload>
+              ]]></ee:set-payload>
               </ee:message>
             </ee:transform>
             <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED (correlationId: #[vars.correlationId]):&#10;#[payload]" />
             <set-variable variableName="filename" value="#['ADT04_' ++ uuid() ++ '.hl7']" doc:name="Set HL7 Filename" />
             <set-variable variableName="hl7FilePath" value="#['C:\\Users\\ychri\\Desktop\\foresthms\\toNGO\\ADT\\' ++ vars.filename]" doc:name="Set HL7 File Path" />
+            <file:write doc:name="Write HL7 to File" path="#[vars.hl7FilePath]" />
             <logger level="INFO" doc:name="SFTP Connection Start" message="Connecting to SFTP for ADT upload: #[vars.filename]" />
             <logger level="INFO" doc:name="SFTP Upload Start" message="Uploading ADT HL7 to SFTP: #[vars.filename]" />
             <sftp:write doc:name="Upload ADT HL7 to SFTP" config-ref="SFTP_Config" path="#['/foresthms/toNGO/ADT/' ++ vars.filename]">
@@ -124,15 +126,17 @@ trim(payload as String)
             <ee:transform doc:name="To HL7 ADT^A08">
               <ee:message>
                 <ee:set-payload><![CDATA[%dw 2.0
+output text/plain
 import buildADT_A08 from dwl::hl7::adt
 ---
 buildADT_A08(payload.event)
-    ]]></ee:set-payload>
+              ]]></ee:set-payload>
               </ee:message>
             </ee:transform>
             <logger level="INFO" doc:name="HL7 Message Logger" message="HL7 MESSAGE GENERATED (correlationId: #[vars.correlationId]):&#10;#[payload]" />
             <set-variable variableName="filename" value="#['ADT08_' ++ uuid() ++ '.hl7']" doc:name="Set HL7 Filename" />
             <set-variable variableName="hl7FilePath" value="#['C:\\Users\\ychri\\Desktop\\foresthms\\toNGO\\ADT\\' ++ vars.filename]" doc:name="Set HL7 File Path" />
+            <file:write doc:name="Write HL7 to File" path="#[vars.hl7FilePath]" />
             <logger level="INFO" doc:name="SFTP Connection Start" message="Connecting to SFTP for ADT upload: #[vars.filename]" />
             <logger level="INFO" doc:name="SFTP Upload Start" message="Uploading ADT HL7 to SFTP: #[vars.filename]" />
             <sftp:write doc:name="Upload ADT HL7 to SFTP" config-ref="SFTP_Config" path="#['/foresthms/toNGO/ADT/' ++ vars.filename]">
@@ -190,7 +194,7 @@ output text/plain
     <logger level="INFO" doc:name="Log NextGenServiceAppointment__e Payload" message="INCOMING NEXTGEN SERVICE APPOINTMENT (correlationId: #[vars.correlationId]): #[write(payload, 'application/json')]" />
     <set-variable variableName="sentToNextgen" value="${sent.to.nextgen}" doc:name="Set sentToNextgen" />
     <choice doc:name="Route by Update_Source__c">
-      <when expression="#['Salesforce' == (payload.event.Update_Source__c default null)]">
+      <when expression="#[(payload.event.Update_Source__c default null) == null or (payload.event.Update_Source__c default null) == 'NextGen Office']">
         <logger level="INFO" doc:name="Skip Salesforce Event" message="Skipped event with Update_Source__c: #[payload.event.Update_Source__c]" />
       </when>
       <otherwise>
