@@ -45,7 +45,6 @@
             initialisationPolicy="INITIALISE_ONE" 
             exhaustedAction="WHEN_EXHAUSTED_WAIT" 
             maxWait="30000"/>
-        <reconnection frequency="5000" count="3"/>
     </sftp:connection>
   </sftp:config>
   
