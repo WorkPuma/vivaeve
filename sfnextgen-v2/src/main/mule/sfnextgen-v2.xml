@@ -36,7 +36,17 @@
     <sftp:connection host="sftp.prod.ngo.nextgenaws.net" 
                     username="foresthms" 
                     password="E7aipaPHV9hf9p3b76Nh"
-                    workingDir="/" />
+                    workingDir="/"
+                    connectionTimeout="30000"
+                    responseTimeout="60000">
+        <pooling-profile 
+            maxActive="5" 
+            maxIdle="2" 
+            initialisationPolicy="INITIALISE_ONE" 
+            exhaustedAction="WHEN_EXHAUSTED_WAIT" 
+            maxWait="30000"/>
+        <reconnection frequency="5000" count="3"/>
+    </sftp:connection>
   </sftp:config>
   
   <!-- ObjectStore configuration -->
