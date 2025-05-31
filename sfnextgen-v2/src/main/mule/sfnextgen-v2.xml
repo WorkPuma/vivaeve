@@ -186,6 +186,23 @@ output text/plain
     </choice>
     <error-handler>
       <on-error-propagate type="ANY">
+        <set-variable variableName="errorMessage" value="#['' + error.description]" />
+        <set-variable variableName="exceptionMessage" value="#['' + error.errorMessage]" />
+        <set-variable variableName="exceptionType" value="#['' + error.errorType]" />
+        <set-variable variableName="exceptionStackTrace" value="#['' + error.stackTrace]" />
+        <set-variable variableName="originLocation" value="#['' + flow.name]" />
+        <set-variable variableName="apiName" value="sfnextgen-v2" />
+        <set-variable variableName="actionName" value="#['' + attributes.method]" />
+        <set-variable variableName="httpRequestUrl" value="#['' + attributes.requestPath]" />
+        <set-variable variableName="httpRequestMethod" value="#['' + attributes.method]" />
+        <set-variable variableName="httpRequestHeaders" value="#[attributes.headers]" />
+        <set-variable variableName="httpRequestBody" value="#['' + payload]" />
+        <set-variable variableName="httpResponseStatusCode" value="#[attributes.statusCode]" />
+        <set-variable variableName="httpResponseStatus" value="#['' + attributes.reasonPhrase]" />
+        <set-variable variableName="httpResponseHeaders" value="#[attributes.headers]" />
+        <set-variable variableName="httpResponseBody" value="#['' + payload]" />
+        <set-variable variableName="sourceIp" value="#['' + attributes.remoteAddress]" />
+        <flow-ref name="publish-logentryevent-error" />
         <logger level="ERROR" message="Error in HL7 flow, correlationId: #[vars.correlationId], error: #[error.description]" />
         <file:write path="deadletter/#[vars.correlationId].err" />
       </on-error-propagate>
@@ -385,6 +402,23 @@ output text/plain
     </choice>
     <error-handler>
       <on-error-propagate type="ANY">
+        <set-variable variableName="errorMessage" value="#['' + error.description]" />
+        <set-variable variableName="exceptionMessage" value="#['' + error.errorMessage]" />
+        <set-variable variableName="exceptionType" value="#['' + error.errorType]" />
+        <set-variable variableName="exceptionStackTrace" value="#['' + error.stackTrace]" />
+        <set-variable variableName="originLocation" value="#['' + flow.name]" />
+        <set-variable variableName="apiName" value="sfnextgen-v2" />
+        <set-variable variableName="actionName" value="#['' + attributes.method]" />
+        <set-variable variableName="httpRequestUrl" value="#['' + attributes.requestPath]" />
+        <set-variable variableName="httpRequestMethod" value="#['' + attributes.method]" />
+        <set-variable variableName="httpRequestHeaders" value="#[attributes.headers]" />
+        <set-variable variableName="httpRequestBody" value="#['' + payload]" />
+        <set-variable variableName="httpResponseStatusCode" value="#[attributes.statusCode]" />
+        <set-variable variableName="httpResponseStatus" value="#['' + attributes.reasonPhrase]" />
+        <set-variable variableName="httpResponseHeaders" value="#[attributes.headers]" />
+        <set-variable variableName="httpResponseBody" value="#['' + payload]" />
+        <set-variable variableName="sourceIp" value="#['' + attributes.remoteAddress]" />
+        <flow-ref name="publish-logentryevent-error" />
         <logger level="ERROR" message="Error in SIU flow, correlationId: #[vars.correlationId], error: #[error.description]" />
         <file:write path="deadletter/#[vars.correlationId].err" />
       </on-error-propagate>
@@ -397,4 +431,49 @@ output text/plain
     <!-- Add your processing logic here -->
     <set-payload value="Received POST to /api/nextgenemr"/>
   </flow>
+
+  <!-- LogEntryEvent__e Error Logging Sub-Flow -->
+  <sub-flow name="publish-logentryevent-error">
+    <ee:transform doc:name="Build LogEntryEvent__e Payload">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+[{
+  TransactionEntryNumber__c: 1,
+  TransactionId__c: vars.correlationId default correlationId default uuid(),
+  Timestamp__c: now() as Number {unit: "milliseconds"},
+  CreatedDate: now() as Number {unit: "milliseconds"},
+  CreatedById: "005500000063g48AAA",
+  Message__c: vars.errorMessage default error.description default "Unknown error",
+  LoggingLevel__c: "ERROR",
+  ExceptionMessage__c: vars.exceptionMessage default error.errorMessage default error.description default "",
+  ExceptionType__c: vars.exceptionType default error.errorType default "MuleError",
+  ExceptionStackTrace__c: vars.exceptionStackTrace default error.stackTrace default "",
+  OriginType__c: "MuleSoft",
+  OriginLocation__c: vars.originLocation default flow.name default "UnknownFlow",
+  OriginSourceApiName__c: vars.apiName default "sfnextgen-v2",
+  OriginSourceActionName__c: vars.actionName default attributes.method default "",
+  HttpRequestEndpointAddress__c: vars.httpRequestUrl default attributes.requestPath default "",
+  HttpRequestMethod__c: vars.httpRequestMethod default attributes.method default "",
+  HttpRequestHeaders__c: vars.httpRequestHeaders default attributes.headers default {},
+  HttpRequestBody__c: vars.httpRequestBody default payload default "",
+  HttpResponseStatusCode__c: if (vars.httpResponseStatusCode != null and vars.httpResponseStatusCode != "") vars.httpResponseStatusCode as Number else null,
+  HttpResponseStatus__c: vars.httpResponseStatus default attributes.reasonPhrase default "",
+  HttpResponseHeaders__c: vars.httpResponseHeaders default attributes.headers default {},
+  HttpResponseBody__c: vars.httpResponseBody default payload default "",
+  RequestId__c: vars.correlationId default correlationId default uuid(),
+  SourceIp__c: vars.sourceIp default attributes.remoteAddress default "",
+  OrganizationId__c: p('mule.env') default "",
+  OrganizationName__c: p('mule.env') default "",
+  Tags__c: "mulesoft;integration;api-failure"
+}]
+]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <salesforce-pub-sub:publish-event
+      config-ref="Pubsub-config"
+      topic="/event/LogEntryEvent__e"
+      doc:name="Publish LogEntryEvent__e"/>
+  </sub-flow>
 </mule>

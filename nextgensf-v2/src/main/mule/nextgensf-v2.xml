@@ -12,6 +12,79 @@
         http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
         http://www.mulesoft.org/schema/mule/salesforce-pub-sub http://www.mulesoft.org/schema/mule/salesforce-pub-sub/current/mule-salesforce-pub-sub.xsd">
 
+  <!-- Application Startup Flow: Log to console and send INFO LogEntryEvent__e -->
+  <flow name="application-startup-flow" initialState="started">
+    <scheduler doc:name="On App Start">
+      <scheduling-strategy>
+        <fixed-frequency frequency="60000" startDelay="0"/>
+      </scheduling-strategy>
+    </scheduler>
+    <set-variable variableName="transactionId" value="#[uuid()]" />
+    <set-variable variableName="errorMessage" value="Mule application has started." />
+    <set-variable variableName="exceptionMessage" value="" />
+    <set-variable variableName="exceptionType" value="" />
+    <set-variable variableName="exceptionStackTrace" value="" />
+    <set-variable variableName="originLocation" value="#[app.name]" />
+    <set-variable variableName="apiName" value="NextGenEMR" />
+    <set-variable variableName="actionName" value="ApplicationStartup" />
+    <set-variable variableName="httpRequestUrl" value="" />
+    <set-variable variableName="httpRequestMethod" value="" />
+    <set-variable variableName="httpRequestHeaders" value="{}" />
+    <set-variable variableName="httpRequestBody" value="" />
+    <set-variable variableName="httpResponseStatusCode" value="" />
+    <set-variable variableName="httpResponseStatus" value="" />
+    <set-variable variableName="httpResponseHeaders" value="{}" />
+    <set-variable variableName="httpResponseBody" value="" />
+    <set-variable variableName="correlationId" value="#[uuid()]" />
+    <set-variable variableName="sourceIp" value="" />
+    <flow-ref name="publish-logentryevent-info" />
+  </flow>
+
+  <!-- Sub-flow for publishing INFO LogEntryEvent__e -->
+  <sub-flow name="publish-logentryevent-info" doc:id="logentryevent-info-subflow">
+    <ee:transform doc:name="Build LogEntryEvent__e INFO Payload">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+[{
+  TransactionEntryNumber__c: 1,
+  TransactionId__c: vars.transactionId,
+  Timestamp__c: now() as Number {unit: "milliseconds"},
+  CreatedDate: now() as Number {unit: "milliseconds"},
+  CreatedById: "005500000063g48AAA",
+  Message__c: vars.errorMessage,
+  LoggingLevel__c: "INFO",
+  ExceptionMessage__c: vars.exceptionMessage,
+  ExceptionType__c: vars.exceptionType,
+  ExceptionStackTrace__c: vars.exceptionStackTrace,
+  OriginType__c: "MuleSoft",
+  OriginLocation__c: vars.originLocation default app.name default "UnknownApp",
+  OriginSourceApiName__c: vars.apiName default "NextGenEMR",
+  OriginSourceActionName__c: vars.actionName default "ApplicationStartup",
+  HttpRequestEndpointAddress__c: vars.httpRequestUrl,
+  HttpRequestMethod__c: vars.httpRequestMethod,
+  HttpRequestHeaders__c: vars.httpRequestHeaders,
+  HttpRequestBody__c: vars.httpRequestBody,
+  HttpResponseStatusCode__c: if (vars.httpResponseStatusCode != null and vars.httpResponseStatusCode != "") vars.httpResponseStatusCode as Number else null,
+  HttpResponseStatus__c: vars.httpResponseStatus,
+  HttpResponseHeaders__c: vars.httpResponseHeaders,
+  HttpResponseBody__c: vars.httpResponseBody,
+  RequestId__c: vars.correlationId,
+  SourceIp__c: vars.sourceIp,
+  OrganizationId__c: p('mule.env') default "",
+  OrganizationName__c: p('mule.env') default "",
+  Tags__c: "mulesoft;startup"
+}]
+]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <salesforce-pub-sub:publish-event
+      config-ref="Salesforce_PubSub_Config"
+      topic="/event/LogEntryEvent__e"
+      doc:name="Publish LogEntryEvent__e INFO"/>
+  </sub-flow>
+
   <!-- HTTP listener configuration to receive from API layer -->
   <http:listener-config name="Inbound-Listener-Config" doc:name="HTTP Listener config" basePath="/">
     <http:listener-connection host="0.0.0.0" port="${app.port}" />
@@ -234,11 +307,28 @@ output text/plain
     
     <error-handler>
       <on-error-continue enableNotifications="true" logException="true">
+        <set-variable variableName="transactionId" value="#['' + correlationId]" />
+        <set-variable variableName="errorMessage" value="#['' + error.description]" />
+        <set-variable variableName="exceptionMessage" value="#['' + error.errorMessage]" />
+        <set-variable variableName="exceptionType" value="#['' + error.errorType]" />
+        <set-variable variableName="exceptionStackTrace" value="#['' + error.stackTrace]" />
+        <set-variable variableName="originLocation" value="#['' + flow.name]" />
+        <set-variable variableName="apiName" value="NextGenEMR" />
+        <set-variable variableName="actionName" value="#['' + attributes.method]" />
+        <set-variable variableName="httpRequestUrl" value="#['' + attributes.requestPath]" />
+        <set-variable variableName="httpRequestMethod" value="#['' + attributes.method]" />
+        <set-variable variableName="httpRequestHeaders" value="#[attributes.headers]" />
+        <set-variable variableName="httpRequestBody" value="#['' + payload]" />
+        <set-variable variableName="httpResponseStatusCode" value="#[attributes.statusCode]" />
+        <set-variable variableName="httpResponseStatus" value="#['' + attributes.reasonPhrase]" />
+        <set-variable variableName="httpResponseHeaders" value="#[attributes.headers]" />
+        <set-variable variableName="httpResponseBody" value="#['' + payload]" />
+        <set-variable variableName="correlationId" value="#['' + correlationId]" />
+        <set-variable variableName="sourceIp" value="#['' + attributes.remoteAddress]" />
+        <flow-ref name="publish-logentryevent-error" />
+        
         <logger level="ERROR" doc:name="Log Error" 
                 message="Error processing HL7 message: #[error.description]"/>
-        
-        <!-- Set error variables for Teams notification -->
-        <set-variable variableName="errorMessage" value="#[error.description]" doc:name="Set Error Message"/>
         
         <!-- Send Teams notification -->
         <flow-ref doc:name="Send Teams Error Notification" name="send-teams-error-notification"/>
@@ -316,11 +406,28 @@ var phoneEmailField = (pidFields[13] default "") splitBy "^"
     
     <error-handler>
       <on-error-continue enableNotifications="true" logException="true">
+        <set-variable variableName="transactionId" value="#['' + correlationId]" />
+        <set-variable variableName="errorMessage" value="#['' + error.description]" />
+        <set-variable variableName="exceptionMessage" value="#['' + error.errorMessage]" />
+        <set-variable variableName="exceptionType" value="#['' + error.errorType]" />
+        <set-variable variableName="exceptionStackTrace" value="#['' + error.stackTrace]" />
+        <set-variable variableName="originLocation" value="#['' + flow.name]" />
+        <set-variable variableName="apiName" value="NextGenEMR" />
+        <set-variable variableName="actionName" value="#['' + attributes.method]" />
+        <set-variable variableName="httpRequestUrl" value="#['' + attributes.requestPath]" />
+        <set-variable variableName="httpRequestMethod" value="#['' + attributes.method]" />
+        <set-variable variableName="httpRequestHeaders" value="#[attributes.headers]" />
+        <set-variable variableName="httpRequestBody" value="#['' + payload]" />
+        <set-variable variableName="httpResponseStatusCode" value="#[attributes.statusCode]" />
+        <set-variable variableName="httpResponseStatus" value="#['' + attributes.reasonPhrase]" />
+        <set-variable variableName="httpResponseHeaders" value="#[attributes.headers]" />
+        <set-variable variableName="httpResponseBody" value="#['' + payload]" />
+        <set-variable variableName="correlationId" value="#['' + correlationId]" />
+        <set-variable variableName="sourceIp" value="#['' + attributes.remoteAddress]" />
+        <flow-ref name="publish-logentryevent-error" />
+        
         <logger level="ERROR" doc:name="Log ADT Error" 
                 message="Error processing ADT message: #[error.description]"/>
-        
-        <!-- Set error variables for Teams notification -->
-        <set-variable variableName="errorMessage" value="#[error.description]" doc:name="Set ADT Error Message"/>
         
         <!-- Send Teams notification -->
         <flow-ref doc:name="Send Teams Error Notification" name="send-teams-error-notification"/>
@@ -517,11 +624,28 @@ else
     
     <error-handler>
       <on-error-continue enableNotifications="true" logException="true">
+        <set-variable variableName="transactionId" value="#['' + correlationId]" />
+        <set-variable variableName="errorMessage" value="#['' + error.description]" />
+        <set-variable variableName="exceptionMessage" value="#['' + error.errorMessage]" />
+        <set-variable variableName="exceptionType" value="#['' + error.errorType]" />
+        <set-variable variableName="exceptionStackTrace" value="#['' + error.stackTrace]" />
+        <set-variable variableName="originLocation" value="#['' + flow.name]" />
+        <set-variable variableName="apiName" value="NextGenEMR" />
+        <set-variable variableName="actionName" value="#['' + attributes.method]" />
+        <set-variable variableName="httpRequestUrl" value="#['' + attributes.requestPath]" />
+        <set-variable variableName="httpRequestMethod" value="#['' + attributes.method]" />
+        <set-variable variableName="httpRequestHeaders" value="#[attributes.headers]" />
+        <set-variable variableName="httpRequestBody" value="#['' + payload]" />
+        <set-variable variableName="httpResponseStatusCode" value="#[attributes.statusCode]" />
+        <set-variable variableName="httpResponseStatus" value="#['' + attributes.reasonPhrase]" />
+        <set-variable variableName="httpResponseHeaders" value="#[attributes.headers]" />
+        <set-variable variableName="httpResponseBody" value="#['' + payload]" />
+        <set-variable variableName="correlationId" value="#['' + correlationId]" />
+        <set-variable variableName="sourceIp" value="#['' + attributes.remoteAddress]" />
+        <flow-ref name="publish-logentryevent-error" />
+        
         <logger level="ERROR" doc:name="Log SIU Error" 
                 message="Error processing SIU message: #[error.description]"/>
-        
-        <!-- Set error variables for Teams notification -->
-        <set-variable variableName="errorMessage" value="#[error.description]" doc:name="Set SIU Error Message"/>
         
         <!-- Send Teams notification -->
         <flow-ref doc:name="Send Teams Error Notification" name="send-teams-error-notification"/>
@@ -531,4 +655,47 @@ else
       </on-error-continue>
     </error-handler>
   </flow>
+  
+  <!-- LogEntryEvent__e Error Logging Sub-Flow -->
+  <sub-flow name="publish-logentryevent-error" doc:id="logentryevent-error-subflow">
+    <ee:transform doc:name="Build LogEntryEvent__e Payload">
+      <ee:message>
+        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  TransactionEntryNumber__c: 1,
+  TransactionId__c: vars.transactionId default correlationId,
+  Timestamp__c: now() as DateTime,
+  Message__c: vars.errorMessage default error.description,
+  LoggingLevel__c: "ERROR",
+  ExceptionMessage__c: vars.exceptionMessage default error.errorMessage default error.description,
+  ExceptionType__c: vars.exceptionType default error.errorType default "MuleError",
+  ExceptionStackTrace__c: vars.exceptionStackTrace default error.stackTrace default "",
+  OriginType__c: "MuleSoft",
+  OriginLocation__c: vars.originLocation default flow.name default "UnknownFlow",
+  OriginSourceApiName__c: vars.apiName default "NextGenEMR",
+  OriginSourceActionName__c: vars.actionName default attributes.method default "",
+  HttpRequestEndpointAddress__c: vars.httpRequestUrl default attributes.requestPath default "",
+  HttpRequestMethod__c: vars.httpRequestMethod default attributes.method default "",
+  HttpRequestHeaders__c: vars.httpRequestHeaders default attributes.headers default {},
+  HttpRequestBody__c: vars.httpRequestBody default payload default "",
+  HttpResponseStatusCode__c: vars.httpResponseStatusCode default attributes.statusCode default null,
+  HttpResponseStatus__c: vars.httpResponseStatus default attributes.reasonPhrase default "",
+  HttpResponseHeaders__c: vars.httpResponseHeaders default attributes.headers default {},
+  HttpResponseBody__c: vars.httpResponseBody default payload default "",
+  RequestId__c: vars.correlationId default correlationId,
+  SourceIp__c: vars.sourceIp default attributes.remoteAddress default "",
+  OrganizationId__c: p('mule.env') default "",
+  OrganizationName__c: p('mule.env') default "",
+  Tags__c: "mulesoft;integration;api-failure"
+}
+]]></ee:set-payload>
+      </ee:message>
+    </ee:transform>
+    <salesforce-pub-sub:publish-event
+      config-ref="Salesforce_PubSub_Config"
+      topic="/event/LogEntryEvent__e"
+      doc:name="Publish LogEntryEvent__e"/>
+  </sub-flow>
 </mule>
