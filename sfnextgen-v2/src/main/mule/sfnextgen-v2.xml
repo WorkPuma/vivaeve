@@ -102,9 +102,11 @@ buildADT_A04(payload.event)
             <file:write doc:name="Write HL7 to File" path="#[vars.hl7FilePath]" />
             <logger level="INFO" doc:name="SFTP Connection Start" message="Connecting to SFTP for ADT upload: #[vars.filename]" />
             <logger level="INFO" doc:name="SFTP Upload Start" message="Uploading ADT HL7 to SFTP: #[vars.filename]" />
-            <sftp:write doc:name="Upload ADT HL7 to SFTP" config-ref="SFTP_Config" path="#['/foresthms/toNGO/ADT/' ++ vars.filename]">
-              <sftp:content><![CDATA[#[payload]]]></sftp:content>
-            </sftp:write>
+            <until-successful maxRetries="1" millisBetweenRetries="1000">
+              <sftp:write doc:name="Upload ADT HL7 to SFTP" config-ref="SFTP_Config" path="#['/foresthms/toNGO/ADT/' ++ vars.filename]">
+                <sftp:content><![CDATA[#[payload]]]></sftp:content>
+              </sftp:write>
+            </until-successful>
             <logger level="INFO" doc:name="SFTP Upload Success" message="Successfully uploaded ADT HL7 to SFTP: #[vars.filename]" />
             <choice doc:name="NextGen Switch">
               <when expression="#[vars.sentToNextgen]">
@@ -148,9 +150,11 @@ buildADT_A08(payload.event)
             <file:write doc:name="Write HL7 to File" path="#[vars.hl7FilePath]" />
             <logger level="INFO" doc:name="SFTP Connection Start" message="Connecting to SFTP for ADT upload: #[vars.filename]" />
             <logger level="INFO" doc:name="SFTP Upload Start" message="Uploading ADT HL7 to SFTP: #[vars.filename]" />
-            <sftp:write doc:name="Upload ADT HL7 to SFTP" config-ref="SFTP_Config" path="#['/foresthms/toNGO/ADT/' ++ vars.filename]">
-              <sftp:content><![CDATA[#[payload]]]></sftp:content>
-            </sftp:write>
+            <until-successful maxRetries="1" millisBetweenRetries="1000">
+              <sftp:write doc:name="Upload ADT HL7 to SFTP" config-ref="SFTP_Config" path="#['/foresthms/toNGO/ADT/' ++ vars.filename]">
+                <sftp:content><![CDATA[#[payload]]]></sftp:content>
+              </sftp:write>
+            </until-successful>
             <logger level="INFO" doc:name="SFTP Upload Success" message="Successfully uploaded ADT HL7 to SFTP: #[vars.filename]" />
             <choice doc:name="NextGen Switch">
               <when expression="#[vars.sentToNextgen]">
