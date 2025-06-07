@@ -190,22 +190,22 @@ output text/plain
     </choice>
     <error-handler>
       <on-error-propagate type="ANY">
-        <set-variable variableName="errorMessage" value="#['' + error.description]" />
-        <set-variable variableName="exceptionMessage" value="#['' + error.errorMessage]" />
-        <set-variable variableName="exceptionType" value="#['' + error.errorType]" />
-        <set-variable variableName="exceptionStackTrace" value="#['' + error.stackTrace]" />
-        <set-variable variableName="originLocation" value="#['' + flow.name]" />
+        <set-variable variableName="errorMessage" value="#[(error.description)]" />
+        <set-variable variableName="exceptionMessage" value="#[(error.errorMessage)]" />
+        <set-variable variableName="exceptionType" value="#[(error.errorType)]" />
+        <set-variable variableName="exceptionStackTrace" value="#[(error.stackTrace)]" />
+        <set-variable variableName="originLocation" value="#[(flow.name)]" />
         <set-variable variableName="apiName" value="sfnextgen-v2" />
-        <set-variable variableName="actionName" value="#['' + attributes.method]" />
-        <set-variable variableName="httpRequestUrl" value="#['' + attributes.requestPath]" />
-        <set-variable variableName="httpRequestMethod" value="#['' + attributes.method]" />
-        <set-variable variableName="httpRequestHeaders" value="#[attributes.headers]" />
-        <set-variable variableName="httpRequestBody" value="#['' + payload]" />
-        <set-variable variableName="httpResponseStatusCode" value="#[attributes.statusCode]" />
-        <set-variable variableName="httpResponseStatus" value="#['' + attributes.reasonPhrase]" />
-        <set-variable variableName="httpResponseHeaders" value="#[attributes.headers]" />
-        <set-variable variableName="httpResponseBody" value="#['' + payload]" />
-        <set-variable variableName="sourceIp" value="#['' + attributes.remoteAddress]" />
+        <set-variable variableName="actionName" value="#[(attributes.method)]" />
+        <set-variable variableName="httpRequestUrl" value="#[(attributes.requestPath)]" />
+        <set-variable variableName="httpRequestMethod" value="#[(attributes.method)]" />
+        <set-variable variableName="httpRequestHeaders" value="#[(attributes.headers)]" />
+        <set-variable variableName="httpRequestBody" value="#[(payload)]" />
+        <set-variable variableName="httpResponseStatusCode" value="#[(attributes.statusCode)]" />
+        <set-variable variableName="httpResponseStatus" value="#[(attributes.reasonPhrase)]" />
+        <set-variable variableName="httpResponseHeaders" value="#[(attributes.headers)]" />
+        <set-variable variableName="httpResponseBody" value="#[(payload)]" />
+        <set-variable variableName="sourceIp" value="#[(attributes.remoteAddress)]" />
         <flow-ref name="publish-logentryevent-error" />
         <logger level="ERROR" message="Error in HL7 flow, correlationId: #[vars.correlationId], error: #[error.description]" />
         <file:write path="deadletter/#[vars.correlationId].err" />
@@ -406,22 +406,22 @@ output text/plain
     </choice>
     <error-handler>
       <on-error-propagate type="ANY">
-        <set-variable variableName="errorMessage" value="#['' + error.description]" />
-        <set-variable variableName="exceptionMessage" value="#['' + error.errorMessage]" />
-        <set-variable variableName="exceptionType" value="#['' + error.errorType]" />
-        <set-variable variableName="exceptionStackTrace" value="#['' + error.stackTrace]" />
-        <set-variable variableName="originLocation" value="#['' + flow.name]" />
+        <set-variable variableName="errorMessage" value="#[(error.description)]" />
+        <set-variable variableName="exceptionMessage" value="#[(error.errorMessage)]" />
+        <set-variable variableName="exceptionType" value="#[(error.errorType)]" />
+        <set-variable variableName="exceptionStackTrace" value="#[(error.stackTrace)]" />
+        <set-variable variableName="originLocation" value="#[(flow.name)]" />
         <set-variable variableName="apiName" value="sfnextgen-v2" />
-        <set-variable variableName="actionName" value="#['' + attributes.method]" />
-        <set-variable variableName="httpRequestUrl" value="#['' + attributes.requestPath]" />
-        <set-variable variableName="httpRequestMethod" value="#['' + attributes.method]" />
-        <set-variable variableName="httpRequestHeaders" value="#[attributes.headers]" />
-        <set-variable variableName="httpRequestBody" value="#['' + payload]" />
-        <set-variable variableName="httpResponseStatusCode" value="#[attributes.statusCode]" />
-        <set-variable variableName="httpResponseStatus" value="#['' + attributes.reasonPhrase]" />
-        <set-variable variableName="httpResponseHeaders" value="#[attributes.headers]" />
-        <set-variable variableName="httpResponseBody" value="#['' + payload]" />
-        <set-variable variableName="sourceIp" value="#['' + attributes.remoteAddress]" />
+        <set-variable variableName="actionName" value="#[(attributes.method)]" />
+        <set-variable variableName="httpRequestUrl" value="#[(attributes.requestPath)]" />
+        <set-variable variableName="httpRequestMethod" value="#[(attributes.method)]" />
+        <set-variable variableName="httpRequestHeaders" value="#[(attributes.headers)]" />
+        <set-variable variableName="httpRequestBody" value="#[(payload)]" />
+        <set-variable variableName="httpResponseStatusCode" value="#[(attributes.statusCode)]" />
+        <set-variable variableName="httpResponseStatus" value="#[(attributes.reasonPhrase)]" />
+        <set-variable variableName="httpResponseHeaders" value="#[(attributes.headers)]" />
+        <set-variable variableName="httpResponseBody" value="#[(payload)]" />
+        <set-variable variableName="sourceIp" value="#[(attributes.remoteAddress)]" />
         <flow-ref name="publish-logentryevent-error" />
         <logger level="ERROR" message="Error in SIU flow, correlationId: #[vars.correlationId], error: #[error.description]" />
         <file:write path="deadletter/#[vars.correlationId].err" />

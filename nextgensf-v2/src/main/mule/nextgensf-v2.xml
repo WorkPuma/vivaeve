@@ -307,24 +307,24 @@ output text/plain
     
     <error-handler>
       <on-error-continue enableNotifications="true" logException="true">
-        <set-variable variableName="transactionId" value="#['' + correlationId]" />
-        <set-variable variableName="errorMessage" value="#['' + error.description]" />
-        <set-variable variableName="exceptionMessage" value="#['' + error.errorMessage]" />
-        <set-variable variableName="exceptionType" value="#['' + error.errorType]" />
-        <set-variable variableName="exceptionStackTrace" value="#['' + error.stackTrace]" />
-        <set-variable variableName="originLocation" value="#['' + flow.name]" />
+        <set-variable variableName="transactionId" value="#[correlationId]" />
+        <set-variable variableName="errorMessage" value="#[(error.description)]" />
+        <set-variable variableName="exceptionMessage" value="#[(error.errorMessage)]" />
+        <set-variable variableName="exceptionType" value="#[(error.errorType)]" />
+        <set-variable variableName="exceptionStackTrace" value="#[(error.stackTrace)]" />
+        <set-variable variableName="originLocation" value="#[(flow.name)]" />
         <set-variable variableName="apiName" value="NextGenEMR" />
-        <set-variable variableName="actionName" value="#['' + attributes.method]" />
-        <set-variable variableName="httpRequestUrl" value="#['' + attributes.requestPath]" />
-        <set-variable variableName="httpRequestMethod" value="#['' + attributes.method]" />
-        <set-variable variableName="httpRequestHeaders" value="#[attributes.headers]" />
-        <set-variable variableName="httpRequestBody" value="#['' + payload]" />
-        <set-variable variableName="httpResponseStatusCode" value="#[attributes.statusCode]" />
-        <set-variable variableName="httpResponseStatus" value="#['' + attributes.reasonPhrase]" />
-        <set-variable variableName="httpResponseHeaders" value="#[attributes.headers]" />
-        <set-variable variableName="httpResponseBody" value="#['' + payload]" />
-        <set-variable variableName="correlationId" value="#['' + correlationId]" />
-        <set-variable variableName="sourceIp" value="#['' + attributes.remoteAddress]" />
+        <set-variable variableName="actionName" value="#[(attributes.method)]" />
+        <set-variable variableName="httpRequestUrl" value="#[(attributes.requestPath)]" />
+        <set-variable variableName="httpRequestMethod" value="#[(attributes.method)]" />
+        <set-variable variableName="httpRequestHeaders" value="#[(attributes.headers)]" />
+        <set-variable variableName="httpRequestBody" value="#[(payload)]" />
+        <set-variable variableName="httpResponseStatusCode" value="#[(attributes.statusCode)]" />
+        <set-variable variableName="httpResponseStatus" value="#[(attributes.reasonPhrase)]" />
+        <set-variable variableName="httpResponseHeaders" value="#[(attributes.headers)]" />
+        <set-variable variableName="httpResponseBody" value="#[(payload)]" />
+        <set-variable variableName="correlationId" value="#[correlationId]" />
+        <set-variable variableName="sourceIp" value="#[(attributes.remoteAddress)]" />
         <flow-ref name="publish-logentryevent-error" />
         
         <logger level="ERROR" doc:name="Log Error" 
@@ -359,17 +359,29 @@ output application/json
 import * from dw::core::Strings
 
 var hl7Text = payload.originalHL7
-var segments = hl7Text splitBy /\r|\n|\s(?=PID|MSH|PV1|GT1|IN1)/
+var segments = hl7Text splitBy /\r|\n|\s(?=PID|MSH|PV1|GT1|IN1|PD1)/
 var pidSegment = (segments filter (s) -> startsWith(s, "PID"))[0] default ""
 var pidFields = pidSegment splitBy "|"
 var nameField = (pidFields[5] default "") splitBy "^"
 var addressField = (pidFields[11] default "") splitBy "^"
 var phoneEmailField = (pidFields[13] default "") splitBy "^"
+var pd1Segment = (segments filter (s) -> startsWith(s, "PD1"))[0] default ""
+var pd1Fields = pd1Segment splitBy "|"
+var providerField = (pd1Fields[4] default "") splitBy "^"
+var podProviderNPI = providerField[0] default ""
 ---
 [{
   Event_Type__c: payload.triggerEvent,
   ContactId__c: if ((pidFields[3] default "") startsWith "003") pidFields[3] else null,
-  HealthFusion_Patient_Record_ID__c: if ((pidFields[4] default "") startsWith "HF") pidFields[4] else null,
+  HealthFusion_Patient_Record_ID__c: 
+    if ((pidFields[4] default "") startsWith "003") 
+      pidFields[4]
+    else if ((pidFields[4] default "") startsWith "HF") 
+      pidFields[4]
+    else if (pidFields[4] default "" != "") 
+      "HF" ++ pidFields[4]
+    else 
+      null,
   FirstName__c: (nameField[1] default ""),
   LastName__c: (nameField[0] default ""),
   MiddleName__c: (nameField[2] default ""),
@@ -394,7 +406,8 @@ var phoneEmailField = (pidFields[13] default "") splitBy "^"
   Language__c: (pidFields[15] default ""),
   Update_Source__c: "NextGen Office",
   CreatedDate: now() as Number {unit: "milliseconds"},
-  CreatedById: "005Rj00000Fzk3mIAB"
+  CreatedById: "005Rj00000Fzk3mIAB",
+  Pod_Provider__c: podProviderNPI
 }]
 ]]></ee:set-payload>
       </ee:message>
@@ -406,24 +419,24 @@ var phoneEmailField = (pidFields[13] default "") splitBy "^"
     
     <error-handler>
       <on-error-continue enableNotifications="true" logException="true">
-        <set-variable variableName="transactionId" value="#['' + correlationId]" />
-        <set-variable variableName="errorMessage" value="#['' + error.description]" />
-        <set-variable variableName="exceptionMessage" value="#['' + error.errorMessage]" />
-        <set-variable variableName="exceptionType" value="#['' + error.errorType]" />
-        <set-variable variableName="exceptionStackTrace" value="#['' + error.stackTrace]" />
-        <set-variable variableName="originLocation" value="#['' + flow.name]" />
+        <set-variable variableName="transactionId" value="#[correlationId]" />
+        <set-variable variableName="errorMessage" value="#[(error.description)]" />
+        <set-variable variableName="exceptionMessage" value="#[(error.errorMessage)]" />
+        <set-variable variableName="exceptionType" value="#[(error.errorType)]" />
+        <set-variable variableName="exceptionStackTrace" value="#[(error.stackTrace)]" />
+        <set-variable variableName="originLocation" value="#[(flow.name)]" />
         <set-variable variableName="apiName" value="NextGenEMR" />
-        <set-variable variableName="actionName" value="#['' + attributes.method]" />
-        <set-variable variableName="httpRequestUrl" value="#['' + attributes.requestPath]" />
-        <set-variable variableName="httpRequestMethod" value="#['' + attributes.method]" />
-        <set-variable variableName="httpRequestHeaders" value="#[attributes.headers]" />
-        <set-variable variableName="httpRequestBody" value="#['' + payload]" />
-        <set-variable variableName="httpResponseStatusCode" value="#[attributes.statusCode]" />
-        <set-variable variableName="httpResponseStatus" value="#['' + attributes.reasonPhrase]" />
-        <set-variable variableName="httpResponseHeaders" value="#[attributes.headers]" />
-        <set-variable variableName="httpResponseBody" value="#['' + payload]" />
-        <set-variable variableName="correlationId" value="#['' + correlationId]" />
-        <set-variable variableName="sourceIp" value="#['' + attributes.remoteAddress]" />
+        <set-variable variableName="actionName" value="#[(attributes.method)]" />
+        <set-variable variableName="httpRequestUrl" value="#[(attributes.requestPath)]" />
+        <set-variable variableName="httpRequestMethod" value="#[(attributes.method)]" />
+        <set-variable variableName="httpRequestHeaders" value="#[(attributes.headers)]" />
+        <set-variable variableName="httpRequestBody" value="#[(payload)]" />
+        <set-variable variableName="httpResponseStatusCode" value="#[(attributes.statusCode)]" />
+        <set-variable variableName="httpResponseStatus" value="#[(attributes.reasonPhrase)]" />
+        <set-variable variableName="httpResponseHeaders" value="#[(attributes.headers)]" />
+        <set-variable variableName="httpResponseBody" value="#[(payload)]" />
+        <set-variable variableName="correlationId" value="#[correlationId]" />
+        <set-variable variableName="sourceIp" value="#[(attributes.remoteAddress)]" />
         <flow-ref name="publish-logentryevent-error" />
         
         <logger level="ERROR" doc:name="Log ADT Error" 
@@ -531,7 +544,15 @@ if (payload.triggerEvent == "S14")
       else
         null,
     ContactId__c: if ((pidFields[3] default "") startsWith "003") pidFields[3] else null,
-    HealthFusion_Patient_Record_ID__c: if ((pidFields[4] default "") startsWith "HF") pidFields[4] else null,
+    HealthFusion_Patient_Record_ID__c: 
+      if ((pidFields[4] default "") startsWith "003") 
+        pidFields[4]
+      else if ((pidFields[4] default "") startsWith "HF") 
+        pidFields[4]
+      else if (pidFields[4] default "" != "") 
+        "HF" ++ pidFields[4]
+      else 
+        null,
     Patient_First_Name__c: if (patientFirstName != "") patientFirstName else null,
     Patient_Last_Name__c: if (patientLastName != "") patientLastName else null,
     Patient_DOB__c: 
@@ -582,7 +603,15 @@ else
       else
         null,
     ContactId__c: if ((pidFields[3] default "") startsWith "003") pidFields[3] else null,
-    HealthFusion_Patient_Record_ID__c: if ((pidFields[4] default "") startsWith "HF") pidFields[4] else null,
+    HealthFusion_Patient_Record_ID__c: 
+      if ((pidFields[4] default "") startsWith "003") 
+        pidFields[4]
+      else if ((pidFields[4] default "") startsWith "HF") 
+        pidFields[4]
+      else if (pidFields[4] default "" != "") 
+        "HF" ++ pidFields[4]
+      else 
+        null,
     Patient_First_Name__c: if (patientFirstName != "") patientFirstName else null,
     Patient_Last_Name__c: if (patientLastName != "") patientLastName else null,
     Patient_DOB__c: 
@@ -624,24 +653,24 @@ else
     
     <error-handler>
       <on-error-continue enableNotifications="true" logException="true">
-        <set-variable variableName="transactionId" value="#['' + correlationId]" />
-        <set-variable variableName="errorMessage" value="#['' + error.description]" />
-        <set-variable variableName="exceptionMessage" value="#['' + error.errorMessage]" />
-        <set-variable variableName="exceptionType" value="#['' + error.errorType]" />
-        <set-variable variableName="exceptionStackTrace" value="#['' + error.stackTrace]" />
-        <set-variable variableName="originLocation" value="#['' + flow.name]" />
+        <set-variable variableName="transactionId" value="#[correlationId]" />
+        <set-variable variableName="errorMessage" value="#[(error.description)]" />
+        <set-variable variableName="exceptionMessage" value="#[(error.errorMessage)]" />
+        <set-variable variableName="exceptionType" value="#[(error.errorType)]" />
+        <set-variable variableName="exceptionStackTrace" value="#[(error.stackTrace)]" />
+        <set-variable variableName="originLocation" value="#[(flow.name)]" />
         <set-variable variableName="apiName" value="NextGenEMR" />
-        <set-variable variableName="actionName" value="#['' + attributes.method]" />
-        <set-variable variableName="httpRequestUrl" value="#['' + attributes.requestPath]" />
-        <set-variable variableName="httpRequestMethod" value="#['' + attributes.method]" />
-        <set-variable variableName="httpRequestHeaders" value="#[attributes.headers]" />
-        <set-variable variableName="httpRequestBody" value="#['' + payload]" />
-        <set-variable variableName="httpResponseStatusCode" value="#[attributes.statusCode]" />
-        <set-variable variableName="httpResponseStatus" value="#['' + attributes.reasonPhrase]" />
-        <set-variable variableName="httpResponseHeaders" value="#[attributes.headers]" />
-        <set-variable variableName="httpResponseBody" value="#['' + payload]" />
-        <set-variable variableName="correlationId" value="#['' + correlationId]" />
-        <set-variable variableName="sourceIp" value="#['' + attributes.remoteAddress]" />
+        <set-variable variableName="actionName" value="#[(attributes.method)]" />
+        <set-variable variableName="httpRequestUrl" value="#[(attributes.requestPath)]" />
+        <set-variable variableName="httpRequestMethod" value="#[(attributes.method)]" />
+        <set-variable variableName="httpRequestHeaders" value="#[(attributes.headers)]" />
+        <set-variable variableName="httpRequestBody" value="#[(payload)]" />
+        <set-variable variableName="httpResponseStatusCode" value="#[(attributes.statusCode)]" />
+        <set-variable variableName="httpResponseStatus" value="#[(attributes.reasonPhrase)]" />
+        <set-variable variableName="httpResponseHeaders" value="#[(attributes.headers)]" />
+        <set-variable variableName="httpResponseBody" value="#[(payload)]" />
+        <set-variable variableName="correlationId" value="#[correlationId]" />
+        <set-variable variableName="sourceIp" value="#[(attributes.remoteAddress)]" />
         <flow-ref name="publish-logentryevent-error" />
         
         <logger level="ERROR" doc:name="Log SIU Error" 
