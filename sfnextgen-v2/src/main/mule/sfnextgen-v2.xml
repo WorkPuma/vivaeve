@@ -28,7 +28,16 @@
   
   <!-- Salesforce Pub/Sub configuration -->
   <salesforce-pub-sub:pubsub-config name="Pubsub-config" doc:name="Salesforce PubSub Config">
-    <salesforce-pub-sub:oauth-user-pass-connection consumerKey="${salesforce.pubsub.consumerKey}" consumerSecret="${salesforce.pubsub.consumerSecret}" username="${salesforce.pubsub.username}" password="${salesforce.pubsub.password}" tokenEndpoint="${salesforce.pubsub.tokenEndpoint}" />
+    <salesforce-pub-sub:oauth-user-pass-connection 
+      consumerKey="${salesforce.pubsub.consumerKey}" 
+      consumerSecret="${salesforce.pubsub.consumerSecret}" 
+      username="${salesforce.pubsub.username}" 
+      password="${salesforce.pubsub.password}" 
+      tokenEndpoint="${salesforce.pubsub.tokenEndpoint}">
+      <reconnection>
+        <reconnect frequency="5000" count="10" blocking="false"/>
+      </reconnection>
+    </salesforce-pub-sub:oauth-user-pass-connection>
   </salesforce-pub-sub:pubsub-config>
   
   <!-- SFTP configuration -->
@@ -58,7 +67,7 @@
   <flow name="sfnextgen-v2Flow" doc:id="569a12c5-1665-4513-9f26-005d78ba61d1">
     <salesforce-pub-sub:subscribe-channel-listener doc:name="Subscribe channel listener" doc:id="40cbd672-9934-4c39-9ef4-b25b6e23244f" config-ref="Pubsub-config" channelName="/event/Contact__e">
       <salesforce-pub-sub:replay-option>
-        <salesforce-pub-sub:latest />
+        <salesforce-pub-sub:replay-id-from-object-store osName="Object_store" osKey="contact_channel_replay" />
       </salesforce-pub-sub:replay-option>
     </salesforce-pub-sub:subscribe-channel-listener>
     <choice doc:name="Route by Update_Source__c">
@@ -188,7 +197,26 @@ output text/plain
         </choice>
       </otherwise>
     </choice>
+    <os:store key="last-successful-event" objectStore="Object_store">
+      <os:value>#[now()]</os:value>
+    </os:store>
+    <os:store key="pubsub-failure-count" objectStore="Object_store">
+      <os:value>0</os:value>
+    </os:store>
     <error-handler>
+      <on-error-continue type="SALESFORCE-PUB-SUB:CONNECTIVITY" enableNotifications="false">
+        <logger level="WARN" message="Salesforce Pub/Sub connectivity issue detected. Will retry automatically. Error: #[error.description]"/>
+        <flow-ref name="record-pubsub-failure"/>
+        <choice>
+          <when expression="#[(error.suppressedExceptions != null) and (sizeOf(error.suppressedExceptions) > 3)]">
+            <logger level="WARN" message="Suppressed exceptions exceeded threshold."/>
+          </when>
+        </choice>
+      </on-error-continue>
+      <on-error-continue type="SALESFORCE-PUB-SUB:RETRY_EXHAUSTED">
+        <logger level="ERROR" message="Salesforce Pub/Sub retry exhausted. Manual intervention may be required. Error: #[error.description]"/>
+        <flow-ref name="publish-logentryevent-error"/>
+      </on-error-continue>
       <on-error-propagate type="ANY">
         <set-variable variableName="errorMessage" value="#[(error.description)]" />
         <set-variable variableName="exceptionMessage" value="#[(error.errorMessage)]" />
@@ -217,7 +245,7 @@ output text/plain
   <flow name="NextGenServiceAppointment__e_SIU">
     <salesforce-pub-sub:subscribe-channel-listener doc:name="Subscribe NextGenServiceAppointment__e" config-ref="Pubsub-config" channelName="/event/NextGenServiceAppointment__e">
       <salesforce-pub-sub:replay-option>
-        <salesforce-pub-sub:latest />
+        <salesforce-pub-sub:replay-id-from-object-store osName="Object_store" osKey="siu_channel_replay" />
       </salesforce-pub-sub:replay-option>
     </salesforce-pub-sub:subscribe-channel-listener>
     <set-variable variableName="correlationId" value="#[uuid()]" />
@@ -404,7 +432,26 @@ output text/plain
         </choice>
       </otherwise>
     </choice>
+    <os:store key="last-successful-event" objectStore="Object_store">
+      <os:value>#[now()]</os:value>
+    </os:store>
+    <os:store key="pubsub-failure-count" objectStore="Object_store">
+      <os:value>0</os:value>
+    </os:store>
     <error-handler>
+      <on-error-continue type="SALESFORCE-PUB-SUB:CONNECTIVITY" enableNotifications="false">
+        <logger level="WARN" message="Salesforce Pub/Sub connectivity issue detected. Will retry automatically. Error: #[error.description]"/>
+        <flow-ref name="record-pubsub-failure"/>
+        <choice>
+          <when expression="#[(error.suppressedExceptions != null) and (sizeOf(error.suppressedExceptions) > 3)]">
+            <logger level="WARN" message="Suppressed exceptions exceeded threshold."/>
+          </when>
+        </choice>
+      </on-error-continue>
+      <on-error-continue type="SALESFORCE-PUB-SUB:RETRY_EXHAUSTED">
+        <logger level="ERROR" message="Salesforce Pub/Sub retry exhausted. Manual intervention may be required. Error: #[error.description]"/>
+        <flow-ref name="publish-logentryevent-error"/>
+      </on-error-continue>
       <on-error-propagate type="ANY">
         <set-variable variableName="errorMessage" value="#[(error.description)]" />
         <set-variable variableName="exceptionMessage" value="#[(error.errorMessage)]" />
@@ -480,4 +527,63 @@ output application/json
       topic="/event/LogEntryEvent__e"
       doc:name="Publish LogEntryEvent__e"/>
   </sub-flow>
+
+  <!-- Circuit breaker and failure tracking sub-flows -->
+  <sub-flow name="circuit-breaker-check">
+    <os:retrieve key="pubsub-failure-count" objectStore="Object_store">
+      <os:default-value>0</os:default-value>
+    </os:retrieve>
+    <choice>
+      <when expression="#[(payload > 5)]">
+        <os:retrieve key="pubsub-circuit-open-time" objectStore="Object_store"/>
+        <choice>
+          <when expression="#[(now() - payload > 300000)]">
+            <os:store key="pubsub-failure-count" objectStore="Object_store">
+              <os:value>0</os:value>
+            </os:store>
+            <os:remove key="pubsub-circuit-open-time" objectStore="Object_store"/>
+            <logger level="INFO" message="Circuit breaker reset - attempting reconnection"/>
+          </when>
+          <otherwise>
+            <raise-error type="MULE:EXPRESSION" description="Circuit breaker is open"/>
+          </otherwise>
+        </choice>
+      </when>
+    </choice>
+  </sub-flow>
+  <sub-flow name="record-pubsub-failure">
+    <os:retrieve key="pubsub-failure-count" objectStore="Object_store">
+      <os:default-value>0</os:default-value>
+    </os:retrieve>
+    <set-variable variableName="failureCount" value="#[(payload + 1)]"/>
+    <os:store key="pubsub-failure-count" objectStore="Object_store">
+      <os:value>#[vars.failureCount]</os:value>
+    </os:store>
+    <choice>
+      <when expression="#[(vars.failureCount >= 5)]">
+        <os:store key="pubsub-circuit-open-time" objectStore="Object_store">
+          <os:value>#[now()]</os:value>
+        </os:store>
+        <logger level="ERROR" message="Circuit breaker opened due to repeated failures"/>
+      </when>
+    </choice>
+  </sub-flow>
+  <!-- Health monitoring flow -->
+  <flow name="pubsub-health-monitor">
+    <scheduler>
+      <scheduling-strategy>
+        <fixed-frequency frequency="60000"/>
+      </scheduling-strategy>
+    </scheduler>
+    <try>
+      <os:retrieve key="last-successful-event" objectStore="Object_store"/>
+      <error-handler>
+        <on-error-continue>
+          <os:store key="last-successful-event" objectStore="Object_store">
+            <os:value>#[now()]</os:value>
+          </os:store>
+        </on-error-continue>
+      </error-handler>
+    </try>
+  </flow>
 </mule>
