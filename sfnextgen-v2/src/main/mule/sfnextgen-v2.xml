@@ -67,7 +67,7 @@
   <flow name="sfnextgen-v2Flow" doc:id="569a12c5-1665-4513-9f26-005d78ba61d1">
     <salesforce-pub-sub:subscribe-channel-listener doc:name="Subscribe channel listener" doc:id="40cbd672-9934-4c39-9ef4-b25b6e23244f" config-ref="Pubsub-config" channelName="/event/Contact__e">
       <salesforce-pub-sub:replay-option>
-        <salesforce-pub-sub:replay-id-from-object-store osName="Object_store" osKey="contact_channel_replay" />
+        <salesforce-pub-sub:latest />
       </salesforce-pub-sub:replay-option>
     </salesforce-pub-sub:subscribe-channel-listener>
     <choice doc:name="Route by Update_Source__c">
@@ -245,7 +245,7 @@ output text/plain
   <flow name="NextGenServiceAppointment__e_SIU">
     <salesforce-pub-sub:subscribe-channel-listener doc:name="Subscribe NextGenServiceAppointment__e" config-ref="Pubsub-config" channelName="/event/NextGenServiceAppointment__e">
       <salesforce-pub-sub:replay-option>
-        <salesforce-pub-sub:replay-id-from-object-store osName="Object_store" osKey="siu_channel_replay" />
+        <salesforce-pub-sub:latest />
       </salesforce-pub-sub:replay-option>
     </salesforce-pub-sub:subscribe-channel-listener>
     <set-variable variableName="correlationId" value="#[uuid()]" />
