@@ -35,7 +35,7 @@
       password="${salesforce.pubsub.password}" 
       tokenEndpoint="${salesforce.pubsub.tokenEndpoint}">
       <reconnection>
-        <reconnect frequency="5000" count="10" blocking="false"/>
+				<reconnect-forever frequency="60000" />
       </reconnection>
     </salesforce-pub-sub:oauth-user-pass-connection>
   </salesforce-pub-sub:pubsub-config>
@@ -522,10 +522,6 @@ output application/json
 ]]></ee:set-payload>
       </ee:message>
     </ee:transform>
-    <salesforce-pub-sub:publish-event
-      config-ref="Pubsub-config"
-      topic="/event/LogEntryEvent__e"
-      doc:name="Publish LogEntryEvent__e"/>
   </sub-flow>
 
   <!-- Circuit breaker and failure tracking sub-flows -->
