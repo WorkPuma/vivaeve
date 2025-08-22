@@ -1,0 +1,70 @@
+# SFNextGen-v2 Configuration Template
+# Copy this file to config.properties and update with your environment-specific values
+
+# NextGen Office Configuration
+# Enable/disable sending messages to NextGen API (true/false)
+sent.to.nextgen=true
+
+# NextGen API endpoint URL
+nextgen.url=https://prod-ehr.prod.ngo.nextgenaws.net/messaging/mcservice
+
+# NextGen API authentication (Base64 encoded username:password)
+# Replace with your actual encoded credentials
+nextgen.auth=Basic [YOUR_BASE64_ENCODED_CREDENTIALS]
+
+# NextGen API headers
+nextgen.x-process=MULESOFT,HUB
+nextgen.content-type=text/plain; charset=UTF-8
+nextgen.Priority=M
+nextgen.Node=MC1
+
+# NextGen account information
+# Replace with your actual account number
+nextgen.accountnumber=[YOUR_ACCOUNT_NUMBER]
+
+# NextGen API key
+# Replace with your actual API key
+nextgen.x-api-key=[YOUR_API_KEY]
+
+# NextGen username
+# Replace with your actual username
+nextgen.username=[YOUR_USERNAME]
+
+# SFTP Configuration
+# Replace with your actual SFTP server details
+sftp.host=[YOUR_SFTP_HOST]
+sftp.username=[YOUR_SFTP_USERNAME]
+sftp.password=[YOUR_SFTP_PASSWORD]
+
+# API Discovery ID for Anypoint Platform
+api.autodiscoveryId=123456
+
+# HTTP Listener Configuration
+http.host=0.0.0.0
+http.port=8083
+
+# HTTPS Listener Configuration (if needed)
+https.host=0.0.0.0
+https.port=8082
+
+# Environment-specific settings
+# Uncomment and modify for different environments
+
+# Development Environment
+#sent.to.nextgen=false
+#nextgen.url=https://test-ehr.test.ngo.nextgenaws.net/messaging/mcservice
+#http.port=8081
+
+# Staging Environment
+#sent.to.nextgen=true
+#nextgen.url=https://staging-ehr.staging.ngo.nextgenaws.net/messaging/mcservice
+
+# Production Environment
+#sent.to.nextgen=true
+#nextgen.url=https://prod-ehr.prod.ngo.nextgenaws.net/messaging/mcservice
+
+# Notes:
+# 1. Never commit the actual config.properties file to version control
+# 2. Use secure property placeholders for sensitive values in production
+# 3. Configure secure properties in your MuleSoft runtime environment
+# 4. Refer to mule-artifact.json for the list of secure properties

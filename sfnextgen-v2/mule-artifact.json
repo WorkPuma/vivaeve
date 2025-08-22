@@ -14,6 +14,11 @@
     "salesforce.pubsub.tokenEndpoint",
     "salesforce.username",
     "salesforce.pubsub.consumerSecret",
+    "sftp.host",
+    "sftp.username",
+    "sftp.password",
+    "nextgen.auth",
+    "nextgen.x-api-key",
     "teams.webhook.sig",
     "teams.webhook.host"
   ]

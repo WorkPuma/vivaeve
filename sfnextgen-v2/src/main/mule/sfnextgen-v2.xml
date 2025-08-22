@@ -42,17 +42,17 @@
   
   <!-- SFTP configuration -->
   <sftp:config name="SFTP_Config" doc:name="SFTP Config" doc:id="9f7c4ec7-6cca-42f0-b928-e6e55a857432">
-    <sftp:connection host="sftp.prod.ngo.nextgenaws.net" 
-                    username="foresthms" 
-                    password="E7aipaPHV9hf9p3b76Nh"
+    <sftp:connection host="${sftp.host}"
+                    username="${sftp.username}"
+                    password="${sftp.password}"
                     workingDir="/"
                     connectionTimeout="30000"
                     responseTimeout="60000">
-        <pooling-profile 
-            maxActive="5" 
-            maxIdle="2" 
-            initialisationPolicy="INITIALISE_ONE" 
-            exhaustedAction="WHEN_EXHAUSTED_WAIT" 
+        <pooling-profile
+            maxActive="5"
+            maxIdle="2"
+            initialisationPolicy="INITIALISE_ONE"
+            exhaustedAction="WHEN_EXHAUSTED_WAIT"
             maxWait="30000"/>
     </sftp:connection>
   </sftp:config>

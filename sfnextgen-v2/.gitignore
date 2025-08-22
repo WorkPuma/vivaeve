@@ -45,3 +45,72 @@ target/
 .mule/
 .DS_Store
 velocity.log
+.tooling-project
+
+# ----------------------- #
+# Security and Sensitive  #
+# ----------------------- #
+# Configuration files with sensitive data
+config.properties
+secure-config.properties
+*-secure.properties
+*.p12
+*.jks
+*.keystore
+*.pem
+*.key
+*.crt
+
+# Environment specific configurations
+config-dev.properties
+config-staging.properties
+config-prod.properties
+
+# Local development files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Dead letter files (may contain sensitive data)
+deadletter/
+*.err
+
+# Local file outputs (contains sensitive healthcare data)
+C:/Users/*/Desktop/foresthms/
+/Users/*/Desktop/foresthms/
+foresthms/
+
+# Backup files
+*.backup
+*.bak
+backup/
+
+# Log files (may contain sensitive data)
+logs/
+*.log
+*.log.*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# IDE specific
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.AppleDouble
+.LSOverride
+Icon
+._*
